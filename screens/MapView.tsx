@@ -3,7 +3,9 @@ import React, { useEffect, useState } from 'react';
 import MapView, { Marker, PROVIDER_GOOGLE, Region } from 'react-native-maps';
 import { StyleSheet, View, Button, Text } from 'react-native';
 import ApiServiceV2 from '../api/PastVuApi';
-import { itemPhotoArray } from '../types/api';
+import { MapScreenNavigationProp, Propss } from '../types/Navigation.types';
+import { StartRoutes } from '../navigation/Routes';
+import { PhotoPage } from './PhotoView';
 
 
 const loc: Region = 
@@ -15,13 +17,19 @@ const loc: Region =
   }
 
 
-export const MapComponent: FC = () => {
+export const MapComponent: React.FC<MapScreenNavigationProp> = ({navigation}) => {
     const [items, setItems] = useState<itemPhotoArray[]>([]);
     const [coordinates, setCoordinates] = useState<Region>(loc);
     
+    const handleButtonPress = async (cid: string) => {
+      const url = await ApiServiceV2.getPhotoInfo(cid)
+      navigation.navigate(StartRoutes.PhotoPage, {url})
+    };
+
     const handleRegionChangeComplete = (region: Region) => {
       setCoordinates(region);
     };
+
     useEffect(() => {
       async function exampleUsage() {
         try {
@@ -30,6 +38,7 @@ export const MapComponent: FC = () => {
             ...prevItems,
             ...photoArray.map((item) => ({
               title: item.title,
+              cid: item.cid,
               location: {
                 latitude: item.location.latitude,
                 longitude: item.location.longitude,
@@ -46,12 +55,7 @@ export const MapComponent: FC = () => {
      
       return (
         <View style={styles.container}>
-          <MapView style={styles.map}  initialRegion={{
-            latitude: 55.476348,
-            longitude: 60.202737,
-            latitudeDelta: 0.08,
-            longitudeDelta: 0.08,
-          }}
+          <MapView style={styles.map}  initialRegion={loc}
             provider={PROVIDER_GOOGLE}
             onRegionChangeComplete={handleRegionChangeComplete}
             >
@@ -60,6 +64,7 @@ export const MapComponent: FC = () => {
               key={index}
               coordinate={marker.location}
               title={marker.title}
+              onPress={()=>handleButtonPress(marker.cid)}
               
             />
             ))}
