@@ -7,6 +7,7 @@ import { StartRoutes } from './Routes';
 import { MapComponent } from '../screens/MapView';
 import { ErrorLoad } from '../screens/Error';
 import { PhotoPage } from '../screens/PhotoView';
+import { BottomNavigator } from './BottomNavigation';
 
 const Stack = createStackNavigator<RootStackParamList>()
 
@@ -20,7 +21,10 @@ export function StartNavigator() {
         >
             <Stack.Screen 
                 name={StartRoutes.MapComponent}
-                component={MapComponent}
+                component={BottomNavigator}
+                options={{
+                    headerShown: false
+                }}
             />
             <Stack.Screen 
                 name={StartRoutes.ErrorLoad}

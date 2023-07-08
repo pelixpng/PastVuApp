@@ -8,7 +8,9 @@ const Tab = createBottomTabNavigator();
 export function BottomNavigator() {
   return (
     <Tab.Navigator>
-      <Tab.Screen name={BottomRoutes.MapComponent} component={MapComponent} />
+      <Tab.Screen name={BottomRoutes.MapComponent} component={MapComponent} options={{
+                    headerShown: false
+                }}/>
       <Tab.Screen name={BottomRoutes.SettingsComponent} component={SettingsComponent} />
     </Tab.Navigator>
   );

@@ -1,12 +1,12 @@
 import { FC } from 'react'
 import React, { useEffect, useState } from 'react';
 import MapView, { Marker, PROVIDER_GOOGLE, Region } from 'react-native-maps';
-import { StyleSheet, View, Button, Text } from 'react-native';
+import { StyleSheet, View, Button, Text, TouchableOpacity } from 'react-native';
 import ApiServiceV2 from '../api/PastVuApi';
 import { MapScreenNavigationProp, Propss } from '../types/Navigation.types';
 import { StartRoutes } from '../navigation/Routes';
 import { PhotoPage } from './PhotoView';
-
+import * as Location from 'expo-location';
 
 const loc: Region = 
   {
@@ -33,6 +33,7 @@ export const MapComponent: React.FC<MapScreenNavigationProp> = ({navigation}) =>
     useEffect(() => {
       async function exampleUsage() {
         try {
+          await Location.requestForegroundPermissionsAsync();
           const photoArray: itemPhotoArray[] = await ApiServiceV2.getAllGroups(coordinates.latitude, coordinates.longitude);
           setItems((prevItems) => [
             ...prevItems,
@@ -55,9 +56,10 @@ export const MapComponent: React.FC<MapScreenNavigationProp> = ({navigation}) =>
      
       return (
         <View style={styles.container}>
-          <MapView style={styles.map}  initialRegion={loc}
+          <MapView style={styles.map}  initialRegion={coordinates}
             provider={PROVIDER_GOOGLE}
             onRegionChangeComplete={handleRegionChangeComplete}
+            showsUserLocation={true}
             >
             {items.map((marker, index)=>(
               <Marker
@@ -69,17 +71,6 @@ export const MapComponent: React.FC<MapScreenNavigationProp> = ({navigation}) =>
             />
             ))}
           </MapView>
-          {coordinates && (
-            <View style={{ position: 'absolute', top: 16, left: 16 }}>
-              <Text style={{ color: 'white', fontSize: 16 }}>
-                {`Latitude: ${coordinates.latitude}`}
-              </Text>
-              <Text style={{ color: 'white', fontSize: 16 }}>
-                {`Longitude: ${coordinates.longitude}`}
-              </Text>
-            </View>
-          )}
-        
         </View>
       );
     }
