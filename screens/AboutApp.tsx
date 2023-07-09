@@ -1,10 +1,10 @@
 import { FC } from 'react'
 import { Text, View } from 'react-native'
 
-export const SettingsComponent: FC = () => {
+export const AppInfo: FC = () => {
   return (
     <View>
-      <Text>SettingsComponent</Text>
+      <Text>AppInfo</Text>
     </View>
   )
 }

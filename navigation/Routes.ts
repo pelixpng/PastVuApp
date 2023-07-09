@@ -8,3 +8,11 @@ export enum BottomRoutes {
     MapComponent = 'MapComponent',
     SettingsComponent = 'SettingsComponent'
 }
+
+export enum SettingsRoutes {
+    AppInfo = 'AppInfo',
+    ChangeTheme = 'ChangeTheme',
+    FeedBack = 'FeedBack',
+    SettingsComponent = 'SettingsComponent',
+    MapSettings = 'MapSettings'
+}

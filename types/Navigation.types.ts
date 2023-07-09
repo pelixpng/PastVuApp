@@ -11,3 +11,12 @@ export type RootStackParamList = {
   export type Propss = {
     navigation: MapScreenNavigationProp;
   };
+
+
+  export type SettingsStackParamList = {
+    AppInfo: undefined;
+    ChangeTheme: undefined;
+    FeedBack: undefined;
+    SettingsComponent: undefined;
+    MapSettings: undefined;
+  };
