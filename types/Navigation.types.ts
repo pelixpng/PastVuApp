@@ -13,6 +13,8 @@ export type RootStackParamList = {
   };
 
 
+  export type SettingsScreenNavigationProp = NativeStackScreenProps<SettingsStackParamList, 'SettingsComponent'>;
+
   export type SettingsStackParamList = {
     AppInfo: undefined;
     ChangeTheme: undefined;

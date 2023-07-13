@@ -7,7 +7,6 @@ import { SettingsComponent } from '../screens/Settings'
 import { AppInfo } from '../screens/AboutApp'
 import { ChangeTheme } from '../screens/ChangeTheme'
 import { FeedBack } from '../screens/FeedBack'
-import { MapSettings } from '../screens/MapSettings'
 
 
 const SettingsStack = createStackNavigator<SettingsStackParamList>()
@@ -43,13 +42,6 @@ export const SettingsNavigation: FC = () => {
 			<SettingsStack.Screen
 				name={SettingsRoutes.FeedBack}
 				component={FeedBack}
-				options={{
-					title: ''
-				}}
-			/>
-            <SettingsStack.Screen
-				name={SettingsRoutes.MapSettings}
-				component={MapSettings}
 				options={{
 					title: ''
 				}}
