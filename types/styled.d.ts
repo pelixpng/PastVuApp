@@ -11,7 +11,8 @@ declare module 'styled-components' {
         tabBarInactiveTintColor: string,
         titleMenuText: string,
         MenuDescriptionText: string,
-        BackgroundMenuIcon: string
+        BackgroundMenuIcon: string,
+        MenuContainer: string
     },
     names:{
       themeName: ThemeNameType

@@ -7,20 +7,21 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 import { SettingsRoutes } from '../navigation/Routes';
 import { SettingsScreenNavigationProp } from '../types/Navigation.types';
+import { MenuButtonProps } from '../types/components.types';
 
 
-export const MenuButton: FC<{ navigation: any }> = ({ navigation }) => {
+export const MenuButton: FC<MenuButtonProps> = ({ navigation, route, title, discription, icon }) => {
     const handlePress = () => {
-        navigation.navigate(SettingsRoutes.FeedBack);
-      };
+        navigation.navigate(route);
+    };
   return (
     <MenuContainer onPress={handlePress}>
          <MenuTextContainer>
-          <MenuTitleText>Обратная связь</MenuTitleText>
-          <MenuDescriptionText>Контакты для связи с разработчиком</MenuDescriptionText>
+          <MenuTitleText>{title}</MenuTitleText>
+          <MenuDescriptionText>{discription}</MenuDescriptionText>
         </MenuTextContainer>
           <BackgroundMenuIcon>
-              <Feather name="mail" size={perfectSize(22)} color="rgba(112, 182, 246, 1)" />
+              <Feather name={icon} size={perfectSize(22)} color="rgba(112, 182, 246, 1)" />
           </BackgroundMenuIcon>
     </MenuContainer>
   )

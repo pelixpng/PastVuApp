@@ -12,10 +12,11 @@ import { AppInfo } from './AboutApp'
 
 
 export const SettingsComponent: React.FC<SettingsScreenNavigationProp> = ({navigation}) => {
-  const route = useRoute();
   return (
     <ScrollContainer>
-      <MenuButton navigation={navigation}/>
+      <MenuButton navigation={navigation} route={SettingsRoutes.FeedBack} title={'Обратная связь'} discription={'Контакты для связи с разработчиком'} icon={'mail'}/>
+      <MenuButton navigation={navigation} route={SettingsRoutes.AppInfo} title={'О приложении'} discription={'Версия и используемые ресурсы'} icon={'info'}/>
+      <MenuButton navigation={navigation} route={SettingsRoutes.MapSettings} title={'Настройки'} discription={'Настройки интерфейса и карты'} icon={'settings'}/>
     </ScrollContainer>
   )
 }

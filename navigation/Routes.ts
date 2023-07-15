@@ -11,7 +11,6 @@ export enum BottomRoutes {
 
 export enum SettingsRoutes {
     AppInfo = 'AppInfo',
-    ChangeTheme = 'ChangeTheme',
     FeedBack = 'FeedBack',
     SettingsComponent = 'SettingsComponent',
     MapSettings = 'MapSettings'

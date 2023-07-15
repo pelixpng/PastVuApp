@@ -19,7 +19,9 @@ export function BottomNavigator() {
       
       tabBarStyle: {
         backgroundColor: theme.colors.backgroundApp,
-        height: perfectSize(60)
+        paddingTop: perfectSize(5),
+        paddingBottom: perfectSize(5),
+        borderTopWidth: 0
     }}
     
     }>
@@ -27,7 +29,7 @@ export function BottomNavigator() {
                     headerShown: false,
                     tabBarShowLabel: true,
                     title: 'Карта',
-                    tabBarLabelStyle: {fontSize: perfectSize(13), fontStyle: 'normal', fontWeight: '500', lineHeight: perfectSize(24) },
+                    tabBarLabelStyle: {fontSize: perfectSize(13), fontStyle: 'normal', fontWeight: '500', lineHeight: perfectSize(12) },
                     tabBarIcon: ({ color }) => (
                       <Feather name="map" size={perfectSize(24)} color={color} />
                     )
@@ -36,7 +38,7 @@ export function BottomNavigator() {
                     headerShown: false,
                     tabBarShowLabel: true,
                     title: 'Карта',
-                    tabBarLabelStyle: {fontSize: perfectSize(13), fontStyle: 'normal', fontWeight: '500', lineHeight: perfectSize(24) },
+                    tabBarLabelStyle: {fontSize: perfectSize(13), fontStyle: 'normal', fontWeight: '500', lineHeight: perfectSize(12) },
                     tabBarIcon: ({ color }) => (
                       <Feather name="settings" size={perfectSize(24)} color={color} />
                     )
