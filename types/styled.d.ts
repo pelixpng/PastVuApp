@@ -12,7 +12,8 @@ declare module 'styled-components' {
         titleMenuText: string,
         MenuDescriptionText: string,
         BackgroundMenuIcon: string,
-        MenuContainer: string
+        MenuContainer: string,
+        SliderRangeBG: string
     },
     names:{
       themeName: ThemeNameType

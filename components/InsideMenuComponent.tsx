@@ -4,17 +4,18 @@ import { InsideMenuContainer, MenuDescriptionText, MenuInsideTextContainer, Menu
 import { ButtonLink } from './ButtonLink'
 import { ButtonLinkProps, InsideMenuProps } from '../types/components.types'
 
-export const InsideMenuComponent: FC<InsideMenuProps> = ({ButtonArray, title, discription}) => {
+export const InsideMenuComponent: FC<InsideMenuProps> = ({ButtonArray, title, discription, child, child2}) => {
   return (
       <InsideMenuContainer>
         <MenuInsideTextContainer>
           <MenuTitleText>{title}</MenuTitleText>
           <MenuDescriptionText>{discription}</MenuDescriptionText>
-        </MenuInsideTextContainer>
-            {ButtonArray.map((item, index) => (
-				<ButtonLink title={item.title} url={item.url} key={index} />
-			))}
+        </MenuInsideTextContainer>  
+          {ButtonArray && ButtonArray.map((item, index) => (
+            <ButtonLink title={item.title} url={item.url} key={index} />
+          ))}
+          {child && child}
+          {child2 && child2}
       </InsideMenuContainer>
   )
 }
-

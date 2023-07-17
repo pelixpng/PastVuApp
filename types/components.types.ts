@@ -1,3 +1,4 @@
+import { JSXElementConstructor, ReactNode } from "react";
 
 export type MenuButtonProps = {
     navigation: any; 
@@ -7,11 +8,12 @@ export type MenuButtonProps = {
     icon: 'mail' | 'info' | 'settings'
 }
 
-
 export type InsideMenuProps = {
-    ButtonArray: ButtonLinkProps[];
+    ButtonArray?: ButtonLinkProps[];
     title: string; 
     discription: string;
+    child?: ReactNode;
+    child2?: ReactNode;
   }
 
 
