@@ -62,7 +62,8 @@ import { DefaultTheme, useTheme } from 'styled-components';
 
 type SliderComponentProps = {
     value: number;
-    setValue: React.Dispatch<React.SetStateAction<number>>;
+    //setValue: React.Dispatch<React.SetStateAction<number>>;
+    setValue: (value: number) => void;
     title: string;
     minValue: number;
     maxValue:number

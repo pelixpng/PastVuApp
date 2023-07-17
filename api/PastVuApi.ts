@@ -3,8 +3,8 @@ import { getPhotoList } from "../types/apiPhotoList";
 import { Root } from "../types/apiPhotoInfo";
 
 export default class ApiServiceV2 {
-    static async getAllGroups(latitude: number, longitude: number) {
-        const response = await fetch(`https://pastvu.com/api2?method=photo.giveNearestPhotos&params={"geo":[${latitude},${longitude}],"limit":12}`);
+    static async getAllGroups(latitude: number, longitude: number, limit: number, distance: number) {
+        const response = await fetch(`https://pastvu.com/api2?method=photo.giveNearestPhotos&params={"geo":[${latitude},${longitude}],"limit":${limit},"distance":${distance}}`);
         const json = await response.json() as getPhotoList;
         let photoArray: itemPhotoArray[] = [];
         for (let i = 0; i < json.result.photos.length ; i++) {

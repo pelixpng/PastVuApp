@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import { FC, useMemo } from 'react'
 import React, { useEffect, useState } from 'react';
 import MapView, { Marker, PROVIDER_GOOGLE, Region } from 'react-native-maps';
 import { StyleSheet, View, Button, Text, TouchableOpacity } from 'react-native';
@@ -7,6 +7,8 @@ import { MapScreenNavigationProp, Propss } from '../types/Navigation.types';
 import { StartRoutes } from '../navigation/Routes';
 import { PhotoPage } from './PhotoView';
 import * as Location from 'expo-location';
+import { observer } from 'mobx-react-lite';
+import apiStore from '../mobxStore/apiStore';
 
 const loc: Region = 
   {
@@ -17,10 +19,10 @@ const loc: Region =
   }
 
 
-export const MapComponent: React.FC<MapScreenNavigationProp> = ({navigation}) => {
+export const MapComponent: React.FC<MapScreenNavigationProp> = observer(({navigation}) => {
     const [items, setItems] = useState<itemPhotoArray[]>([]);
     const [coordinates, setCoordinates] = useState<Region>(loc);
-    
+    const {countPhoto, maxDistance} = apiStore;
     const handleButtonPress = async (cid: string) => {
       const url = await ApiServiceV2.getPhotoInfo(cid)
       navigation.navigate(StartRoutes.PhotoPage, {url})
@@ -30,11 +32,11 @@ export const MapComponent: React.FC<MapScreenNavigationProp> = ({navigation}) =>
       setCoordinates(region);
     };
 
-    useEffect(() => {
+    useMemo(() => {
       async function exampleUsage() {
         try {
           await Location.requestForegroundPermissionsAsync();
-          const photoArray: itemPhotoArray[] = await ApiServiceV2.getAllGroups(coordinates.latitude, coordinates.longitude);
+          const photoArray: itemPhotoArray[] = await ApiServiceV2.getAllGroups(coordinates.latitude, coordinates.longitude, countPhoto, maxDistance);
           setItems((prevItems) => [
             ...prevItems,
             ...photoArray.map((item) => ({
@@ -73,7 +75,7 @@ export const MapComponent: React.FC<MapScreenNavigationProp> = ({navigation}) =>
           </MapView>
         </View>
       );
-    }
+    })
     
     const styles = StyleSheet.create({
       container: {
