@@ -13,7 +13,7 @@ export const LightTheme: DefaultTheme =  {
         SliderRangeBG: "#EDEDED"
     },
     names:{
-        themeName: 'LIGHT'
+        themeName: 'LightTheme'
     }
 };
 
@@ -29,6 +29,6 @@ export const DarkTheme: DefaultTheme =  {
         SliderRangeBG: "#232325"
     },
     names:{
-        themeName: 'DARK'
+        themeName: 'DarkTheme'
     }
 };

@@ -1,8 +1,10 @@
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, observable } from "mobx";
 
 class ApiStore {
     countPhoto = 10;
     maxDistance = 8000;
+    themeSettings = 'Системная';
+    theme = '0';
 
     constructor(){
         makeAutoObservable(this)
@@ -14,6 +16,14 @@ class ApiStore {
 
     changeDistancePhoto = (value: number) => {
         this.maxDistance = value;
+    }
+
+    changeThemeSettings = (value: string) => {
+        this.themeSettings = value;
+    }
+
+    changeTheme = (value: string) => {
+        this.theme = value
     }
 }
 
