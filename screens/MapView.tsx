@@ -9,6 +9,10 @@ import { PhotoPage } from './PhotoView';
 import * as Location from 'expo-location';
 import { observer } from 'mobx-react-lite';
 import apiStore from '../mobxStore/apiStore';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import styled from 'styled-components/native';
+import { YearsSlider } from '../components/YearsSliderComponent';
+
 
 const loc: Region = 
   {
@@ -57,33 +61,38 @@ export const MapComponent: React.FC<MapScreenNavigationProp> = observer(({naviga
       
      
       return (
-        <View style={styles.container}>
-          <MapView style={styles.map}  initialRegion={coordinates}
-            provider={PROVIDER_GOOGLE}
-            onRegionChangeComplete={handleRegionChangeComplete}
-            showsUserLocation={true}
-            >
-            {items.map((marker, index)=>(
-              <Marker
-              key={index}
-              coordinate={marker.location}
-              title={marker.title}
-              onPress={()=>handleButtonPress(marker.cid)}
-              
-            />
-            ))}
-          </MapView>
+        <SafeAreaView>
+        <View style={{ position: 'relative', height: '100%', width: '100%' }}>
+            <MapView style={{height: '100%', width: '100%', position: 'absolute'}}  initialRegion={coordinates}
+              provider={PROVIDER_GOOGLE}
+              onRegionChangeComplete={handleRegionChangeComplete}
+              showsUserLocation={true}
+              >
+              {items.map((marker, index)=>(
+                <Marker
+                key={index}
+                coordinate={marker.location}
+                title={marker.title}
+                onPress={()=>handleButtonPress(marker.cid)}
+                
+              />
+              ))}
+            </MapView>
+             {/* <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 50, backgroundColor: 'blue', zIndex: 999 }} /> */}
+             <YearsSlider/>
         </View>
+        </SafeAreaView>
       );
     })
     
-    const styles = StyleSheet.create({
-      container: {
-        flex: 1,
-      },
-      map: {
-        width: '100%',
-        height: '100%',
-      },
-    });
 
+export const MapContainer = styled.View`
+  flex-direction: column;
+  width: 100%;
+  //height: 90%;
+`
+export const Slider = styled.View`
+  background-color: aqua;
+  width: 100%;
+  height: 50px;
+`

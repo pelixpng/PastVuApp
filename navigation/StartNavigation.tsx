@@ -8,13 +8,19 @@ import { MapComponent } from '../screens/MapView';
 import { ErrorLoad } from '../screens/Error';
 import { PhotoPage } from '../screens/PhotoView';
 import { BottomNavigator } from './BottomNavigation';
+//import { DefaultTheme, useTheme } from 'styled-components'
+import { DarkTheme } from '../components/Theme';
 
 const Stack = createStackNavigator<RootStackParamList>()
 
 export function StartNavigator() {
   const internetState: NetInfoState = useNetInfo()
+
+  
+
+
   return (
-    <NavigationContainer>
+    <NavigationContainer >
         <Stack.Navigator 
             initialRouteName={internetState.isConnected ? StartRoutes.ErrorLoad : StartRoutes.MapComponent}
             // screenOptions={{ presentation: 'transparentModal' }}

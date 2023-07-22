@@ -3,36 +3,51 @@ import { Text, View } from 'react-native'
 import styled from 'styled-components/native';
 import { perfectSize } from '../utils/ScreenSize';
 import { DefaultTheme } from 'styled-components/dist/types';
+import { observer } from 'mobx-react-lite';
+import apiStore from '../mobxStore/apiStore';
 
-export const RadioButtonComponent: FC = () => {
-  const [current, setCurrent] = useState("test");
+
+// type RadioButtonComponentProps = {
+//     themeSettings: string;
+//     setthemeSettings: (value: string) => void;
+// }
+
+
+const ActiveButtonContainer: FC = () => {
+    return(
+        <ActiveButton>
+            <CenterActiveButton/>
+        </ActiveButton>
+    )
+}
+
+export const RadioButtonComponent: FC = observer(() => {
+const { themeSettings, changeThemeSettings} = apiStore;
   return (
     <GroupRadioButtonContainer>
-        <RadioButtonContainer>
-            <NoActiveButton/>
+        <RadioButtonContainer onPress={() => changeThemeSettings("Тёмная")}>
+            {themeSettings=='Тёмная' ? <ActiveButtonContainer/> : <NoActiveButton/>}
             <LabelContainer>
                 <LabelText>Тёмная</LabelText>
             </LabelContainer>
         </RadioButtonContainer>
         <Delimetr/>
-        <RadioButtonContainer>
-            <NoActiveButton/>
+        <RadioButtonContainer onPress={() => changeThemeSettings("Светлая")}>
+            {themeSettings=='Светлая' ? <ActiveButtonContainer/> : <NoActiveButton/>}
             <LabelContainer>
                 <LabelText>Светлая</LabelText>
             </LabelContainer>
         </RadioButtonContainer>
         <Delimetr/>
-        <RadioButtonContainer>
-            <ActiveButton>
-                <CenterActiveButton/>
-            </ActiveButton>
+        <RadioButtonContainer onPress={() => changeThemeSettings("Системная")}>
+            {themeSettings=='Системная' ? <ActiveButtonContainer/> : <NoActiveButton/>}
             <LabelContainer>
                 <LabelText>Системная</LabelText>
             </LabelContainer>
         </RadioButtonContainer>
     </GroupRadioButtonContainer>
   )
-}
+})
 
 export const GroupRadioButtonContainer = styled.View`
     display: flex;
@@ -41,7 +56,7 @@ export const GroupRadioButtonContainer = styled.View`
     flex-direction: column;
     align-items: flex-start;
     flex-shrink: 0;
-    background-color: ${props => props.theme.colors.backgroundApp};
+    background-color: ${props => props.theme.colors.MenuContainer};
 `
 
 export const RadioButtonContainer = styled.TouchableOpacity`
@@ -52,10 +67,10 @@ export const RadioButtonContainer = styled.TouchableOpacity`
     gap: 12px;
     align-self: stretch;
     flex-direction: row;
-    background-color: ${props => props.theme.colors.backgroundApp};
+    background-color: ${props => props.theme.colors.MenuContainer};
 `
 export const Delimetr = styled.View`
-    height: ${perfectSize(2)};
+    height: 1px;
     width: 100%;
     background-color: #F4F4F4;
 `
@@ -83,6 +98,7 @@ export const LabelText = styled.Text`
     font-weight: 500;
     line-height: 24px;
     color: ${props => props.theme.colors.titleMenuText};
+    background-color: ${props => props.theme.colors.MenuContainer};
 `
 
 export const ActiveButton = styled.View`
@@ -94,8 +110,8 @@ export const ActiveButton = styled.View`
 `
 
 export const CenterActiveButton = styled.View`
-    width: ${perfectSize(12)};
-    height: ${perfectSize(12)};
+    width: ${perfectSize(10)};
+    height: ${perfectSize(10)};
     border-radius: 20px;
     background-color: ${props => props.theme.colors.backgroundApp};
 `

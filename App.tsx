@@ -6,56 +6,64 @@ import { DefaultTheme, ThemeProvider, useTheme } from 'styled-components/native'
 import { useColorScheme } from 'react-native';
 import { DarkTheme, LightTheme } from './components/Theme';
 import { useFonts } from 'expo-font';
-import { Storage } from './Storage/Storage';
+import StorageServiceMMKV, { Storage } from './Storage/Storage';
 import apiStore from './mobxStore/apiStore';
 import { observer } from 'mobx-react-lite';
+import { StatusBar } from 'expo-status-bar';
+
 
 export default observer(function App() {
   const colorScheme = useColorScheme()
-  const {themeSettings, theme, changeThemeSettings, changeTheme} = apiStore;
+  const {themeSettings, theme, changeThemeSettings, changeTheme, changeDistancePhoto, changeCountPhoto} = apiStore;
   
+  useEffect(() => {
+   getColorScheme()     
+  }, [])
+  
+  
+
   const getColorScheme = () => {
-		const SavethemeSettings = Storage.getString('theme')
-		if (SavethemeSettings == 'Тёмная') {
-      changeThemeSettings(SavethemeSettings)
+		
+		if (themeSettings == 'Тёмная') {
       changeTheme('dark')
-			// dispatch(addThemeSettingsToRedux(themeSettings))
-			// dispatch(addThemeToRedux('dark'))
-		} else if (SavethemeSettings == 'Светлая') {
-      changeThemeSettings(SavethemeSettings)
+		} else if (themeSettings == 'Светлая') {
       changeTheme('light')
-			// dispatch(addThemeSettingsToRedux(themeSettings))
-			// dispatch(addThemeToRedux('light'))
 		} else {
-			changeThemeSettings('Системная')
 			if (colorScheme != null && colorScheme != undefined) {
         changeTheme(colorScheme)
-				//dispatch(addThemeToRedux(colorScheme))
 			} else {
         changeTheme('light')
-				//dispatch(addThemeToRedux('light'))
 			}
 		}
 	}
 
   const getTheme = (theme: string) => {
-		if (theme == 'light') {
+		if (theme == 'Светлая' || theme == 'light') {
 			return LightTheme
 		} else {
 			return DarkTheme
 		}
 	}
 
-  getColorScheme()
+  
   
   return (
     <ThemeProvider
 			theme={
 				themeSettings == 'Системная' ? getTheme(colorScheme) : getTheme(theme)
 			}
-      //theme={DarkTheme}
 		>
-      <StartNavigator/>
+      <StatusBar
+				backgroundColor={
+					themeSettings == 'Системная'
+						? getTheme(colorScheme).colors.backgroundApp
+						: getTheme(theme).colors.backgroundApp
+				}
+        style='auto'
+			/>
+      
+        <StartNavigator/>
+      
     </ThemeProvider>
   );
 })

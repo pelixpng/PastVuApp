@@ -19,6 +19,14 @@ export const SettingsNavigation: FC = () => {
   return (
     <SettingsStack.Navigator
 			initialRouteName={SettingsRoutes.SettingsComponent}
+			screenOptions={{
+				headerStyle: {
+					backgroundColor: theme.colors.backgroundApp,
+					elevation: 0
+				},
+				headerTintColor: theme.colors.titleMenuText,
+				presentation: 'transparentModal'
+			}}
 		>
 			<SettingsStack.Screen
 				name={SettingsRoutes.SettingsComponent}
@@ -26,6 +34,7 @@ export const SettingsNavigation: FC = () => {
 				options={{
 					title: 'Настройки',
 					headerShown: false,
+	
 				}}
 			/>
 			<SettingsStack.Screen
@@ -40,11 +49,8 @@ export const SettingsNavigation: FC = () => {
     					fontWeight: '800',
     					lineHeight: perfectSize(25)
 					},
-					headerTintColor: theme.colors.titleMenuText,
-					headerStyle: {
-						backgroundColor: theme.colors.backgroundApp,
-						elevation: 0
-					}
+					
+					
 				}}
 			/>
 			<SettingsStack.Screen
@@ -59,11 +65,8 @@ export const SettingsNavigation: FC = () => {
     					fontWeight: '800',
     					lineHeight: perfectSize(25)
 					},
-					headerTintColor: theme.colors.titleMenuText,
-					headerStyle: {
-						backgroundColor: theme.colors.backgroundApp,
-						elevation: 0
-					}
+					
+					
 				}}
 			/>
 			<SettingsStack.Screen
@@ -78,11 +81,8 @@ export const SettingsNavigation: FC = () => {
     					fontWeight: '800',
     					lineHeight: perfectSize(25)
 					},
-					headerTintColor: theme.colors.titleMenuText,
-					headerStyle: {
-						backgroundColor: theme.colors.backgroundApp,
-						elevation: 0
-					}
+					
+					
 				}}
 				
 			/>

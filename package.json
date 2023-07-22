@@ -23,6 +23,7 @@
     "expo-updates": "~0.16.4",
     "mobx": "^6.9.1",
     "mobx-react-lite": "^4.0.3",
+    "polished": "^4.2.2",
     "react": "18.2.0",
     "react-native": "0.71.8",
     "react-native-gesture-handler": "~2.9.0",
