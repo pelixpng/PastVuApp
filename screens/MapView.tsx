@@ -12,6 +12,8 @@ import apiStore from '../mobxStore/apiStore';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 import { YearsSlider } from '../components/YearsSliderComponent';
+import { RangeSlider } from '../components/MySlider';
+import { Storage } from '../Storage/Storage';
 
 
 const loc: Region = 
@@ -26,6 +28,7 @@ const loc: Region =
 export const MapComponent: React.FC<MapScreenNavigationProp> = observer(({navigation}) => {
     const [items, setItems] = useState<itemPhotoArray[]>([]);
     const [coordinates, setCoordinates] = useState<Region>(loc);
+    const [yearsRange, setYearsRange] = useState<YearsRangeType>(Storage.getString('RangeYears') ? JSON.parse(Storage.getString('RangeYears')) : [1900, 1917])
     const {countPhoto, maxDistance} = apiStore;
     const handleButtonPress = async (cid: string) => {
       const url = await ApiServiceV2.getPhotoInfo(cid)
@@ -36,29 +39,38 @@ export const MapComponent: React.FC<MapScreenNavigationProp> = observer(({naviga
       setCoordinates(region);
     };
 
-    useMemo(() => {
-      async function exampleUsage() {
-        try {
-          await Location.requestForegroundPermissionsAsync();
-          const photoArray: itemPhotoArray[] = await ApiServiceV2.getAllGroups(coordinates.latitude, coordinates.longitude, countPhoto, maxDistance);
-          setItems((prevItems) => [
-            ...prevItems,
-            ...photoArray.map((item) => ({
-              title: item.title,
-              cid: item.cid,
-              location: {
-                latitude: item.location.latitude,
-                longitude: item.location.longitude,
-              },
-            })),
-          ]);
-        } catch (error) {
-          console.error(error);
-        }
+
+    async function exampleUsage() {
+      try {
+        await Location.requestForegroundPermissionsAsync();
+        const photoArray: itemPhotoArray[] = await ApiServiceV2.getAllGroups(coordinates.latitude, coordinates.longitude, countPhoto, maxDistance, yearsRange[0], yearsRange[1]);
+        setItems((prevItems) => [
+          ...prevItems,
+          ...photoArray.map((item) => ({
+            title: item.title,
+            cid: item.cid,
+            location: {
+              latitude: item.location.latitude,
+              longitude: item.location.longitude,
+            },
+          })),
+        ]);
+      } catch (error) {
+        console.error(error);
       }
+    }
+
+
+
+    useMemo(() => {  
       exampleUsage();
     }, [coordinates]);
-      
+
+    useMemo(() => {
+      setItems([])  
+      exampleUsage();
+    }, [yearsRange]);
+    
      
       return (
         <SafeAreaView>
@@ -79,7 +91,8 @@ export const MapComponent: React.FC<MapScreenNavigationProp> = observer(({naviga
               ))}
             </MapView>
              {/* <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 50, backgroundColor: 'blue', zIndex: 999 }} /> */}
-             <YearsSlider/>
+             <YearsSlider value={yearsRange} setValue={setYearsRange}/>
+             
         </View>
         </SafeAreaView>
       );

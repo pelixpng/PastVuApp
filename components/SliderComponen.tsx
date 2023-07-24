@@ -60,6 +60,8 @@ import { perfectSize } from '../utils/ScreenSize'
 import { Slider } from '@miblanchard/react-native-slider'
 import { DefaultTheme, useTheme } from 'styled-components';
 
+
+
 type SliderComponentProps = {
     value: number;
     //setValue: React.Dispatch<React.SetStateAction<number>>;
@@ -73,6 +75,7 @@ type SliderComponentProps = {
 
 export const SliderComponent: FC<SliderComponentProps> = ({value, setValue, title, minValue, maxValue}) => {
   const theme: DefaultTheme = useTheme()
+  
   return (
     <SliderContainer>
         <LabelTextContainer>
@@ -80,6 +83,7 @@ export const SliderComponent: FC<SliderComponentProps> = ({value, setValue, titl
             <TitleSliderText>{value.toString()}</TitleSliderText>
         </LabelTextContainer>
         <SliderBodyContainer>
+
             <Slider  minimumValue={minValue} maximumValue={maxValue} thumbStyle={{height: perfectSize(15), width: perfectSize(15)}} containerStyle={{height: perfectSize(25)}} thumbTintColor='#526ED3' animateTransitions={true} maximumTrackTintColor={theme.colors.SliderRangeBG} minimumTrackTintColor='#526ED3' value={value}  onValueChange={setValue} step={1}/>
         </SliderBodyContainer>
         <LabelTextContainer>

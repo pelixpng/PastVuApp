@@ -18,4 +18,9 @@ export default class StorageServiceMMKV{
     static saveApiMaxDistance = (MaxDistance: number) => {
         Storage.set('MaxDistance', MaxDistance)
     }
+
+    static saveYearsRange = (RangeYears: YearsRangeType) => {
+        const stringifiedArray = JSON.stringify(RangeYears);
+        Storage.set('RangeYears', stringifiedArray)
+    }
 }
