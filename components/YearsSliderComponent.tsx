@@ -14,6 +14,7 @@ type SliderComponentProps = {
 }
 
 export const YearsSlider: FC<SliderComponentProps> = ({value, setValue}) => {
+  const theme: DefaultTheme = useTheme()
   const [tmpRange, setTmpRange] = useState<YearsRangeType>(value)
   const changeyears = () =>{
     setValue(tmpRange)
@@ -28,12 +29,12 @@ export const YearsSlider: FC<SliderComponentProps> = ({value, setValue}) => {
         <SliderBodyContainer>
         <Slider
           animateTransitions
-          maximumTrackTintColor="#d3d3d3"
+          maximumTrackTintColor={theme.colors.SliderRangeBG}
           maximumValue={2000}
-          minimumTrackTintColor="#1fb28a"
+          minimumTrackTintColor='#526ED3'
           minimumValue={1826}
           step={1}
-          thumbTintColor="#1a9274"
+          thumbTintColor='#526ED3'
           thumbStyle={{height: perfectSize(15), width: perfectSize(15)}}
           containerStyle={{height: perfectSize(25)}}
           value={tmpRange}
@@ -58,7 +59,7 @@ export const YearsSlider: FC<SliderComponentProps> = ({value, setValue}) => {
 
 
 export const SliderBodyContainer = styled.View`
-  background-color: green;
+  //background-color: green;
   width: 100%;
 `
 
@@ -66,7 +67,7 @@ export const SliderComponentBack = styled.View`
   width: 100%;
   height: auto;
   border-radius: 16px 16px 0px 0px;
-  background-color: white;
+  background-color: ${props => props.theme.colors.backgroundApp};
   position: absolute;
   bottom: 0;
   left: 0;
@@ -79,32 +80,17 @@ export const SliderComponentBack = styled.View`
   align-items: flex-start;
   gap: 5px;
 `
-// const SliderLoyaut = styled.View`
-//   display: flex;
-//   width: 100%;
-//   flex-direction: column;
-//   align-items: flex-start;
-//   gap: 10px;
-// `
-const CurentYearsContainer = styled.View`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  align-self: stretch;
-  background-color: aqua;
-`
+
 const CurentYearsText = styled.Text`
-  font-size: 13px;
+  font-size: ${perfectSize(14)};
   font-style: normal;
   font-weight: 500;
   line-height: 20px;
-  color: rgba(27, 31, 59, 0.65);
+  color: ${props => props.theme.colors.MenuDescriptionText};
   text-align: center;
   align-self: center;
-  
 `
 const YearsTitleContainer = styled.View`
-  background-color: pink;
   justify-content: space-between;
   flex-direction: row;
   align-self: stretch;
