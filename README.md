@@ -2,10 +2,10 @@
 
 ![A blue star in a pink circle](img/logo.png)
 
-This app implements the [PastVu website](https://pastvu.com/) in form of an
-application. 
+This application is an implementation of the [PastVu
+website](https://pastvu.com/)in the form of a mobile app. 
 
-It's written in ReactNative and TypeScript + Expo, so it's intended to be
-cross-platform (it can run on both Android and iOS).
+It has been developed using ReactNative, TypeScript, and Expo,
+making it compatible with both Android and iOS platforms. 
 
-The iOS version has not been implemented nor tested yet.
+The iOS version of the app has not been implemented or tested yet.
