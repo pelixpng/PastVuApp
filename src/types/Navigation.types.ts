@@ -1,9 +1,10 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { Root } from './apiPhotoInfo';
 
 export type RootStackParamList = {
     MapComponent: undefined;
     ErrorLoad: undefined;
-    PhotoPage: {url: string};
+    PhotoPage: {PhotoJson: Root};
   };
 
   export type MapScreenNavigationProp = NativeStackScreenProps<RootStackParamList, 'MapComponent'>;

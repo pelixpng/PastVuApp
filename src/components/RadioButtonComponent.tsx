@@ -7,11 +7,6 @@ import { observer } from 'mobx-react-lite';
 import apiStore from '../mobxStore/apiStore';
 
 
-// type RadioButtonComponentProps = {
-//     themeSettings: string;
-//     setthemeSettings: (value: string) => void;
-// }
-
 
 const ActiveButtonContainer: FC = () => {
     return(

@@ -47,6 +47,7 @@ export interface Root {
     watersignTextApplied: string
     r2d: number[]
     regions: Region[]
+    author: ?string
   }
   
   export interface Frag {

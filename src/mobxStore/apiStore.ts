@@ -1,30 +1,8 @@
 import { makeAutoObservable, observable } from "mobx";
 import StorageServiceMMKV, { Storage } from "../Storage/Storage";
-import { useColorScheme } from 'react-native';
-
-// const getColorScheme = () => {
-//     const SavethemeSettings = Storage.getString('theme')
-//     if (SavethemeSettings == 'Тёмная') {
-//     changeThemeSettings(SavethemeSettings)
-//     changeTheme('dark')
-//     } else if (SavethemeSettings == 'Светлая') {
-//     changeThemeSettings(SavethemeSettings)
-//     changeTheme('light')
-//     } else {
-//         changeThemeSettings('Системная')
-//         if (colorScheme != null && colorScheme != undefined) {
-//     changeTheme(colorScheme)
-//         } else {
-//     changeTheme('light')
-//         }
-//     }
-// }
-
-
-
 
 class ApiStore {
-    countPhoto = Storage.getNumber('countPhoto') ?  Storage.getNumber('countPhoto') : 15;
+    countPhoto = Storage.getNumber('countPhoto') ?  Storage.getNumber('countPhoto') : 20;
     maxDistance = Storage.getNumber('MaxDistance') ?  Storage.getNumber('MaxDistance') : 8000;
     themeSettings = Storage.getString('theme') ? Storage.getString('theme') : 'Системная';
     theme = '0'

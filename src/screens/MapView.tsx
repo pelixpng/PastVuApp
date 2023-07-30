@@ -2,7 +2,7 @@ import { FC, useMemo } from 'react'
 import React, { useEffect, useState } from 'react';
 import MapView, { Marker, PROVIDER_GOOGLE, Region } from 'react-native-maps';
 import { StyleSheet, View, Button, Text, TouchableOpacity } from 'react-native';
-import ApiServiceV2 from '../api/PastVuApi';
+import ApiService from '../api/PastVuApi';
 import { MapScreenNavigationProp, Propss } from '../types/Navigation.types';
 import { StartRoutes } from '../navigation/Routes';
 import { PhotoPage } from './PhotoView';
@@ -12,8 +12,9 @@ import apiStore from '../mobxStore/apiStore';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 import { YearsSlider } from '../components/YearsSliderComponent';
-import { RangeSlider } from '../components/MySlider';
 import { Storage } from '../Storage/Storage';
+import { Root } from '../types/apiPhotoInfo';
+import { getColor } from '../utils/getColor';
 
 
 const loc: Region = 
@@ -26,24 +27,35 @@ const loc: Region =
 
 
 export const MapComponent: React.FC<MapScreenNavigationProp> = observer(({navigation}) => {
+    const saveRangeYears = Storage.getString('RangeYears');
     const [items, setItems] = useState<itemPhotoArray[]>([]);
     const [coordinates, setCoordinates] = useState<Region>(loc);
-    const [yearsRange, setYearsRange] = useState<YearsRangeType>(Storage.getString('RangeYears') ? JSON.parse(Storage.getString('RangeYears')) : [1900, 1917])
+    const [yearsRange, setYearsRange] = useState<YearsRangeType>(saveRangeYears ? JSON.parse(saveRangeYears) : [1900, 1917])
     const {countPhoto, maxDistance} = apiStore;
+    
     const handleButtonPress = async (cid: string) => {
-      const url = await ApiServiceV2.getPhotoInfo(cid)
-      navigation.navigate(StartRoutes.PhotoPage, {url})
+      const PhotoJson: Root = await ApiService.getPhotoInfo(cid)
+      navigation.navigate(StartRoutes.PhotoPage, {PhotoJson})
     };
 
     const handleRegionChangeComplete = (region: Region) => {
       setCoordinates(region);
     };
 
+    
 
     async function exampleUsage() {
       try {
         await Location.requestForegroundPermissionsAsync();
-        const photoArray: itemPhotoArray[] = await ApiServiceV2.getAllGroups(coordinates.latitude, coordinates.longitude, countPhoto, maxDistance, yearsRange[0], yearsRange[1]);
+        const params: getPhotoListProps = {
+          latitude: coordinates.latitude, 
+          longitude: coordinates.longitude, 
+          limit: countPhoto, 
+          distance: maxDistance, 
+          yearStart: yearsRange[0], 
+          yearEnd: yearsRange[1]
+        };
+        const photoArray: itemPhotoArray[] = await ApiService.getPhotoList(params);
         setItems((prevItems) => [
           ...prevItems,
           ...photoArray.map((item) => ({
@@ -53,6 +65,7 @@ export const MapComponent: React.FC<MapScreenNavigationProp> = observer(({naviga
               latitude: item.location.latitude,
               longitude: item.location.longitude,
             },
+            year: item.year
           })),
         ]);
       } catch (error) {
@@ -86,11 +99,11 @@ export const MapComponent: React.FC<MapScreenNavigationProp> = observer(({naviga
                 coordinate={marker.location}
                 title={marker.title}
                 onPress={()=>handleButtonPress(marker.cid)}
+                pinColor={getColor(marker.year)}
                 
               />
               ))}
             </MapView>
-             {/* <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 50, backgroundColor: 'blue', zIndex: 999 }} /> */}
              <YearsSlider value={yearsRange} setValue={setYearsRange}/>
              
         </View>
@@ -102,7 +115,6 @@ export const MapComponent: React.FC<MapScreenNavigationProp> = observer(({naviga
 export const MapContainer = styled.View`
   flex-direction: column;
   width: 100%;
-  //height: 90%;
 `
 export const Slider = styled.View`
   background-color: aqua;

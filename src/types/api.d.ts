@@ -1,12 +1,5 @@
-
-//ИНТЕРФЕЙСЫ
-
-
-
-
-
-//ТИПЫ
   type itemPhotoArray = {
+    year: number;
     title: string;
     cid: string;
     location: {
@@ -21,3 +14,12 @@
   };
 
   type YearsRangeType = [number, number];
+
+  type getPhotoListProps = {
+    latitude: number;
+    longitude: number;
+    limit?: number;
+    distance?: number;
+    yearStart: number;
+    yearEnd: number;
+  }

@@ -1,10 +1,7 @@
 import React, { FC } from 'react'
-import { Text, View } from 'react-native'
 import { AppIconContainer, LogoContainer, MenuDescriptionText, ScrollContainer } from '../components/UniversalComponents'
 import { ButtonLinkProps, InsideMenuProps } from '../types/components.types';
 import { InsideMenuComponent } from '../components/InsideMenuComponent';
-import { ButtonLink } from '../components/ButtonLink';
-
 
 const ResourcesUsed: ButtonLinkProps[] = [
   { title: 'PastVu Api', url: 'https://docs.pastvu.com/dev/api' },

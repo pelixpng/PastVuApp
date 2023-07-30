@@ -1,8 +1,6 @@
 import styled from 'styled-components/native'
 import { perfectSize } from '../utils/ScreenSize'
 import { Platform } from 'react-native'
-import { StyledColor } from '../types/styled'
-import { DefaultTheme } from 'styled-components'
 
 
 
@@ -18,13 +16,12 @@ export const ScrollContainer = styled.ScrollView`
 	background: ${props => props.theme.colors.backgroundApp};
     height: 100%;
     width: 100%;
-    padding-bottom: 10px;
 `
 
 export const MenuContainer = styled.TouchableOpacity`
   flex-direction: row;
   display: flex;
-  width: ${perfectSize(364)};
+  width: ${perfectSize(380)};
   padding: 20px;
   align-items: flex-start;
   gap: 12px;
@@ -72,7 +69,7 @@ export const BackgroundMenuIcon = styled.View`
 export const InsideMenuContainer = styled.View`
   flex-direction: column;
   display: flex;
-  width: ${perfectSize(364)};
+  width: ${perfectSize(380)};
   padding: 20px;
   align-items: flex-start;
   gap: 12px;

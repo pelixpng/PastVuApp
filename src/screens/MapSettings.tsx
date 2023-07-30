@@ -9,7 +9,6 @@ import apiStore from '../mobxStore/apiStore'
 import { observer } from 'mobx-react-lite'
 import { RadioButtonComponent } from '../components/RadioButtonComponent'
 import StorageServiceMMKV, { Storage } from '../Storage/Storage'
-import { RangeSlider } from '../components/MySlider'
 
 const InsideMenuText: InsideMenuProps[] = [
   { 
@@ -30,8 +29,8 @@ export const MapSettings: FC = observer(() => {
   return (
     
     <ScrollContainer>
-      <InsideMenuComponent title={InsideMenuText[0].title} discription={InsideMenuText[0].discription} child={<SliderComponent title='Максимальное растояние в метрах' maxValue={10000} minValue={0} value={maxDistance} setValue={changeDistancePhoto}/>}  child2={<SliderComponent value={countPhoto} setValue={changeCountPhoto} title={'Максимальное количество фото'} minValue={0} maxValue={30}/>}/>
-      <InsideMenuComponent title={InsideMenuText[1].title} discription={InsideMenuText[1].discription} child={<RadioButtonComponent/>}/>
+      <InsideMenuComponent title={InsideMenuText[0].title} discription={InsideMenuText[0].discription} CustomComponent={<SliderComponent title='Максимальное растояние в метрах' maxValue={10000} minValue={0} value={maxDistance} setValue={changeDistancePhoto}/>}  CustomComponent2={<SliderComponent value={countPhoto} setValue={changeCountPhoto} title={'Максимальное количество фото'} minValue={0} maxValue={30}/>}/>
+      <InsideMenuComponent title={InsideMenuText[1].title} discription={InsideMenuText[1].discription} CustomComponent={<RadioButtonComponent/>}/>
       <Button title='clear' onPress={() => Storage.clearAll()}/>
       
     </ScrollContainer>

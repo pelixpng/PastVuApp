@@ -22,22 +22,20 @@ export default observer(function App() {
   
   
 
-  const getColorScheme = () => {
-		
-		if (themeSettings == 'Тёмная') {
-      changeTheme('dark')
-		} else if (themeSettings == 'Светлая') {
-      changeTheme('light')
-		} else {
-			if (colorScheme != null && colorScheme != undefined) {
-        changeTheme(colorScheme)
-			} else {
-        changeTheme('light')
-			}
-		}
+const getColorScheme = () => {
+	let selectedTheme = '';
+	if (themeSettings === 'Тёмная') {
+	  selectedTheme = 'dark';
+	} else if (themeSettings === 'Светлая') {
+	  selectedTheme = 'light';
+	} else {
+	  selectedTheme = colorScheme || 'light';
 	}
+	changeTheme(selectedTheme);
+  };
 
-  const getTheme = (theme: string) => {
+
+  const getTheme = (theme: string | null | undefined) => {
 		if (theme == 'Светлая' || theme == 'light') {
 			return LightTheme
 		} else {

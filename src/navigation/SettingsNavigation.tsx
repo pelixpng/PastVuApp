@@ -1,5 +1,4 @@
 import { FC } from 'react'
-import { Text, View } from 'react-native'
 import { createStackNavigator } from '@react-navigation/stack'
 import { SettingsStackParamList } from '../types/Navigation.types'
 import { SettingsRoutes } from './Routes'

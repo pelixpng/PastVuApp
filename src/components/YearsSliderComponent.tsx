@@ -1,31 +1,22 @@
 import styled from 'styled-components/native'
 import { FC, useState } from 'react'
-import { Text, View } from 'react-native'
 import { perfectSize } from '../utils/ScreenSize'
-
 import { DefaultTheme, useTheme } from 'styled-components';
-import { linearGradient } from 'polished';
 import { Slider } from '@miblanchard/react-native-slider'
 import StorageServiceMMKV, { Storage } from '../Storage/Storage';
+import { YearsSliderComponentProps } from '../types/components.types';
 
-type SliderComponentProps = {
-  value: YearsRangeType;
-  setValue: (value: YearsRangeType) => void;
-}
-
-export const YearsSlider: FC<SliderComponentProps> = ({value, setValue}) => {
+export const YearsSlider: FC<YearsSliderComponentProps> = ({value, setValue}) => {
   const theme: DefaultTheme = useTheme()
   const [tmpRange, setTmpRange] = useState<YearsRangeType>(value)
   const changeyears = () =>{
     setValue(tmpRange)
     StorageServiceMMKV.saveYearsRange(tmpRange)
   }
+
   return (
     <SliderComponentBack>
-      {/* <SliderLoyaut> */}
-        {/* <CurentYearsContainer> */}
           <CurentYearsText>{tmpRange[0]}-{tmpRange[1]}</CurentYearsText>
-        {/* </CurentYearsContainer> */}
         <SliderBodyContainer>
         <Slider
           animateTransitions
@@ -49,7 +40,6 @@ export const YearsSlider: FC<SliderComponentProps> = ({value, setValue}) => {
           <CurentYearsText>1942</CurentYearsText>
           <CurentYearsText>2000</CurentYearsText>
         </YearsTitleContainer>
-      {/* </SliderLoyaut> */}
     </SliderComponentBack>
   )
 }
@@ -59,7 +49,6 @@ export const YearsSlider: FC<SliderComponentProps> = ({value, setValue}) => {
 
 
 export const SliderBodyContainer = styled.View`
-  //background-color: green;
   width: 100%;
 `
 

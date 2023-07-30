@@ -1,77 +1,9 @@
-// import React, { useState } from 'react';
-// import { View, Text, StyleSheet } from 'react-native';
-// import Slider from '@react-native-community/slider';
-
-// export const SliderComponent: React.FC = () => {
-//   const [distance, setDistance] = useState(0);
-
-//   const handleSliderChange = (value: number) => {
-//     setDistance(value);
-//   }
-
-//   return (
-//     <View style={styles.container}>
-//       {/* <Text style={styles.label}>Дистанция</Text>
-//       <Text style={styles.value}>{distance}</Text>
-//       <Slider
-//         style={styles.slider}
-//         minimumValue={0}
-//         maximumValue={30}
-//         step={1}
-//         value={distance}
-//         onValueChange={handleSliderChange}
-//       />
-//       <View style={styles.sliderLabels}>
-//         <Text style={styles.label}>0</Text>
-//         <Text style={styles.label}>30</Text>
-//       </View> */}
-//     </View>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//   },
-//   label: {
-//     fontSize: 20,
-//     fontWeight: 'bold',
-//   },
-//   value: {
-//     fontSize: 32,
-//     fontWeight: 'bold',
-//     marginVertical: 20,
-//   },
-//   slider: {
-//     width: '80%',
-//   },
-//   sliderLabels: {
-//     width: '80%',
-//     flexDirection: 'row',
-//     justifyContent: 'space-between',
-//   },
-// });
 import styled from 'styled-components/native'
-import { FC, useState } from 'react'
-import { Text, View } from 'react-native'
+import { FC } from 'react'
 import { perfectSize } from '../utils/ScreenSize'
 import { Slider } from '@miblanchard/react-native-slider'
 import { DefaultTheme, useTheme } from 'styled-components';
-
-
-
-type SliderComponentProps = {
-    value: number;
-    //setValue: React.Dispatch<React.SetStateAction<number>>;
-    setValue: (value: number) => void;
-    title: string;
-    minValue: number;
-    maxValue:number
-}
-
-
+import { SliderComponentProps } from '../types/components.types'
 
 export const SliderComponent: FC<SliderComponentProps> = ({value, setValue, title, minValue, maxValue}) => {
   const theme: DefaultTheme = useTheme()
