@@ -8,11 +8,21 @@ const ResourcesUsed: ButtonLinkProps[] = [
   { title: 'Maps Platform', url: 'https://developers.google.com/maps?hl=ru' },
 ];
 
+const AboutProject: ButtonLinkProps[] = [
+  { title: 'О проекте PastVu', url: 'https://docs.pastvu.com/about' },
+  { title: 'GitHub приложения', url: 'https://github.com/pelixpng/PastVuApp' },
+  { title: 'Web версия PastVu', url: 'https://pastvu.com/' },
+];
+
 const Developers: ButtonLinkProps[] = [
   { title: 'Семён Кузьмин', url: 'https://t.me/paveldur0' },
 ];
 
 const InsideMenuText: InsideMenuProps[] = [
+  {
+    title: 'Что такое PastVu?',
+    discription: 'Данное приложение является мобильной версией проекта PastVu, а также имеет полностью открытый исходный код.  PastVu - проект по сбору свидетельств прошлого в фотографиях, взгляд на историю среды обитания человечества.'
+  },
   { 
     title: 'Используемые ресурсы', 
     discription: 'Для получения фотографий и информации о них используется открытое  Api проекта PastVu. Карта предоставлена Google Maps Platform.' 
@@ -31,10 +41,11 @@ export const AppInfo: FC = () => {
         <LogoContainer
 				  source={require('../assets/icon.png')}
 			  />
-        <MenuDescriptionText>Версия 1.0.0 от 1 августа 2023 г.</MenuDescriptionText>
+        <MenuDescriptionText>Версия 1.0.0 от 5 августа 2023 г.</MenuDescriptionText>
       </AppIconContainer>
-      <InsideMenuComponent ButtonArray={ResourcesUsed} title={InsideMenuText[0].title} discription={InsideMenuText[0].discription}/>
-      <InsideMenuComponent ButtonArray={Developers} title={InsideMenuText[1].title} discription={InsideMenuText[1].discription} />
+      <InsideMenuComponent ButtonArray={AboutProject} title={InsideMenuText[0].title} discription={InsideMenuText[0].discription}/>
+      <InsideMenuComponent ButtonArray={ResourcesUsed} title={InsideMenuText[1].title} discription={InsideMenuText[1].discription} />
+      <InsideMenuComponent ButtonArray={Developers} title={InsideMenuText[2].title} discription={InsideMenuText[2].discription} />
     </ScrollContainer>
   )
 }

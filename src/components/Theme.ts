@@ -10,7 +10,8 @@ export const LightTheme: DefaultTheme =  {
         MenuDescriptionText: 'rgba(27, 31, 59, 0.65)',
         BackgroundMenuIcon: 'rgba(112, 182, 246, 0.12)',
         MenuContainer: 'white',
-        SliderRangeBG: "#EDEDED"
+        SliderRangeBG: "#EDEDED",
+        Delimetr: "#F4F4F4"
     },
     names:{
         themeName: 'LightTheme'
@@ -26,7 +27,8 @@ export const DarkTheme: DefaultTheme =  {
         MenuDescriptionText: 'rgba(255, 255, 255, 0.72)',
         BackgroundMenuIcon: 'rgba(112, 182, 246, 0.12)',
         MenuContainer: '#202020',
-        SliderRangeBG: "#232325"
+        SliderRangeBG: "#232325",
+        Delimetr: '#202020'
     },
     names:{
         themeName: 'DarkTheme'

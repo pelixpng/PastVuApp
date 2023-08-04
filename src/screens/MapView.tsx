@@ -19,10 +19,10 @@ import { getColor } from '../utils/getColor';
 
 const loc: Region = 
   {
-    latitude: 55.476348,
-    longitude: 60.202737,
-    latitudeDelta: 0.08,
-    longitudeDelta: 0.08,
+    latitude: 55.763307,
+    longitude: 37.576945,
+    latitudeDelta: 0.01,
+    longitudeDelta: 0.01,
   }
 
 
@@ -30,7 +30,7 @@ export const MapComponent: React.FC<MapScreenNavigationProp> = observer(({naviga
     const saveRangeYears = Storage.getString('RangeYears');
     const [items, setItems] = useState<itemPhotoArray[]>([]);
     const [coordinates, setCoordinates] = useState<Region>(loc);
-    const [yearsRange, setYearsRange] = useState<YearsRangeType>(saveRangeYears ? JSON.parse(saveRangeYears) : [1900, 1917])
+    const [yearsRange, setYearsRange] = useState<YearsRangeType>(saveRangeYears ? JSON.parse(saveRangeYears) : [1900, 1916])
     const {countPhoto, maxDistance} = apiStore;
     
     const handleButtonPress = async (cid: string) => {

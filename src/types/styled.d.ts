@@ -14,6 +14,7 @@ declare module 'styled-components' {
         BackgroundMenuIcon: string,
         MenuContainer: string,
         SliderRangeBG: string,
+        Delimetr: string
     },
     names:{
       themeName: ThemeNameType

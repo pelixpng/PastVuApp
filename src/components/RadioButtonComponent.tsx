@@ -67,7 +67,7 @@ export const RadioButtonContainer = styled.TouchableOpacity`
 export const Delimetr = styled.View`
     height: 1px;
     width: 100%;
-    background-color: #F4F4F4;
+    background-color: ${props => props.theme.colors.Delimetr};
 `
 
 export const NoActiveButton = styled.View`
@@ -101,12 +101,15 @@ export const ActiveButton = styled.View`
     align-items: flex-start;
     gap: 10px;
     background-color: #6C86E2;
-    border-radius: 20px;
+    border-radius: 12px;
+    width: ${perfectSize(22)};
+    height: ${perfectSize(22)};
+
 `
 
 export const CenterActiveButton = styled.View`
-    width: ${perfectSize(10)};
-    height: ${perfectSize(10)};
-    border-radius: 20px;
+    width: ${perfectSize(9)};
+    height: ${perfectSize(9)};
+    border-radius: 12px;
     background-color: ${props => props.theme.colors.backgroundApp};
 `
