@@ -9,14 +9,12 @@ import { MapSettings } from '../screens/MapSettings'
 import { DefaultTheme, useTheme } from 'styled-components'
 import { perfectSize } from '../utils/ScreenSize'
 
-
 const SettingsStack = createStackNavigator<SettingsStackParamList>()
 
-
 export const SettingsNavigation: FC = () => {
-	const theme: DefaultTheme = useTheme()	
-  return (
-    <SettingsStack.Navigator
+	const theme: DefaultTheme = useTheme()
+	return (
+		<SettingsStack.Navigator
 			initialRouteName={SettingsRoutes.SettingsComponent}
 			screenOptions={{
 				headerStyle: {
@@ -32,8 +30,7 @@ export const SettingsNavigation: FC = () => {
 				component={SettingsComponent}
 				options={{
 					title: 'Настройки',
-					headerShown: false,
-	
+					headerShown: false
 				}}
 			/>
 			<SettingsStack.Screen
@@ -45,11 +42,9 @@ export const SettingsNavigation: FC = () => {
 						color: theme.colors.titleMenuText,
 						fontSize: perfectSize(25),
 						fontStyle: 'normal',
-    					fontWeight: '800',
-    					lineHeight: perfectSize(25)
-					},
-					
-					
+						fontWeight: '800',
+						lineHeight: perfectSize(25)
+					}
 				}}
 			/>
 			<SettingsStack.Screen
@@ -61,11 +56,9 @@ export const SettingsNavigation: FC = () => {
 						color: theme.colors.titleMenuText,
 						fontSize: perfectSize(25),
 						fontStyle: 'normal',
-    					fontWeight: '800',
-    					lineHeight: perfectSize(25)
-					},
-					
-					
+						fontWeight: '800',
+						lineHeight: perfectSize(25)
+					}
 				}}
 			/>
 			<SettingsStack.Screen
@@ -77,15 +70,11 @@ export const SettingsNavigation: FC = () => {
 						color: theme.colors.titleMenuText,
 						fontSize: perfectSize(25),
 						fontStyle: 'normal',
-    					fontWeight: '800',
-    					lineHeight: perfectSize(25)
-					},
-					
-					
+						fontWeight: '800',
+						lineHeight: perfectSize(25)
+					}
 				}}
-				
 			/>
 		</SettingsStack.Navigator>
-  )
+	)
 }
-

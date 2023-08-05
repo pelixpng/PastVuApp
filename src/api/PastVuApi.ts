@@ -4,7 +4,7 @@ import { Root } from "../types/apiPhotoInfo";
 
 export default class ApiService {
     static async getPhotoList(params: getPhotoListProps) {
-        const response = await fetch(`https://pastvu.com/api2?method=photo.giveNearestPhotos&params={"geo":[${params.latitude},${params.longitude}],"limit":${params.limit},"distance":${params.distance},"year":${params.yearStart},"year2":${params.yearEnd}}`);
+    const response = await fetch(`https://pastvu.com/api2?method=photo.giveNearestPhotos&params={"geo":[${params.latitude},${params.longitude}],"limit":${params.limit},"distance":${params.distance},"year":${params.yearStart},"year2":${params.yearEnd}}`);
         const json = await response.json() as getPhotoList;
         let photoArray: itemPhotoArray[] = [];
         for (let i = 0; i < json.result.photos.length ; i++) {
@@ -14,7 +14,7 @@ export default class ApiService {
                 cid: json.result.photos[i].cid.toString(),
                 year: json.result.photos[i].year
             }) 
-        }
+        } 
         return photoArray;
     }
 
