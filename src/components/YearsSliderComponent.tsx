@@ -1,10 +1,10 @@
 import styled from 'styled-components/native'
-import { FC, useState } from 'react'
+import React, { FC, useState } from 'react'
 import { perfectSize } from '../utils/ScreenSize'
 import { DefaultTheme, useTheme } from 'styled-components'
 import { Slider } from '@miblanchard/react-native-slider'
-import StorageServiceMMKV, { Storage } from '../Storage/Storage'
-import { YearsSliderComponentProps } from '../types/components.types'
+import StorageServiceMMKV from '../Storage/Storage'
+import { YearsSliderComponentProps } from '../types/components'
 
 export const YearsSlider: FC<YearsSliderComponentProps> = ({
 	value,
@@ -63,7 +63,6 @@ export const SliderComponentBack = styled.View`
 	right: 0;
 	z-index: 999;
 	padding: 6px;
-
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;

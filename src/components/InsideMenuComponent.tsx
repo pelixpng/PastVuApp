@@ -1,14 +1,12 @@
-import { FC } from 'react'
-import { Text, View } from 'react-native'
+import React, { FC } from 'react'
 import {
 	InsideMenuContainer,
 	MenuDescriptionText,
 	MenuInsideTextContainer,
-	MenuTitleText,
-	ViewContainer
+	MenuTitleText
 } from './UniversalComponents'
 import { ButtonLink } from './ButtonLink'
-import { ButtonLinkProps, InsideMenuProps } from '../types/components.types'
+import { InsideMenuProps } from '../types/components'
 
 export const InsideMenuComponent: FC<InsideMenuProps> = ({
 	ButtonArray,

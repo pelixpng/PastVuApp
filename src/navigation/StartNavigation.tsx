@@ -1,23 +1,19 @@
 import * as React from 'react'
 import { NavigationContainer } from '@react-navigation/native'
-import { RootStackParamList } from '../types/Navigation.types'
+import { RootStackParamList } from '../types/Navigation'
 import { createStackNavigator } from '@react-navigation/stack'
 import { NetInfoState, useNetInfo } from '@react-native-community/netinfo'
 import { StartRoutes } from './Routes'
-import { MapComponent } from '../screens/MapView'
 import { ErrorLoad } from '../screens/Error'
 import { PhotoPage } from '../screens/PhotoView'
 import { BottomNavigator } from './BottomNavigation'
-import { DarkTheme } from '../components/Theme'
 import { DefaultTheme, useTheme } from 'styled-components'
 
 const Stack = createStackNavigator<RootStackParamList>()
 
 export function StartNavigator() {
 	const internetState: NetInfoState = useNetInfo()
-
 	const theme: DefaultTheme = useTheme()
-
 	return (
 		<NavigationContainer>
 			<Stack.Navigator

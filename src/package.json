@@ -40,6 +40,10 @@
     "@babel/core": "^7.20.0",
     "@types/react": "~18.0.14",
     "@types/react-native-htmlview": "^0.16.0",
+    "@typescript-eslint/eslint-plugin": "^6.2.1",
+    "@typescript-eslint/parser": "^6.2.1",
+    "eslint": "^8.46.0",
+    "eslint-plugin-react": "^7.33.1",
     "typescript": "^4.9.4"
   },
   "private": true

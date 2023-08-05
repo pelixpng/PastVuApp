@@ -1,16 +1,6 @@
-import { FC } from 'react'
-import { Text, View } from 'react-native'
-import {
-	ButtonLinkText,
-	InsideMenuContainer,
-	MenuDescriptionText,
-	MenuInsideTextContainer,
-	MenuTextContainer,
-	MenuTitleText,
-	ViewContainer
-} from '../components/UniversalComponents'
-import { ButtonLink } from '../components/ButtonLink'
-import { ButtonLinkProps, InsideMenuProps } from '../types/components.types'
+import React, { FC } from 'react'
+import { ViewContainer } from '../components/UniversalComponents'
+import { ButtonLinkProps, InsideMenuProps } from '../types/components'
 import { InsideMenuComponent } from '../components/InsideMenuComponent'
 
 const ButtonArray: ButtonLinkProps[] = [

@@ -5,7 +5,7 @@ import {
 	MenuDescriptionText,
 	ScrollContainer
 } from '../components/UniversalComponents'
-import { ButtonLinkProps, InsideMenuProps } from '../types/components.types'
+import { ButtonLinkProps, InsideMenuProps } from '../types/components'
 import { InsideMenuComponent } from '../components/InsideMenuComponent'
 
 const ResourcesUsed: ButtonLinkProps[] = [
@@ -46,7 +46,7 @@ export const AppInfo: FC = () => {
 			<AppIconContainer>
 				<LogoContainer source={require('../assets/icon.png')} />
 				<MenuDescriptionText>
-					Версия 1.0.0 от 5 августа 2023 г.
+					Версия 1.0.0 от 10 августа 2023 г.
 				</MenuDescriptionText>
 			</AppIconContainer>
 			<InsideMenuComponent

@@ -1,9 +1,9 @@
 import styled from 'styled-components/native'
-import { FC } from 'react'
+import React, { FC } from 'react'
 import { perfectSize } from '../utils/ScreenSize'
 import { Slider } from '@miblanchard/react-native-slider'
 import { DefaultTheme, useTheme } from 'styled-components'
-import { SliderComponentProps } from '../types/components.types'
+import { SliderComponentProps } from '../types/components'
 
 export const SliderComponent: FC<SliderComponentProps> = ({
 	value,

@@ -1,7 +1,7 @@
-import { FC } from 'react'
-import { Linking, Share, Text, View } from 'react-native'
+import React, { FC } from 'react'
+import { Share } from 'react-native'
 import { ButtonLinkContainer, ButtonLinkText } from './UniversalComponents'
-import { ButtonLinkProps } from '../types/components.types'
+import { ButtonLinkProps } from '../types/components'
 
 export const ShareButton: FC<ButtonLinkProps> = ({ title, url }) => {
 	const shareLink = () => {

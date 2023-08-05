@@ -1,8 +1,6 @@
-import { FC, useState } from 'react'
-import { Text, View } from 'react-native'
+import React, { FC } from 'react'
 import styled from 'styled-components/native'
 import { perfectSize } from '../utils/ScreenSize'
-import { DefaultTheme } from 'styled-components/dist/types'
 import { observer } from 'mobx-react-lite'
 import apiStore from '../mobxStore/apiStore'
 

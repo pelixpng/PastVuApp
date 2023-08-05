@@ -1,5 +1,4 @@
 import React, { FC } from 'react'
-import { Text, View } from 'react-native'
 import { perfectSize } from '../utils/ScreenSize'
 import {
 	MenuContainer,
@@ -9,11 +8,7 @@ import {
 	BackgroundMenuIcon
 } from './UniversalComponents'
 import { Feather } from '@expo/vector-icons'
-import { TouchableOpacity } from 'react-native-gesture-handler'
-import { useNavigation } from '@react-navigation/native'
-import { SettingsRoutes } from '../navigation/Routes'
-import { SettingsScreenNavigationProp } from '../types/Navigation.types'
-import { MenuButtonProps } from '../types/components.types'
+import { MenuButtonProps } from '../types/components'
 
 export const MenuButton: FC<MenuButtonProps> = ({
 	navigation,

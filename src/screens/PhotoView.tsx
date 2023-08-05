@@ -1,31 +1,15 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import {
-	View,
-	Image,
-	StyleSheet,
-	Text,
-	ScrollView,
-	Linking
-} from 'react-native'
-import { MapScreenNavigationProp, Propss } from '../types/Navigation.types'
-import {
-	ButtonLinkContainer,
-	MenuDescriptionText,
-	MenuInsideTextContainer,
-	MenuTitleText,
 	ScrollContainer,
 	ViewContainer
 } from '../components/UniversalComponents'
 import styled from 'styled-components/native'
 import { InsideMenuComponent } from '../components/InsideMenuComponent'
-import { Root } from '../types/apiPhotoInfo'
 import { perfectSize } from '../utils/ScreenSize'
-import { ButtonLink } from '../components/ButtonLink'
 import { ShareButton } from '../components/ShareButton'
-import { TextProps } from 'react-native'
 import RenderHtml from 'react-native-render-html'
 import { DefaultTheme, useTheme } from 'styled-components'
-import { PhotoPageProps } from '../types/components.types'
+import { PhotoPageProps } from '../types/components'
 
 export const PhotoPage: React.FC<PhotoPageProps> = ({ route }) => {
 	const {

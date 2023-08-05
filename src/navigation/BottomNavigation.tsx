@@ -1,12 +1,11 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { MapComponent } from '../screens/MapView'
-import { SettingsComponent } from '../screens/Settings'
 import { BottomRoutes } from './Routes'
 import { SettingsNavigation } from './SettingsNavigation'
 import { DefaultTheme, useTheme } from 'styled-components'
 import { perfectSize } from '../utils/ScreenSize'
 import { Feather } from '@expo/vector-icons'
-
+import React from 'react'
 const Tab = createBottomTabNavigator()
 
 export function BottomNavigator() {

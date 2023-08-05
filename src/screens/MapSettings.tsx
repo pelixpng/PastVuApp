@@ -1,17 +1,11 @@
-import { FC, SetStateAction, useEffect, useMemo, useState } from 'react'
-import { Button, Text, View } from 'react-native'
-import {
-	MenuContainer,
-	ScrollContainer
-} from '../components/UniversalComponents'
+import React, { FC } from 'react'
+import { ScrollContainer } from '../components/UniversalComponents'
 import { InsideMenuComponent } from '../components/InsideMenuComponent'
 import { SliderComponent } from '../components/SliderComponen'
-import { Slider } from '@miblanchard/react-native-slider'
-import { InsideMenuProps } from '../types/components.types'
+import { InsideMenuProps } from '../types/components'
 import apiStore from '../mobxStore/apiStore'
 import { observer } from 'mobx-react-lite'
 import { RadioButtonComponent } from '../components/RadioButtonComponent'
-import StorageServiceMMKV, { Storage } from '../Storage/Storage'
 
 const InsideMenuText: InsideMenuProps[] = [
 	{

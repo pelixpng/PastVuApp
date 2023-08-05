@@ -1,6 +1,6 @@
-import { FC } from 'react'
+import React, { FC } from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
-import { SettingsStackParamList } from '../types/Navigation.types'
+import { SettingsStackParamList } from '../types/Navigation'
 import { SettingsRoutes } from './Routes'
 import { SettingsComponent } from '../screens/Settings'
 import { AppInfo } from '../screens/AboutApp'

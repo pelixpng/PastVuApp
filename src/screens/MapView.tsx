@@ -1,19 +1,15 @@
-import { FC, useMemo } from 'react'
-import React, { useEffect, useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import MapView, { Marker, PROVIDER_GOOGLE, Region } from 'react-native-maps'
-import { StyleSheet, View, Button, Text, TouchableOpacity } from 'react-native'
+import { View } from 'react-native'
 import ApiService from '../api/PastVuApi'
-import { MapScreenNavigationProp, Propss } from '../types/Navigation.types'
+import { MapScreenNavigationProp } from '../types/Navigation'
 import { StartRoutes } from '../navigation/Routes'
-import { PhotoPage } from './PhotoView'
 import * as Location from 'expo-location'
 import { observer } from 'mobx-react-lite'
 import apiStore from '../mobxStore/apiStore'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import styled from 'styled-components/native'
 import { YearsSlider } from '../components/YearsSliderComponent'
 import { Storage } from '../Storage/Storage'
-import { Root } from '../types/apiPhotoInfo'
 import { getColor } from '../utils/getColor'
 
 const loc: Region = {
@@ -29,7 +25,7 @@ export const MapComponent: React.FC<MapScreenNavigationProp> = observer(
 		const [items, setItems] = useState<itemPhotoArray[]>([])
 		const [coordinates, setCoordinates] = useState<Region>(loc)
 		const [yearsRange, setYearsRange] = useState<YearsRangeType>(
-			saveRangeYears ? JSON.parse(saveRangeYears) : [1900, 1916]
+			saveRangeYears ? JSON.parse(saveRangeYears) : [1840, 1916]
 		)
 		const { countPhoto, maxDistance } = apiStore
 
@@ -108,13 +104,3 @@ export const MapComponent: React.FC<MapScreenNavigationProp> = observer(
 		)
 	}
 )
-
-export const MapContainer = styled.View`
-	flex-direction: column;
-	width: 100%;
-`
-export const Slider = styled.View`
-	background-color: aqua;
-	width: 100%;
-	height: 50px;
-`
