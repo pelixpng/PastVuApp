@@ -3,10 +3,10 @@ import { Share } from 'react-native'
 import { ButtonLinkContainer, ButtonLinkText } from './UniversalComponents'
 import { ButtonLinkProps } from '../types/components'
 
-export const ShareButton: FC<ButtonLinkProps> = ({ title, url }) => {
+export const ShareButton: FC<ButtonLinkProps> = ({ title, url, postTitle }) => {
 	const shareLink = () => {
 		Share.share({
-			message: 'Посмотри как это место выглядело много лет назад: ' + url
+			message: postTitle + ': ' + url
 		})
 	}
 	return (

@@ -17,7 +17,7 @@ export const ScrollContainer = styled.ScrollView`
 export const MenuContainer = styled.TouchableOpacity`
 	flex-direction: row;
 	display: flex;
-	width: ${perfectSize(380)};
+	width: 93%;
 	padding: 20px;
 	align-items: flex-start;
 	gap: 12px;
@@ -66,7 +66,7 @@ export const BackgroundMenuIcon = styled.View`
 export const InsideMenuContainer = styled.View`
 	flex-direction: column;
 	display: flex;
-	width: ${perfectSize(380)};
+	width: 93%;
 	padding: 20px;
 	align-items: flex-start;
 	gap: 12px;
@@ -88,7 +88,7 @@ export const MenuInsideTextContainer = styled.View`
 
 export const ButtonLinkContainer = styled.TouchableOpacity`
 	display: flex;
-	width: ${perfectSize(325)};
+	width: 100%;
 	height: ${perfectSize(46)};
 	padding: 0px 8px;
 	justify-content: center;

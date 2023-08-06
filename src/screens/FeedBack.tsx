@@ -4,7 +4,7 @@ import { ButtonLinkProps, InsideMenuProps } from '../types/components'
 import { InsideMenuComponent } from '../components/InsideMenuComponent'
 
 const ButtonArray: ButtonLinkProps[] = [
-	{ title: 'Telegram', url: 'https://t.me/paveldur0' },
+	{ title: 'Telegram', url: 'https://t.me/semenKuzminWork' },
 	{ title: 'Почта', url: 'mailto:semeonky@gmail.com' }
 ]
 

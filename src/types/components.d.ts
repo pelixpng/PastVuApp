@@ -23,6 +23,7 @@ type InsideMenuProps = {
 type ButtonLinkProps = {
 	title: string
 	url: string
+	postTitle?: string
 }
 
 type PhotoPageProps = {

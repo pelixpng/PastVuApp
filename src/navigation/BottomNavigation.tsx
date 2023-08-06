@@ -20,7 +20,10 @@ export function BottomNavigator() {
 					backgroundColor: theme.colors.backgroundApp,
 					paddingTop: perfectSize(5),
 					paddingBottom: perfectSize(5),
-					borderTopWidth: 0
+					borderTopWidth: 0,
+					height: perfectSize(60)
+
+					//сделать высоту свою
 				}
 			}}
 		>

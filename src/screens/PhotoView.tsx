@@ -73,6 +73,7 @@ export const PhotoPage: React.FC<PhotoPageProps> = ({ route }) => {
 						<ShareButton
 							title={'Поделиться'}
 							url={'https://pastvu.com/p/' + cid}
+							postTitle={title}
 						/>
 					}
 				/>

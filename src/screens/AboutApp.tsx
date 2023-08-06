@@ -20,7 +20,7 @@ const AboutProject: ButtonLinkProps[] = [
 ]
 
 const Developers: ButtonLinkProps[] = [
-	{ title: 'Семён Кузьмин', url: 'https://t.me/paveldur0' }
+	{ title: 'Семён Кузьмин', url: 'https://t.me/semenKuzminWork' }
 ]
 
 const InsideMenuText: InsideMenuProps[] = [
