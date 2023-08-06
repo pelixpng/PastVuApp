@@ -38,7 +38,7 @@ export const MapComponent: React.FC<MapScreenNavigationProp> = observer(
 			setCoordinates(region)
 		}
 
-		async function exampleUsage() {
+		async function getPhoto() {
 			try {
 				await Location.requestForegroundPermissionsAsync()
 				const params: getPhotoListProps = {
@@ -70,12 +70,13 @@ export const MapComponent: React.FC<MapScreenNavigationProp> = observer(
 		}
 
 		useMemo(() => {
-			exampleUsage()
+			items.length > 150 && setItems([])
+			getPhoto()
 		}, [coordinates])
 
 		useMemo(() => {
 			setItems([])
-			exampleUsage()
+			getPhoto()
 		}, [yearsRange])
 
 		return (
