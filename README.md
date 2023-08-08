@@ -26,14 +26,14 @@ PastVu is an online platform for gathering, geo-tagging, attributing and discuss
 
 # Resources Used
 
-[PastVu api](https://docs.pastvu.com/dev/api) is used to get a photo.
-Map provided by google map [platform](https://developers.google.com/maps)
 [TaigaUI](https://taiga-ui.dev/) components were used in the design.
+[PastVu api](https://docs.pastvu.com/dev/api) is used to get a photo.
+Map provided by google map [platform](https://developers.google.com/maps).
 
 # How to start ?
 
-1) Generate your key to work with google maps api. Instruction
+1) Generate your key to work with google maps api. [Instruction](https://docs.expo.dev/versions/latest/sdk/map-view/#deploy-app-with-google-maps)
 2) Copy and open this repository.
 3) In the SRC folder, open the app.json file. Paste your key into the line android.config.googleMaps.apikey
-4) Generate your expo dev client. Instruction
+4) Generate your development build. [Instruction](https://docs.expo.dev/develop/development-builds/create-a-build/)
 5) Install the expo dev client apk on your device or emulator and run the command: "npx expo start --dev-client" 
