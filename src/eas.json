@@ -1,22 +1,24 @@
 {
-  "cli": {
-    "version": ">= 3.15.0"
-  },
-  "build": {
-    "preview": {
-      "android": {
-        "buildType": "apk"
-      }
-    },
-    "preview2": {
-      "android": {
-        "gradleCommand": ":app:assembleRelease"
-      }
-    },
-    "development": {
-      "developmentClient": true,
-      "distribution": "internal"
-    },
-    "production": {}
-  }
+	"cli": {
+		"version": ">= 3.15.0"
+	},
+	"build": {
+		"preview": {
+			"android": {
+				"buildType": "apk"
+			}
+		},
+		"preview2": {
+			"android": {
+				"gradleCommand": ":app:assembleRelease"
+			}
+		},
+		"development": {
+			"developmentClient": true,
+			"distribution": "internal"
+		},
+		"production": {
+			"channel": "production"
+		}
+	}
 }
