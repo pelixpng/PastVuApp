@@ -13,7 +13,12 @@ PastVu is an online platform for gathering, geo-tagging, attributing and discuss
   <img src="img/2.jpg" width="300" /> 
   <img src="img/3.jpg" width="300" />
 </p>
-![screen1](img/1.jpg) ![screen2](img/2.jpg) ![screen3](img/3.jpg) ![screen4](img/4.jpg) ![screen5](img/5.jpg) ![screen6](img/6.jpg)
+
+<p align="center">
+  <img src="img/4.jpg" width="300" />
+  <img src="img/5.jpg" width="300" /> 
+  <img src="img/6.jpg" width="300" />
+</p>
 
 # Resources Used
 
