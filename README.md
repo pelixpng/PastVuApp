@@ -9,15 +9,15 @@ PastVu is an online platform for gathering, geo-tagging, attributing and discuss
 # Screenshots
 
 <p align="center">
-  <img src="img/1.jpg" width="300" />
-  <img src="img/2.jpg" width="300" /> 
-  <img src="img/3.jpg" width="300" />
+  <img src="img/1.jpg" width="250" />
+  <img src="img/2.jpg" width="250" /> 
+  <img src="img/3.jpg" width="250" />
 </p>
 
 <p align="center">
-  <img src="img/4.jpg" width="300" />
-  <img src="img/5.jpg" width="300" /> 
-  <img src="img/6.jpg" width="300" />
+  <img src="img/4.jpg" width="250" />
+  <img src="img/5.jpg" width="250" /> 
+  <img src="img/6.jpg" width="250" />
 </p>
 
 # Resources Used
