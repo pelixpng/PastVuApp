@@ -4,7 +4,7 @@
 
 It has been developed using ReactNative, TypeScript, and Expo,
 making it compatible with both Android and iOS platforms.
-Currently only available for Android on Google Play, the iOS version will be released in the fall.
+Currently only available for Android on [Google Play](https://play.google.com/store/apps/details?id=com.pelixpng.PastVuApp), the iOS version will be released in the fall.
 
 This application is a mobile version of the [PastVu website](https://pastvu.com/).
 
