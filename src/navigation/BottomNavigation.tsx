@@ -51,7 +51,7 @@ export function BottomNavigator() {
 				options={{
 					headerShown: false,
 					tabBarShowLabel: true,
-					title: 'Карта',
+					title: 'Настройки',
 					tabBarLabelStyle: {
 						fontSize: perfectSize(13),
 						fontStyle: 'normal',
