@@ -1,17 +1,12 @@
-import React, { useEffect, useState } from 'react'
-import { MapComponent } from './screens/MapView'
+import React, { useEffect } from 'react'
 import { StartNavigator } from './navigation/StartNavigation'
-import { BottomNavigator } from './navigation/BottomNavigation'
-import { DefaultTheme, ThemeProvider, useTheme } from 'styled-components/native'
+import { ThemeProvider } from 'styled-components/native'
 import { useColorScheme } from 'react-native'
 import { DarkTheme, LightTheme } from './components/Theme'
-import { useFonts } from 'expo-font'
-import StorageServiceMMKV, { Storage } from './Storage/Storage'
 import apiStore from './mobxStore/apiStore'
 import { observer } from 'mobx-react-lite'
 import { StatusBar } from 'expo-status-bar'
 
-//ПОМЕНЯТЬ ТЕЛЕГУ ССЫЛКУ
 export default observer(function App() {
 	const colorScheme = useColorScheme()
 	const { themeSettings, theme, changeTheme } = apiStore
