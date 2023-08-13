@@ -37,7 +37,7 @@ about the project [here](https://docs.pastvu.com/en/about). Platform source
 # Resources Used
 
 [TaigaUI](https://taiga-ui.dev/) components were used in the design.  
-[PastVu API](https://docs.pastvu.com/dev/api) is used to get photos.
+[PastVu API](https://docs.pastvu.com/dev/api) is used to get photos.  
 The map API is provided by the Google Map
 [platform](https://developers.google.com/maps).  
 
