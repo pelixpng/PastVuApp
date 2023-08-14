@@ -3,9 +3,10 @@
 ![A blue star in a pink circle](img/logo.png)
 
 This application is a mobile version of the [PastVu
-website](https://pastvu.com/).
+website](https://pastvu.com/), [here's its GitHub
+page](https://github.com/PastVu/pastvu).
 
-It has been developed using ReactNative, TypeScript, and Expo, making it
+The app has been developed using ReactNative, TypeScript, and Expo, making it
 compatible with both Android and iOS platforms. Currently only available for
 Android on [Google
 Play](https://play.google.com/store/apps/details?id=com.pelixpng.PastVuApp),
