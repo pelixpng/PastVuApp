@@ -1,4 +1,4 @@
-interface Root {
+interface PhotoInfo {
 	result: Result
 	rid: string
 }

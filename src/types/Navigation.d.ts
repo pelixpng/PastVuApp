@@ -27,3 +27,13 @@ type SettingsStackParamList = {
 	SettingsComponent: undefined
 	MapSettings: undefined
 }
+
+export type StartRoutes = 'MapComponent' | 'ErrorLoad' | 'PhotoPage'
+
+export type BottomRoutes = 'MapComponent' | 'SettingsComponent'
+
+export type SettingsRoutes =
+	| 'AppInfo'
+	| 'FeedBack'
+	| 'SettingsComponent'
+	| 'MapSettings'

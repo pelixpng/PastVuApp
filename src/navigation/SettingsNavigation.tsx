@@ -1,11 +1,10 @@
 import React, { FC } from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
 import { SettingsStackParamList } from '../types/Navigation'
-import { SettingsRoutes } from './Routes'
-import { SettingsComponent } from '../screens/Settings'
-import { AppInfo } from '../screens/AboutApp'
-import { FeedBack } from '../screens/FeedBack'
-import { MapSettings } from '../screens/MapSettings'
+import { SettingsComponent } from '../screens/settings/Settings'
+import { AppInfo } from '../screens/settings/AboutApp'
+import { FeedBack } from '../screens/settings/FeedBack'
+import { MapSettings } from '../screens/settings/MapSettings'
 import { DefaultTheme, useTheme } from 'styled-components'
 import { perfectSize } from '../utils/ScreenSize'
 
@@ -15,7 +14,7 @@ export const SettingsNavigation: FC = () => {
 	const theme: DefaultTheme = useTheme()
 	return (
 		<SettingsStack.Navigator
-			initialRouteName={SettingsRoutes.SettingsComponent}
+			initialRouteName={'SettingsComponent'}
 			screenOptions={{
 				headerStyle: {
 					backgroundColor: theme.colors.backgroundApp,
@@ -26,7 +25,7 @@ export const SettingsNavigation: FC = () => {
 			}}
 		>
 			<SettingsStack.Screen
-				name={SettingsRoutes.SettingsComponent}
+				name={'SettingsComponent'}
 				component={SettingsComponent}
 				options={{
 					title: 'Настройки',
@@ -34,7 +33,7 @@ export const SettingsNavigation: FC = () => {
 				}}
 			/>
 			<SettingsStack.Screen
-				name={SettingsRoutes.AppInfo}
+				name={'AppInfo'}
 				component={AppInfo}
 				options={{
 					title: 'О приложении',
@@ -48,7 +47,7 @@ export const SettingsNavigation: FC = () => {
 				}}
 			/>
 			<SettingsStack.Screen
-				name={SettingsRoutes.MapSettings}
+				name={'MapSettings'}
 				component={MapSettings}
 				options={{
 					title: 'Настройки',
@@ -62,7 +61,7 @@ export const SettingsNavigation: FC = () => {
 				}}
 			/>
 			<SettingsStack.Screen
-				name={SettingsRoutes.FeedBack}
+				name={'FeedBack'}
 				component={FeedBack}
 				options={{
 					title: 'Обратная связь',

@@ -3,24 +3,27 @@ import { NavigationContainer } from '@react-navigation/native'
 import { RootStackParamList } from '../types/Navigation'
 import { createStackNavigator } from '@react-navigation/stack'
 import { NetInfoState, useNetInfo } from '@react-native-community/netinfo'
-import { StartRoutes } from './Routes'
-import { ErrorLoad } from '../screens/Error'
-import { PhotoPage } from '../screens/PhotoView'
+import { ErrorLoad } from '../screens/map/Error'
+import { PhotoPage } from '../screens/map/PhotoView'
 import { BottomNavigator } from './BottomNavigation'
 import { DefaultTheme, useTheme } from 'styled-components'
+import { useMemo } from 'react'
+import AlertModalService from '../utils/AlertModalService'
 
 const Stack = createStackNavigator<RootStackParamList>()
 
 export function StartNavigator() {
 	const internetState: NetInfoState = useNetInfo()
 	const theme: DefaultTheme = useTheme()
+
+	useMemo(() => {
+		internetState.isConnected === false && AlertModalService.internetError()
+	}, [internetState])
 	return (
 		<NavigationContainer>
 			<Stack.Navigator
 				initialRouteName={
-					internetState.isConnected
-						? StartRoutes.ErrorLoad
-						: StartRoutes.MapComponent
+					internetState.isConnected ? 'ErrorLoad' : 'MapComponent'
 				}
 				screenOptions={{
 					headerStyle: {
@@ -32,15 +35,15 @@ export function StartNavigator() {
 				}}
 			>
 				<Stack.Screen
-					name={StartRoutes.MapComponent}
+					name={'MapComponent'}
 					component={BottomNavigator}
 					options={{
 						headerShown: false
 					}}
 				/>
-				<Stack.Screen name={StartRoutes.ErrorLoad} component={ErrorLoad} />
+				<Stack.Screen name={'ErrorLoad'} component={ErrorLoad} />
 				<Stack.Screen
-					name={StartRoutes.PhotoPage}
+					name={'PhotoPage'}
 					component={PhotoPage}
 					options={{
 						title: ''

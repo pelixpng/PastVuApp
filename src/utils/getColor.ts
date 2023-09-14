@@ -8,4 +8,5 @@ export function getColor(number: number) {
 	else if (number <= 1970) return '#FFF500'
 	else if (number <= 1980) return '#9FFC00'
 	else if (number <= 2000) return '#1EFF00'
+	else return 'black'
 }

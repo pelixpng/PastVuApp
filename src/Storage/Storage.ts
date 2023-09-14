@@ -1,5 +1,5 @@
 import { MMKV } from 'react-native-mmkv'
-
+import { Region } from 'react-native-maps'
 export const Storage = new MMKV()
 
 export default class StorageServiceMMKV {
@@ -22,5 +22,10 @@ export default class StorageServiceMMKV {
 	static saveYearsRange = (RangeYears: YearsRangeType) => {
 		const stringifiedArray = JSON.stringify(RangeYears)
 		Storage.set('RangeYears', stringifiedArray)
+	}
+
+	static saveRegion = (Region: Region) => {
+		const RegionString = JSON.stringify(Region)
+		Storage.set('RegionString', RegionString)
 	}
 }

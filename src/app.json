@@ -2,20 +2,22 @@
 	"expo": {
 		"name": "PastVu",
 		"slug": "PastVuApp",
-		"version": "1.0.0",
+		"version": "1.0.1",
 		"orientation": "portrait",
 		"icon": "./assets/icon.png",
 		"userInterfaceStyle": "light",
 		"splash": {
 			"image": "./assets/splash.png",
 			"resizeMode": "contain",
-			"backgroundColor": "#ffffff"
+			"backgroundColor": "#2D61A0"
 		},
 		"assetBundlePatterns": ["**/*"],
 		"ios": {
-			"supportsTablet": true
+			"supportsTablet": true,
+			"bundleIdentifier": "com.pelixpng.PastVuApp"
 		},
 		"android": {
+			"softwareKeyboardLayoutMode": "pan",
 			"config": {
 				"googleMaps": {
 					"apiKey": "YOUR_GOOGLEMAPS_API_KEY"
@@ -25,7 +27,8 @@
 				"foregroundImage": "./assets/adaptive-icon.png",
 				"backgroundColor": "#ffffff"
 			},
-			"package": "com.pelixpng.PastVuApp"
+			"package": "com.pelixpng.PastVuApp",
+			"versionCode": 2
 		},
 		"web": {
 			"favicon": "./assets/favicon.png"
@@ -34,6 +37,10 @@
 			"eas": {
 				"projectId": "e18d3b69-bdd0-4b43-a4e2-02847112f893"
 			}
+		},
+		"runtimeVersion": "1.0.0",
+		"updates": {
+			"url": "https://u.expo.dev/e18d3b69-bdd0-4b43-a4e2-02847112f893"
 		}
 	}
 }

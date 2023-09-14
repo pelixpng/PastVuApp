@@ -1,11 +1,11 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import { MapComponent } from '../screens/MapView'
-import { BottomRoutes } from './Routes'
+import { MapComponent } from '../screens/map/MapView'
 import { SettingsNavigation } from './SettingsNavigation'
 import { DefaultTheme, useTheme } from 'styled-components'
 import { perfectSize } from '../utils/ScreenSize'
 import { Feather } from '@expo/vector-icons'
 import React from 'react'
+
 const Tab = createBottomTabNavigator()
 
 export function BottomNavigator() {
@@ -15,20 +15,18 @@ export function BottomNavigator() {
 			screenOptions={{
 				tabBarActiveTintColor: theme.colors.tabBarActiveTint,
 				tabBarInactiveTintColor: theme.colors.tabBarInactiveTintColor,
-
 				tabBarStyle: {
 					backgroundColor: theme.colors.backgroundApp,
 					paddingTop: perfectSize(5),
 					paddingBottom: perfectSize(5),
 					borderTopWidth: 0,
 					height: perfectSize(60)
-
-					//сделать высоту свою
-				}
+				},
+				tabBarHideOnKeyboard: true
 			}}
 		>
 			<Tab.Screen
-				name={BottomRoutes.MapComponent}
+				name={'MapComponent'}
 				component={MapComponent}
 				options={{
 					headerShown: false,
@@ -46,7 +44,7 @@ export function BottomNavigator() {
 				}}
 			/>
 			<Tab.Screen
-				name={BottomRoutes.SettingsComponent}
+				name={'SettingsComponent'}
 				component={SettingsNavigation}
 				options={{
 					headerShown: false,

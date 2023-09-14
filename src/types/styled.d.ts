@@ -15,6 +15,7 @@ declare module 'styled-components' {
 			MenuContainer: string
 			SliderRangeBG: string
 			Delimetr: string
+			MapTheme: Array
 		}
 		names: {
 			themeName: ThemeNameType

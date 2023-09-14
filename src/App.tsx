@@ -1,40 +1,31 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { StartNavigator } from './navigation/StartNavigation'
 import { ThemeProvider } from 'styled-components/native'
 import { useColorScheme } from 'react-native'
-import { DarkTheme, LightTheme } from './components/Theme'
-import apiStore from './mobxStore/apiStore'
+import { DarkTheme, LightTheme } from './components/theme/Theme'
 import { observer } from 'mobx-react-lite'
 import { StatusBar } from 'expo-status-bar'
+import ThemeStore from './mobx/ThemeStore'
 
 export default observer(function App() {
 	const colorScheme = useColorScheme()
-	const { themeSettings, theme, changeTheme } = apiStore
-
-	useEffect(() => {
-		getColorScheme()
-	}, [])
+	const { themeSettings, theme, changeTheme } = ThemeStore
 
 	const getColorScheme = () => {
-		let selectedTheme = ''
-		if (themeSettings === 'Тёмная') {
-			selectedTheme = 'dark'
-		} else if (themeSettings === 'Светлая') {
-			selectedTheme = 'light'
-		} else {
-			selectedTheme = colorScheme || 'light'
-		}
+		const selectedTheme =
+			themeSettings === 'Тёмная'
+				? 'dark'
+				: themeSettings === 'Светлая'
+				? 'light'
+				: colorScheme || 'light'
 		changeTheme(selectedTheme)
 	}
 
 	const getTheme = (theme: string | null | undefined) => {
-		if (theme == 'Светлая' || theme == 'light') {
-			return LightTheme
-		} else {
-			return DarkTheme
-		}
+		return theme === 'Светлая' || theme === 'light' ? LightTheme : DarkTheme
 	}
 
+	getColorScheme()
 	return (
 		<ThemeProvider
 			theme={
@@ -49,7 +40,6 @@ export default observer(function App() {
 				}
 				style="auto"
 			/>
-
 			<StartNavigator />
 		</ThemeProvider>
 	)

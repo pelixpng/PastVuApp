@@ -1,11 +1,8 @@
 import { ReactNode } from 'react'
 
-type MenuButtonProps = {
-	navigation: any
-	route: string
+type LinkProps = {
 	title: string
-	discription: string
-	icon: 'mail' | 'info' | 'settings'
+	url: string
 }
 
 type InsideMenuProps = {
@@ -20,16 +17,6 @@ type InsideMenuProps = {
 	button?: ReactNode
 }
 
-type ButtonLinkProps = {
-	title: string
-	url: string
-	postTitle?: string
-}
-
-type PhotoPageProps = {
-	route: { params: { PhotoJson: Root } }
-}
-
 type SliderComponentProps = {
 	value: number
 	setValue: (value: number) => void
@@ -42,3 +29,10 @@ type YearsSliderComponentProps = {
 	value: YearsRangeType
 	setValue: (value: YearsRangeType) => void
 }
+
+type MarkerProps = {
+	color: string
+	direction: Direction
+}
+
+type Direction = 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w' | 'nw' | 'aero' | ''
