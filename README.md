@@ -35,25 +35,20 @@ about the project [here](https://docs.pastvu.com/en/about). Platform source
   <img src="img/6.jpg" width="250" />
 </p>
 
+<p align="center">
+  <img src="img/7.jpg" width="250" />
+  <img src="img/8.jpg" width="250" /> 
+  <img src="img/9.jpg" width="250" />
+</p>
+
 # Resources Used
 
 [TaigaUI](https://taiga-ui.dev/) components were used in the design.  
 [PastVu API](https://docs.pastvu.com/dev/api) is used to get photos.  
 The map API is provided by the Google Map
-[platform](https://developers.google.com/maps).  
+[platform](https://developers.google.com/maps).
 
-# How to start?
+# Plans
 
-1. Generate your key to work with Google Maps API.
-   [Instruction](https://docs.expo.dev/versions/latest/sdk/map-view/#deploy-app-with-google-maps)
-2. Clone and open this repository.
-3. In the `SRC` folder, open the `app.json` file. Paste your key into the line
-   `android.config.googleMaps.apikey`.
-4. Generate your development build.
-   [Instruction](https://docs.expo.dev/develop/development-builds/create-a-build/)
-5. Install the development build on your device or emulator and run the
-   command: 
-
-    ```
-    npx expo start --dev-client
-    ```
+1. Add Yandex maps.
+2. Downloading photos to your device.

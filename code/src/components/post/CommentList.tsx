@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useState } from 'react'
 import styled from 'styled-components/native'
 import { Comment } from './Comment'
-import ApiService from '../../../api/PastVuApi'
+import ApiService from '../../api/PastVuApi'
 import { IComment, Users } from '../../types/apiPhotoComment'
 import AlertModalService from '../../utils/AlertModalService'
 

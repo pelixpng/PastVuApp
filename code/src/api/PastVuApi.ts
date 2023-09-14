@@ -1,11 +1,11 @@
-import { IComments } from '../src/types/apiPhotoComment'
+import { IComments } from '../types/apiPhotoComment'
 import {
 	PhotoList,
 	getPhotoListProps,
 	itemPhotoArray
-} from '../src/types/apiPhotoList'
-import { getColor } from '../src/utils/getColor'
-import { getAngle } from '../src/utils/getDirection'
+} from '../types/apiPhotoList'
+import { getColor } from '../utils/getColor'
+import { getAngle } from '../utils/getDirection'
 
 export default class ApiService {
 	static async getPhotoList(params: getPhotoListProps) {

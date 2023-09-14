@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import { Region } from 'react-native-maps'
 import { View } from 'react-native'
-import ApiService from '../../../api/PastVuApi'
+import ApiService from '../../api/PastVuApi'
 import { RootStackParamList } from '../../types/Navigation'
 import { observer } from 'mobx-react-lite'
 import { SafeAreaView } from 'react-native-safe-area-context'
