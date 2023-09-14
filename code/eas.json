@@ -1,0 +1,36 @@
+{
+  "cli": {
+    "version": ">= 3.15.0"
+  },
+  "build": {
+    "preview": {
+      "android": {
+        "buildType": "apk"
+      },
+      "channel": "preview"
+    },
+    "preview2": {
+      "android": {
+        "gradleCommand": ":app:assembleRelease"
+      },
+      "channel": "preview2"
+    },
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "channel": "development"
+    },
+    "production": {
+      "channel": "production",
+      "autoIncrement": true
+    },
+    "development-simulator": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "ios": {
+        "simulator": true
+      },
+      "channel": "development-simulator"
+    }
+  }
+}
