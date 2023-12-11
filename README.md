@@ -52,3 +52,6 @@ The map API is provided by the Google Map
 
 1. Add Yandex maps.
 2. Downloading photos to your device.
+
+# License
+* GNU Affero General Public License (AGPL) v3 or later. See [LICENSE](https://github.com/pelixpng/PastVuApp/blob/master/LICENSE) for the full license text.
