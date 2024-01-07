@@ -1,9 +1,10 @@
 import { FC } from 'react'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
-import { perfectSize } from '../../utils/ScreenSize'
 import { DefaultTheme, useTheme } from 'styled-components'
 import { Region } from 'react-native-maps'
 import React from 'react'
+import AlertModalService from '../../utils/AlertModalService'
+import { perfectSize } from '../../utils/ScreenSize'
 
 type SearchPlaceProp = {
 	setCoordinates: (region: Region) => void
@@ -19,6 +20,14 @@ const SearchPlaceComponent: FC<SearchPlaceProp> = ({ setCoordinates }) => {
 				returnKeyType: 'search'
 			}}
 			fetchDetails={true}
+			onFail={(error: string) => {
+				error.includes('quota')
+					? AlertModalService.infoAlert(
+							'Ошибка',
+							'К сожалению, ежедневный лимит поисковых запросов исчерпан. Попробуйте завтра.'
+					  )
+					: AlertModalService.infoAlert('ОШИБКА', error)
+			}}
 			onPress={(data, details = null) => {
 				setCoordinates({
 					latitude: details?.geometry.location.lat,
@@ -28,7 +37,7 @@ const SearchPlaceComponent: FC<SearchPlaceProp> = ({ setCoordinates }) => {
 				})
 			}}
 			query={{
-				key: 'YOUR_GOOGLEMAPS_API_KEY',
+				key: 'YOUR_GOOGLE_MAPS_API_KEY',
 				language: 'ru'
 			}}
 			styles={{
@@ -37,7 +46,7 @@ const SearchPlaceComponent: FC<SearchPlaceProp> = ({ setCoordinates }) => {
 					alignSelf: 'center',
 					position: 'absolute',
 					zIndex: 9,
-					marginTop: 10
+					marginTop: perfectSize(10)
 				},
 				textInput: {
 					borderRadius: 30,

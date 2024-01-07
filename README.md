@@ -10,7 +10,7 @@ The app has been developed using ReactNative, TypeScript, and Expo, making it
 compatible with both Android and iOS platforms. Currently only available for
 Android on [Google
 Play](https://play.google.com/store/apps/details?id=com.pelixpng.PastVuApp),
-the iOS version will be released in the fall.
+the iOS version will be released later.
 
 PastVu is an online platform for gathering, geo-tagging, attributing and
 discussing retro images. A look at the history of humanity habitat. The
@@ -41,6 +41,12 @@ about the project [here](https://docs.pastvu.com/en/about). Platform source
   <img src="img/9.png" width="250" />
 </p>
 
+<p align="center">
+  <img src="img/10.png" width="250" />
+  <img src="img/11.png" width="250" /> 
+  <img src="img/12.png" width="250" />
+</p>
+
 # Resources Used
 
 [TaigaUI](https://taiga-ui.dev/) components were used in the design.  
@@ -51,7 +57,9 @@ The map API is provided by the Google Map
 # Plans
 
 1. Add Yandex maps.
-2. Downloading photos to your device.
+   ~~2. Downloading photos to your device.~~
+2. Publish in App Store.
 
 # License
-* GNU Affero General Public License (AGPL) v3 or later. See [LICENSE](https://github.com/pelixpng/PastVuApp/blob/master/LICENSE) for the full license text.
+
+- GNU Affero General Public License (AGPL) v3 or later. See [LICENSE](https://github.com/pelixpng/PastVuApp/blob/master/LICENSE) for the full license text.

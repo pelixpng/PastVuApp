@@ -1,6 +1,6 @@
 import { Direction } from '../types/components'
 
-export const getAngle = (direction: Direction): number => {
+export const getAngle = (direction: Direction | undefined): number => {
 	switch (direction) {
 		case 'n':
 			return 180.0

@@ -4,6 +4,7 @@ import { Comment } from './Comment'
 import ApiService from '../../api/PastVuApi'
 import { IComment, Users } from '../../types/apiPhotoComment'
 import AlertModalService from '../../utils/AlertModalService'
+import { perfectSize } from '../../utils/ScreenSize'
 
 type CommentListProps = {
 	cid: string
@@ -56,5 +57,5 @@ export const CommentList: FC<CommentListProps> = ({ cid }) => {
 const Container = styled.View`
 	align-self: center;
 	width: 93%;
-	margin-top: 2px;
+	margin-top: ${perfectSize(2)};
 `

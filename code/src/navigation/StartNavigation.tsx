@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { NavigationContainer } from '@react-navigation/native'
-import { RootStackParamList } from '../types/Navigation'
+import { RootStackParamList } from '../types/navigation'
 import { createStackNavigator } from '@react-navigation/stack'
 import { NetInfoState, useNetInfo } from '@react-native-community/netinfo'
 import { ErrorLoad } from '../screens/map/Error'
@@ -9,15 +9,16 @@ import { BottomNavigator } from './BottomNavigation'
 import { DefaultTheme, useTheme } from 'styled-components'
 import { useMemo } from 'react'
 import AlertModalService from '../utils/AlertModalService'
+import { History } from '../screens/map/History'
 
 const Stack = createStackNavigator<RootStackParamList>()
 
 export function StartNavigator() {
 	const internetState: NetInfoState = useNetInfo()
 	const theme: DefaultTheme = useTheme()
-
 	useMemo(() => {
-		internetState.isConnected === false && AlertModalService.internetError()
+		internetState.isConnected === false &&
+			AlertModalService.infoAlert('Ошибка', 'Нет подключения к интернету')
 	}, [internetState])
 	return (
 		<NavigationContainer>
@@ -31,7 +32,8 @@ export function StartNavigator() {
 						elevation: 0
 					},
 					headerTintColor: theme.colors.titleMenuText,
-					presentation: 'transparentModal'
+					presentation: 'transparentModal',
+					title: ''
 				}}
 			>
 				<Stack.Screen
@@ -42,13 +44,8 @@ export function StartNavigator() {
 					}}
 				/>
 				<Stack.Screen name={'ErrorLoad'} component={ErrorLoad} />
-				<Stack.Screen
-					name={'PhotoPage'}
-					component={PhotoPage}
-					options={{
-						title: ''
-					}}
-				/>
+				<Stack.Screen name={'PhotoPage'} component={PhotoPage} />
+				<Stack.Screen name={'History'} component={History} />
 			</Stack.Navigator>
 		</NavigationContainer>
 	)

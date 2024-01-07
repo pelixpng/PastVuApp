@@ -1,22 +1,25 @@
 import React, { FC } from 'react'
 import styled from 'styled-components/native'
-import { Ionicons } from '@expo/vector-icons'
+import { MaterialIcons } from '@expo/vector-icons'
 import * as Location from 'expo-location'
 import { Region } from 'react-native-maps'
 import { DefaultTheme, useTheme } from 'styled-components'
 import AlertModalService from '../../utils/AlertModalService'
+import { perfectSize } from '../../utils/ScreenSize'
 
 type LocationButtonProps = {
 	setCoord: (region: Region) => void
 }
 
 const GetLocationButton: FC<LocationButtonProps> = ({ setCoord }) => {
-	console.log('MEMOOO')
 	const theme: DefaultTheme = useTheme()
 	const getLocation = async () => {
 		let { status } = await Location.requestForegroundPermissionsAsync()
 		if (status !== 'granted') {
-			AlertModalService.userLoactinoError()
+			AlertModalService.infoAlert(
+				'Ошибка',
+				'У приложения нет доступа к геопозиции'
+			)
 		}
 		let location = await Location.getCurrentPositionAsync({})
 		setCoord({
@@ -27,31 +30,24 @@ const GetLocationButton: FC<LocationButtonProps> = ({ setCoord }) => {
 		})
 	}
 	return (
-		<Container>
-			<ContainerIcon onPress={() => getLocation()}>
-				<Ionicons
-					name="ios-location-sharp"
-					size={24}
-					color={theme.colors.titleMenuText}
-				/>
-			</ContainerIcon>
-		</Container>
+		<ContainerIcon onPress={() => getLocation()}>
+			<MaterialIcons
+				name="my-location"
+				size={24}
+				color={theme.colors.titleMenuText}
+			/>
+		</ContainerIcon>
 	)
 }
 
 export const LocationButton = React.memo(GetLocationButton)
 
-const Container = styled.View`
-	width: 95%;
-	position: absolute;
-	bottom: 130px;
-	z-index: 10;
-	align-self: center;
-`
-
 const ContainerIcon = styled.TouchableOpacity`
 	background-color: ${props => props.theme.colors.backgroundApp};
 	align-self: flex-end;
-	padding: 11px;
+	padding: 10px;
 	border-radius: 50px;
+	position: absolute;
+	bottom: ${perfectSize(130)};
+	right: ${perfectSize(10)};
 `

@@ -20,7 +20,7 @@
 			"softwareKeyboardLayoutMode": "pan",
 			"config": {
 				"googleMaps": {
-					"apiKey": "YOUR_GOOGLEMAPS_API_KEY"
+					"apiKey": "YOUR_GOOGLE_MAPS_API_KEY"
 				}
 			},
 			"adaptiveIcon": {
@@ -28,7 +28,7 @@
 				"backgroundColor": "#ffffff"
 			},
 			"package": "com.pelixpng.PastVuApp",
-			"versionCode": 2
+			"versionCode": 3
 		},
 		"web": {
 			"favicon": "./assets/favicon.png"
@@ -41,6 +41,16 @@
 		"runtimeVersion": "1.0.0",
 		"updates": {
 			"url": "https://u.expo.dev/e18d3b69-bdd0-4b43-a4e2-02847112f893"
-		}
+		},
+		"plugins": [
+			[
+				"expo-media-library",
+				{
+					"photosPermission": "Allow $(PRODUCT_NAME) to access your photos.",
+					"savePhotosPermission": "Allow $(PRODUCT_NAME) to save photos.",
+					"isAccessMediaLocationEnabled": true
+				}
+			]
+		]
 	}
 }

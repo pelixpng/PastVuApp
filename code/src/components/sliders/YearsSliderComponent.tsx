@@ -3,8 +3,13 @@ import React, { FC, useState } from 'react'
 import { perfectSize } from '../../utils/ScreenSize'
 import { DefaultTheme, useTheme } from 'styled-components'
 import { Slider } from '@miblanchard/react-native-slider'
-import StorageServiceMMKV from '../../Storage/Storage'
-import { YearsSliderComponentProps } from '../../types/components'
+import StorageServiceMMKV from '../../storage/Storage'
+import { YearsRangeType } from '../../types/components'
+
+type YearsSliderComponentProps = {
+	value: YearsRangeType
+	setValue: (value: YearsRangeType) => void
+}
 
 const YearsSliderComponent: FC<YearsSliderComponentProps> = ({
 	value,
@@ -56,7 +61,6 @@ export const SliderBodyContainer = styled.View`
 
 export const SliderComponentBack = styled.View`
 	width: 100%;
-	height: auto;
 	border-radius: 16px 16px 0px 0px;
 	background-color: ${props => props.theme.colors.backgroundApp};
 	position: absolute;
@@ -66,16 +70,15 @@ export const SliderComponentBack = styled.View`
 	z-index: 8;
 	padding: 6px;
 	display: flex;
-	flex-direction: column;
 	align-items: flex-start;
-	gap: 5px;
+	gap: ${perfectSize(6)};
 `
 
 const CurentYearsText = styled.Text`
 	font-size: ${perfectSize(14)};
 	font-style: normal;
 	font-weight: 500;
-	line-height: 20px;
+	line-height: ${perfectSize(20)};
 	color: ${props => props.theme.colors.MenuDescriptionText};
 	text-align: center;
 	align-self: center;

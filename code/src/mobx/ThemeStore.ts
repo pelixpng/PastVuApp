@@ -1,5 +1,5 @@
 import { makeAutoObservable } from 'mobx'
-import StorageServiceMMKV, { Storage } from '../Storage/Storage'
+import StorageServiceMMKV, { Storage } from '../storage/Storage'
 
 class ThemeStore {
 	themeSettings = Storage.getString('theme') ?? 'Системная'

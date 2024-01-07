@@ -20,7 +20,7 @@ export const MenuContainer = styled.TouchableOpacity`
 	width: 93%;
 	padding: 20px;
 	align-items: flex-start;
-	gap: 12px;
+	gap: ${perfectSize(12)};
 	border-radius: 16px;
 	background: ${props => props.theme.colors.MenuContainer};
 	align-self: center;
@@ -32,7 +32,6 @@ export const MenuContainer = styled.TouchableOpacity`
 `
 export const MenuTextContainer = styled.View`
 	display: flex;
-	flex-direction: column;
 	align-items: flex-start;
 	flex: 1 0 0;
 `
@@ -56,7 +55,6 @@ export const BackgroundMenuIcon = styled.View`
 	display: flex;
 	width: ${perfectSize(44)};
 	height: ${perfectSize(44)};
-	padding: 8px;
 	justify-content: center;
 	align-items: center;
 	background-color: ${props => props.theme.colors.BackgroundMenuIcon};
@@ -64,17 +62,16 @@ export const BackgroundMenuIcon = styled.View`
 `
 
 export const InsideMenuContainer = styled.View`
-	flex-direction: column;
 	display: flex;
 	width: 93%;
 	padding: 20px;
 	align-items: flex-start;
-	gap: 12px;
+	gap: ${perfectSize(12)};
 	border-radius: 16px;
 	background: ${props => props.theme.colors.MenuContainer};
 	align-self: center;
-	margin-top: 10px;
-	margin-bottom: 10px;
+	margin-top: ${perfectSize(10)};
+	margin-bottom: ${perfectSize(10)};
 	${Platform.OS === 'android'
 		? 'elevation: 4;'
 		: 'shadow-color: rgba(0, 0, 0, 0.12); shadow-opacity: 1; shadow-radius: 4px; shadow-offset: 0px 4px;'}
@@ -82,7 +79,6 @@ export const InsideMenuContainer = styled.View`
 
 export const MenuInsideTextContainer = styled.View`
 	display: flex;
-	flex-direction: column;
 	align-items: flex-start;
 `
 
@@ -107,17 +103,15 @@ export const ButtonLinkText = styled.Text`
 `
 
 export const AppIconContainer = styled.View`
-	flex-direction: column;
 	display: flex;
-	width: auto;
 	padding: 20px;
 	align-items: center;
-	gap: 12px;
+	gap: ${perfectSize(12)};
 	border-radius: 16px;
 	background: ${props => props.theme.colors.MenuContainer};
 	align-self: center;
-	margin-top: 10px;
-	margin-bottom: 10px;
+	margin-top: ${perfectSize(10)};
+	margin-bottom: ${perfectSize(10)};
 	${Platform.OS === 'android'
 		? 'elevation: 4;'
 		: 'shadow-color: rgba(0, 0, 0, 0.12); shadow-opacity: 1; shadow-radius: 4px; shadow-offset: 0px 4px;'}
@@ -125,6 +119,6 @@ export const AppIconContainer = styled.View`
 
 export const LogoContainer = styled.Image`
 	align-self: center;
-	width: 150;
-	height: 150;
+	width: ${perfectSize(150)};
+	height: ${perfectSize(150)};
 `

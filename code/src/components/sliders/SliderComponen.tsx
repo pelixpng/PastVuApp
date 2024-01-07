@@ -3,7 +3,14 @@ import React, { FC } from 'react'
 import { perfectSize } from '../../utils/ScreenSize'
 import { Slider } from '@miblanchard/react-native-slider'
 import { DefaultTheme, useTheme } from 'styled-components'
-import { SliderComponentProps } from '../../types/components'
+
+type SliderComponentProps = {
+	value: number
+	setValue: (value: number[]) => void
+	title: string
+	minValue: number
+	maxValue: number
+}
 
 export const SliderComponent: FC<SliderComponentProps> = ({
 	value,
@@ -24,7 +31,7 @@ export const SliderComponent: FC<SliderComponentProps> = ({
 				<Slider
 					minimumValue={minValue}
 					maximumValue={maxValue}
-					thumbStyle={{ height: perfectSize(15), width: perfectSize(15) }}
+					thumbStyle={{ height: 15, width: 15 }}
 					containerStyle={{ height: perfectSize(25) }}
 					thumbTintColor="#526ED3"
 					animateTransitions={true}
@@ -45,7 +52,6 @@ export const SliderComponent: FC<SliderComponentProps> = ({
 
 export const SliderContainer = styled.View`
 	display: flex;
-	flex-direction: column;
 	align-items: flex-start;
 	width: 100%;
 `

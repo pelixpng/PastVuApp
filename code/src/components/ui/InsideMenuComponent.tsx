@@ -12,19 +12,17 @@ import { Linking } from 'react-native'
 export const InsideMenuComponent: FC<InsideMenuProps> = ({
 	ButtonArray,
 	title,
-	discription,
-	CustomComponent,
-	CustomComponent2,
+	description: description,
+	children,
 	HTMLdiscription,
 	HTMLautor,
-	HTMLsource,
-	button
+	HTMLsource
 }) => {
 	return (
 		<InsideMenuContainer>
 			<MenuInsideTextContainer>
 				<MenuTitleText>{title}</MenuTitleText>
-				<MenuDescriptionText>{discription}</MenuDescriptionText>
+				<MenuDescriptionText>{description}</MenuDescriptionText>
 				{HTMLdiscription && HTMLdiscription}
 				{HTMLsource && HTMLsource}
 				{HTMLautor && HTMLautor}
@@ -37,9 +35,7 @@ export const InsideMenuComponent: FC<InsideMenuProps> = ({
 						key={index}
 					/>
 				))}
-			{CustomComponent && CustomComponent}
-			{CustomComponent2 && CustomComponent2}
-			{button && button}
+			{children}
 		</InsideMenuContainer>
 	)
 }

@@ -34,15 +34,13 @@ export default class ApiService {
 		const response = await fetch(
 			`https://pastvu.com/api2?method=photo.giveForPage&params={"cid":${cid}}`
 		)
-		const json = (await response.json()) as PhotoInfo
-		return json
+		return (await response.json()) as PhotoInfo
 	}
 
 	static async getComments(cid: string) {
 		const response = await fetch(
 			`https://pastvu.com/api2?method=comment.giveForObj&params={"cid":${cid}}`
 		)
-		const json = (await response.json()) as IComments
-		return json
+		return (await response.json()) as IComments
 	}
 }

@@ -1,5 +1,4 @@
 import React, { FC } from 'react'
-import { perfectSize } from '../../utils/ScreenSize'
 import {
 	MenuContainer,
 	MenuTextContainer,
@@ -7,16 +6,16 @@ import {
 	MenuDescriptionText,
 	BackgroundMenuIcon
 } from '../ui/UniversalComponents'
-import { Feather } from '@expo/vector-icons'
+import { MaterialIcons } from '@expo/vector-icons'
 import { NavigationProp, useNavigation } from '@react-navigation/native'
-import { SettingsRoutes, SettingsStackParamList } from '../../types/Navigation'
+import { SettingsRoutes, SettingsStackParamList } from '../../types/navigation'
+import { perfectSize } from '../../utils/ScreenSize'
 
 type MenuButtonProps = {
-	navigation: any
-	route: SettingsRoutes
+	route?: SettingsRoutes
 	title: string
-	discription: string
-	icon: 'mail' | 'info' | 'settings'
+	description: string
+	icon: 'mail' | 'info' | 'settings' | 'history'
 }
 
 type settingProp = NavigationProp<SettingsStackParamList>
@@ -24,22 +23,18 @@ type settingProp = NavigationProp<SettingsStackParamList>
 export const MenuButton: FC<MenuButtonProps> = ({
 	route,
 	title,
-	discription,
+	description: description,
 	icon
 }) => {
 	const navigation = useNavigation<settingProp>()
 	return (
-		<MenuContainer onPress={() => navigation.navigate(route)}>
+		<MenuContainer onPress={() => route && navigation.navigate(route)}>
 			<MenuTextContainer>
 				<MenuTitleText>{title}</MenuTitleText>
-				<MenuDescriptionText>{discription}</MenuDescriptionText>
+				<MenuDescriptionText>{description}</MenuDescriptionText>
 			</MenuTextContainer>
 			<BackgroundMenuIcon>
-				<Feather
-					name={icon}
-					size={perfectSize(22)}
-					color="rgba(112, 182, 246, 1)"
-				/>
+				<MaterialIcons name={icon} size={perfectSize(22)} color="white" />
 			</BackgroundMenuIcon>
 		</MenuContainer>
 	)

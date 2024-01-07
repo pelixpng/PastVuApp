@@ -2,11 +2,11 @@ import React, { useState, useMemo } from 'react'
 import { Region } from 'react-native-maps'
 import { View } from 'react-native'
 import ApiService from '../../api/PastVuApi'
-import { RootStackParamList } from '../../types/Navigation'
+import { RootStackParamList } from '../../types/navigation'
 import { observer } from 'mobx-react-lite'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { YearsSlider } from '../../components/sliders/YearsSliderComponent'
-import StorageServiceMMKV, { Storage } from '../../Storage/Storage'
+import StorageServiceMMKV, { Storage } from '../../storage/Storage'
 import { NavigationProp, useNavigation } from '@react-navigation/native'
 import SettingsMapStore from '../../mobx/SettingsMapStore'
 import { LocationButton } from '../../components/buttons/LocationButton'
@@ -14,6 +14,7 @@ import { SearchPlace } from '../../components/map/SearchPlace'
 import { GoogleMap } from '../../components/map/Map'
 import * as Location from 'expo-location'
 import { itemPhotoArray, getPhotoListProps } from '../../types/apiPhotoList'
+import { HistoryButton } from '../../components/buttons/HistoryButton'
 
 const loc: Region = {
 	latitude: 55.763307,
@@ -21,8 +22,6 @@ const loc: Region = {
 	latitudeDelta: 0.01,
 	longitudeDelta: 0.01
 }
-
-type mainNavProps = NavigationProp<RootStackParamList>
 
 export const MapComponent: React.FC = observer(() => {
 	const saveRangeYears = Storage.getString('RangeYears')
@@ -34,11 +33,23 @@ export const MapComponent: React.FC = observer(() => {
 	const [yearsRange, setYearsRange] = useState<YearsRangeType>(
 		saveRangeYears ? JSON.parse(saveRangeYears) : [1840, 1916]
 	)
-	const { countPhoto, maxDistance } = SettingsMapStore
-	const navigation = useNavigation<mainNavProps>()
+	const { countPhoto, maxDistance, maxPhotoOnMap } = SettingsMapStore
+	const navigation = useNavigation<NavigationProp<RootStackParamList>>()
 	const handleButtonPress = async (cid: string) => {
 		const PhotoJson: PhotoInfo = await ApiService.getPhotoInfo(cid)
+		const description =
+			PhotoJson.result.photo.y +
+			' ' +
+			PhotoJson.result.photo.regions
+				.map(region => region.title_local)
+				.join(', ')
 		navigation.navigate('PhotoPage', { PhotoJson })
+		StorageServiceMMKV.saveHistory(
+			cid,
+			PhotoJson.result.photo.title,
+			description,
+			PhotoJson.result.photo.file
+		)
 	}
 	async function getPhoto() {
 		try {
@@ -72,7 +83,7 @@ export const MapComponent: React.FC = observer(() => {
 
 	useMemo(() => {
 		StorageServiceMMKV.saveRegion(coordinates)
-		items.length > 100 && setItems([])
+		items.length > maxPhotoOnMap && setItems([])
 		getPhoto()
 	}, [coordinates])
 
@@ -91,6 +102,7 @@ export const MapComponent: React.FC = observer(() => {
 					items={items}
 					handleButtonPress={handleButtonPress}
 				/>
+				<HistoryButton />
 				<LocationButton setCoord={setCoordinates} />
 				<YearsSlider value={yearsRange} setValue={setYearsRange} />
 			</View>

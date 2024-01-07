@@ -26,17 +26,17 @@ const Developers: LinkProps[] = [
 const InsideMenuText: InsideMenuProps[] = [
 	{
 		title: 'Что такое PastVu?',
-		discription:
+		description:
 			'Данное приложение является мобильной версией проекта PastVu, а также имеет полностью открытый исходный код.  PastVu - проект по сбору свидетельств прошлого в фотографиях, взгляд на историю среды обитания человечества.'
 	},
 	{
 		title: 'Используемые ресурсы',
-		discription:
+		description:
 			'Для получения фотографий и информации о них используется открытое  Api проекта PastVu. Карта предоставлена Google Maps Platform.'
 	},
 	{
 		title: 'Разработчики',
-		discription: 'Персоны участвовашие в разработке и отладке приложения.'
+		description: 'Персоны участвовавшие в разработке и отладке приложения.'
 	}
 ]
 
@@ -44,25 +44,25 @@ export const AppInfo: FC = () => {
 	return (
 		<ScrollContainer>
 			<AppIconContainer>
-				<LogoContainer source={require('../../assets/icon.png')} />
+				<LogoContainer source={require('../../../assets/icon.png')} />
 				<MenuDescriptionText>
-					Версия 1.0.1 от 14 сентября 2023 г.
+					Версия 1.0.2 от 5 января 2024 г.
 				</MenuDescriptionText>
 			</AppIconContainer>
 			<InsideMenuComponent
 				ButtonArray={AboutProject}
 				title={InsideMenuText[0].title}
-				discription={InsideMenuText[0].discription}
+				description={InsideMenuText[0].description}
 			/>
 			<InsideMenuComponent
 				ButtonArray={ResourcesUsed}
 				title={InsideMenuText[1].title}
-				discription={InsideMenuText[1].discription}
+				description={InsideMenuText[1].description}
 			/>
 			<InsideMenuComponent
 				ButtonArray={Developers}
 				title={InsideMenuText[2].title}
-				discription={InsideMenuText[2].discription}
+				description={InsideMenuText[2].description}
 			/>
 		</ScrollContainer>
 	)

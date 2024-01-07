@@ -16,9 +16,9 @@ export const Comment: FC<CommentProps> = ({ name, text, uri, width }) => {
 	const textHTML = {
 		html: `<span style="color: ${
 			theme.colors.MenuDescriptionText
-		}; font-size: 13px; line-height: ${perfectSize(
-			20
-		)}; font-weight: 400; font-style: normal;"> ${text} </span>`
+		}; font-size: ${perfectSize(13)}px; line-height: 
+		${perfectSize(18)}px;
+		; font-weight: 400; font-style: normal;"> ${text} </span>`
 	}
 
 	return (
@@ -41,22 +41,22 @@ type CommentType = { width: string }
 const CommentContainer = styled.View<CommentType>`
 	flex-direction: row;
 	align-items: center;
-	margin-bottom: 10px;
+	margin-bottom: ${perfectSize(10)};
 	align-self: center;
 	margin-left: auto;
 	width: ${props => props.width};
 `
 
 const CommentAuthorImage = styled.Image`
-	width: 40px;
-	height: 40px;
+	width: ${perfectSize(40)};
+	height: ${perfectSize(40)};
 	border-radius: 30px;
 	margin-bottom: auto;
 `
 
 const CommentTextContainer = styled.View`
 	flex: 1;
-	margin-left: 10px;
+	margin-left: ${perfectSize(10)};
 	margin-bottom: auto;
 `
 

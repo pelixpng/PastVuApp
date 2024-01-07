@@ -1,6 +1,6 @@
 import React, { FC } from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
-import { SettingsStackParamList } from '../types/Navigation'
+import { SettingsStackParamList } from '../types/navigation'
 import { SettingsComponent } from '../screens/settings/Settings'
 import { AppInfo } from '../screens/settings/AboutApp'
 import { FeedBack } from '../screens/settings/FeedBack'
@@ -20,6 +20,13 @@ export const SettingsNavigation: FC = () => {
 					backgroundColor: theme.colors.backgroundApp,
 					elevation: 0
 				},
+				headerTitleStyle: {
+					color: theme.colors.titleMenuText,
+					fontSize: perfectSize(25),
+					fontStyle: 'normal',
+					fontWeight: '800',
+					lineHeight: perfectSize(25)
+				},
 				headerTintColor: theme.colors.titleMenuText,
 				presentation: 'transparentModal'
 			}}
@@ -28,7 +35,6 @@ export const SettingsNavigation: FC = () => {
 				name={'SettingsComponent'}
 				component={SettingsComponent}
 				options={{
-					title: 'Настройки',
 					headerShown: false
 				}}
 			/>
@@ -36,42 +42,21 @@ export const SettingsNavigation: FC = () => {
 				name={'AppInfo'}
 				component={AppInfo}
 				options={{
-					title: 'О приложении',
-					headerTitleStyle: {
-						color: theme.colors.titleMenuText,
-						fontSize: perfectSize(25),
-						fontStyle: 'normal',
-						fontWeight: '800',
-						lineHeight: perfectSize(25)
-					}
+					title: 'О приложении'
 				}}
 			/>
 			<SettingsStack.Screen
 				name={'MapSettings'}
 				component={MapSettings}
 				options={{
-					title: 'Настройки',
-					headerTitleStyle: {
-						color: theme.colors.titleMenuText,
-						fontSize: perfectSize(25),
-						fontStyle: 'normal',
-						fontWeight: '800',
-						lineHeight: perfectSize(25)
-					}
+					title: 'Настройки'
 				}}
 			/>
 			<SettingsStack.Screen
 				name={'FeedBack'}
 				component={FeedBack}
 				options={{
-					title: 'Обратная связь',
-					headerTitleStyle: {
-						color: theme.colors.titleMenuText,
-						fontSize: perfectSize(25),
-						fontStyle: 'normal',
-						fontWeight: '800',
-						lineHeight: perfectSize(25)
-					}
+					title: 'Обратная связь'
 				}}
 			/>
 		</SettingsStack.Navigator>

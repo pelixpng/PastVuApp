@@ -11,7 +11,7 @@ const ButtonArray: LinkProps[] = [
 const InsideMenuText: InsideMenuProps[] = [
 	{
 		title: 'Нужна помощь?',
-		discription:
+		description:
 			'Если у вас возникли проблемы во время использования приложения, вы можете связаться с разработчиком через почту или телеграмм.'
 	}
 ]
@@ -22,7 +22,7 @@ export const FeedBack: FC = () => {
 			<InsideMenuComponent
 				ButtonArray={ButtonArray}
 				title={InsideMenuText[0].title}
-				discription={InsideMenuText[0].discription}
+				description={InsideMenuText[0].description}
 			/>
 		</ViewContainer>
 	)
