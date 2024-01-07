@@ -57,8 +57,8 @@ The map API is provided by the Google Map
 # Plans
 
 1. Add Yandex maps.
-   ~~2. Downloading photos to your device.~~
-2. Publish in App Store.
+2. ~~Downloading photos to your device.~~
+3. Publish in App Store.
 
 # License
 
