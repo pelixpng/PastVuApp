@@ -1,6 +1,7 @@
 # PastVuApp
 
-![A blue star in a pink circle](img/logo.png)
+![The PastVu logo with screenshots from the app on two phone
+screens](./img/top_image.png)
 
 This application is a mobile version of the [PastVu
 website](https://pastvu.com/), [here's its GitHub
