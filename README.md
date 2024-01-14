@@ -57,6 +57,14 @@ about the project [here](https://docs.pastvu.com/en/about). Platform source
 # Plans
 
 - Add Yandex maps;
+- Add English language support;
+- Change the way place markers are displayed;
+- Add place marker color customization;
+- Add the news section;
+- Add post-translating functionality;
+- Add the settings reset button;
+- Add cache management;
+- Add animations;
 - Publish the app to the App Store.
 
 # License
