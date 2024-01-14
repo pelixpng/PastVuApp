@@ -1,12 +1,12 @@
 import React, { FC } from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
-import { SettingsStackParamList } from '../types/navigation'
 import { SettingsComponent } from '../screens/settings/Settings'
 import { AppInfo } from '../screens/settings/AboutApp'
 import { FeedBack } from '../screens/settings/FeedBack'
 import { MapSettings } from '../screens/settings/MapSettings'
 import { DefaultTheme, useTheme } from 'styled-components'
 import { perfectSize } from '../utils/ScreenSize'
+import { SettingsStackParamList } from '../types/navigation'
 
 const SettingsStack = createStackNavigator<SettingsStackParamList>()
 

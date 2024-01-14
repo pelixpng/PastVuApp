@@ -2,10 +2,11 @@ import styled from 'styled-components/native'
 import { perfectSize } from '../../utils/ScreenSize'
 import { Platform } from 'react-native'
 
-export const ViewContainer = styled.View`
+export const ViewContainer = styled.View<{ paddingTop?: number }>`
 	background: ${props => props.theme.colors.backgroundApp};
 	height: 100%;
 	width: 100%;
+	padding-top: ${props => props.paddingTop};
 `
 
 export const ScrollContainer = styled.ScrollView`

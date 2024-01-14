@@ -17,12 +17,16 @@ const InsideMenuText: InsideMenuProps[] = [
 	},
 	{
 		title: 'Тема',
-		description: 'Настройка цветовой схемы приложения.'
+		description: 'Цветовая схема приложения.'
 	},
 	{
 		title: 'Фото',
 		description:
-			'Настройка качества загружаемых фотографий, при плохом интернет соединении рекомендуется понизить качество до миниатюры.'
+			'Качество загружаемых фотографий, при плохом интернет соединении рекомендуется понизить качество до миниатюры.'
+	},
+	{
+		title: 'Тип карты',
+		description: 'Выбор карты'
 	}
 ]
 
@@ -33,12 +37,15 @@ export const MapSettings: FC = observer(() => {
 		maxDistance,
 		changeDistancePhoto,
 		changeMaxPhotoMap,
-		maxPhotoOnMap
+		maxPhotoOnMap,
+		mapTypeTitle,
+		changeMapType
 	} = SettingsMapStore
-	const { changePhotoQuality, photoQuality } = SettingsPhotoStore
-	const { changeThemeSettings, themeSettings } = ThemeStore
+	const { changePhotoQuality, photoQualityTitle } = SettingsPhotoStore
+	const { themeSettingsTitle, changeSettingsThemeTitle } = ThemeStore
 	const themeTitles = ['Тёмная', 'Светлая', 'Системная']
 	const PhotoSettingsTitles = ['Оригинал', 'Стандарт', 'Миниатюра']
+	const mapTypeTitles = ['Стандарт', 'Спутник', 'Гибрид', 'Рельеф']
 	return (
 		<ScrollContainer>
 			<InsideMenuComponent
@@ -73,8 +80,8 @@ export const MapSettings: FC = observer(() => {
 			>
 				<RadioButtons
 					titles={themeTitles}
-					value={themeSettings}
-					setValue={changeThemeSettings}
+					value={themeSettingsTitle}
+					setValue={changeSettingsThemeTitle}
 				/>
 			</InsideMenuComponent>
 			<InsideMenuComponent
@@ -83,8 +90,18 @@ export const MapSettings: FC = observer(() => {
 			>
 				<RadioButtons
 					titles={PhotoSettingsTitles}
-					value={photoQuality}
+					value={photoQualityTitle}
 					setValue={changePhotoQuality}
+				/>
+			</InsideMenuComponent>
+			<InsideMenuComponent
+				title={InsideMenuText[3].title}
+				description={InsideMenuText[3].description}
+			>
+				<RadioButtons
+					titles={mapTypeTitles}
+					value={mapTypeTitle}
+					setValue={changeMapType}
 				/>
 			</InsideMenuComponent>
 		</ScrollContainer>

@@ -8,17 +8,15 @@ import {
 } from '../ui/UniversalComponents'
 import { MaterialIcons } from '@expo/vector-icons'
 import { NavigationProp, useNavigation } from '@react-navigation/native'
-import { SettingsRoutes, SettingsStackParamList } from '../../types/navigation'
 import { perfectSize } from '../../utils/ScreenSize'
+import { SettingsStackParamList } from '../../types/navigation'
 
 type MenuButtonProps = {
-	route?: SettingsRoutes
+	route?: 'AppInfo' | 'FeedBack' | 'SettingsComponent' | 'MapSettings'
 	title: string
 	description: string
 	icon: 'mail' | 'info' | 'settings' | 'history'
 }
-
-type settingProp = NavigationProp<SettingsStackParamList>
 
 export const MenuButton: FC<MenuButtonProps> = ({
 	route,
@@ -26,7 +24,7 @@ export const MenuButton: FC<MenuButtonProps> = ({
 	description: description,
 	icon
 }) => {
-	const navigation = useNavigation<settingProp>()
+	const navigation = useNavigation<NavigationProp<SettingsStackParamList>>()
 	return (
 		<MenuContainer onPress={() => route && navigation.navigate(route)}>
 			<MenuTextContainer>

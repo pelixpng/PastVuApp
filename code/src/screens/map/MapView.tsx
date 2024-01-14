@@ -1,8 +1,6 @@
 import React, { useState, useMemo } from 'react'
 import { Region } from 'react-native-maps'
-import { View } from 'react-native'
 import ApiService from '../../api/PastVuApi'
-import { RootStackParamList } from '../../types/navigation'
 import { observer } from 'mobx-react-lite'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { YearsSlider } from '../../components/sliders/YearsSliderComponent'
@@ -12,9 +10,12 @@ import SettingsMapStore from '../../mobx/SettingsMapStore'
 import { LocationButton } from '../../components/buttons/LocationButton'
 import { SearchPlace } from '../../components/map/SearchPlace'
 import { GoogleMap } from '../../components/map/Map'
-import * as Location from 'expo-location'
 import { itemPhotoArray, getPhotoListProps } from '../../types/apiPhotoList'
 import { HistoryButton } from '../../components/buttons/HistoryButton'
+import { YearsRangeType } from '../../types/components'
+import { RootStackParamList } from '../../types/navigation'
+import AlertModalService from '../../utils/AlertModalService'
+import styled from 'styled-components/native'
 
 const loc: Region = {
 	latitude: 55.763307,
@@ -44,7 +45,7 @@ export const MapComponent: React.FC = observer(() => {
 				.map(region => region.title_local)
 				.join(', ')
 		navigation.navigate('PhotoPage', { PhotoJson })
-		StorageServiceMMKV.saveHistory(
+		await StorageServiceMMKV.saveHistory(
 			cid,
 			PhotoJson.result.photo.title,
 			description,
@@ -77,7 +78,7 @@ export const MapComponent: React.FC = observer(() => {
 				}))
 			])
 		} catch (error) {
-			console.log(error)
+			AlertModalService.infoAlert('Ошибка', 'Не удалось получить метки')
 		}
 	}
 
@@ -94,7 +95,7 @@ export const MapComponent: React.FC = observer(() => {
 
 	return (
 		<SafeAreaView>
-			<View style={{ position: 'relative', height: '100%', width: '100%' }}>
+			<Container>
 				<SearchPlace setCoordinates={setCoordinates} />
 				<GoogleMap
 					setCoordinates={setCoordinates}
@@ -105,7 +106,14 @@ export const MapComponent: React.FC = observer(() => {
 				<HistoryButton />
 				<LocationButton setCoord={setCoordinates} />
 				<YearsSlider value={yearsRange} setValue={setYearsRange} />
-			</View>
+			</Container>
 		</SafeAreaView>
 	)
 })
+
+const Container = styled.View`
+	height: 100%;
+	width: 100%;
+	position: relative;
+	background-color: ${props => props.theme.colors.backgroundApp};
+`

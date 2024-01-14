@@ -20,7 +20,6 @@ export const SliderComponent: FC<SliderComponentProps> = ({
 	maxValue
 }) => {
 	const theme: DefaultTheme = useTheme()
-
 	return (
 		<SliderContainer>
 			<LabelTextContainer>

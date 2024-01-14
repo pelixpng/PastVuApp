@@ -1,10 +1,10 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 
 type RootStackParamList = {
+	StartScreen: undefined
 	History: undefined
 	MapComponent: undefined
-	ErrorLoad: undefined
-	PhotoPage: { PhotoJson: Root }
+	PhotoPage: { params: { PhotoJson: PhotoInfo } }
 }
 
 type SettingsStackParamList = {
@@ -14,9 +14,3 @@ type SettingsStackParamList = {
 	SettingsComponent: undefined
 	MapSettings: undefined
 }
-
-export type SettingsRoutes =
-	| 'AppInfo'
-	| 'FeedBack'
-	| 'SettingsComponent'
-	| 'MapSettings'

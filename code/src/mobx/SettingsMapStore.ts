@@ -1,13 +1,28 @@
 import { makeAutoObservable } from 'mobx'
 import StorageServiceMMKV, { Storage } from '../storage/Storage'
+import { MapType } from 'react-native-maps'
+
+const Maps: { [key: string]: MapType } = {
+	Стандарт: 'standard',
+	Спутник: 'satellite',
+	Гибрид: 'hybrid',
+	Рельеф: 'terrain'
+}
 
 class SettingsMapStore {
 	countPhoto = Storage.getNumber('countPhoto') ?? 30
 	maxDistance = Storage.getNumber('MaxDistance') ?? 7000
 	maxPhotoOnMap = Storage.getNumber('MaxPhoto') ?? 150 //добавить проверку на платформу
-
+	mapTypeTitle = Storage.getString('TypeMap') ?? 'Стандарт'
+	mapTypeSetting = Maps[this.mapTypeTitle] ?? 'standard'
 	constructor() {
 		makeAutoObservable(this)
+	}
+
+	changeMapType = (value: string) => {
+		this.mapTypeTitle = value
+		this.mapTypeSetting = Maps[value]
+		StorageServiceMMKV.saveTypeMap(value)
 	}
 
 	changeMaxPhotoMap = (value: number[]) => {

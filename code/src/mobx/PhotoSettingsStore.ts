@@ -1,30 +1,23 @@
 import { makeAutoObservable } from 'mobx'
 import StorageServiceMMKV, { Storage } from '../storage/Storage'
 
-const Constant: { [key: string]: string } = {
+const PhotoQuality: { [key: string]: string } = {
 	Миниатюра: 'h',
 	Стандарт: 'd',
 	Оригинал: 'a'
 }
 
 class SettingsPhotoStore {
-	photoQualitySettings = Storage.getString('photoQuality') ?? 'a'
-	photoQuality =
-		Object.keys(Constant).find(
-			key => Constant[key] === this.photoQualitySettings
-		) ?? 'Оригинал'
+	photoQualityTitle = Storage.getString('photoQuality') ?? 'Оригинал'
+	photoQualitySettings = PhotoQuality[this.photoQualityTitle]
 
 	constructor() {
 		makeAutoObservable(this)
 	}
 
 	changePhotoQuality = (value: string) => {
-		this.photoQuality = value
-		this.changePhotoQualitySettings(Constant[value])
-	}
-
-	changePhotoQualitySettings = (value: string) => {
-		this.photoQualitySettings = value
+		this.photoQualityTitle = value
+		this.photoQualitySettings = PhotoQuality[value]
 		StorageServiceMMKV.savePhotoQualitySettings(value)
 	}
 }

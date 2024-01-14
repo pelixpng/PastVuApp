@@ -5,6 +5,8 @@ import { HistoryItem } from '../../storage/Storage'
 import { NavigationProp, useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from '../../types/navigation'
 import { perfectSize } from '../../utils/ScreenSize'
+import { Image } from 'expo-image'
+import AlertModalService from '../../utils/AlertModalService'
 
 export const ItemHistory: FC<HistoryItem> = ({
 	title,
@@ -19,7 +21,17 @@ export const ItemHistory: FC<HistoryItem> = ({
 	}
 	return (
 		<MainContainer onPress={() => handleButtonPress(cid)}>
-			<Photo source={{ uri: `https://pastvu.com/_p/d/${file}` }} />
+			<Image
+				source={{ uri: `https://pastvu.com/_p/d/${file}` }}
+				style={{ width: '25%', height: perfectSize(80), borderRadius: 20 }}
+				onError={() =>
+					AlertModalService.infoAlert(
+						'Ошибка',
+						'Не удалось загрузить изображение, попробуйте позже'
+					)
+				}
+				cachePolicy="disk"
+			/>
 			<InfoContainer>
 				<TitleText>{title}</TitleText>
 				<DescriptionText>{description}</DescriptionText>
@@ -55,10 +67,4 @@ const MainContainer = styled.TouchableOpacity`
 	align-items: center;
 	align-self: center;
 	padding-bottom: ${perfectSize(10)};
-`
-
-const Photo = styled.Image`
-	width: 25%;
-	height: ${perfectSize(80)};
-	border-radius: 20px;
 `

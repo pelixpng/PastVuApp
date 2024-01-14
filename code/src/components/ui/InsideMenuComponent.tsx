@@ -14,7 +14,7 @@ export const InsideMenuComponent: FC<InsideMenuProps> = ({
 	title,
 	description: description,
 	children,
-	HTMLdiscription,
+	HTMLdiscription, //переделать на children
 	HTMLautor,
 	HTMLsource
 }) => {

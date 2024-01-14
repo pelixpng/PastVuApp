@@ -32,7 +32,7 @@ export const CommentList: FC<CommentListProps> = ({ cid }) => {
 				setComments(tmp)
 				setUsers(json.result.users)
 			} catch (error) {
-				AlertModalService.internetError()
+				AlertModalService.infoAlert('Ошибка', 'Не удалось получить комментарии')
 			}
 		}
 		getComments()

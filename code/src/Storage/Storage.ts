@@ -1,5 +1,7 @@
 import { MMKV } from 'react-native-mmkv'
 import { Region } from 'react-native-maps'
+import { YearsRangeType } from '../types/components'
+import { Image } from 'expo-image'
 
 export interface HistoryItem {
 	title: string
@@ -11,8 +13,9 @@ export interface HistoryItem {
 export const Storage = new MMKV()
 
 export default class StorageServiceMMKV {
-	static clearData = () => {
+	static saveLaunchStatus = (launchStatus: boolean) => {
 		Storage.clearAll()
+		Storage.set('launchStatus', launchStatus)
 	}
 
 	static savePhotoQualitySettings = (photoQuality: string) => {
@@ -35,19 +38,19 @@ export default class StorageServiceMMKV {
 		Storage.set('MaxPhoto', MaxPhoto)
 	}
 
+	static saveTypeMap = (TypeMap: string) => {
+		Storage.set('TypeMap', TypeMap)
+	}
+
 	static saveYearsRange = (RangeYears: YearsRangeType) => {
-		const stringifiedArray = JSON.stringify(RangeYears)
-		Storage.set('RangeYears', stringifiedArray)
+		Storage.set('RangeYears', JSON.stringify(RangeYears))
 	}
 
 	static saveRegion = (Region: Region) => {
-		const RegionString = JSON.stringify(Region)
-		Storage.set('RegionString', RegionString)
+		Storage.set('RegionString', JSON.stringify(Region))
 	}
 
-	//это все оптимизировать
-	//проверить
-	static saveHistory = (
+	static saveHistory = async (
 		cid: string,
 		title: string,
 		description: string,
@@ -55,14 +58,13 @@ export default class StorageServiceMMKV {
 	) => {
 		const historyString = Storage.getString('History') ?? '[]'
 		const parseArr: HistoryItem[] = JSON.parse(historyString)
-		parseArr.unshift({
-			title: title,
-			description: description,
-			cid: cid,
-			file: file
-		})
-		parseArr.length >= 400 && parseArr.splice(-200, 200)
-		const history = JSON.stringify(parseArr)
-		Storage.set('History', history)
+		if (!parseArr.some(obj => obj.cid === cid)) {
+			parseArr.unshift({ title, description, cid, file })
+			if (parseArr.length >= 400) {
+				parseArr.splice(-200, 200)
+				await Image.clearDiskCache()
+			}
+			Storage.set('History', JSON.stringify(parseArr))
+		}
 	}
 }

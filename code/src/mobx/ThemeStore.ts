@@ -1,22 +1,28 @@
 import { makeAutoObservable } from 'mobx'
 import StorageServiceMMKV, { Storage } from '../storage/Storage'
+import { DefaultTheme } from 'styled-components'
+import { DarkTheme, LightTheme } from '../components/theme/Theme'
+
+const ThemeConstant: { [key: string]: DefaultTheme } = {
+	Светлая: LightTheme,
+	Тёмная: DarkTheme
+}
 
 class ThemeStore {
-	themeSettings = Storage.getString('theme') ?? 'Системная'
-	theme = ''
-
+	themeSettingsTitle = Storage.getString('theme') ?? 'Системная'
+	themeSettings = ThemeConstant[this.themeSettingsTitle] ?? LightTheme
 	constructor() {
 		makeAutoObservable(this)
 	}
 
-	changeThemeSettings = (value: string) => {
-		this.themeSettings = value
-		value != 'Системная' && this.changeTheme(value)
+	changeSettingsThemeTitle = (value: string) => {
+		this.themeSettingsTitle = value
+		value !== 'Системная' && (this.themeSettings = ThemeConstant[value])
 		StorageServiceMMKV.saveThemeSettings(value)
 	}
 
-	changeTheme = (value: string) => {
-		this.theme = value
+	changeSettingsTheme = (value: DefaultTheme) => {
+		this.themeSettings = value
 	}
 }
 

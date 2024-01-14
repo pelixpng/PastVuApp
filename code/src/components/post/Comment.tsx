@@ -3,6 +3,7 @@ import styled from 'styled-components/native'
 import { perfectSize } from '../../utils/ScreenSize'
 import { DefaultTheme, useTheme } from 'styled-components'
 import RenderHtml from 'react-native-render-html'
+import { Image } from 'expo-image'
 
 type CommentProps = {
 	uri: string | undefined
@@ -20,13 +21,19 @@ export const Comment: FC<CommentProps> = ({ name, text, uri, width }) => {
 		${perfectSize(18)}px;
 		; font-weight: 400; font-style: normal;"> ${text} </span>`
 	}
-
 	return (
 		<CommentContainer width={width}>
-			<CommentAuthorImage
+			<Image
 				source={{
 					uri: `https://pastvu.com${uri ? uri : '/img/caps/avatar.png'}`
 				}}
+				style={{
+					width: perfectSize(40),
+					height: perfectSize(40),
+					borderRadius: 40,
+					marginBottom: 'auto'
+				}}
+				cachePolicy="disk"
 			/>
 			<CommentTextContainer>
 				<CommentAuthorName>{name}</CommentAuthorName>
@@ -36,22 +43,13 @@ export const Comment: FC<CommentProps> = ({ name, text, uri, width }) => {
 	)
 }
 
-type CommentType = { width: string }
-
-const CommentContainer = styled.View<CommentType>`
+const CommentContainer = styled.View<{ width: string }>`
 	flex-direction: row;
 	align-items: center;
 	margin-bottom: ${perfectSize(10)};
 	align-self: center;
 	margin-left: auto;
 	width: ${props => props.width};
-`
-
-const CommentAuthorImage = styled.Image`
-	width: ${perfectSize(40)};
-	height: ${perfectSize(40)};
-	border-radius: 30px;
-	margin-bottom: auto;
 `
 
 const CommentTextContainer = styled.View`

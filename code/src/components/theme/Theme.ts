@@ -11,7 +11,6 @@ export const LightTheme: DefaultTheme = {
 		BackgroundMenuIcon: '#438BF9',
 		MenuContainer: 'white',
 		SliderRangeBG: '#EDEDED',
-		Delimetr: '#F4F4F4',
 		MapTheme: MapLigth
 	},
 	names: {
@@ -29,7 +28,6 @@ export const DarkTheme: DefaultTheme = {
 		BackgroundMenuIcon: '#438BF9',
 		MenuContainer: '#1C1C1E',
 		SliderRangeBG: '#232325',
-		Delimetr: '#1C1C1E',
 		MapTheme: MapDark
 	},
 	names: {

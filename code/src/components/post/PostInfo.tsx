@@ -73,12 +73,13 @@ export const PostInfo: FC<PostInfoProps> = ({
 	const sourceHTML = {
 		html: `<span style="color: ${
 			theme.colors.MenuDescriptionText
-		}; font-size: ${perfectSize(13)}px; lline-height: 
+		}; font-size: ${perfectSize(13)}px; line-height: 
 		${perfectSize(20)}
 		; font-weight: 500; font-style: normal;"> Источник: ${
 			source ? source : 'Отсутствует'
 		} </span>`
 	}
+
 	return (
 		<PostContainer>
 			<TextContainer>
