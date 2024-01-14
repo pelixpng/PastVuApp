@@ -49,17 +49,18 @@ about the project [here](https://docs.pastvu.com/en/about). Platform source
 
 # Resources Used
 
-[TaigaUI](https://taiga-ui.dev/) components were used in the design.  
-[PastVu API](https://docs.pastvu.com/dev/api) is used to get photos.  
-The map API is provided by the Google Map
-[platform](https://developers.google.com/maps).
+- [TaigaUI](https://taiga-ui.dev/) components were used in the design;
+- [PastVu API](https://docs.pastvu.com/dev/api) is used to get photos;
+- The map API is provided by the [Google Maps
+  platform](https://developers.google.com/maps).
 
 # Plans
 
-1. Add Yandex maps.
-2. ~~Downloading photos to your device.~~
-3. Publish in App Store.
+- Add Yandex maps;
+- Publish the app to the App Store.
 
 # License
 
-- GNU Affero General Public License (AGPL) v3 or later. See [LICENSE](https://github.com/pelixpng/PastVuApp/blob/master/LICENSE) for the full license text.
+GNU Affero General Public License (AGPL) v3 or later.  
+See [LICENSE](https://github.com/pelixpng/PastVuApp/blob/master/LICENSE) for
+the full license text.
