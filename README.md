@@ -8,12 +8,12 @@ website](https://pastvu.com/), [here's its GitHub
 page](https://github.com/PastVu/pastvu).
 
 The app has been developed using ReactNative, TypeScript, and Expo, making it
-compatible with both Android and iOS platforms. Currently only available for
+compatible with both Android and iOS platforms. Currently, only available for
 Android on [Google
 Play](https://play.google.com/store/apps/details?id=com.pelixpng.PastVuApp),
 the iOS version will be released later.
 
-PastVu is an online platform for gathering, geo-tagging, attributing and
+PastVu is an online platform for gathering, geotagging, attributing and
 discussing retro images. A look at the history of humanity habitat. The
 platform's main goal is to make historical images more accessible to a wider
 audience and to promote cultural heritage preservation. The platform is free to
