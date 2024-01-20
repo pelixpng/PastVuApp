@@ -4,9 +4,10 @@ import { perfectSize } from '../../utils/ScreenSize'
 import { DefaultTheme, useTheme } from 'styled-components'
 import RenderHtml from 'react-native-render-html'
 import { Image } from 'expo-image'
+import StandardAvatar from '../../../assets/avatar.png'
 
 type CommentProps = {
-	uri: string | undefined
+	uri?: string
 	name: string
 	text: string
 	width: string
@@ -24,9 +25,7 @@ export const Comment: FC<CommentProps> = ({ name, text, uri, width }) => {
 	return (
 		<CommentContainer width={width}>
 			<Image
-				source={{
-					uri: `https://pastvu.com${uri ? uri : '/img/caps/avatar.png'}`
-				}}
+				source={uri ? { uri: `https://pastvu.com${uri}` } : StandardAvatar}
 				style={{
 					width: perfectSize(40),
 					height: perfectSize(40),

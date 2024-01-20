@@ -7,6 +7,7 @@ import {
 } from '../../components/ui/UniversalComponents'
 import { InsideMenuProps, LinkProps } from '../../types/components'
 import { InsideMenuComponent } from '../../components/ui/InsideMenuComponent'
+import AppIcon from '../../../assets/icon.png'
 
 const ResourcesUsed: LinkProps[] = [
 	{ title: 'PastVu Api', url: 'https://docs.pastvu.com/dev/api' },
@@ -44,9 +45,9 @@ export const AppInfo: FC = () => {
 	return (
 		<ScrollContainer>
 			<AppIconContainer>
-				<LogoContainer source={require('../../../assets/icon.png')} />
+				<LogoContainer source={AppIcon} />
 				<MenuDescriptionText>
-					Версия 1.3.0 от 13 января 2024 г.
+					Версия 1.3.1 от 18 января 2024 г.
 				</MenuDescriptionText>
 			</AppIconContainer>
 			<InsideMenuComponent

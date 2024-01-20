@@ -35,14 +35,13 @@ export const PhotoPage: React.FC<PhotoPageProps> = observer(({ route }) => {
 	} = route.params
 	return (
 		<ViewContainer>
-			<Pinchable style={{ width: '100%', height: '40%' }}>
+			<Pinchable style={{ width: '100%', height: '45%' }}>
 				<Image
 					source={{
 						uri: `https://pastvu.com/_p/${photoQualitySettings}/${file}`
 					}}
 					style={{ width: '100%', height: '100%' }}
 					contentFit="contain"
-					allowDownscaling={false}
 					onError={() =>
 						AlertModalService.infoAlert(
 							'Ошибка',
