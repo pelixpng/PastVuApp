@@ -48,10 +48,8 @@ about the project [here](https://docs.pastvu.com/en/about). Platform source
   <img src="img/12.png" width="250" />
 </p>
 
-# More screenshots
-
 <details>
-<summary>show</summary>
+<summary><strong>MORE SCREENSHOTS</strong></summary>
 <p align="center">
   <img src="img/13.png" width="250" />
   <img src="img/14.png" width="250" /> 
@@ -82,10 +80,10 @@ about the project [here](https://docs.pastvu.com/en/about). Platform source
 
 - Add Yandex maps;
 - Add English language support;
-- Change the way place markers are displayed;
-- Add place marker color customization;
+- Optimize marker placement;
+- Add marker customization;
 - Add the news section;
-- Add post-translating functionality;
+- Add functionality to translate posts;
 - Add the settings reset button;
 - Add cache management;
 - Add animations;
