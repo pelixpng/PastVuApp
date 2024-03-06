@@ -12,9 +12,6 @@ type InsideMenuProps = {
 	title: string
 	description: string
 	children?: ReactNode[] | ReactNode
-	HTMLdiscription?: ReactNode
-	HTMLsource?: ReactNode
-	HTMLautor?: ReactNode
 }
 
 type Direction = 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w' | 'nw' | 'aero' | ''

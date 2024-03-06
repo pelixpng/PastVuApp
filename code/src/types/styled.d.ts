@@ -15,6 +15,7 @@ declare module 'styled-components' {
 			MenuContainer: string
 			SliderRangeBG: string
 			MapTheme: Array
+			markerBorder: number
 		}
 		names: {
 			themeName: ThemeNameType

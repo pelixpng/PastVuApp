@@ -5,15 +5,23 @@ import { DefaultTheme, useTheme } from 'styled-components'
 import RenderHtml from 'react-native-render-html'
 import { Image } from 'expo-image'
 import StandardAvatar from '../../../assets/avatar.png'
+import moment from 'moment'
 
 type CommentProps = {
 	uri?: string
 	name: string
 	text: string
 	width: string
+	stamp: number
 }
 
-export const Comment: FC<CommentProps> = ({ name, text, uri, width }) => {
+export const Comment: FC<CommentProps> = ({
+	name,
+	text,
+	uri,
+	width,
+	stamp
+}) => {
 	const theme: DefaultTheme = useTheme()
 	const textHTML = {
 		html: `<span style="color: ${
@@ -22,6 +30,7 @@ export const Comment: FC<CommentProps> = ({ name, text, uri, width }) => {
 		${perfectSize(18)}px;
 		; font-weight: 400; font-style: normal;"> ${text} </span>`
 	}
+	const date = ` - ${moment(stamp).format('DD.MM.YYYY, HH:mm')}`
 	return (
 		<CommentContainer width={width}>
 			<Image
@@ -35,12 +44,19 @@ export const Comment: FC<CommentProps> = ({ name, text, uri, width }) => {
 				cachePolicy="disk"
 			/>
 			<CommentTextContainer>
-				<CommentAuthorName>{name}</CommentAuthorName>
+				<NameDateContainer>
+					<CommentAuthorName>{name}</CommentAuthorName>
+					<DateText>{date}</DateText>
+				</NameDateContainer>
 				<RenderHtml source={textHTML} />
 			</CommentTextContainer>
 		</CommentContainer>
 	)
 }
+
+const NameDateContainer = styled.View`
+	flex-direction: row;
+`
 
 const CommentContainer = styled.View<{ width: string }>`
 	flex-direction: row;
@@ -62,4 +78,10 @@ const CommentAuthorName = styled.Text`
 	font-size: ${perfectSize(13)};
 	line-height: ${perfectSize(13)};
 	color: ${props => props.theme.colors.titleMenuText};
+`
+const DateText = styled.Text`
+	color: ${props => props.theme.colors.MenuDescriptionText};
+	font-size: ${perfectSize(13)};
+	line-height: ${perfectSize(13)};
+	font-weight: 400;
 `

@@ -229,6 +229,14 @@ export const MapDark = [
 				color: '#4e6d70'
 			}
 		]
+	},
+	{
+		featureType: 'poi.business',
+		stylers: [
+			{
+				visibility: 'off'
+			}
+		]
 	}
 ]
 
@@ -238,6 +246,14 @@ export const MapLigth = [
 		stylers: [
 			{
 				lightness: -5
+			}
+		]
+	},
+	{
+		featureType: 'poi.business',
+		stylers: [
+			{
+				visibility: 'off'
 			}
 		]
 	}

@@ -13,19 +13,13 @@ export const InsideMenuComponent: FC<InsideMenuProps> = ({
 	ButtonArray,
 	title,
 	description: description,
-	children,
-	HTMLdiscription, //переделать на children
-	HTMLautor,
-	HTMLsource
+	children
 }) => {
 	return (
 		<InsideMenuContainer>
 			<MenuInsideTextContainer>
 				<MenuTitleText>{title}</MenuTitleText>
 				<MenuDescriptionText>{description}</MenuDescriptionText>
-				{HTMLdiscription && HTMLdiscription}
-				{HTMLsource && HTMLsource}
-				{HTMLautor && HTMLautor}
 			</MenuInsideTextContainer>
 			{ButtonArray &&
 				ButtonArray.map((item, index) => (

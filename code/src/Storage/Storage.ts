@@ -60,7 +60,7 @@ export default class StorageServiceMMKV {
 		const parseArr: HistoryItem[] = JSON.parse(historyString)
 		if (!parseArr.some(obj => obj.cid === cid)) {
 			parseArr.unshift({ title, description, cid, file })
-			if (parseArr.length >= 400) {
+			if (parseArr.length >= 1000) {
 				parseArr.splice(-200, 200)
 				await Image.clearDiskCache()
 			}

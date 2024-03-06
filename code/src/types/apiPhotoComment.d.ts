@@ -11,7 +11,7 @@ export interface Result {
 }
 
 export interface IComment {
-	cid: number
+	cid: string
 	user: string
 	txt: string
 	s: number
@@ -23,7 +23,7 @@ export interface IComment {
 }
 
 export interface ReplayComment {
-	cid: number
+	cid: string
 	user: string
 	txt: string
 	parent: number

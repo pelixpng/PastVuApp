@@ -48,6 +48,29 @@ about the project [here](https://docs.pastvu.com/en/about). Platform source
   <img src="img/12.png" width="250" />
 </p>
 
+# More screenshots
+
+<details>
+<summary>show</summary>
+<p align="center">
+  <img src="img/13.png" width="250" />
+  <img src="img/14.png" width="250" /> 
+  <img src="img/15.png" width="250" />
+</p>
+
+<p align="center">
+  <img src="img/16.png" width="250" />
+  <img src="img/17.png" width="250" /> 
+  <img src="img/18.png" width="250" />
+</p>
+
+<p align="center">
+  <img src="img/19.png" width="250" />
+  <img src="img/20.png" width="250" /> 
+  <img src="img/21.png" width="250" />
+</p>
+</details>
+
 # Resources Used
 
 - [TaigaUI](https://taiga-ui.dev/) components were used in the design;

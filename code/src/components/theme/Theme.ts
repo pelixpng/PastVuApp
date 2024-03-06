@@ -11,7 +11,8 @@ export const LightTheme: DefaultTheme = {
 		BackgroundMenuIcon: '#438BF9',
 		MenuContainer: 'white',
 		SliderRangeBG: '#EDEDED',
-		MapTheme: MapLigth
+		MapTheme: MapLigth,
+		markerBorder: 0.2
 	},
 	names: {
 		themeName: 'LightTheme'
@@ -28,7 +29,8 @@ export const DarkTheme: DefaultTheme = {
 		BackgroundMenuIcon: '#438BF9',
 		MenuContainer: '#1C1C1E',
 		SliderRangeBG: '#232325',
-		MapTheme: MapDark
+		MapTheme: MapDark,
+		markerBorder: 0.5
 	},
 	names: {
 		themeName: 'DarkTheme'
