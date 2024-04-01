@@ -4,67 +4,66 @@ import { YearsRangeType } from '../types/components'
 import { Image } from 'expo-image'
 
 export interface HistoryItem {
-	title: string
-	description: string
-	cid: string
-	file: string
+  title: string
+  description: string
+  cid: string
+  file: string
 }
 
 export const Storage = new MMKV()
 
 export default class StorageServiceMMKV {
-	static saveLaunchStatus = (launchStatus: boolean) => {
-		Storage.clearAll()
-		Storage.set('launchStatus', launchStatus)
-	}
+  static saveLaunchStatus = (launchStatus: boolean) => {
+    Storage.clearAll()
+    Storage.set('launchStatus', launchStatus)
+  }
 
-	static savePhotoQualitySettings = (photoQuality: string) => {
-		Storage.set('photoQuality', photoQuality)
-	}
+  static savePhotoQualitySettings = (photoQuality: string) => {
+    Storage.set('photoQuality', photoQuality)
+  }
 
-	static saveThemeSettings = (themeSettings: string) => {
-		Storage.set('theme', themeSettings)
-	}
+  static saveThemeSettings = (themeSettings: string) => {
+    Storage.set('theme', themeSettings)
+  }
 
-	static saveApiCountPhoto = (countPhoto: number) => {
-		Storage.set('countPhoto', countPhoto)
-	}
+  static saveApiCountPhoto = (countPhoto: number) => {
+    Storage.set('countPhoto', countPhoto)
+  }
 
-	static saveApiMaxDistance = (MaxDistance: number) => {
-		Storage.set('MaxDistance', MaxDistance)
-	}
+  static saveApiMaxDistance = (MaxDistance: number) => {
+    Storage.set('MaxDistance', MaxDistance)
+  }
 
-	static saveMaxPhotoOnMap = (MaxPhoto: number) => {
-		Storage.set('MaxPhoto', MaxPhoto)
-	}
+  static saveMaxPhotoOnMap = (MaxPhoto: number) => {
+    Storage.set('MaxPhoto', MaxPhoto)
+  }
 
-	static saveTypeMap = (TypeMap: string) => {
-		Storage.set('TypeMap', TypeMap)
-	}
+  static saveTypeMap = (TypeMap: string) => {
+    Storage.set('TypeMap', TypeMap)
+  }
 
-	static saveYearsRange = (RangeYears: YearsRangeType) => {
-		Storage.set('RangeYears', JSON.stringify(RangeYears))
-	}
+  static saveTypeMarker = (TypeMarker: string) => {
+    Storage.set('TypeMarker', TypeMarker)
+  }
 
-	static saveRegion = (Region: Region) => {
-		Storage.set('RegionString', JSON.stringify(Region))
-	}
+  static saveYearsRange = (RangeYears: YearsRangeType) => {
+    Storage.set('RangeYears', JSON.stringify(RangeYears))
+  }
 
-	static saveHistory = async (
-		cid: string,
-		title: string,
-		description: string,
-		file: string
-	) => {
-		const historyString = Storage.getString('History') ?? '[]'
-		const parseArr: HistoryItem[] = JSON.parse(historyString)
-		if (!parseArr.some(obj => obj.cid === cid)) {
-			parseArr.unshift({ title, description, cid, file })
-			if (parseArr.length >= 1000) {
-				parseArr.splice(-200, 200)
-				await Image.clearDiskCache()
-			}
-			Storage.set('History', JSON.stringify(parseArr))
-		}
-	}
+  static saveRegion = (Region: Region) => {
+    Storage.set('RegionString', JSON.stringify(Region))
+  }
+
+  static saveHistory = async (cid: string, title: string, description: string, file: string) => {
+    const historyString = Storage.getString('History') ?? '[]'
+    const parseArr: HistoryItem[] = JSON.parse(historyString)
+    if (!parseArr.some(obj => obj.cid === cid)) {
+      parseArr.unshift({ title, description, cid, file })
+      if (parseArr.length >= 1000) {
+        parseArr.splice(-200, 200)
+        await Image.clearDiskCache()
+      }
+      Storage.set('History', JSON.stringify(parseArr))
+    }
+  }
 }

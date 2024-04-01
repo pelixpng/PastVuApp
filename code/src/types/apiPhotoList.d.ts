@@ -39,4 +39,5 @@ type itemPhotoArray = {
   }
   dir: number
   marker: any[]
+  color: string
 }

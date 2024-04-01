@@ -2,7 +2,7 @@
   "expo": {
     "name": "PastVu",
     "slug": "PastVuApp",
-    "version": "1.4.0",
+    "version": "1.5.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -28,7 +28,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.pelixpng.PastVuApp",
-      "versionCode": 6
+      "versionCode": 8
     },
     "web": {
       "favicon": "./assets/favicon.png"

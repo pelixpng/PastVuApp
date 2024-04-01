@@ -14,7 +14,7 @@ type PostInfoProps = {
   title: string
   years: string
   regions: Region[]
-  cid: number
+  cid: string
   author: string | null
   description: string
   source: string
@@ -38,7 +38,7 @@ export const PostInfo: FC<PostInfoProps> = ({
         const localuri = await FileSystem.downloadAsync(
           `https://pastvu.com/_p/a/${file}`,
           FileSystem.documentDirectory +
-            `${title.substring(0, 15)}${file.substring(file.indexOf('.'))}`,
+            `${title?.substring(0, 15)}${file?.substring(file.indexOf('.'))}`,
         )
         await MediaLibrary.createAssetAsync(localuri.uri)
         AlertModalService.infoAlert('Готово', 'Фотография успешно сохранена в галерею')
@@ -48,17 +48,17 @@ export const PostInfo: FC<PostInfoProps> = ({
     }
   }
   const theme: DefaultTheme = useTheme()
-  const titlesRegion = regions.map(region => region.title_local).join(', ')
+  const titlesRegion = regions?.map(region => region.title_local).join(', ')
   const authorHTML = {
     html: `<span style="color: ${theme.colors.MenuDescriptionText}; font-size: ${perfectSize(
-      13,
+      12,
     )}px; line-height: 
 		${perfectSize(20)}
 		; font-weight: 500; font-style: normal;"> Автор: ${author ? author : 'Неизвестен'} </span>`,
   }
   const descriptionHTML = {
     html: `<span style="color: ${theme.colors.MenuDescriptionText}; font-size: ${perfectSize(
-      13,
+      12,
     )}px; line-height: 
 		${perfectSize(20)}
 		; font-weight: 500; font-style: normal;"> Описание: ${
@@ -67,7 +67,7 @@ export const PostInfo: FC<PostInfoProps> = ({
   }
   const sourceHTML = {
     html: `<span style="color: ${theme.colors.MenuDescriptionText}; font-size: ${perfectSize(
-      13,
+      12,
     )}px; line-height: 
 		${perfectSize(20)}
 		; font-weight: 500; font-style: normal;"> Источник: ${source ? source : 'Отсутствует'} </span>`,

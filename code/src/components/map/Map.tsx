@@ -1,49 +1,65 @@
 import { FC } from 'react'
-import MapView, { Marker, PROVIDER_GOOGLE, Region } from 'react-native-maps'
+import MapView, { Marker, Region } from 'react-native-maps'
 import { DefaultTheme, useTheme } from 'styled-components'
 import { itemPhotoArray } from '../../types/apiPhotoList'
 import { observer } from 'mobx-react-lite'
 import SettingsMapStore from '../../mobx/SettingsMapStore'
+import { Platform, StyleSheet } from 'react-native'
+import { NavigationProp, useNavigation } from '@react-navigation/native'
+import { RootStackParamList } from '../../types/navigation'
 
 type MapProp = {
   setCoordinates: (region: Region) => void
   coordinates: Region
   items: itemPhotoArray[]
-  handleButtonPress: (cid: string) => void
 }
 
-export const GoogleMap: FC<MapProp> = observer(
-  ({ setCoordinates, coordinates, items, handleButtonPress }) => {
-    const theme: DefaultTheme = useTheme()
-    const mapTypeSetting = SettingsMapStore.mapTypeSetting
+export const GoogleMap: FC<MapProp> = observer(({ setCoordinates, coordinates, items }) => {
+  const theme: DefaultTheme = useTheme()
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>()
+  const { mapTypeSetting, markerType } = SettingsMapStore
+  return (
+    <MapView
+      style={s.map}
+      userInterfaceStyle={theme.names.themeName}
+      customMapStyle={theme.colors.MapTheme}
+      onRegionChangeComplete={setCoordinates}
+      showsUserLocation={true}
+      showsMyLocationButton={false}
+      region={coordinates}
+      loadingBackgroundColor={theme.colors.backgroundApp}
+      moveOnMarkerPress={false}
+      rotateEnabled={false}
+      maxZoomLevel={19}
+      mapType={mapTypeSetting}>
+      {items.map((marker, index) => (
+        <Marker
+          key={index}
+          coordinate={marker.location}
+          title={undefined}
+          tracksViewChanges={false}
+          rotation={marker.dir}
+          pinColor={marker.color}
+          onPress={() => navigation.navigate('PhotoPage', { cid: marker.cid })}
+          //onPress={() => console.log(marker.cid)}
+          style={Platform.OS === 'ios' && { transform: [{ rotate: `${marker.dir}deg` }] }}
+          image={
+            markerType === 'Новый'
+              ? theme.names.themeName == 'light'
+                ? marker.marker[0]
+                : marker.marker[1]
+              : undefined
+          }
+        />
+      ))}
+    </MapView>
+  )
+})
 
-    return (
-      <MapView
-        style={{ height: '100%', width: '100%', position: 'absolute' }}
-        provider={PROVIDER_GOOGLE}
-        onRegionChangeComplete={setCoordinates}
-        showsUserLocation={true}
-        showsMyLocationButton={false}
-        region={coordinates}
-        showsBuildings={true}
-        customMapStyle={theme.colors.MapTheme}
-        loadingBackgroundColor={theme.colors.backgroundApp}
-        moveOnMarkerPress={false}
-        rotateEnabled={false}
-        maxZoomLevel={19}
-        mapType={mapTypeSetting}>
-        {items.map((marker, index) => (
-          <Marker
-            key={index}
-            coordinate={marker.location}
-            title={marker.title}
-            onPress={() => handleButtonPress(marker.cid)}
-            tracksViewChanges={false}
-            rotation={marker.dir}
-            image={theme.names.themeName == 'LightTheme' ? marker.marker[0] : marker.marker[1]}
-          />
-        ))}
-      </MapView>
-    )
+const s = StyleSheet.create({
+  map: {
+    height: '100%',
+    width: '100%',
+    position: 'absolute',
   },
-)
+})

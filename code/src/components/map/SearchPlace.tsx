@@ -5,12 +5,14 @@ import { Region } from 'react-native-maps'
 import React from 'react'
 import AlertModalService from '../../utils/AlertModalService'
 import { perfectSize } from '../../utils/ScreenSize'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 type SearchPlaceProp = {
   setCoordinates: (region: Region) => void
 }
 
 const SearchPlaceComponent: FC<SearchPlaceProp> = ({ setCoordinates }) => {
+  const { top } = useSafeAreaInsets()
   const theme: DefaultTheme = useTheme()
   return (
     <GooglePlacesAutocomplete
@@ -46,22 +48,21 @@ const SearchPlaceComponent: FC<SearchPlaceProp> = ({ setCoordinates }) => {
           alignSelf: 'center',
           position: 'absolute',
           zIndex: 9,
-          marginTop: perfectSize(10),
+          marginTop: top,
         },
         textInput: {
           borderRadius: 30,
           backgroundColor: theme.colors.backgroundApp,
           color: theme.colors.MenuDescriptionText,
-          fontSize: perfectSize(16),
-          lineHeight: perfectSize(16),
+          fontSize: perfectSize(15),
         },
         row: {
           backgroundColor: theme.colors.backgroundApp,
         },
         description: {
           color: theme.colors.MenuDescriptionText,
-          fontSize: perfectSize(16),
-          lineHeight: perfectSize(16),
+          fontSize: perfectSize(15),
+          lineHeight: perfectSize(15),
         },
         listView: {
           backgroundColor: theme.colors.backgroundApp,

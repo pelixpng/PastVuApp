@@ -1,5 +1,6 @@
 import { IComment, IComments } from '../types/apiPhotoComment'
 import { PhotoList, getPhotoListProps, itemPhotoArray } from '../types/apiPhotoList'
+import { getColor } from '../utils/getColor'
 import { getAngle } from '../utils/getDirection'
 import { getMarker } from '../utils/getMarker'
 
@@ -21,6 +22,7 @@ export default class ApiService {
         year: json.result.photos[i].year,
         dir: getAngle(json.result.photos[i].dir),
         marker: getMarker(json.result.photos[i].year, json.result.photos[i].dir),
+        color: getColor(json.result.photos[i].year),
       })
     }
     return photoArray

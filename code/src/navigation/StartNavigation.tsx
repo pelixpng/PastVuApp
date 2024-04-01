@@ -12,34 +12,33 @@ import { Storage } from '../storage/Storage'
 const Stack = createStackNavigator<RootStackParamList>()
 
 export function StartNavigator() {
-	const theme: DefaultTheme = useTheme()
-	return (
-		<NavigationContainer>
-			<Stack.Navigator
-				initialRouteName={
-					Storage.getBoolean('launchStatus') ? 'MapComponent' : 'StartScreen'
-				}
-				screenOptions={{
-					headerStyle: {
-						backgroundColor: theme.colors.backgroundApp,
-						elevation: 0
-					},
-					headerTintColor: theme.colors.titleMenuText,
-					presentation: 'transparentModal',
-					title: ''
-				}}
-			>
-				<Stack.Screen
-					name={'MapComponent'}
-					component={BottomNavigator}
-					options={{
-						headerShown: false
-					}}
-				/>
-				<Stack.Screen name={'PhotoPage'} component={PhotoPage} />
-				<Stack.Screen name={'History'} component={History} />
-				<Stack.Screen name={'StartScreen'} component={StartScreen} />
-			</Stack.Navigator>
-		</NavigationContainer>
-	)
+  const theme: DefaultTheme = useTheme()
+  return (
+    <NavigationContainer>
+      <Stack.Navigator
+        initialRouteName={Storage.getBoolean('launchStatus') ? 'MapComponent' : 'StartScreen'}
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: theme.colors.backgroundApp,
+            elevation: 0,
+          },
+          headerTintColor: theme.colors.titleMenuText,
+          presentation: 'transparentModal',
+          headerShadowVisible: false,
+          headerBackTitle: 'Назад',
+          title: '',
+        }}>
+        <Stack.Screen
+          name={'MapComponent'}
+          component={BottomNavigator}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen name={'PhotoPage'} component={PhotoPage} />
+        <Stack.Screen name={'History'} component={History} />
+        <Stack.Screen name={'StartScreen'} component={StartScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  )
 }

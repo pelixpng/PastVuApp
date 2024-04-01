@@ -4,6 +4,7 @@ import { ItemHistory } from '../../components/history/Item'
 import { HistoryItem, Storage } from '../../storage/Storage'
 import { MenuButton } from '../../components/buttons/MenuButton'
 import { FlatList } from 'react-native'
+import { StyleSheet } from 'react-native'
 
 export const History: FC = () => {
   const historyString = Storage.getString('History') ?? '[]'
@@ -20,7 +21,7 @@ export const History: FC = () => {
             file={item.file}
           />
         )}
-        contentContainerStyle={{ paddingHorizontal: 10 }}
+        contentContainerStyle={s.container}
         keyExtractor={item => item.cid}
         ListEmptyComponent={
           <MenuButton
@@ -33,3 +34,7 @@ export const History: FC = () => {
     </ViewContainer>
   )
 }
+
+const s = StyleSheet.create({
+  container: { paddingHorizontal: 10 },
+})
