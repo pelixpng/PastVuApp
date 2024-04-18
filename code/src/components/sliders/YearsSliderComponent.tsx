@@ -66,7 +66,10 @@ export const SliderComponentBack = styled.View`
   left: 0;
   right: 0;
   z-index: 8;
-  padding: 6px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  padding-left: 10px;
+  padding-right: 10px;
   display: flex;
   align-items: flex-start;
   gap: ${perfectSize(6)};

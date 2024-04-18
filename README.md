@@ -8,10 +8,8 @@ website](https://pastvu.com/), [here's its GitHub
 page](https://github.com/PastVu/pastvu).
 
 The app has been developed using ReactNative, TypeScript, and Expo, making it
-compatible with both Android and iOS platforms. Currently, only available for
-Android on [Google
-Play](https://play.google.com/store/apps/details?id=com.pelixpng.PastVuApp),
-the iOS version will be released later.
+compatible with both Android and iOS platforms. Available on [Google
+Play](https://play.google.com/store/apps/details?id=com.pelixpng.PastVuApp) and [App Store](https://apps.apple.com/kz/app/pastvu-com/id6482482875).
 
 PastVu is an online platform for gathering, geotagging, attributing and
 discussing retro images. A look at the history of humanity habitat. The
@@ -22,7 +20,7 @@ well as contribute images and information to the archive. You can read more
 about the project [here](https://docs.pastvu.com/en/about). Platform source
 [code](https://github.com/PastVu).
 
-# Screenshots
+# Android
 
 <p align="center">
   <img src="img/1.png" width="250" />
@@ -42,52 +40,37 @@ about the project [here](https://docs.pastvu.com/en/about). Platform source
   <img src="img/9.png" width="250" />
 </p>
 
+# IOS
+
 <p align="center">
   <img src="img/10.png" width="250" />
   <img src="img/11.png" width="250" /> 
   <img src="img/12.png" width="250" />
 </p>
 
-<details>
-<summary><strong>MORE SCREENSHOTS</strong></summary>
 <p align="center">
   <img src="img/13.png" width="250" />
   <img src="img/14.png" width="250" /> 
   <img src="img/15.png" width="250" />
 </p>
 
-<p align="center">
-  <img src="img/16.png" width="250" />
-  <img src="img/17.png" width="250" /> 
-  <img src="img/18.png" width="250" />
-</p>
-
-<p align="center">
-  <img src="img/19.png" width="250" />
-  <img src="img/20.png" width="250" /> 
-  <img src="img/21.png" width="250" />
-</p>
-</details>
-
 # Resources Used
 
 - [TaigaUI](https://taiga-ui.dev/) components were used in the design;
 - [PastVu API](https://docs.pastvu.com/dev/api) is used to get photos;
 - The map API is provided by the [Google Maps
-  platform](https://developers.google.com/maps).
+  platform](https://developers.google.com/maps) and Apple Maps.
 
 # Plans
 
-- Add Yandex maps;
+- Add other maps providers
 - Add English language support;
 - Optimize marker placement;
-- Add marker customization;
 - Add the news section;
 - Add functionality to translate posts;
 - Add the settings reset button;
 - Add cache management;
 - Add animations;
-- Publish the app to the App Store.
 
 # License
 

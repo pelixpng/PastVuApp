@@ -43,7 +43,7 @@ export const AppInfo: FC = () => {
     <ScrollContainer>
       <AppIconContainer>
         <LogoContainer source={require('../../../assets/icon.png')} />
-        <MenuDescriptionText>Версия 1.5.1 от 1 апреля 2024 г.</MenuDescriptionText>
+        <MenuDescriptionText>Версия 1.6.0 от 10 апреля 2024 г.</MenuDescriptionText>
       </AppIconContainer>
       <InsideMenuComponent
         ButtonArray={AboutProject}

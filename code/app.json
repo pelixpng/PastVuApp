@@ -2,7 +2,7 @@
   "expo": {
     "name": "PastVu",
     "slug": "PastVuApp",
-    "version": "1.5.1",
+    "version": "1.6.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -13,8 +13,10 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.pelixpng.PastVuApp"
+      "supportsTablet": false,
+      "userInterfaceStyle": "automatic",
+      "bundleIdentifier": "com.pelixpng.PastVuApp",
+      "buildNumber": "12"
     },
     "android": {
       "softwareKeyboardLayoutMode": "pan",
@@ -28,7 +30,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.pelixpng.PastVuApp",
-      "versionCode": 8
+      "versionCode": 9
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -46,9 +48,14 @@
       [
         "expo-media-library",
         {
-          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos.",
-          "savePhotosPermission": "Allow $(PRODUCT_NAME) to save photos.",
-          "isAccessMediaLocationEnabled": true
+          "savePhotosPermission": "Это позволяет сохранять фото в фотопленку.",
+          "isAccessMediaLocationEnabled": false
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Доступ к геолокации позволяет нам показать на карте интересны фотографии рядом с вами."
         }
       ]
     ]

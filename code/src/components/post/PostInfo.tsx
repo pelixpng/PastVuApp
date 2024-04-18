@@ -2,13 +2,13 @@ import React, { FC } from 'react'
 import styled from 'styled-components/native'
 import { perfectSize } from '../../utils/ScreenSize'
 import { MenuDescriptionText, MenuTitleText } from '../ui/UniversalComponents'
-import { Share } from 'react-native'
+import { Platform, Share } from 'react-native'
 import { MyButton } from '../buttons/MyButton'
 import RenderHtml from 'react-native-render-html'
 import { DefaultTheme, useTheme } from 'styled-components'
 import * as MediaLibrary from 'expo-media-library'
-import * as FileSystem from 'expo-file-system'
 import AlertModalService from '../../utils/AlertModalService'
+import * as FileSystem from 'expo-file-system'
 
 type PostInfoProps = {
   title: string
@@ -33,14 +33,19 @@ export const PostInfo: FC<PostInfoProps> = ({
 }) => {
   const saveImage = async () => {
     try {
-      const { status } = await MediaLibrary.requestPermissionsAsync()
+      const { status } = await MediaLibrary.requestPermissionsAsync(true)
       if (status === 'granted') {
-        const localuri = await FileSystem.downloadAsync(
-          `https://pastvu.com/_p/a/${file}`,
-          FileSystem.documentDirectory +
-            `${title?.substring(0, 15)}${file?.substring(file.indexOf('.'))}`,
-        )
-        await MediaLibrary.createAssetAsync(localuri.uri)
+        const localuri =
+          Platform.OS === 'android'
+            ? await FileSystem.downloadAsync(
+                `https://pastvu.com/_p/a/${file}`,
+                FileSystem.documentDirectory +
+                  `${title?.substring(0, 15)}${file?.substring(file.indexOf('.'))}`,
+              ).then(({ uri }) => {
+                return uri
+              })
+            : `https://pastvu.com/_p/a/${file}`
+        await MediaLibrary.saveToLibraryAsync(localuri)
         AlertModalService.infoAlert('Готово', 'Фотография успешно сохранена в галерею')
       }
     } catch (error) {

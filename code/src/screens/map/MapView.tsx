@@ -26,6 +26,9 @@ export const MapComponent: React.FC = observer(() => {
   const saveRegion = Storage.getString('RegionString')
   const [items, setItems] = useState<itemPhotoArray[]>([])
   const [coordinates, setCoordinates] = useState<Region>(saveRegion ? JSON.parse(saveRegion) : loc)
+  const [helpersCoordinates, setHelpersCoordinates] = useState<Region>(
+    saveRegion ? JSON.parse(saveRegion) : loc,
+  )
   const [yearsRange, setYearsRange] = useState<YearsRangeType>(
     saveRangeYears ? JSON.parse(saveRangeYears) : [1840, 1916],
   )
@@ -77,10 +80,10 @@ export const MapComponent: React.FC = observer(() => {
 
   return (
     <Container>
-      <SearchPlace setCoordinates={setCoordinates} />
-      <GoogleMap setCoordinates={setCoordinates} coordinates={coordinates} items={items} />
+      <SearchPlace setCoordinates={setHelpersCoordinates} />
+      <GoogleMap setCoordinates={setCoordinates} coordinates={helpersCoordinates} items={items} />
       <HistoryButton />
-      <LocationButton setCoord={setCoordinates} />
+      <LocationButton setCoord={setHelpersCoordinates} />
       <YearsSlider value={yearsRange} setValue={setYearsRange} />
     </Container>
   )

@@ -8,6 +8,9 @@ import { DefaultTheme, useTheme } from 'styled-components'
 import { History } from '../screens/map/History'
 import { StartScreen } from '../screens/map/StartScreen'
 import { Storage } from '../storage/Storage'
+import { MaterialIcons } from '@expo/vector-icons'
+import { perfectSize } from '../utils/ScreenSize'
+import { Platform } from 'react-native'
 
 const Stack = createStackNavigator<RootStackParamList>()
 
@@ -23,10 +26,14 @@ export function StartNavigator() {
             elevation: 0,
           },
           headerTintColor: theme.colors.titleMenuText,
-          presentation: 'transparentModal',
           headerShadowVisible: false,
           headerBackTitle: 'Назад',
+          gestureResponseDistance: 200,
+          presentation: Platform.OS === 'android' ? 'transparentModal' : undefined,
           title: '',
+          headerBackImage: ({ tintColor }) => (
+            <MaterialIcons name={'arrow-back-ios-new'} size={perfectSize(20)} color={tintColor} />
+          ),
         }}>
         <Stack.Screen
           name={'MapComponent'}

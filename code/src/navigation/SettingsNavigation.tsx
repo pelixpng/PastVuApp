@@ -6,6 +6,9 @@ import { FeedBack } from '../screens/settings/FeedBack'
 import { MapSettings } from '../screens/settings/MapSettings'
 import { DefaultTheme, useTheme } from 'styled-components'
 import { SettingsStackParamList } from '../types/navigation'
+import { MaterialIcons } from '@expo/vector-icons'
+import { perfectSize } from '../utils/ScreenSize'
+import { Platform } from 'react-native'
 
 const SettingsStack = createStackNavigator<SettingsStackParamList>()
 
@@ -23,7 +26,11 @@ export const SettingsNavigation: FC = () => {
         headerBackTitle: 'Назад',
         title: '',
         headerTintColor: theme.colors.titleMenuText,
-        presentation: 'transparentModal',
+        gestureResponseDistance: 200,
+        presentation: Platform.OS === 'android' ? 'transparentModal' : undefined,
+        headerBackImage: ({ tintColor }) => (
+          <MaterialIcons name={'arrow-back-ios-new'} size={perfectSize(20)} color={tintColor} />
+        ),
       }}>
       <SettingsStack.Screen
         name={'SettingsComponent'}

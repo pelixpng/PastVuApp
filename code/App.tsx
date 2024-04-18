@@ -6,6 +6,7 @@ import { DarkTheme, LightTheme } from './src/components/theme/Theme'
 import { observer } from 'mobx-react-lite'
 import ThemeStore from './src/mobx/ThemeStore'
 import { StatusBar } from 'react-native'
+import 'react-native-gesture-handler'
 
 export default observer(function App() {
   const colorScheme = useColorScheme()

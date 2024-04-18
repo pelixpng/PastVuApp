@@ -26,7 +26,9 @@ export const GoogleMap: FC<MapProp> = observer(({ setCoordinates, coordinates, i
       onRegionChangeComplete={setCoordinates}
       showsUserLocation={true}
       showsMyLocationButton={false}
+      initialRegion={coordinates}
       region={coordinates}
+      showsPointsOfInterest={false}
       loadingBackgroundColor={theme.colors.backgroundApp}
       moveOnMarkerPress={false}
       rotateEnabled={false}
@@ -36,12 +38,11 @@ export const GoogleMap: FC<MapProp> = observer(({ setCoordinates, coordinates, i
         <Marker
           key={index}
           coordinate={marker.location}
-          title={undefined}
+          title={Platform.OS === 'android' ? marker.title : undefined}
           tracksViewChanges={false}
           rotation={marker.dir}
           pinColor={marker.color}
           onPress={() => navigation.navigate('PhotoPage', { cid: marker.cid })}
-          //onPress={() => console.log(marker.cid)}
           style={Platform.OS === 'ios' && { transform: [{ rotate: `${marker.dir}deg` }] }}
           image={
             markerType === 'Новый'

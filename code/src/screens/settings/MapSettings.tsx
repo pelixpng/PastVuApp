@@ -76,7 +76,7 @@ export const MapSettings: FC = observer(() => {
         <SliderComponent
           value={maxPhotoOnMap}
           setValue={changeMaxPhotoMap}
-          title={'Максимальное количество фото на карте'}
+          title={'Количество фото на карте'}
           minValue={0}
           maxValue={800}
         />
