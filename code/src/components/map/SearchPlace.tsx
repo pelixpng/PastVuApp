@@ -3,16 +3,15 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import { DefaultTheme, useTheme } from 'styled-components'
 import { Region } from 'react-native-maps'
 import React from 'react'
-import AlertModalService from '../../utils/AlertModalService'
 import { perfectSize } from '../../utils/ScreenSize'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { Alert, StyleSheet } from 'react-native'
+import { INSET_TOP } from '../../constants/sizes'
 
 type SearchPlaceProp = {
   setCoordinates: (region: Region) => void
 }
 
 const SearchPlaceComponent: FC<SearchPlaceProp> = ({ setCoordinates }) => {
-  const { top } = useSafeAreaInsets()
   const theme: DefaultTheme = useTheme()
   return (
     <GooglePlacesAutocomplete
@@ -23,12 +22,12 @@ const SearchPlaceComponent: FC<SearchPlaceProp> = ({ setCoordinates }) => {
       }}
       fetchDetails={true}
       onFail={(error: string) => {
-        error.includes('quota')
-          ? AlertModalService.infoAlert(
-              'Ошибка',
-              'К сожалению, ежедневный лимит поисковых запросов исчерпан. Попробуйте завтра.',
-            )
-          : AlertModalService.infoAlert('ОШИБКА', error)
+        Alert.alert(
+          'Ошибка',
+          error.includes('quota')
+            ? 'К сожалению, ежедневный лимит поисковых запросов исчерпан. Попробуйте завтра.'
+            : error,
+        )
       }}
       onPress={(data, details = null) => {
         setCoordinates({
@@ -43,13 +42,7 @@ const SearchPlaceComponent: FC<SearchPlaceProp> = ({ setCoordinates }) => {
         language: 'ru',
       }}
       styles={{
-        container: {
-          width: '95%',
-          alignSelf: 'center',
-          position: 'absolute',
-          zIndex: 9,
-          marginTop: top,
-        },
+        container: s.container,
         textInput: {
           borderRadius: 30,
           backgroundColor: theme.colors.backgroundApp,
@@ -80,5 +73,15 @@ const SearchPlaceComponent: FC<SearchPlaceProp> = ({ setCoordinates }) => {
     />
   )
 }
+
+const s = StyleSheet.create({
+  container: {
+    width: '95%',
+    alignSelf: 'center',
+    position: 'absolute',
+    zIndex: 9,
+    marginTop: INSET_TOP,
+  },
+})
 
 export const SearchPlace = React.memo(SearchPlaceComponent)

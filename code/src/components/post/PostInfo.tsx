@@ -1,13 +1,12 @@
-import React, { FC } from 'react'
+import { FC } from 'react'
 import styled from 'styled-components/native'
 import { perfectSize } from '../../utils/ScreenSize'
 import { MenuDescriptionText, MenuTitleText } from '../ui/UniversalComponents'
-import { Platform, Share } from 'react-native'
+import { Alert, Platform, Share } from 'react-native'
 import { MyButton } from '../buttons/MyButton'
 import RenderHtml from 'react-native-render-html'
 import { DefaultTheme, useTheme } from 'styled-components'
 import * as MediaLibrary from 'expo-media-library'
-import AlertModalService from '../../utils/AlertModalService'
 import * as FileSystem from 'expo-file-system'
 
 type PostInfoProps = {
@@ -46,10 +45,10 @@ export const PostInfo: FC<PostInfoProps> = ({
               })
             : `https://pastvu.com/_p/a/${file}`
         await MediaLibrary.saveToLibraryAsync(localuri)
-        AlertModalService.infoAlert('Готово', 'Фотография успешно сохранена в галерею')
+        Alert.alert('Готово', 'Фотография успешно сохранена в галерею')
       }
     } catch (error) {
-      AlertModalService.infoAlert('Ошибка', 'Не удалось сохранить изображение')
+      Alert.alert('Ошибка', 'Не удалось сохранить изображение')
     }
   }
   const theme: DefaultTheme = useTheme()
@@ -101,8 +100,8 @@ export const PostInfo: FC<PostInfoProps> = ({
 }
 
 const PostContainer = styled.View`
-  display: flex;
   width: 100%;
+  display: flex;
   align-items: flex-start;
   gap: ${perfectSize(12)};
   align-self: center;

@@ -1,5 +1,5 @@
 import { makeAutoObservable } from 'mobx'
-import StorageServiceMMKV, { Storage } from '../storage/Storage'
+import { MMKVStorage } from '../storage/Storage'
 
 const PhotoQuality: { [key: string]: string } = {
   Миниатюра: 'h',
@@ -8,7 +8,7 @@ const PhotoQuality: { [key: string]: string } = {
 }
 
 class SettingsPhotoStore {
-  photoQualityTitle = Storage.getString('photoQuality') ?? 'Оригинал'
+  photoQualityTitle = MMKVStorage.get('photoQuality') ?? 'Оригинал'
   photoQualitySettings = PhotoQuality[this.photoQualityTitle]
 
   constructor() {
@@ -18,7 +18,7 @@ class SettingsPhotoStore {
   changePhotoQuality = (value: string) => {
     this.photoQualityTitle = value
     this.photoQualitySettings = PhotoQuality[value]
-    StorageServiceMMKV.savePhotoQualitySettings(value)
+    MMKVStorage.set('photoQuality', value)
   }
 }
 

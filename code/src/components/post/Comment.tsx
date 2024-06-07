@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import { FC } from 'react'
 import styled from 'styled-components/native'
 import { perfectSize } from '../../utils/ScreenSize'
 import { DefaultTheme, useTheme } from 'styled-components'

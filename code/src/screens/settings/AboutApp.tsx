@@ -1,4 +1,3 @@
-import React, { FC } from 'react'
 import {
   AppIconContainer,
   LogoContainer,
@@ -7,6 +6,7 @@ import {
 } from '../../components/ui/UniversalComponents'
 import { InsideMenuProps, LinkProps } from '../../types/components'
 import { InsideMenuComponent } from '../../components/ui/InsideMenuComponent'
+import * as Application from 'expo-application'
 
 const ResourcesUsed: LinkProps[] = [
   { title: 'PastVu Api', url: 'https://docs.pastvu.com/dev/api' },
@@ -38,12 +38,13 @@ const InsideMenuText: InsideMenuProps[] = [
   },
 ]
 
-export const AppInfo: FC = () => {
+export const AppInfo = () => {
+  const version = Application.nativeApplicationVersion
   return (
     <ScrollContainer>
       <AppIconContainer>
         <LogoContainer source={require('../../../assets/icon.png')} />
-        <MenuDescriptionText>Версия 1.6.0 от 10 апреля 2024 г.</MenuDescriptionText>
+        <MenuDescriptionText>Версия {version} от 2 июня 2024 г.</MenuDescriptionText>
       </AppIconContainer>
       <InsideMenuComponent
         ButtonArray={AboutProject}

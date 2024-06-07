@@ -1,11 +1,11 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { MapComponent } from '../screens/map/MapView'
-import { SettingsNavigation } from './SettingsNavigation'
 import { DefaultTheme, useTheme } from 'styled-components'
 import { perfectSize } from '../utils/ScreenSize'
 import { MaterialIcons } from '@expo/vector-icons'
-import React from 'react'
 import { StyleSheet } from 'react-native'
+import { SettingsComponent } from '../screens/settings/Settings'
+import { History } from '../screens/map/History'
 
 const Tab = createBottomTabNavigator()
 
@@ -35,8 +35,18 @@ export function BottomNavigator() {
         }}
       />
       <Tab.Screen
+        name={'History'}
+        component={History}
+        options={{
+          title: 'История',
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="history" size={perfectSize(24)} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
         name={'SettingsComponent'}
-        component={SettingsNavigation}
+        component={SettingsComponent}
         options={{
           title: 'Настройки',
           tabBarIcon: ({ color }) => (
@@ -51,7 +61,6 @@ export function BottomNavigator() {
 const s = StyleSheet.create({
   tabBarLabelStyle: {
     fontSize: perfectSize(13),
-    fontStyle: 'normal',
     fontWeight: '500',
   },
 })

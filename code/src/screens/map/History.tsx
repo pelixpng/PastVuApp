@@ -1,18 +1,30 @@
-import React, { FC } from 'react'
+import { useState, useCallback } from 'react'
 import { ViewContainer } from '../../components/ui/UniversalComponents'
 import { ItemHistory } from '../../components/history/Item'
-import { HistoryItem, Storage } from '../../storage/Storage'
+import { MMKVStorage } from '../../storage/Storage'
 import { MenuButton } from '../../components/buttons/MenuButton'
 import { FlatList } from 'react-native'
-import { StyleSheet } from 'react-native'
+import { useFocusEffect } from '@react-navigation/native'
+import { INSET_TOP } from '../../constants/sizes'
 
-export const History: FC = () => {
-  const historyString = Storage.getString('History') ?? '[]'
-  const parseArr: HistoryItem[] = JSON.parse(historyString)
+export interface HistoryItem {
+  title: string
+  description: string
+  cid: string
+  file: string
+}
+
+export const History = () => {
+  const [historyArr, setHistoryArr] = useState<Array<HistoryItem>>([])
+  useFocusEffect(
+    useCallback(() => {
+      setHistoryArr(MMKVStorage.get('History') ?? [])
+    }, []),
+  )
   return (
-    <ViewContainer>
+    <ViewContainer paddingTop={INSET_TOP}>
       <FlatList
-        data={parseArr}
+        data={historyArr}
         renderItem={({ item }) => (
           <ItemHistory
             cid={item.cid}
@@ -21,7 +33,6 @@ export const History: FC = () => {
             file={item.file}
           />
         )}
-        contentContainerStyle={s.container}
         keyExtractor={item => item.cid}
         ListEmptyComponent={
           <MenuButton
@@ -34,7 +45,3 @@ export const History: FC = () => {
     </ViewContainer>
   )
 }
-
-const s = StyleSheet.create({
-  container: { paddingHorizontal: 10 },
-})

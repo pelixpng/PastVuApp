@@ -6,15 +6,12 @@ const OS = Platform.OS
 
 export const ViewContainer = styled.View<{ paddingTop?: number }>`
   background: ${props => props.theme.colors.backgroundApp};
-  height: 100%;
-  width: 100%;
   padding-top: ${props => props.paddingTop};
+  height: 100%;
 `
 
 export const ScrollContainer = styled.ScrollView<{ paddingTop?: number }>`
   background: ${props => props.theme.colors.backgroundApp};
-  height: 100%;
-  width: 100%;
   padding-top: ${props => props.paddingTop};
 `
 
@@ -72,8 +69,8 @@ export const MenuInsideTextContainer = styled.View`
 `
 
 export const ButtonLinkContainer = styled.TouchableOpacity`
-  display: flex;
   width: 100%;
+  display: flex;
   height: ${perfectSize(46)};
   padding: 0px 8px;
   justify-content: center;

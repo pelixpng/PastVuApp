@@ -1,9 +1,9 @@
 import styled from 'styled-components/native'
-import React, { FC, useState } from 'react'
+import { FC, useState, memo } from 'react'
 import { perfectSize } from '../../utils/ScreenSize'
 import { DefaultTheme, useTheme } from 'styled-components'
 import { Slider } from '@miblanchard/react-native-slider'
-import StorageServiceMMKV from '../../storage/Storage'
+import { MMKVStorage } from '../../storage/Storage'
 import { YearsRangeType } from '../../types/components'
 import { StyleSheet } from 'react-native'
 
@@ -17,7 +17,7 @@ const YearsSliderComponent: FC<YearsSliderComponentProps> = ({ value, setValue }
   const [tmpRange, setTmpRange] = useState<YearsRangeType>(value)
   const changeyears = () => {
     setValue(tmpRange)
-    StorageServiceMMKV.saveYearsRange(tmpRange)
+    MMKVStorage.set('RangeYears', tmpRange)
   }
 
   return (
@@ -25,37 +25,29 @@ const YearsSliderComponent: FC<YearsSliderComponentProps> = ({ value, setValue }
       <CurentYearsText>
         {tmpRange[0]}-{tmpRange[1]}
       </CurentYearsText>
-      <SliderBodyContainer>
-        <Slider
-          animateTransitions
-          maximumTrackTintColor={theme.colors.SliderRangeBG}
-          maximumValue={2000}
-          minimumTrackTintColor="#526ED3"
-          minimumValue={1826}
-          step={1}
-          thumbTintColor="#526ED3"
-          thumbStyle={s.thumb}
-          containerStyle={s.container}
-          value={tmpRange}
-          onValueChange={setTmpRange}
-          onSlidingComplete={changeyears}
-        />
-      </SliderBodyContainer>
+      <Slider
+        animateTransitions
+        maximumTrackTintColor={theme.colors.SliderRangeBG}
+        maximumValue={2000}
+        minimumTrackTintColor="#526ED3"
+        minimumValue={1826}
+        step={1}
+        thumbTintColor="#526ED3"
+        thumbStyle={s.thumb}
+        containerStyle={s.container}
+        value={tmpRange}
+        onValueChange={setTmpRange}
+        onSlidingComplete={changeyears}
+      />
       <YearsTitleContainer>
         <CurentYearsText>1826</CurentYearsText>
-        <CurentYearsText>1884</CurentYearsText>
-        <CurentYearsText>1942</CurentYearsText>
         <CurentYearsText>2000</CurentYearsText>
       </YearsTitleContainer>
     </SliderComponentBack>
   )
 }
 
-export const YearsSlider = React.memo(YearsSliderComponent)
-
-export const SliderBodyContainer = styled.View`
-  width: 100%;
-`
+export const YearsSlider = memo(YearsSliderComponent)
 
 export const SliderComponentBack = styled.View`
   width: 100%;
@@ -63,8 +55,6 @@ export const SliderComponentBack = styled.View`
   background-color: ${props => props.theme.colors.backgroundApp};
   position: absolute;
   bottom: 0;
-  left: 0;
-  right: 0;
   z-index: 8;
   padding-top: 6px;
   padding-bottom: 6px;
@@ -91,5 +81,5 @@ const YearsTitleContainer = styled.View`
 `
 const s = StyleSheet.create({
   thumb: { height: 15, width: 15 },
-  container: { height: perfectSize(25) },
+  container: { height: perfectSize(25), width: '100%' },
 })

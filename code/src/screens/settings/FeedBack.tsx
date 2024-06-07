@@ -1,29 +1,28 @@
-import React, { FC } from 'react'
 import { ViewContainer } from '../../components/ui/UniversalComponents'
 import { InsideMenuProps, LinkProps } from '../../types/components'
 import { InsideMenuComponent } from '../../components/ui/InsideMenuComponent'
 
 const ButtonArray: LinkProps[] = [
-	{ title: 'Telegram', url: 'https://t.me/semenKuzminWork' },
-	{ title: 'Почта', url: 'mailto:semeonky@gmail.com' }
+  { title: 'Telegram', url: 'https://t.me/semenKuzminWork' },
+  { title: 'Почта', url: 'mailto:semeonky@gmail.com' },
 ]
 
 const InsideMenuText: InsideMenuProps[] = [
-	{
-		title: 'Нужна помощь?',
-		description:
-			'Если у вас возникли проблемы во время использования приложения, вы можете связаться с разработчиком через почту или телеграмм.'
-	}
+  {
+    title: 'Нужна помощь?',
+    description:
+      'Если у вас возникли проблемы во время использования приложения, вы можете связаться с разработчиком через почту или телеграмм.',
+  },
 ]
 
-export const FeedBack: FC = () => {
-	return (
-		<ViewContainer>
-			<InsideMenuComponent
-				ButtonArray={ButtonArray}
-				title={InsideMenuText[0].title}
-				description={InsideMenuText[0].description}
-			/>
-		</ViewContainer>
-	)
+export const FeedBack = () => {
+  return (
+    <ViewContainer>
+      <InsideMenuComponent
+        ButtonArray={ButtonArray}
+        title={InsideMenuText[0].title}
+        description={InsideMenuText[0].description}
+      />
+    </ViewContainer>
+  )
 }

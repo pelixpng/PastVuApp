@@ -1,12 +1,11 @@
-import React, { useEffect } from 'react'
-import { StartNavigator } from './src/navigation/StartNavigation'
+import { useEffect } from 'react'
+import { StartNavigator } from './src/navigation/MainNavigation'
 import { ThemeProvider } from 'styled-components/native'
 import { useColorScheme } from 'react-native'
 import { DarkTheme, LightTheme } from './src/components/theme/Theme'
 import { observer } from 'mobx-react-lite'
 import ThemeStore from './src/mobx/ThemeStore'
 import { StatusBar } from 'react-native'
-import 'react-native-gesture-handler'
 
 export default observer(function App() {
   const colorScheme = useColorScheme()

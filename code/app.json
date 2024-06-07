@@ -2,7 +2,7 @@
   "expo": {
     "name": "PastVu",
     "slug": "PastVuApp",
-    "version": "1.6.0",
+    "version": "1.7.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -16,7 +16,7 @@
       "supportsTablet": false,
       "userInterfaceStyle": "automatic",
       "bundleIdentifier": "com.pelixpng.PastVuApp",
-      "buildNumber": "12"
+      "buildNumber": "16"
     },
     "android": {
       "softwareKeyboardLayoutMode": "pan",
@@ -30,10 +30,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.pelixpng.PastVuApp",
-      "versionCode": 9
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
+      "versionCode": 10
     },
     "extra": {
       "eas": {

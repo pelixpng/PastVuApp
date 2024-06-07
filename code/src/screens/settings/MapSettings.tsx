@@ -1,4 +1,3 @@
-import React, { FC } from 'react'
 import { ScrollContainer } from '../../components/ui/UniversalComponents'
 import { InsideMenuComponent } from '../../components/ui/InsideMenuComponent'
 import { SliderComponent } from '../../components/sliders/SliderComponen'
@@ -35,7 +34,7 @@ const InsideMenuText: InsideMenuProps[] = [
   },
 ]
 
-export const MapSettings: FC = observer(() => {
+export const MapSettings = observer(() => {
   const {
     countPhoto,
     changeCountPhoto,

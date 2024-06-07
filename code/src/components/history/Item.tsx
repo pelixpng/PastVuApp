@@ -1,12 +1,11 @@
-import React, { FC } from 'react'
+import { FC } from 'react'
 import styled from 'styled-components/native'
-import { HistoryItem } from '../../storage/Storage'
 import { NavigationProp, useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from '../../types/navigation'
 import { perfectSize } from '../../utils/ScreenSize'
 import { Image } from 'expo-image'
-import AlertModalService from '../../utils/AlertModalService'
-import { StyleSheet } from 'react-native'
+import { Alert, StyleSheet } from 'react-native'
+import { HistoryItem } from '../../screens/map/History'
 
 export const ItemHistory: FC<HistoryItem> = ({ title, description, cid, file }) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>()
@@ -15,12 +14,7 @@ export const ItemHistory: FC<HistoryItem> = ({ title, description, cid, file }) 
       <Image
         source={{ uri: `https://pastvu.com/_p/d/${file}` }}
         style={s.image}
-        onError={() =>
-          AlertModalService.infoAlert(
-            'Ошибка',
-            'Не удалось загрузить изображение, попробуйте позже',
-          )
-        }
+        onError={() => Alert.alert('Ошибка', 'Не удалось загрузить изображение, попробуйте позже')}
         cachePolicy="disk"
       />
       <InfoContainer>
@@ -57,7 +51,9 @@ const MainContainer = styled.TouchableOpacity`
   flex-direction: row;
   align-items: center;
   align-self: center;
-  padding-bottom: ${perfectSize(10)};
+  padding-bottom: 5;
+  padding-top: 5;
+  width: 93%;
 `
 const s = StyleSheet.create({
   image: {

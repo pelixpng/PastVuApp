@@ -1,12 +1,10 @@
-import React from 'react'
 import { ScrollContainer } from '../../components/ui/UniversalComponents'
 import { MenuButton } from '../../components/buttons/MenuButton'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { INSET_TOP } from '../../constants/sizes'
 
-export const SettingsComponent: React.FC = () => {
-  const { top } = useSafeAreaInsets()
+export const SettingsComponent = () => {
   return (
-    <ScrollContainer paddingTop={top}>
+    <ScrollContainer paddingTop={INSET_TOP}>
       <MenuButton
         route={'FeedBack'}
         title={'Обратная связь'}

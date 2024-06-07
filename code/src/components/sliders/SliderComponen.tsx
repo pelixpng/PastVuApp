@@ -1,5 +1,5 @@
 import styled from 'styled-components/native'
-import React, { FC } from 'react'
+import { FC } from 'react'
 import { perfectSize } from '../../utils/ScreenSize'
 import { Slider } from '@miblanchard/react-native-slider'
 import { DefaultTheme, useTheme } from 'styled-components'

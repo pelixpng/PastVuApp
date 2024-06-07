@@ -5,9 +5,6 @@ type RootStackParamList = {
   History: undefined
   MapComponent: undefined
   PhotoPage: { cid: string }
-}
-
-type SettingsStackParamList = {
   AppInfo: undefined
   ChangeTheme: undefined
   FeedBack: undefined
