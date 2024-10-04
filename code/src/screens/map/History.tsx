@@ -1,11 +1,10 @@
 import { useState, useCallback } from 'react'
-import { ViewContainer } from '../../components/ui/UniversalComponents'
+import { ViewContainer } from '../../components/ui/Containers'
 import { ItemHistory } from '../../components/history/Item'
 import { MMKVStorage } from '../../storage/Storage'
-import { MenuButton } from '../../components/buttons/MenuButton'
 import { FlatList } from 'react-native'
 import { useFocusEffect } from '@react-navigation/native'
-import { INSET_TOP } from '../../constants/sizes'
+import { MenuButton } from '../../components/ui/buttons/MenuButton'
 
 export interface HistoryItem {
   title: string
@@ -22,7 +21,7 @@ export const History = () => {
     }, []),
   )
   return (
-    <ViewContainer paddingTop={INSET_TOP}>
+    <ViewContainer>
       <FlatList
         data={historyArr}
         renderItem={({ item }) => (

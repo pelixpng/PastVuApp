@@ -1,7 +1,6 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { MapComponent } from '../screens/map/MapView'
 import { DefaultTheme, useTheme } from 'styled-components'
-import { perfectSize } from '../utils/ScreenSize'
 import { MaterialIcons } from '@expo/vector-icons'
 import { StyleSheet } from 'react-native'
 import { SettingsComponent } from '../screens/settings/Settings'
@@ -14,24 +13,27 @@ export function BottomNavigator() {
   return (
     <Tab.Navigator
       screenOptions={{
-        tabBarActiveTintColor: theme.colors.tabBarActiveTint,
-        tabBarInactiveTintColor: theme.colors.tabBarInactiveTintColor,
+        tabBarActiveTintColor: theme.colors.basePrimary,
+        tabBarInactiveTintColor: theme.colors.textThird,
         tabBarStyle: {
           backgroundColor: theme.colors.backgroundApp,
           borderTopWidth: 0,
         },
+        headerShadowVisible: false,
+        headerStyle: {
+          backgroundColor: theme.colors.backgroundApp,
+        },
+        headerTitle: '',
         tabBarHideOnKeyboard: true,
-        headerShown: false,
         tabBarLabelStyle: s.tabBarLabelStyle,
       }}>
       <Tab.Screen
         name={'MapComponent'}
         component={MapComponent}
         options={{
+          headerShown: false,
           title: 'Карта',
-          tabBarIcon: ({ color }) => (
-            <MaterialIcons name="map" size={perfectSize(24)} color={color} />
-          ),
+          tabBarIcon: ({ color }) => <MaterialIcons name="map" size={24} color={color} />,
         }}
       />
       <Tab.Screen
@@ -39,9 +41,7 @@ export function BottomNavigator() {
         component={History}
         options={{
           title: 'История',
-          tabBarIcon: ({ color }) => (
-            <MaterialIcons name="history" size={perfectSize(24)} color={color} />
-          ),
+          tabBarIcon: ({ color }) => <MaterialIcons name="history" size={24} color={color} />,
         }}
       />
       <Tab.Screen
@@ -49,9 +49,7 @@ export function BottomNavigator() {
         component={SettingsComponent}
         options={{
           title: 'Настройки',
-          tabBarIcon: ({ color }) => (
-            <MaterialIcons name="settings" size={perfectSize(24)} color={color} />
-          ),
+          tabBarIcon: ({ color }) => <MaterialIcons name="settings" size={24} color={color} />,
         }}
       />
     </Tab.Navigator>
@@ -60,7 +58,8 @@ export function BottomNavigator() {
 
 const s = StyleSheet.create({
   tabBarLabelStyle: {
-    fontSize: perfectSize(13),
+    fontSize: 11,
+    lineHeight: 16,
     fontWeight: '500',
   },
 })

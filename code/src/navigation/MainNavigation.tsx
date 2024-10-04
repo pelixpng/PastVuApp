@@ -5,11 +5,8 @@ import { PhotoPage } from '../screens/map/PhotoView'
 import { BottomNavigator } from './BottomNavigation'
 import { DefaultTheme, useTheme } from 'styled-components'
 import { History } from '../screens/map/History'
-import { StartScreen } from '../screens/map/StartScreen'
-import { mmkv } from '../storage/Storage'
 import { MaterialIcons } from '@expo/vector-icons'
-import { perfectSize } from '../utils/ScreenSize'
-import { Platform } from 'react-native'
+import { Platform, StyleSheet } from 'react-native'
 import { SettingsComponent } from '../screens/settings/Settings'
 import { AppInfo } from '../screens/settings/AboutApp'
 import { FeedBack } from '../screens/settings/FeedBack'
@@ -22,26 +19,20 @@ export function StartNavigator() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName={
-          Platform.OS === 'android'
-            ? mmkv.getAllKeys().length
-              ? 'MapComponent'
-              : 'StartScreen'
-            : 'MapComponent'
-        }
+        initialRouteName={'MapComponent'}
         screenOptions={{
           headerStyle: {
             backgroundColor: theme.colors.backgroundApp,
             elevation: 0,
           },
-          headerTintColor: theme.colors.titleMenuText,
+          headerTintColor: theme.colors.textFirst,
           headerShadowVisible: false,
-          headerBackTitle: 'Назад',
+          headerBackTitleVisible: false,
           gestureResponseDistance: 200,
           presentation: Platform.OS === 'android' ? 'transparentModal' : undefined,
           title: '',
           headerBackImage: ({ tintColor }) => (
-            <MaterialIcons name={'arrow-back-ios-new'} size={perfectSize(20)} color={tintColor} />
+            <MaterialIcons name={'arrow-back'} size={24} color={tintColor} style={s.back} />
           ),
         }}>
         <Stack.Screen
@@ -53,14 +44,7 @@ export function StartNavigator() {
         />
         <Stack.Screen name={'PhotoPage'} component={PhotoPage} />
         <Stack.Screen name={'History'} component={History} />
-        <Stack.Screen name={'StartScreen'} component={StartScreen} />
-        <Stack.Screen
-          name={'SettingsComponent'}
-          component={SettingsComponent}
-          options={{
-            headerShown: false,
-          }}
-        />
+        <Stack.Screen name={'SettingsComponent'} component={SettingsComponent} />
         <Stack.Screen name={'AppInfo'} component={AppInfo} />
         <Stack.Screen name={'MapSettings'} component={MapSettings} />
         <Stack.Screen name={'FeedBack'} component={FeedBack} />
@@ -68,3 +52,7 @@ export function StartNavigator() {
     </NavigationContainer>
   )
 }
+
+const s = StyleSheet.create({
+  back: { marginLeft: Platform.OS === 'android' ? 0 : 16 },
+})

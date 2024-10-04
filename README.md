@@ -20,6 +20,14 @@ well as contribute images and information to the archive. You can read more
 about the project [here](https://docs.pastvu.com/en/about). Platform source
 [code](https://github.com/PastVu).
 
+# System Requirements
+
+- **Android:** 6.0 and up
+- **iOS:** 13.4 and up
+- **iPadOS:** Not supported currently
+- **macOS:** 11.0 and up
+- **visionOS:** 1.0 and up
+
 # Android
 
 <p align="center">
@@ -32,12 +40,6 @@ about the project [here](https://docs.pastvu.com/en/about). Platform source
   <img src="img/4.png" width="250" />
   <img src="img/5.png" width="250" /> 
   <img src="img/6.png" width="250" />
-</p>
-
-<p align="center">
-  <img src="img/7.png" width="250" />
-  <img src="img/8.png" width="250" /> 
-  <img src="img/9.png" width="250" />
 </p>
 
 # IOS
@@ -61,16 +63,10 @@ about the project [here](https://docs.pastvu.com/en/about). Platform source
 - The map API is provided by the [Google Maps
   platform](https://developers.google.com/maps) and Apple Maps.
 
-# Plans
+# Project team
 
-- Add other maps providers
-- Add English language support;
-- Optimize marker placement;
-- Add the news section;
-- Add functionality to translate posts;
-- Add the settings reset button;
-- Add cache management;
-- Add animations;
+1. [**Semyon Kuzmin**](https://github.com/pelixpng) - Application creator, development, testing.
+2. [**Artem Kostyuchenko**](https://t.me/ArtemWaves) - Designer.
 
 # License
 

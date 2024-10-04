@@ -4,7 +4,6 @@ import { MaterialIcons } from '@expo/vector-icons'
 import * as Location from 'expo-location'
 import { Region } from 'react-native-maps'
 import { DefaultTheme, useTheme } from 'styled-components'
-import { perfectSize } from '../../utils/ScreenSize'
 import { Alert } from 'react-native'
 
 type LocationButtonProps = {
@@ -29,7 +28,7 @@ const GetLocationButton: FC<LocationButtonProps> = ({ setCoord }) => {
   }
   return (
     <ContainerIcon onPress={getLocation}>
-      <MaterialIcons name="my-location" size={24} color={theme.colors.titleMenuText} />
+      <MaterialIcons name="my-location" size={24} color={theme.colors.textFirst} />
     </ContainerIcon>
   )
 }
@@ -38,10 +37,9 @@ export const LocationButton = memo(GetLocationButton)
 
 const ContainerIcon = styled.TouchableOpacity`
   background-color: ${props => props.theme.colors.backgroundApp};
-  align-self: flex-end;
-  padding: 10px;
-  border-radius: 50px;
+  padding: 16px;
+  border-radius: 100px;
   position: absolute;
-  bottom: ${perfectSize(130)};
-  right: ${perfectSize(10)};
+  bottom: 120;
+  right: 16;
 `

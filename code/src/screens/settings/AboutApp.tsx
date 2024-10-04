@@ -1,12 +1,9 @@
-import {
-  AppIconContainer,
-  LogoContainer,
-  MenuDescriptionText,
-  ScrollContainer,
-} from '../../components/ui/UniversalComponents'
-import { InsideMenuProps, LinkProps } from '../../types/components'
-import { InsideMenuComponent } from '../../components/ui/InsideMenuComponent'
 import * as Application from 'expo-application'
+import { ScrollContainer } from '../../components/ui/Containers'
+import { MenuDescriptionText } from '../../components/ui/Texts'
+import { LinkProps, UICardProps } from '../../types/components'
+import { UICard } from '../../components/ui/UICards'
+import { Image, View, StyleSheet } from 'react-native'
 
 const ResourcesUsed: LinkProps[] = [
   { title: 'PastVu Api', url: 'https://docs.pastvu.com/dev/api' },
@@ -19,9 +16,12 @@ const AboutProject: LinkProps[] = [
   { title: 'Web версия PastVu', url: 'https://pastvu.com/' },
 ]
 
-const Developers: LinkProps[] = [{ title: 'Семён Кузьмин', url: 'https://t.me/semenKuzminWork' }]
+const Developers: LinkProps[] = [
+  { title: 'Семён Кузьмин • Разработчик', url: 'https://t.me/semenKuzminWork' },
+  { title: 'Артём Костюченко • Дизайнер', url: 'https://t.me/ArtemWaves' },
+]
 
-const InsideMenuText: InsideMenuProps[] = [
+const InsideMenuText: UICardProps[] = [
   {
     title: 'Что такое PastVu?',
     description:
@@ -42,21 +42,21 @@ export const AppInfo = () => {
   const version = Application.nativeApplicationVersion
   return (
     <ScrollContainer>
-      <AppIconContainer>
-        <LogoContainer source={require('../../../assets/icon.png')} />
-        <MenuDescriptionText>Версия {version} от 2 июня 2024 г.</MenuDescriptionText>
-      </AppIconContainer>
-      <InsideMenuComponent
+      <View style={s.block}>
+        <Image style={s.image} source={require('../../../assets/icon.png')} />
+        <MenuDescriptionText>Версия {version} от 1 октября 2024 г.</MenuDescriptionText>
+      </View>
+      <UICard
         ButtonArray={AboutProject}
         title={InsideMenuText[0].title}
         description={InsideMenuText[0].description}
       />
-      <InsideMenuComponent
+      <UICard
         ButtonArray={ResourcesUsed}
         title={InsideMenuText[1].title}
         description={InsideMenuText[1].description}
       />
-      <InsideMenuComponent
+      <UICard
         ButtonArray={Developers}
         title={InsideMenuText[2].title}
         description={InsideMenuText[2].description}
@@ -64,3 +64,8 @@ export const AppInfo = () => {
     </ScrollContainer>
   )
 }
+
+const s = StyleSheet.create({
+  block: { width: '100%', alignItems: 'center', gap: 16, marginBottom: 24 },
+  image: { width: 128, height: 128, borderRadius: 400 },
+})

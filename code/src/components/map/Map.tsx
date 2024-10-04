@@ -4,7 +4,7 @@ import { DefaultTheme, useTheme } from 'styled-components'
 import { itemPhotoArray } from '../../types/apiPhotoList'
 import { observer } from 'mobx-react-lite'
 import SettingsMapStore from '../../mobx/SettingsMapStore'
-import { Platform, StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native'
 import { NavigationProp, useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from '../../types/navigation'
 
@@ -17,10 +17,11 @@ type MapProp = {
 export const GoogleMap: FC<MapProp> = observer(({ setCoordinates, coordinates, items }) => {
   const theme: DefaultTheme = useTheme()
   const navigation = useNavigation<NavigationProp<RootStackParamList>>()
-  const { mapTypeSetting, markerType } = SettingsMapStore
+  const { mapTypeSetting, markerType, mapProvider } = SettingsMapStore
   return (
     <MapView
       style={s.map}
+      //provider={PROVIDER_GOOGLE}
       userInterfaceStyle={theme.names.themeName}
       customMapStyle={theme.colors.MapTheme}
       onRegionChangeComplete={setCoordinates}
@@ -32,18 +33,17 @@ export const GoogleMap: FC<MapProp> = observer(({ setCoordinates, coordinates, i
       loadingBackgroundColor={theme.colors.backgroundApp}
       moveOnMarkerPress={false}
       rotateEnabled={false}
-      maxZoomLevel={19}
       mapType={mapTypeSetting}>
       {items.map((marker, index) => (
         <Marker
           key={index}
           coordinate={marker.location}
-          title={Platform.OS === 'android' ? marker.title : undefined}
+          title={mapProvider === 'Google' ? marker.title : undefined}
           tracksViewChanges={false}
           rotation={marker.dir}
           pinColor={marker.color}
           onPress={() => navigation.navigate('PhotoPage', { cid: marker.cid })}
-          style={Platform.OS === 'ios' && { transform: [{ rotate: `${marker.dir}deg` }] }}
+          style={mapProvider === 'Apple' && { transform: [{ rotate: `${marker.dir}deg` }] }}
           image={
             markerType === 'Новый'
               ? theme.names.themeName == 'light'

@@ -19,7 +19,7 @@
     <key>CFBundlePackageType</key>
     <string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.7.0</string>
+    <string>1.8.0</string>
     <key>CFBundleSignature</key>
     <string>????</string>
     <key>CFBundleURLTypes</key>
@@ -38,7 +38,7 @@
       </dict>
     </array>
     <key>CFBundleVersion</key>
-    <string>16</string>
+    <string>19</string>
     <key>LSRequiresIPhoneOS</key>
     <true/>
     <key>NSAppTransportSecurity</key>
@@ -55,7 +55,7 @@
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>Доступ к геолокации позволяет нам показать на карте интересны фотографии рядом с вами.</string>
     <key>NSPhotoLibraryAddUsageDescription</key>
-    <string>Это позволяет сохранять фото в фотопленку.</string>
+    <string>Мы запрашиваем доступ для сохранения изображений в вашу фотогалерею, чтобы вы могли добавлять загруженные фотографии для дальнейшего просмотра и использования.</string>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your photos</string>
     <key>UILaunchStoryboardName</key>

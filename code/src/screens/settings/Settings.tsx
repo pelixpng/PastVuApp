@@ -1,14 +1,19 @@
-import { ScrollContainer } from '../../components/ui/UniversalComponents'
-import { MenuButton } from '../../components/buttons/MenuButton'
-import { INSET_TOP } from '../../constants/sizes'
+import { MenuButton } from '../../components/ui/buttons/MenuButton'
+import { ViewContainer } from '../../components/ui/Containers'
 
 export const SettingsComponent = () => {
   return (
-    <ScrollContainer paddingTop={INSET_TOP}>
+    <ViewContainer>
+      <MenuButton
+        route={'MapSettings'}
+        title={'Настройки'}
+        description={'Параметры интерфейса и карты'}
+        icon={'settings'}
+      />
       <MenuButton
         route={'FeedBack'}
         title={'Обратная связь'}
-        description={'Контакты для связи с разработчиком'}
+        description={'Контакты с разработчиком'}
         icon={'mail'}
       />
       <MenuButton
@@ -17,12 +22,6 @@ export const SettingsComponent = () => {
         description={'Версия и используемые ресурсы'}
         icon={'info'}
       />
-      <MenuButton
-        route={'MapSettings'}
-        title={'Настройки'}
-        description={'Настройки интерфейса и карты'}
-        icon={'settings'}
-      />
-    </ScrollContainer>
+    </ViewContainer>
   )
 }

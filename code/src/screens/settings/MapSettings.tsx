@@ -1,15 +1,15 @@
-import { ScrollContainer } from '../../components/ui/UniversalComponents'
-import { InsideMenuComponent } from '../../components/ui/InsideMenuComponent'
-import { SliderComponent } from '../../components/sliders/SliderComponen'
-import { InsideMenuProps } from '../../types/components'
+import { ScrollContainer } from '../../components/ui/Containers'
+import { SliderComponent } from '../../components/sliders/settingsSlider/SliderSettings'
 import { observer } from 'mobx-react-lite'
-import { RadioButtons } from '../../components/buttons/radioButton/RadioButtons'
 import SettingsMapStore from '../../mobx/SettingsMapStore'
 import SettingsPhotoStore from '../../mobx/PhotoSettingsStore'
 import ThemeStore from '../../mobx/ThemeStore'
-import { Platform } from 'react-native'
+import { Platform, ScrollView } from 'react-native'
+import { UICardProps } from '../../types/components'
+import { UICard } from '../../components/ui/UICards'
+import { RadioButtons } from '../../components/ui/buttons/radioButton/RadioButtons'
 
-const InsideMenuText: InsideMenuProps[] = [
+const InsideMenuText: UICardProps[] = [
   {
     title: 'Параметры карты',
     description:
@@ -26,11 +26,15 @@ const InsideMenuText: InsideMenuProps[] = [
   },
   {
     title: 'Тип карты',
-    description: 'Выбор карты',
+    description: 'Выбор слоя карты.',
   },
   {
     title: 'Тип маркера',
-    description: 'Выбор типа маркера на карте.',
+    description: 'Выбор типа маркера на Google Maps.',
+  },
+  {
+    title: 'Провайдер карты',
+    description: 'Выбор поставщика карты.',
   },
 ]
 
@@ -46,6 +50,8 @@ export const MapSettings = observer(() => {
     changeMapType,
     changeMarkerType,
     markerType,
+    changeMapProvider,
+    mapProvider,
   } = SettingsMapStore
   const { changePhotoQuality, photoQualityTitle } = SettingsPhotoStore
   const { themeSettingsTitle, changeSettingsThemeTitle } = ThemeStore
@@ -53,11 +59,10 @@ export const MapSettings = observer(() => {
   const PhotoSettingsTitles = ['Оригинал', 'Стандарт', 'Миниатюра']
   const mapTypeTitles = ['Стандарт', 'Спутник', 'Гибрид', 'Рельеф']
   const markerTypeTitles = ['Новый', 'Старый']
+  const providerMapTitles = Platform.OS === 'android' ? ['Google'] : ['Apple', 'Google']
   return (
     <ScrollContainer>
-      <InsideMenuComponent
-        title={InsideMenuText[0].title}
-        description={InsideMenuText[0].description}>
+      <UICard title={InsideMenuText[0].title} description={InsideMenuText[0].description}>
         <SliderComponent
           title="Максимальное расстояние в метрах"
           maxValue={10000}
@@ -79,37 +84,34 @@ export const MapSettings = observer(() => {
           minValue={0}
           maxValue={800}
         />
-      </InsideMenuComponent>
-      <InsideMenuComponent
-        title={InsideMenuText[1].title}
-        description={InsideMenuText[1].description}>
+      </UICard>
+      <UICard title={InsideMenuText[1].title} description={InsideMenuText[1].description}>
         <RadioButtons
           titles={themeTitles}
           value={themeSettingsTitle}
           setValue={changeSettingsThemeTitle}
         />
-      </InsideMenuComponent>
-      <InsideMenuComponent
-        title={InsideMenuText[2].title}
-        description={InsideMenuText[2].description}>
+      </UICard>
+      <UICard title={InsideMenuText[2].title} description={InsideMenuText[2].description}>
         <RadioButtons
           titles={PhotoSettingsTitles}
           value={photoQualityTitle}
           setValue={changePhotoQuality}
         />
-      </InsideMenuComponent>
-      <InsideMenuComponent
-        title={InsideMenuText[3].title}
-        description={InsideMenuText[3].description}>
+      </UICard>
+      <UICard title={InsideMenuText[3].title} description={InsideMenuText[3].description}>
         <RadioButtons titles={mapTypeTitles} value={mapTypeTitle} setValue={changeMapType} />
-      </InsideMenuComponent>
+      </UICard>
       {Platform.OS === 'android' && (
-        <InsideMenuComponent
-          title={InsideMenuText[4].title}
-          description={InsideMenuText[4].description}>
+        <UICard title={InsideMenuText[4].title} description={InsideMenuText[4].description}>
           <RadioButtons titles={markerTypeTitles} value={markerType} setValue={changeMarkerType} />
-        </InsideMenuComponent>
+        </UICard>
       )}
+      {/* <InsideMenuComponent
+        title={InsideMenuText[5].title}
+        description={InsideMenuText[5].description}>
+        <RadioButtons titles={providerMapTitles} value={mapProvider} setValue={changeMapProvider} />
+      </InsideMenuComponent> */}
     </ScrollContainer>
   )
 })

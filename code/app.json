@@ -2,7 +2,7 @@
   "expo": {
     "name": "PastVu",
     "slug": "PastVuApp",
-    "version": "1.7.0",
+    "version": "1.8.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -16,13 +16,18 @@
       "supportsTablet": false,
       "userInterfaceStyle": "automatic",
       "bundleIdentifier": "com.pelixpng.PastVuApp",
-      "buildNumber": "16"
+      "buildNumber": "19",
+      "config": {
+        "googleMaps": {
+          "apiKey": "YOUR API KEY"
+        }
+      }
     },
     "android": {
       "softwareKeyboardLayoutMode": "pan",
       "config": {
         "googleMaps": {
-          "apiKey": "YOUR_GOOGLE_MAPS_API_KEY"
+          "apiKey": "YOUR API KEY"
         }
       },
       "adaptiveIcon": {
@@ -45,7 +50,7 @@
       [
         "expo-media-library",
         {
-          "savePhotosPermission": "Это позволяет сохранять фото в фотопленку.",
+          "savePhotosPermission": "Мы запрашиваем доступ для сохранения изображений в вашу фотогалерею, чтобы вы могли добавлять загруженные фотографии для дальнейшего просмотра и использования.",
           "isAccessMediaLocationEnabled": false
         }
       ],

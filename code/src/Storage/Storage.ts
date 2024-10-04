@@ -11,6 +11,7 @@ type MMKVStorageType =
   | 'RangeYears'
   | 'RegionString'
   | 'History'
+  | 'mapProvider'
 
 type TValue = string | number | object
 

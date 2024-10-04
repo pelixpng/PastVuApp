@@ -1,17 +1,18 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Region } from 'react-native-maps'
 import ApiService from '../../api/PastVuApi'
 import { observer } from 'mobx-react-lite'
-import { YearsSlider } from '../../components/sliders/YearsSliderComponent'
+import { YearsSlider } from '../../components/sliders/YearsSlider/YearsSlider'
 import { MMKVStorage } from '../../storage/Storage'
 import SettingsMapStore from '../../mobx/SettingsMapStore'
-import { LocationButton } from '../../components/buttons/LocationButton'
-import { SearchPlace } from '../../components/map/SearchPlace'
+import { SearchPlace } from '../../components/map/searchPlase/SearchPlace'
 import { GoogleMap } from '../../components/map/Map'
 import { itemPhotoArray, getPhotoListProps } from '../../types/apiPhotoList'
 import { YearsRangeType } from '../../types/components'
 import styled from 'styled-components/native'
 import { Alert } from 'react-native'
+import * as Location from 'expo-location'
+import { LocationButton } from '../../components/ui/buttons/LocationButton'
 
 const loc: Region = {
   latitude: 55.763307,
@@ -28,6 +29,34 @@ export const MapComponent = observer(() => {
   const [helpersCoordinates, setHelpersCoordinates] = useState<Region>(saveRegion ?? loc)
   const [yearsRange, setYearsRange] = useState<YearsRangeType>(saveRangeYears ?? [1840, 1916])
   const { countPhoto, maxDistance, maxPhotoOnMap } = SettingsMapStore
+  useEffect(() => {
+    const getLocation = async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync()
+      if (status !== 'granted') {
+        const lastPosition = await Location.getLastKnownPositionAsync()
+        if (lastPosition) {
+          setCoordinates({
+            latitude: lastPosition.coords.latitude,
+            longitude: lastPosition.coords.longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          })
+        } else {
+          const { coords } = await Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.Lowest,
+          })
+          setCoordinates({
+            latitude: coords.latitude,
+            longitude: coords.longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          })
+        }
+      }
+    }
+    if (!saveRegion) getLocation()
+  }, [])
+
   async function getPhoto() {
     try {
       MMKVStorage.set('RegionString', coordinates)

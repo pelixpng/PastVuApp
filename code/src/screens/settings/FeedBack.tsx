@@ -1,13 +1,13 @@
-import { ViewContainer } from '../../components/ui/UniversalComponents'
-import { InsideMenuProps, LinkProps } from '../../types/components'
-import { InsideMenuComponent } from '../../components/ui/InsideMenuComponent'
+import { ViewContainer } from '../../components/ui/Containers'
+import { LinkProps, UICardProps } from '../../types/components'
+import { UICard } from '../../components/ui/UICards'
 
 const ButtonArray: LinkProps[] = [
   { title: 'Telegram', url: 'https://t.me/semenKuzminWork' },
   { title: 'Почта', url: 'mailto:semeonky@gmail.com' },
 ]
 
-const InsideMenuText: InsideMenuProps[] = [
+const InsideMenuText: UICardProps[] = [
   {
     title: 'Нужна помощь?',
     description:
@@ -18,7 +18,7 @@ const InsideMenuText: InsideMenuProps[] = [
 export const FeedBack = () => {
   return (
     <ViewContainer>
-      <InsideMenuComponent
+      <UICard
         ButtonArray={ButtonArray}
         title={InsideMenuText[0].title}
         description={InsideMenuText[0].description}

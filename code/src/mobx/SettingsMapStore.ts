@@ -1,6 +1,7 @@
 import { makeAutoObservable } from 'mobx'
 import { MMKVStorage } from '../storage/Storage'
 import { MapType } from 'react-native-maps'
+import { Platform } from 'react-native'
 
 const Maps: { [key: string]: MapType } = {
   Стандарт: 'standard',
@@ -16,8 +17,14 @@ class SettingsMapStore {
   mapTypeTitle = MMKVStorage.get('TypeMap') ?? 'Стандарт'
   mapTypeSetting = Maps[this.mapTypeTitle] ?? 'standard'
   markerType = MMKVStorage.get('TypeMarker') ?? 'Новый'
+  mapProvider = MMKVStorage.get('mapProvider') ?? Platform.OS === 'android' ? 'Google' : 'Apple'
   constructor() {
     makeAutoObservable(this)
+  }
+
+  changeMapProvider = (value: string) => {
+    this.mapProvider = value
+    MMKVStorage.set('mapProvider', value)
   }
 
   changeMarkerType = (value: string) => {
