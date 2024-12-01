@@ -12,7 +12,7 @@ export const LightTheme: DefaultTheme = {
     basePrimary: '#428BF9',
     baseFourth: '#EDEDED',
     MapTheme: MapLigth,
-    markerBorder: 0.2,
+    markerBorder: 'rgba(0, 0, 0, 0.20)',
   },
   names: {
     themeName: 'light',
@@ -30,7 +30,7 @@ export const DarkTheme: DefaultTheme = {
     basePrimary: '#428BF9',
     baseFourth: '#444444',
     MapTheme: MapDark,
-    markerBorder: 0.5,
+    markerBorder: 'rgba(0, 0, 0, 0.50)',
   },
   names: {
     themeName: 'dark',

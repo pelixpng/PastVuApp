@@ -44,7 +44,7 @@ export const AppInfo = () => {
     <ScrollContainer>
       <View style={s.block}>
         <Image style={s.image} source={require('../../../assets/icon.png')} />
-        <MenuDescriptionText>Версия {version} от 1 октября 2024 г.</MenuDescriptionText>
+        <MenuDescriptionText>Версия {version} от 27 ноября 2024 г.</MenuDescriptionText>
       </View>
       <UICard
         ButtonArray={AboutProject}

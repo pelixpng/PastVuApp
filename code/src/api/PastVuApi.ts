@@ -1,5 +1,10 @@
 import { IComment, IComments } from '../types/apiPhotoComment'
-import { PhotoList, getPhotoListProps } from '../types/apiPhotoList'
+import {
+  PhotoList,
+  clusterResponse,
+  getClustersPhotosProps,
+  getPhotoListProps,
+} from '../types/apiPhotoList'
 import { getColor } from '../utils/getColor'
 import { getAngle } from '../utils/getDirection'
 import { getMarker } from '../utils/getMarker'
@@ -22,6 +27,39 @@ export default class ApiService {
       marker: getMarker(photo.year, photo.dir),
       color: getColor(photo.year),
     }))
+  }
+
+  static async getPhotosClusters(params: getClustersPhotosProps) {
+    const localWork = params.zoom >= 17
+    const response = await fetch(
+      `https://pastvu.com/api2?method=photo.getByBounds&params={"z":${params.zoom},"year":${params.yearStart},"year2":${params.yearEnd},"localWork":${localWork},"geometry":{"type":"Polygon","coordinates":[[[${params.polygon[0]}],[${params.polygon[1]}],[${params.polygon[2]}],[${params.polygon[3]}],[${params.polygon[4]}]]]}}`,
+    )
+    const jsonPromise = response.json() as Promise<clusterResponse>
+    const [json] = await Promise.all([jsonPromise])
+    const clustersPromise = localWork
+      ? []
+      : json.result.clusters.map(cluster => ({
+          count: Math.min(cluster.c, 999),
+          location: {
+            latitude: cluster.geo[0],
+            longitude: cluster.geo[1],
+          },
+        }))
+
+    const photosPromise = json.result.photos.map(photo => ({
+      title: photo.title,
+      location: {
+        latitude: photo.geo[0],
+        longitude: photo.geo[1],
+      },
+      cid: photo.cid.toString(),
+      year: photo.year,
+      dir: getAngle(photo.dir),
+      marker: getMarker(photo.year, photo.dir),
+      color: getColor(photo.year),
+    }))
+    const [clusters, photos] = await Promise.all([clustersPromise, photosPromise])
+    return { clusters, photos }
   }
 
   static async getPhotoInfo(cid: string) {

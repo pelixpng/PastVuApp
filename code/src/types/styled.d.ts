@@ -15,7 +15,7 @@ declare module 'styled-components' {
       basePrimary: string
       baseFourth: string
       MapTheme: Array
-      markerBorder: number
+      markerBorder: string
     }
     names: {
       themeName: ThemeNameType

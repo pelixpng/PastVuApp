@@ -12,6 +12,7 @@ type MMKVStorageType =
   | 'RegionString'
   | 'History'
   | 'mapProvider'
+  | 'showCluster'
 
 type TValue = string | number | object
 

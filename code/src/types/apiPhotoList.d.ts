@@ -29,6 +29,40 @@ type getPhotoListProps = {
   yearEnd: number
 }
 
+type getClustersPhotosProps = {
+  polygon: number[[]]
+  latitude: number
+  longitude: number
+  yearStart: number
+  yearEnd: number
+  zoom: number
+}
+
+interface clusterResponse {
+  result: {
+    clusters: Cluster[]
+    photos: Photo[]
+  }
+}
+
+interface Cluster {
+  c: number
+  geo: number[]
+}
+
+type itemPhotoCluster = {
+  clusters: itemClusterPhotoArray[]
+  photos: itemPhotoArray[]
+}
+
+type itemClusterPhotoArray = {
+  count: number
+  location: {
+    latitude: number
+    longitude: number
+  }
+}
+
 type itemPhotoArray = {
   year: number
   title: string

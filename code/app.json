@@ -2,7 +2,7 @@
   "expo": {
     "name": "PastVu",
     "slug": "PastVuApp",
-    "version": "1.8.0",
+    "version": "1.9.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -16,12 +16,7 @@
       "supportsTablet": false,
       "userInterfaceStyle": "automatic",
       "bundleIdentifier": "com.pelixpng.PastVuApp",
-      "buildNumber": "19",
-      "config": {
-        "googleMaps": {
-          "apiKey": "YOUR API KEY"
-        }
-      }
+      "buildNumber": "19"
     },
     "android": {
       "softwareKeyboardLayoutMode": "pan",

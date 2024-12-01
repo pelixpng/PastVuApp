@@ -18,6 +18,7 @@ class SettingsMapStore {
   mapTypeSetting = Maps[this.mapTypeTitle] ?? 'standard'
   markerType = MMKVStorage.get('TypeMarker') ?? 'Новый'
   mapProvider = MMKVStorage.get('mapProvider') ?? Platform.OS === 'android' ? 'Google' : 'Apple'
+  showCluster = MMKVStorage.get('showCluster') ?? 'Да'
   constructor() {
     makeAutoObservable(this)
   }
@@ -51,6 +52,11 @@ class SettingsMapStore {
   changeDistancePhoto = (value: number[]) => {
     this.maxDistance = value[0]
     MMKVStorage.set('MaxDistance', value[0])
+  }
+
+  changeShowCluster = (value: string) => {
+    this.showCluster = value
+    MMKVStorage.set('showCluster', value)
   }
 }
 

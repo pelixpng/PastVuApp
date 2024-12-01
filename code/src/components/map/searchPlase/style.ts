@@ -9,12 +9,6 @@ export const s = StyleSheet.create({
     alignSelf: 'center',
     zIndex: 9,
     marginTop: INSET_TOP,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
   },
   textInputContainer: {
     paddingRight: 8,
@@ -29,7 +23,6 @@ export const s = StyleSheet.create({
     fontSize: 13,
     marginBottom: 0,
     lineHeight: 20,
-    backgroundColor: 'red',
     fontStyle: 'normal',
   },
   separator: {
@@ -44,6 +37,13 @@ export const s = StyleSheet.create({
     paddingVertical: 12,
     marginTop: 10,
     borderRadius: 12,
+  },
+  shadow: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
 })
 

@@ -65,9 +65,11 @@ export const PhotoPage: FC<PhotoPageProps> = observer(({ route }) => {
       Alert.alert('Ошибка', 'Не удалось загрузить информацию о фото')
     }
   }, [cid, navigation, theme])
+
   useEffect(() => {
     getPostInfo()
   }, [getPostInfo])
+
   if (!postInfo) {
     return (
       <ViewContainer>
@@ -77,7 +79,7 @@ export const PhotoPage: FC<PhotoPageProps> = observer(({ route }) => {
   }
   return (
     <ViewContainer>
-      <Pinchable style={styles.pinchable}>
+      <Pinchable style={styles.pinchable} maximumZoomScale={10}>
         <Image
           source={{ uri: `https://pastvu.com/_p/${photoQualitySettings}/${postInfo.file}` }}
           style={styles.image}

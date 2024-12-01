@@ -11,6 +11,7 @@ type UICardProps = {
   ButtonArray?: ButtonLinkProps[]
   title: string
   description: string
+  descriptionSecond?: string
   children?: ReactNode[] | ReactNode
 }
 

@@ -4,15 +4,17 @@ import { observer } from 'mobx-react-lite'
 import SettingsMapStore from '../../mobx/SettingsMapStore'
 import SettingsPhotoStore from '../../mobx/PhotoSettingsStore'
 import ThemeStore from '../../mobx/ThemeStore'
-import { Platform, ScrollView } from 'react-native'
+import { Platform } from 'react-native'
 import { UICardProps } from '../../types/components'
 import { UICard } from '../../components/ui/UICards'
 import { RadioButtons } from '../../components/ui/buttons/radioButton/RadioButtons'
+import { MenuDescriptionText } from '../../components/ui/Texts'
 
 const InsideMenuText: UICardProps[] = [
   {
     title: 'Параметры карты',
-    description:
+    description: 'Сгруппировать фото на карте (как на веб версии) ?',
+    descriptionSecond:
       'Настройка расстояния поиска фотографий от текущих координат, количества запрашиваемых фотографий при изменении координат, максимального количество фотографий на карте.',
   },
   {
@@ -50,6 +52,8 @@ export const MapSettings = observer(() => {
     changeMapType,
     changeMarkerType,
     markerType,
+    showCluster,
+    changeShowCluster,
     changeMapProvider,
     mapProvider,
   } = SettingsMapStore
@@ -59,31 +63,38 @@ export const MapSettings = observer(() => {
   const PhotoSettingsTitles = ['Оригинал', 'Стандарт', 'Миниатюра']
   const mapTypeTitles = ['Стандарт', 'Спутник', 'Гибрид', 'Рельеф']
   const markerTypeTitles = ['Новый', 'Старый']
-  const providerMapTitles = Platform.OS === 'android' ? ['Google'] : ['Apple', 'Google']
+  const showClusterTitles = ['Да', 'Нет']
+  //const providerMapTitles = Platform.OS === 'android' ? ['Google'] : ['Apple', 'Google']
   return (
     <ScrollContainer>
       <UICard title={InsideMenuText[0].title} description={InsideMenuText[0].description}>
-        <SliderComponent
-          title="Максимальное расстояние в метрах"
-          maxValue={10000}
-          minValue={0}
-          value={maxDistance}
-          setValue={changeDistancePhoto}
-        />
-        <SliderComponent
-          value={countPhoto}
-          setValue={changeCountPhoto}
-          title={'Количество запрашиваемых фото '}
-          minValue={0}
-          maxValue={30}
-        />
-        <SliderComponent
-          value={maxPhotoOnMap}
-          setValue={changeMaxPhotoMap}
-          title={'Количество фото на карте'}
-          minValue={0}
-          maxValue={800}
-        />
+        <RadioButtons titles={showClusterTitles} value={showCluster} setValue={changeShowCluster} />
+        {showCluster === 'Нет' && (
+          <>
+            <MenuDescriptionText>{InsideMenuText[0].descriptionSecond}</MenuDescriptionText>
+            <SliderComponent
+              title="Максимальное расстояние в метрах"
+              maxValue={10000}
+              minValue={0}
+              value={maxDistance}
+              setValue={changeDistancePhoto}
+            />
+            <SliderComponent
+              value={countPhoto}
+              setValue={changeCountPhoto}
+              title={'Количество запрашиваемых фото '}
+              minValue={0}
+              maxValue={30}
+            />
+            <SliderComponent
+              value={maxPhotoOnMap}
+              setValue={changeMaxPhotoMap}
+              title={'Количество фото на карте'}
+              minValue={0}
+              maxValue={800}
+            />
+          </>
+        )}
       </UICard>
       <UICard title={InsideMenuText[1].title} description={InsideMenuText[1].description}>
         <RadioButtons

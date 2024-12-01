@@ -1,13 +1,12 @@
 import { FC, memo } from 'react'
 import { GooglePlaceData, GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 import { DefaultTheme, useTheme } from 'styled-components'
-import { Region } from 'react-native-maps'
-import { Alert } from 'react-native'
+import { Alert, Platform } from 'react-native'
 import { MaterialIcons } from '@expo/vector-icons'
 import { Ball, ResultText, RowContainer, s } from './style'
 
 type SearchPlaceProp = {
-  setCoordinates: (region: Region) => void
+  setCoordinates: (latitude: number, longitude: number) => void
 }
 
 const RenderRow: FC<Partial<GooglePlaceData>> = props => {
@@ -40,12 +39,7 @@ const SearchPlaceComponent: FC<SearchPlaceProp> = ({ setCoordinates }) => {
         )
       }}
       onPress={(data, details = null) => {
-        setCoordinates({
-          latitude: details?.geometry.location.lat,
-          longitude: details?.geometry.location.lng,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
-        })
+        setCoordinates(details?.geometry.location.lat, details?.geometry.location.lng)
       }}
       query={{
         language: 'ru',
@@ -56,15 +50,23 @@ const SearchPlaceComponent: FC<SearchPlaceProp> = ({ setCoordinates }) => {
         <MaterialIcons name={'search'} size={24} color={theme.colors.textThird} />
       )}
       styles={{
-        container: s.container,
+        container: [s.container, Platform.OS === 'ios' && s.shadow],
         separator: s.separator,
-        textInputContainer: [s.textInputContainer, { backgroundColor: theme.colors.backgroundApp }],
+        textInputContainer: [
+          s.textInputContainer,
+          { backgroundColor: theme.colors.backgroundApp },
+          Platform.OS === 'android' && s.shadow,
+        ],
         row: s.row,
         textInput: [
           s.textInput,
           { color: theme.colors.textFirst, backgroundColor: theme.colors.backgroundApp },
         ],
-        listView: [s.listView, { backgroundColor: theme.colors.backgroundApp }],
+        listView: [
+          s.listView,
+          { backgroundColor: theme.colors.backgroundApp },
+          Platform.OS === 'android' && s.shadow,
+        ],
       }}
     />
   )
