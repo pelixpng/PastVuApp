@@ -28,32 +28,18 @@ about the project [here](https://docs.pastvu.com/en/about). Platform source
 - **macOS:** 11.0 and up
 - **visionOS:** 1.0 and up
 
-# Android
+# Features
 
 <p align="center">
-  <img src="img/1.png" width="250" />
-  <img src="img/2.png" width="250" /> 
-  <img src="img/3.png" width="250" />
+  <img src="img/1.jpg" width="250" />
+  <img src="img/2.jpg" width="250" /> 
+  <img src="img/3.jpg" width="250" />
 </p>
 
 <p align="center">
-  <img src="img/4.png" width="250" />
-  <img src="img/5.png" width="250" /> 
-  <img src="img/6.png" width="250" />
-</p>
-
-# IOS
-
-<p align="center">
-  <img src="img/10.png" width="250" />
-  <img src="img/11.png" width="250" /> 
-  <img src="img/12.png" width="250" />
-</p>
-
-<p align="center">
-  <img src="img/13.png" width="250" />
-  <img src="img/14.png" width="250" /> 
-  <img src="img/15.png" width="250" />
+  <img src="img/4.jpg" width="250" />
+  <img src="img/5.jpg" width="250" /> 
+  <img src="img/6.jpg" width="250" />
 </p>
 
 # Resources Used
