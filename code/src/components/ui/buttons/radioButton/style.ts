@@ -8,25 +8,18 @@ export const s = StyleSheet.create({
     flexDirection: 'row',
   },
 })
-
-export const NoActiveButton = styled.View`
-  width: 24;
-  height: 24;
-  border-radius: 50px;
-  background-color: ${props => props.theme.colors.baseFourth};
-`
-
 export const LabelText = styled.Text`
-  font-size: 15;
-  line-height: 24;
+  font-size: 15px;
+  line-height: 24px;
   font-weight: 500;
   color: ${props => props.theme.colors.textFirst};
 `
 
-export const ActiveButton = styled.View`
-  width: 24;
-  height: 24;
+export const RadioButton = styled.View<{ isActive: boolean }>`
+  width: 24px;
+  height: 24px;
   border-radius: 50px;
-  background-color: ${props => props.theme.colors.backgroundApp};
-  border: 6px solid ${props => props.theme.colors.basePrimary};
+  background-color: ${({ isActive, theme }) =>
+    isActive ? theme.colors.backgroundApp : theme.colors.baseFourth};
+  border: ${({ isActive, theme }) => (isActive ? `6px solid ${theme.colors.basePrimary}` : 'none')};
 `

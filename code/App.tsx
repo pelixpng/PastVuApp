@@ -1,39 +1,30 @@
-import { useEffect } from 'react'
-import { StartNavigator } from './src/navigation/MainNavigation'
+import { useMemo } from 'react'
 import { ThemeProvider } from 'styled-components/native'
 import { useColorScheme } from 'react-native'
 import { DarkTheme, LightTheme } from './src/components/theme/Theme'
-import { observer } from 'mobx-react-lite'
-import ThemeStore from './src/mobx/ThemeStore'
 import { StatusBar } from 'react-native'
+import { MainStackNavigator } from './src/navigation/MainStackNavigator'
+import { observer } from 'mobx-react'
+import ThemeStore from './src/store/global/Theme.store'
 
 export default observer(function App() {
   const colorScheme = useColorScheme()
-  const { themeSettings, themeSettingsTitle, changeSettingsTheme } = ThemeStore
-  useEffect(() => {
-    if (themeSettingsTitle === 'Системная') {
-      switch (colorScheme) {
-        case 'light':
-          changeSettingsTheme(LightTheme)
-          break
-        case 'dark':
-          changeSettingsTheme(DarkTheme)
-          break
-        default:
-          changeSettingsTheme(LightTheme)
-          break
-      }
-    }
-  }, [colorScheme, themeSettingsTitle])
+  const theme = useMemo(() => {
+    const isSystemTheme = ThemeStore.selectedTheme === 'system'
+    const isLightTheme =
+      ThemeStore.selectedTheme === 'light' || (isSystemTheme && colorScheme === 'light')
+    return isLightTheme ? LightTheme : DarkTheme
+  }, [ThemeStore.selectedTheme, colorScheme])
+
   return (
-    <ThemeProvider theme={themeSettings}>
+    <ThemeProvider theme={theme}>
       <StatusBar
         animated
         backgroundColor="transparent"
         translucent={true}
-        barStyle={themeSettings.names.themeName === 'light' ? 'dark-content' : 'light-content'}
+        barStyle={theme.names.themeName === 'light' ? 'dark-content' : 'light-content'}
       />
-      <StartNavigator />
+      <MainStackNavigator />
     </ThemeProvider>
   )
 })

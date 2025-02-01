@@ -1,28 +1,20 @@
 import { FC } from 'react'
 import { MaterialIcons } from '@expo/vector-icons'
-import { NavigationProp, useNavigation } from '@react-navigation/native'
-import { RootStackParamList } from '../../../types/navigation'
 import { MenuContainer } from '../Containers'
 import { View, StyleSheet } from 'react-native'
 import { MenuDescriptionText, MenuTitleText } from '../Texts'
 
 type MenuButtonProps = {
-  route?: 'AppInfo' | 'FeedBack' | 'SettingsComponent' | 'MapSettings'
   title: string
   description: string
   icon: 'mail' | 'info' | 'settings' | 'history'
+  onPress?: () => void
 }
 
-export const MenuButton: FC<MenuButtonProps> = ({
-  route,
-  title,
-  description: description,
-  icon,
-}) => {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>()
+export const MenuButton: FC<MenuButtonProps> = ({ title, description, icon, onPress }) => {
   return (
-    <MenuContainer onPress={() => route && navigation.navigate(route)}>
-      <View style={{ flex: 1 }}>
+    <MenuContainer onPress={onPress}>
+      <View style={s.textBlock}>
         <MenuTitleText>{title}</MenuTitleText>
         <MenuDescriptionText>{description}</MenuDescriptionText>
       </View>
@@ -34,6 +26,7 @@ export const MenuButton: FC<MenuButtonProps> = ({
 }
 
 const s = StyleSheet.create({
+  textBlock: { flex: 1 },
   bgIcon: {
     width: 48,
     height: 48,

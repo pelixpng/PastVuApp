@@ -1,20 +1,25 @@
 import { FC } from 'react'
 import { View, TouchableOpacity } from 'react-native'
-import { ActiveButton, LabelText, NoActiveButton, s } from './style'
+import { LabelText, RadioButton, s } from './style'
+
+export type OptionsRadioButton = {
+  label: string
+  value: string
+}
 
 type RadioButtonsProps = {
-  titles: string[]
-  value: string
+  options: OptionsRadioButton[]
+  selectedValue: string
   setValue: (value: string) => void
 }
 
-export const RadioButtons: FC<RadioButtonsProps> = ({ titles, value, setValue }) => {
+export const RadioButtons: FC<RadioButtonsProps> = ({ options, selectedValue, setValue }) => {
   return (
     <View style={s.block}>
-      {titles.map(item => (
-        <TouchableOpacity style={s.container} onPress={() => setValue(item)}>
-          {value == item ? <ActiveButton /> : <NoActiveButton />}
-          <LabelText>{item}</LabelText>
+      {options.map(item => (
+        <TouchableOpacity key={item.value} style={s.container} onPress={() => setValue(item.value)}>
+          <RadioButton isActive={item.value === selectedValue} />
+          <LabelText>{item.label}</LabelText>
         </TouchableOpacity>
       ))}
     </View>
