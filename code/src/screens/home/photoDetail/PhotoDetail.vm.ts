@@ -9,6 +9,7 @@ import { Alert, Platform } from 'react-native'
 import * as MediaLibrary from 'expo-media-library'
 import * as FileSystem from 'expo-file-system'
 import ApiStore from '../../../store/global/Api.store'
+import { IosTargetStorage } from '../../../storage/appleTargetStorage'
 
 class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
   @observable comments: IComment[] = []
@@ -46,6 +47,7 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
         const file = result.photo.file
         if (!history.some(item => item.cid === cid)) {
           MMKVStorage.set('History', [{ title, description, cid, file }, ...history])
+          IosTargetStorage.set('title', title)
         }
         if (result.photo?.ccount) {
           this.getComments()

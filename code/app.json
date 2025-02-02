@@ -16,7 +16,11 @@
       "supportsTablet": false,
       "userInterfaceStyle": "automatic",
       "bundleIdentifier": "com.pelixpng.PastVuApp",
-      "buildNumber": "19"
+      "buildNumber": "19",
+      "appleTeamId": "989AHJ2KDZ",
+      "entitlements": {
+        "com.apple.security.application-groups": ["group.com.pelixpng.PastVuApp"]
+      }
     },
     "android": {
       "softwareKeyboardLayoutMode": "pan",
@@ -30,7 +34,13 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.pelixpng.PastVuApp",
-      "versionCode": 10
+      "versionCode": 10,
+      "permissions": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ]
     },
     "extra": {
       "eas": {
@@ -54,7 +64,8 @@
         {
           "locationWhenInUsePermission": "Доступ к геолокации позволяет нам показать на карте интересны фотографии рядом с вами."
         }
-      ]
+      ],
+      "@bacons/apple-targets"
     ]
   }
 }

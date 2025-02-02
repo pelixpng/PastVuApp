@@ -8,6 +8,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@bacons/apple-targets": "^0.2.1",
     "@expo/config": "^10.0.0",
     "@expo/metro-config": "~0.19.0",
     "@miblanchard/react-native-slider": "^2.3.1",
