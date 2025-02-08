@@ -10,6 +10,7 @@ import * as MediaLibrary from 'expo-media-library'
 import * as FileSystem from 'expo-file-system'
 import ApiStore from '../../../store/global/Api.store'
 import { IosTargetStorage } from '../../../storage/appleTargetStorage'
+import { ExtensionStorage } from '@bacons/apple-targets'
 
 class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
   @observable comments: IComment[] = []
@@ -47,7 +48,11 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
         const file = result.photo.file
         if (!history.some(item => item.cid === cid)) {
           MMKVStorage.set('History', [{ title, description, cid, file }, ...history])
-          IosTargetStorage.set('title', title)
+          IosTargetStorage.set(
+            'History',
+            JSON.stringify([{ title, description, cid, file }, ...history]), //сделать как в ммкв
+          )
+          ExtensionStorage.reloadWidget()
         }
         if (result.photo?.ccount) {
           this.getComments()

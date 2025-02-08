@@ -16,6 +16,7 @@ class PhotoHistoryVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
   @action.bound
   getPhotos() {
     this.photos = MMKVStorage.get('History') ?? []
+    console.log(this.photos)
   }
 
   @action.bound
