@@ -21,7 +21,7 @@ const handleSearchError = (error: string) => {
   Alert.alert(
     'Ошибка',
     isQuotaExceeded
-      ? 'К сожалению, ежедневный лимит поисковых запросов исчерпан. Попробуйте завтра.'
+      ? 'К сожалению, ежедневный лимит поисковых запросов для всех пользователей исчерпан. Попробуйте завтра.'
       : error,
   )
 }
@@ -30,7 +30,6 @@ const SearchPlaceComponent: FC<SearchPlaceProp> = ({ goToLocation }) => {
   const theme: DefaultTheme = useTheme()
   const backgroundStyle = { backgroundColor: theme.colors.backgroundApp }
   const shadowStyle = Platform.OS === 'android' ? s.shadow : null
-
   return (
     <GooglePlacesAutocomplete
       placeholder="Поиск"
@@ -39,6 +38,7 @@ const SearchPlaceComponent: FC<SearchPlaceProp> = ({ goToLocation }) => {
         returnKeyType: 'search',
         clearButtonMode: 'while-editing',
       }}
+      minLength={2}
       renderRow={data => <RenderRow description={data.description} />}
       fetchDetails={true}
       onFail={handleSearchError}

@@ -1,45 +1,24 @@
 import WidgetKit
 import SwiftUI
 
-// MARK: - Модели данных
-struct HistoryItem: Codable {
-    let cid: String
-    let description: String
-    let file: String
-    let title: String
-}
-
-struct HistoryEntryItem: Identifiable {
-    let id: String
-    let historyItem: HistoryItem
-    let imageData: Data?
-    
-    init(historyItem: HistoryItem, imageData: Data?) {
-        self.id = historyItem.cid
-        self.historyItem = historyItem
-        self.imageData = imageData
-    }
-}
-
-// MARK: - Timeline Provider
-struct Provider: TimelineProvider {
-    func placeholder(in context: Context) -> SimpleEntry {
-        SimpleEntry(date: Date(), items: [])
+struct HistoryListProvider: TimelineProvider {
+    func placeholder(in context: Context) -> HistoryListEntry {
+      HistoryListEntry(date: Date(), items: [])
     }
   
-  func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> Void) {
+  func getSnapshot(in context: Context, completion: @escaping (HistoryListEntry) -> Void) {
           if context.isPreview {
               let sampleItems = loadSampleItems()
-              let entry = SimpleEntry(date: Date(), items: sampleItems)
+              let entry = HistoryListEntry(date: Date(), items: sampleItems)
               completion(entry)
           } else {
-              let items = fetchItems().prefix(5).map { HistoryEntryItem(historyItem: $0, imageData: nil) }
-              let entry = SimpleEntry(date: Date(), items: Array(items))
+              let items = fetchItems().prefix(5).map { HistoryListEntryItem(historyItem: $0, imageData: nil) }
+              let entry = HistoryListEntry(date: Date(), items: Array(items))
               completion(entry)
           }
       }
       
-      private func loadSampleItems() -> [HistoryEntryItem] {
+      private func loadSampleItems() -> [HistoryListEntryItem] {
           let sampleImages = [
               "historyListPreviewFirst",
               "historyListPreviewSecond",
@@ -81,20 +60,20 @@ struct Provider: TimelineProvider {
               )
           ]
           
-          var items = [HistoryEntryItem]()
+          var items = [HistoryListEntryItem]()
           for (index, item) in sampleHistoryItems.enumerated() {
               let imageName = sampleImages[index]
               let imageData = UIImage(named: imageName)?.jpegData(compressionQuality: 1.0)
-              items.append(HistoryEntryItem(historyItem: item, imageData: imageData))
+              items.append(HistoryListEntryItem(historyItem: item, imageData: imageData))
           }
           return items
       }
     
-    func getTimeline(in context: Context, completion: @escaping (Timeline<SimpleEntry>) -> Void) {
+    func getTimeline(in context: Context, completion: @escaping (Timeline<HistoryListEntry>) -> Void) {
         Task {
             let historyItems = fetchItems()
             let entryItems = await processItems(historyItems)
-            let entry = SimpleEntry(date: Date(), items: entryItems)
+            let entry = HistoryListEntry(date: Date(), items: entryItems)
             let timeline = Timeline(entries: [entry], policy: .after(Date().addingTimeInterval(3600)))
             completion(timeline)
         }
@@ -115,16 +94,16 @@ struct Provider: TimelineProvider {
     }
     
   
-  private func processItems(_ items: [HistoryItem]) async -> [HistoryEntryItem] {
-      return await withTaskGroup(of: HistoryEntryItem.self) { group in
+  private func processItems(_ items: [HistoryItem]) async -> [HistoryListEntryItem] {
+      return await withTaskGroup(of: HistoryListEntryItem.self) { group in
           for item in items.prefix(5) {
               group.addTask {
                   let imageData = await self.loadImageData(for: item.file)
-                  return HistoryEntryItem(historyItem: item, imageData: imageData)
+                  return HistoryListEntryItem(historyItem: item, imageData: imageData)
               }
           }
           
-          var results = [HistoryEntryItem]()
+          var results = [HistoryListEntryItem]()
           for await result in group {
               results.append(result)
           }
@@ -145,14 +124,14 @@ struct Provider: TimelineProvider {
 }
 
 // MARK: - Timeline Entry
-struct SimpleEntry: TimelineEntry {
+struct HistoryListEntry: TimelineEntry {
     let date: Date
-    let items: [HistoryEntryItem]
+    let items: [HistoryListEntryItem]
 }
 
 // MARK: - View
-struct widgetEntryView: View {
-    var entry: Provider.Entry
+struct HistoryEntryView: View {
+    var entry: HistoryListProvider.Entry
     
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -198,7 +177,7 @@ struct widgetEntryView: View {
     }
     
     @ViewBuilder
-    private func imageView(for item: HistoryEntryItem) -> some View {
+    private func imageView(for item: HistoryListEntryItem) -> some View {
         if let data = item.imageData, let image = UIImage(data: data) {
             Image(uiImage: image)
                 .resizable()
@@ -219,30 +198,30 @@ struct widgetEntryView: View {
 }
 
 // MARK: - Widget Configuration
-struct widget: Widget {
+struct HistoryListWidget: Widget {
     let kind: String = "HistoryWidget"
     
     var body: some WidgetConfiguration {
         StaticConfiguration(
             kind: kind,
-            provider: Provider()
+            provider: HistoryListProvider()
         ) { entry in
-            widgetEntryView(entry: entry)
+          HistoryEntryView(entry: entry)
         }
-        .configurationDisplayName("Viewing History")
-        .description("Displays recently viewed items")
+        .configurationDisplayName("История")
+        .description("Последние 5 просмотренных фотографий.")
         .supportedFamilies([.systemExtraLarge, .systemLarge])
     }
 }
 
 // MARK: - Preview
 #Preview(as: .systemExtraLarge) {
-    widget()
+  HistoryListWidget()
 } timeline: {
-    SimpleEntry(
+  HistoryListEntry(
         date: .now,
         items: [
-            HistoryEntryItem(
+          HistoryListEntryItem(
                 historyItem: HistoryItem(
                     cid: "1524279",
                     description: "1965 Сербия, Воеводина",
@@ -251,7 +230,7 @@ struct widget: Widget {
                 ),
                 imageData: UIImage(named: "historyListPreviewFirst")?.heicData()
             ),
-            HistoryEntryItem(
+          HistoryListEntryItem(
                 historyItem: HistoryItem(
                     cid: "1019254",
                     description: "1842 Россия, Москва, ЦАО, Якиманка",
@@ -260,7 +239,7 @@ struct widget: Widget {
                 ),
                 imageData: UIImage(named: "historyListPreviewSecond")?.heicData()
             ),
-            HistoryEntryItem(
+          HistoryListEntryItem(
                 historyItem: HistoryItem(
                     cid: "1019255",
                     description: "1985 Германия, Берлин, округ Митте, Митте",
@@ -269,7 +248,7 @@ struct widget: Widget {
                 ),
                 imageData: UIImage(named: "historyListPreviewThird")?.heicData()
             ),
-            HistoryEntryItem(
+          HistoryListEntryItem(
                 historyItem: HistoryItem(
                     cid: "1019256",
                     description: "1902-1909 Россия, Санкт-Петербург, Петроградский район",
@@ -278,7 +257,7 @@ struct widget: Widget {
                 ),
                 imageData: UIImage(named: "historyListPreviewFourth")?.heicData()
             ),
-            HistoryEntryItem(
+          HistoryListEntryItem(
                 historyItem: HistoryItem(
                     cid: "1019257",
                     description: "1907-1917 Россия, Челябинская область, Челябинск",
@@ -290,3 +269,4 @@ struct widget: Widget {
         ]
     )
 }
+
