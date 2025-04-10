@@ -10,7 +10,7 @@ import { formatDate } from '../../../../../utils/getTime'
 
 type CommentProps = {
   comment: IComment
-  users: Users
+  users: Users | null
 }
 
 export const Comment: FC<CommentProps> = ({ users, comment }) => {

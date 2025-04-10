@@ -78,7 +78,7 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
           Alert.alert('Ошибка', 'Нет разрешения на сохранение изображений')
           return
         }
-        const fileUri = `https://pastvu.com/_p/a/${this.postInfo.file}`
+        const fileUri = `https://img.pastvu.com/a/${this.postInfo.file}`
         let localUri = fileUri
         if (Platform.OS === 'android') {
           const fileExtension = this.postInfo.file?.substring(this.postInfo.file.indexOf('.')) || ''

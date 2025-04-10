@@ -2,7 +2,7 @@
   "expo": {
     "name": "PastVu",
     "slug": "PastVuApp",
-    "version": "1.10.0",
+    "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -20,6 +20,11 @@
       "appleTeamId": "989AHJ2KDZ",
       "entitlements": {
         "com.apple.security.application-groups": ["group.com.pelixpng.PastVuApp"]
+      },
+      "splash": {
+        "image": "./assets/splash.png",
+        "backgroundColor": "#2D61A0",
+        "resizeMode": "contain"
       }
     },
     "android": {
@@ -33,8 +38,13 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "splash": {
+        "image": "./assets/splashAndroid.png",
+        "backgroundColor": "#2D61A0",
+        "resizeMode": "contain"
+      },
       "package": "com.pelixpng.PastVuApp",
-      "versionCode": 10,
+      "versionCode": 20,
       "permissions": [
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE",

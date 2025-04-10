@@ -1,18 +1,18 @@
 import { MMKV } from 'react-native-mmkv'
 
 type MMKVStorageType =
-  | 'qualityPhoto' //done
-  | 'themeApp' //done
+  | 'qualityPhoto'
+  | 'themeApp'
   | 'countPhoto'
   | 'MaxDistance'
   | 'MaxPhoto'
-  | 'mapType' //done
-  | 'markerType' //done
+  | 'mapType'
+  | 'markerType'
   | 'RangeYears'
   | 'RegionString'
   | 'History'
   | 'mapProvider'
-  | 'isShowCluster' //done
+  | 'isShowCluster'
 
 type TValue = string | number | object
 

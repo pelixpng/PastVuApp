@@ -1,5 +1,6 @@
 import { IComment, IComments } from '../types/apiPhotoComment'
 import {
+  LocationItem,
   PhotoList,
   clusterResponse,
   getClustersPhotosProps,
@@ -9,7 +10,9 @@ import { getColor } from '../utils/getColor'
 import { getAngle } from '../utils/getDirection'
 import { getMarker } from '../utils/getMarker'
 
-const BASE_URL = 'https://pastvu.com/api2'
+const BASE_URL = 'https://api.pastvu.com/api2'
+const PLACE_API_URL = 'https://us1.locationiq.com/v1'
+const PLACE_API_KEY = 'YOUR API KEY'
 
 export default class ApiService {
   static async getPhotoList(params: getPhotoListProps) {
@@ -83,5 +86,15 @@ export default class ApiService {
       users: json.result.users,
       comments: convertComments,
     }
+  }
+
+  static async searchPlace(query: string) {
+    const response = await fetch(
+      `${PLACE_API_URL}/autocomplete?key=${PLACE_API_KEY}&q=${query}&format=json&limit=5`,
+    )
+    if (!response.ok) {
+      throw new Error(response.status.toString())
+    }
+    return (await response.json()) as LocationItem[]
   }
 }

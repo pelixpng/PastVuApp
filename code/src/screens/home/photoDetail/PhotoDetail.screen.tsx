@@ -22,7 +22,7 @@ export const PhotoDetailScreen = observer(() => {
     <ViewContainer>
       <Pinchable style={s.pinchable} maximumZoomScale={10}>
         <Image
-          source={{ uri: `https://pastvu.com/_p/${vm.photoQuality}/${vm.postInfo?.file}` }}
+          source={{ uri: `https://img.pastvu.com/${vm.photoQuality}/${vm.postInfo?.file}` }}
           style={s.image}
           contentFit="contain"
           onError={() =>
@@ -33,7 +33,7 @@ export const PhotoDetailScreen = observer(() => {
       <FlatList
         showsVerticalScrollIndicator={false}
         data={vm.comments}
-        renderItem={({ item }) => <Comment comment={item} users={vm.users!} />}
+        renderItem={({ item }) => <Comment comment={item} users={vm.users} />}
         ListHeaderComponent={() => <PostInfo postInfo={vm.postInfo!} saveImage={vm.saveImage} />}
         ListHeaderComponentStyle={s.listHeader}
         style={s.listStyle}

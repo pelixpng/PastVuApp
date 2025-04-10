@@ -1,24 +1,13 @@
 import { action, makeObservable } from 'mobx'
 import { SCREENS } from '../../../navigation/navigation.types'
 import { BaseViewModelProvider } from '../../../store/vm.provider'
-import * as Application from 'expo-application'
 import { Linking } from 'react-native'
 
-export enum LinkKeys {
-  TelegramDeveloper = 'https://t.me/semenKuzminWork',
-  TelegramDesigner = 'https://t.me/ArtemWaves',
-  Web = 'https://pastvu.com/',
-  SourceCode = 'https://github.com/pelixpng/PastVuApp',
-  AboutPastVu = 'https://docs.pastvu.com/about',
-  PastVuAPI = 'https://docs.pastvu.com/dev/api',
-  MapsPlatformAPI = 'https://developers.google.com/maps?hl=ru',
-}
-
 class AboutAppVM extends BaseViewModelProvider<SCREENS.ABOUT_APP> {
-  version = Application.nativeApplicationVersion
   links = {
     telegramDeveloper: 'https://t.me/semenKuzminWork',
     telegramDesigner: 'https://t.me/ArtemWaves',
+    telegramChanel: 'https://t.me/pastvumobile',
     web: 'https://pastvu.com/',
     sourceCode: 'https://github.com/pelixpng/PastVuApp',
     aboutPastVu: 'https://docs.pastvu.com/about',

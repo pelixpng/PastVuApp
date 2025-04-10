@@ -1,6 +1,6 @@
 import * as Location from 'expo-location'
 import { action, autorun, computed, makeObservable, observable, reaction, runInAction } from 'mobx'
-import { Alert, Platform } from 'react-native'
+import { Alert, Keyboard, Platform } from 'react-native'
 import MapView, { Region } from 'react-native-maps'
 import ApiService from '../../../api/apiService'
 import { SCREENS } from '../../../navigation/navigation.types'
@@ -13,6 +13,7 @@ import {
   getPhotoListProps,
   itemPhotoArray,
   itemPhotoCluster,
+  LocationItem,
 } from '../../../types/apiPhotoList'
 import { YearsRangeType } from '../../../types/components'
 import { getPolygon, getZoom, zoomLevelToAltitude } from '../../../utils/getMapData'
@@ -30,7 +31,10 @@ export const mapRef = createRef<MapView>()
 class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
   @observable.ref photoCollection: itemPhotoCluster = { photos: [], clusters: [] }
   @observable.ref coordinates: Region = MMKVStorage.get('RegionString') ?? startRegion
-  @observable.ref yearsRange: YearsRangeType = MMKVStorage.get('RangeYears') ?? [1840, 1930]
+  @observable.ref yearsRange: YearsRangeType = MMKVStorage.get('RangeYears') ?? [1840, 2000]
+  @observable.ref places: LocationItem[] = []
+  @observable queryPlace = ''
+  private timeoutId: NodeJS.Timeout | null = null
   constructor() {
     super()
     autorun(() => {
@@ -43,6 +47,17 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
           this.photoCollection = { clusters: [], photos: [] }
           this.getPhotoCollection()
         })
+      },
+    )
+    reaction(
+      () => this.queryPlace,
+      query => {
+        if (query.length > 2) {
+          if (this.timeoutId) clearTimeout(this.timeoutId)
+          this.timeoutId = setTimeout(() => {
+            this.findPlace()
+          }, 500)
+        }
       },
     )
     makeObservable(this)
@@ -80,7 +95,19 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
   }
 
   @action.bound
+  setQueryPlace(value: string) {
+    runInAction(() => {
+      if (value.length < 2) {
+        this.places = []
+      }
+      this.queryPlace = value
+    })
+  }
+
+  @action.bound
   goToLocation(latitude: number, longitude: number) {
+    Keyboard.dismiss()
+    this.places = []
     const zoomLevel = ApiStore.showCluster ? getZoom(this.coordinates.latitudeDelta) + 1.2 : 14
     const altitude = Platform.OS === 'ios' ? zoomLevelToAltitude(zoomLevel) : undefined
     const camera = {
@@ -162,6 +189,20 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
       }
     } catch (error) {
       Alert.alert('Ошибка', 'Не удалось загрузить метки')
+    }
+  }
+
+  @action.bound
+  async findPlace() {
+    try {
+      this.places = await ApiService.searchPlace(this.queryPlace)
+    } catch (error: any) {
+      if (error.message === '429') {
+        Alert.alert(
+          'Ошибка',
+          'Лимит поиска для всех пользователей исчерпан. Попробуйте через пару минут или завтра 🪫',
+        )
+      }
     }
   }
 }

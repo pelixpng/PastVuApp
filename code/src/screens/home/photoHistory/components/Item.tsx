@@ -14,7 +14,7 @@ export const ItemHistory: FC<ItemHistoryProps> = ({ title, description, file, on
   return (
     <TouchableOpacity style={s.mainContainer} onPress={onPress}>
       <Image
-        source={{ uri: `https://pastvu.com/_p/d/${file}` }}
+        source={{ uri: `https://img.pastvu.com/h/${file}` }}
         style={s.image}
         onError={() => Alert.alert('Ошибка', 'Не удалось загрузить изображение, попробуйте позже')}
         cachePolicy="disk"

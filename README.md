@@ -1,7 +1,7 @@
 # PastVuApp
 
-![The PastVu logo with screenshots from the app on two phone
-screens](./img/top_image.png)
+[![Release](https://img.shields.io/github/v/release/pelixpng/PastVuApp?style=for-the-badge)](https://github.com/pelixpng/PastVuApp/releases/latest) <!-- :contentReference[oaicite:0]{index=0} -->
+[![Stars](https://img.shields.io/github/stars/pelixpng/PastVuApp?style=for-the-badge)](https://github.com/pelixpng/PastVuApp/stargazers) <!-- :contentReference[oaicite:1]{index=1} -->
 
 This application is a mobile version of the [PastVu
 website](https://pastvu.com/), [here's its GitHub
@@ -20,27 +20,27 @@ well as contribute images and information to the archive. You can read more
 about the project [here](https://docs.pastvu.com/en/about). Platform source
 [code](https://github.com/PastVu).
 
-# System Requirements
-
-- **Android:** 6.0 and up
-- **iOS:** 13.4 and up
-- **iPadOS:** Not supported currently
-- **macOS:** 11.0 and up
-- **visionOS:** 1.0 and up
-
 # Features
 
 <p align="center">
   <img src="img/1.jpg" width="250" />
-  <img src="img/2.jpg" width="250" /> 
+  <img src="img/2.jpg" width="250" />
   <img src="img/3.jpg" width="250" />
 </p>
 
 <p align="center">
   <img src="img/4.jpg" width="250" />
-  <img src="img/5.jpg" width="250" /> 
+  <img src="img/5.jpg" width="250" />
   <img src="img/6.jpg" width="250" />
 </p>
+
+# System Requirements
+
+- **Android:** 7.0 and up
+- **iOS:** 15.1 and up
+- **watchOS:** 9.4 and up
+- **macOS:** 12.0 and up
+- **visionOS:** 1.0 and up
 
 # Resources Used
 
@@ -56,6 +56,6 @@ about the project [here](https://docs.pastvu.com/en/about). Platform source
 
 # License
 
-GNU Affero General Public License (AGPL) v3 or later.  
+GNU Affero General Public License (AGPL) v3 or later.
 See [LICENSE](https://github.com/pelixpng/PastVuApp/blob/master/LICENSE) for
 the full license text.

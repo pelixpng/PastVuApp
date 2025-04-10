@@ -3,18 +3,24 @@ import { Platform, StyleSheet, View } from 'react-native'
 import { DefaultTheme, useTheme } from 'styled-components/native'
 import { useVM } from '../../../hooks/useVM'
 import MapVM, { mapRef } from './Map.vm'
-import { SearchPlace } from './components/searchPlase/SearchPlace'
 import { LocationButton } from './components/LocationButton'
 import { ClusterMarker } from './components/markers/ClusterMarker'
 import { YearsSlider } from './components/yearsSlider/YearsSlider'
 import { observer } from 'mobx-react'
+import { SearchPlace } from './components/searchPlase/SearchPlace'
+import { HEIGHT, WIDTH } from '../../../constants/sizes'
 
 export const MapScreen = observer(() => {
   const vm = useVM(MapVM)
   const theme: DefaultTheme = useTheme()
   return (
     <View style={s.block}>
-      <SearchPlace goToLocation={vm.goToLocation} />
+      <SearchPlace
+        places={vm.places}
+        query={vm.queryPlace}
+        setQueryPlace={vm.setQueryPlace}
+        goToLocation={vm.goToLocation}
+      />
       <MapView
         ref={mapRef}
         style={s.map}
@@ -34,9 +40,9 @@ export const MapScreen = observer(() => {
           animated: false,
         }}
         mapType={vm.mapTypeSetting}>
-        {vm.photoCollection.photos?.map(marker => (
+        {vm.photoCollection.photos?.map((marker, index) => (
           <Marker
-            key={marker.cid}
+            key={index}
             coordinate={marker.location}
             tracksViewChanges={false}
             rotation={marker.dir}
@@ -71,8 +77,7 @@ export const MapScreen = observer(() => {
 const s = StyleSheet.create({
   block: { flex: 1 },
   map: {
-    height: '100%',
-    width: '100%',
-    position: 'absolute',
+    width: WIDTH,
+    height: HEIGHT,
   },
 })

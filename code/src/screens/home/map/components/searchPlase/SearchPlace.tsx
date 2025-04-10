@@ -1,71 +1,75 @@
-import { FC, memo } from 'react'
-import { GooglePlaceData, GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
+import { FC, memo, useState } from 'react'
+import { View, FlatList } from 'react-native'
 import { DefaultTheme, useTheme } from 'styled-components'
-import { Alert, Platform } from 'react-native'
 import { MaterialIcons } from '@expo/vector-icons'
-import { Ball, ResultText, RowContainer, s } from './style'
+import { LocationItem } from '../../../../../types/apiPhotoList'
+import { Ball, Input, ResultText, RowContainer, s, SearchContainer } from './style'
 
-type SearchPlaceProp = {
+type LocationSearchProps = {
+  places: LocationItem[]
+  query: string
+  setQueryPlace: (query: string) => void
   goToLocation: (latitude: number, longitude: number) => void
 }
 
-const RenderRow: FC<Partial<GooglePlaceData>> = ({ description }) => (
-  <RowContainer>
+type RowProps = {
+  text: string
+  onPress: () => void
+}
+
+const RenderRow: FC<RowProps> = ({ text, onPress }) => (
+  <RowContainer onPress={onPress}>
     <Ball />
-    <ResultText>{description || 'Нет описания'}</ResultText>
+    <ResultText numberOfLines={1}>{text}</ResultText>
   </RowContainer>
 )
 
-const handleSearchError = (error: string) => {
-  const isQuotaExceeded = error.includes('quota')
-  Alert.alert(
-    'Ошибка',
-    isQuotaExceeded
-      ? 'К сожалению, ежедневный лимит поисковых запросов для всех пользователей исчерпан. Попробуйте завтра.'
-      : error,
-  )
-}
-
-const SearchPlaceComponent: FC<SearchPlaceProp> = ({ goToLocation }) => {
+const LocationSearch: FC<LocationSearchProps> = ({
+  places,
+  query,
+  goToLocation,
+  setQueryPlace,
+}) => {
   const theme: DefaultTheme = useTheme()
-  const backgroundStyle = { backgroundColor: theme.colors.backgroundApp }
-  const shadowStyle = Platform.OS === 'android' ? s.shadow : null
+  const [isFocused, setIsFocused] = useState(false)
   return (
-    <GooglePlacesAutocomplete
-      placeholder="Поиск"
-      textInputProps={{
-        placeholderTextColor: theme.colors.textSecond,
-        returnKeyType: 'search',
-        clearButtonMode: 'while-editing',
-      }}
-      minLength={2}
-      renderRow={data => <RenderRow description={data.description} />}
-      fetchDetails={true}
-      onFail={handleSearchError}
-      onPress={(data, details) => {
-        if (details) {
-          const { lat, lng } = details.geometry.location
-          goToLocation(lat, lng)
-        }
-      }}
-      query={{
-        language: 'ru',
-        key: '',
-      }}
-      enablePoweredByContainer={false}
-      renderLeftButton={() => (
+    <View style={s.container}>
+      <SearchContainer>
         <MaterialIcons name="search" size={24} color={theme.colors.textThird} />
+        <Input
+          placeholder="Поиск..."
+          placeholderTextColor={theme.colors.textSecond}
+          value={query}
+          onChangeText={setQueryPlace}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+        />
+        {query.length > 0 && (
+          <MaterialIcons
+            name="close"
+            size={20}
+            color={theme.colors.textThird}
+            onPress={() => setQueryPlace('')}
+          />
+        )}
+      </SearchContainer>
+      {isFocused && places.length > 0 && (
+        <FlatList
+          data={places}
+          scrollEnabled={false}
+          keyboardShouldPersistTaps={'always'}
+          keyExtractor={(item, index) => index.toString()}
+          contentContainerStyle={[s.list, { backgroundColor: theme.colors.backgroundApp }]}
+          renderItem={({ item }) => (
+            <RenderRow
+              text={item.display_name}
+              onPress={() => goToLocation(Number(item.lat), Number(item.lon))}
+            />
+          )}
+        />
       )}
-      styles={{
-        container: [s.container, shadowStyle],
-        separator: s.separator,
-        textInputContainer: [s.textInputContainer, backgroundStyle, shadowStyle],
-        row: s.row,
-        textInput: [s.textInput, { color: theme.colors.textFirst, ...backgroundStyle }],
-        listView: [s.listView, backgroundStyle, shadowStyle],
-      }}
-    />
+    </View>
   )
 }
 
-export const SearchPlace = memo(SearchPlaceComponent)
+export const SearchPlace = memo(LocationSearch)

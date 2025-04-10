@@ -12,7 +12,7 @@ export const AboutAppScreen = () => {
     <ScrollContainer>
       <View style={s.block}>
         <Image style={s.image} source={require('../../../../assets/icon.png')} />
-        <MenuDescriptionText>Версия {vm.version} от 27 ноября 2024 г.</MenuDescriptionText>
+        <MenuDescriptionText>Версия 2.0.0 от 1 апреля 2025 г.</MenuDescriptionText>
       </View>
       <UICard>
         <View>
@@ -23,6 +23,7 @@ export const AboutAppScreen = () => {
             взгляд на историю среды обитания человечества.
           </MenuDescriptionText>
         </View>
+        <MyButton title={'Наш Telegram канал'} func={() => vm.openLink('telegramChanel')} />
         <MyButton title={'О проекте PastVu'} func={() => vm.openLink('aboutPastVu')} />
         <MyButton title={'Web версия PastVu'} func={() => vm.openLink('web')} />
         <MyButton title={'GitHub приложения'} func={() => vm.openLink('sourceCode')} />
@@ -35,7 +36,7 @@ export const AboutAppScreen = () => {
             Карта предоставлена Google Maps Platform.
           </MenuDescriptionText>
         </View>
-        <MyButton title={'PastVu Api'} func={() => vm.openLink('pastVuAPI')} />
+        <MyButton title={'PastVu API'} func={() => vm.openLink('pastVuAPI')} />
         <MyButton title={'Maps Platform'} func={() => vm.openLink('mapsPlatformAPI')} />
       </UICard>
       <UICard>
