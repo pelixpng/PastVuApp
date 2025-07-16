@@ -12,7 +12,7 @@ export const AboutAppScreen = () => {
     <ScrollContainer>
       <View style={s.block}>
         <Image style={s.image} source={require('../../../../assets/icon.png')} />
-        <MenuDescriptionText>Версия 2.0.0 от 1 апреля 2025 г.</MenuDescriptionText>
+        <MenuDescriptionText>Версия 2.0.1 от 20 июля 2025 г.</MenuDescriptionText>
       </View>
       <UICard>
         <View>
