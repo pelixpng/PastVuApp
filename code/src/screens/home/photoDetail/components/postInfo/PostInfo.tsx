@@ -1,11 +1,12 @@
 import { FC } from 'react'
-import { View } from 'react-native'
-import RenderHtml from 'react-native-render-html'
-import { DefaultTheme, useTheme } from 'styled-components'
+import { View, Text } from 'react-native'
 import { MaterialIcons } from '@expo/vector-icons'
-import { CommentHeader, LastEditText, PostLocationText, PostTitleText, s } from './style'
+import { s } from './style'
 import { formatDate } from '../../../../../utils/getTime'
 import { MyButton } from '../../../../../components/ui/buttons/MyButton'
+import { useTheme } from '@react-navigation/native'
+import RenderHTML from 'react-native-render-html'
+import { Spacer } from '../../../../../components/ui/Spacer'
 
 type PostInfoProps = {
   postInfo: Photo
@@ -13,49 +14,106 @@ type PostInfoProps = {
 }
 
 export const PostInfo: FC<PostInfoProps> = ({ postInfo, saveImage }) => {
-  const theme: DefaultTheme = useTheme()
+  const { colors } = useTheme()
   const commentTotal = postInfo.ccount || 0
   const titlesRegion = postInfo.regions?.map(region => region.title_local).join(', ')
   const locationText = postInfo.y + ', ' + titlesRegion
-  const createHTML = (text?: string, title?: string) => ({
-    html: `
-    ${
-      title
-        ? `<span style="font-size: 13px; font-weight: 800; line-height: 20; color: ${theme.colors.textSecond};">${title}:</span>`
-        : ''
-    }
-      <span style="color: ${
-        title ? theme.colors.textSecond : theme.colors.textFirst
-      }; font-size: 13px; line-height: 20; font-weight: 500;">
-        ${text}
-      </span>
-    `,
-  })
-  const descriptionHTML = createHTML(postInfo.desc)
-  const sourceHTML = createHTML(postInfo.source || 'Отсутствует', 'Источник')
-  const authorHTML = createHTML(postInfo.author || 'Неизвестен', 'Автор')
+  const descriptionHTML = { html: `<p>${postInfo.desc}</p>` }
+  const sourceHTML = {
+    html: `<p><strong>Источник:</strong> <span>${postInfo.source || 'Отсутствует'}</span></p>`,
+  }
+  const authorHTML = {
+    html: `<p><strong>Автор:</strong> <span>${postInfo.author || 'Неизвестен'}</span></p>`,
+  }
   const lastEditFormat = formatDate(postInfo.cdate)
   return (
     <View>
-      <PostTitleText>{postInfo.title}</PostTitleText>
-      <View style={s.texts}>
-        <PostLocationText>{locationText}</PostLocationText>
-        {postInfo.desc && <RenderHtml source={descriptionHTML} />}
-        <View>
-          <RenderHtml source={authorHTML} />
-          <RenderHtml source={sourceHTML} />
-        </View>
-        {lastEditFormat && <LastEditText>Последнее изменение {lastEditFormat}</LastEditText>}
-      </View>
+      <Text selectable style={[s.postTitleText, { color: colors.textFirst }]}>
+        {postInfo.title}
+      </Text>
+      <Spacer height={4} />
+      <Text selectable style={[s.postLocationText, { color: colors.textSecond }]}>
+        {locationText}
+      </Text>
+      <Spacer height={8} />
+      {postInfo.desc && (
+        <RenderHTML
+          source={descriptionHTML}
+          baseStyle={{
+            color: colors.textFirst,
+            fontSize: 13,
+            lineHeight: 20,
+            fontWeight: '500',
+          }}
+          tagsStyles={{
+            a: {
+              color: colors.primary,
+              textDecorationLine: 'underline',
+            },
+          }}
+        />
+      )}
+      <Spacer height={8} />
+      <RenderHTML
+        source={authorHTML}
+        tagsStyles={{
+          strong: {
+            color: colors.textSecond,
+            fontSize: 13,
+            lineHeight: 20,
+            fontWeight: '900',
+          },
+          span: {
+            color: colors.textSecond,
+            fontSize: 13,
+            lineHeight: 20,
+            fontWeight: '500',
+          },
+          a: {
+            color: colors.primary,
+            textDecorationLine: 'underline',
+          },
+        }}
+      />
+      <RenderHTML
+        source={sourceHTML}
+        tagsStyles={{
+          strong: {
+            color: colors.textSecond,
+            fontSize: 13,
+            lineHeight: 20,
+            fontWeight: '900',
+          },
+          span: {
+            color: colors.textSecond,
+            fontSize: 13,
+            lineHeight: 20,
+            fontWeight: '500',
+          },
+          a: {
+            color: colors.primary,
+            textDecorationLine: 'underline',
+          },
+        }}
+      />
+      <Spacer height={8} />
+      {lastEditFormat && (
+        <Text selectable style={[s.postLocationText, { color: colors.textThird }]}>
+          Последнее изменение {lastEditFormat}
+        </Text>
+      )}
+      <Spacer height={8} />
       <MyButton
         title={'Скачать изображение'}
         children={<MaterialIcons name={'save-alt'} size={24} color={'white'} />}
         func={saveImage}
       />
-      <View style={s.block}>
-        <CommentHeader>Комментарии </CommentHeader>
-        <CommentHeader count>{commentTotal}</CommentHeader>
+      <Spacer height={12} />
+      <View style={s.row}>
+        <Text style={[s.commentHeaderText, { color: colors.textFirst }]}>Комментарии </Text>
+        <Text style={[s.commentHeaderText, { color: colors.textThird }]}>{commentTotal}</Text>
       </View>
+      <Spacer height={12} />
     </View>
   )
 }

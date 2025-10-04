@@ -64,6 +64,7 @@ type itemPhotoCluster = {
 
 type itemClusterPhotoArray = {
   count: number
+  marker: any[]
   location: {
     latitude: number
     longitude: number

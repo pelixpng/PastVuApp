@@ -1,7 +1,7 @@
 import { action, makeObservable, observable } from 'mobx'
 import { BaseViewModelProvider } from '../../../store/vm.provider'
 import { SCREENS } from '../../../navigation/navigation.types'
-import { MMKVStorage } from '../../../storage/storage'
+import { MMKVStorage } from '../../../storage/mmkv'
 import { HistoryItem } from './PhotoHistory.screen'
 
 class PhotoHistoryVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {

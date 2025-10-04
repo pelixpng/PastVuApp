@@ -1,3 +1,4 @@
+import { Platform } from 'react-native'
 import { IComment, IComments } from '../types/apiPhotoComment'
 import {
   LocationItem,
@@ -8,7 +9,7 @@ import {
 } from '../types/apiPhotoList'
 import { getColor } from '../utils/getColor'
 import { getAngle } from '../utils/getDirection'
-import { getMarker } from '../utils/getMarker'
+import { getMarker, getMarkerCluster } from '../utils/getMarker'
 
 const BASE_URL = 'https://api.pastvu.com/api2'
 const PLACE_API_URL = 'https://us1.locationiq.com/v1'
@@ -45,6 +46,7 @@ export default class ApiService {
       ? []
       : json.result.clusters.map(cluster => ({
           count: Math.min(cluster.c, 999),
+          marker: Platform.OS === 'android' ? getMarkerCluster(cluster.c) : [],
           location: {
             latitude: cluster.geo[0],
             longitude: cluster.geo[1],

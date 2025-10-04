@@ -1,14 +1,12 @@
 PODS:
   - boost (1.84.0)
   - DoubleConversion (1.1.6)
-  - EASClient (0.14.4):
-    - ExpoModulesCore
   - EXConstants (17.1.7):
     - ExpoModulesCore
   - EXJSONUtils (0.15.0)
   - EXManifests (0.16.6):
     - ExpoModulesCore
-  - Expo (53.0.19):
+  - Expo (53.0.22):
     - DoubleConversion
     - ExpoModulesCore
     - glog
@@ -276,7 +274,7 @@ PODS:
     - ExpoModulesCore
   - ExpoFont (13.3.2):
     - ExpoModulesCore
-  - ExpoImage (2.3.2):
+  - ExpoImage (2.4.0):
     - ExpoModulesCore
     - libavif/libdav1d
     - SDWebImage (~> 5.21.0)
@@ -290,7 +288,7 @@ PODS:
   - ExpoMediaLibrary (17.1.7):
     - ExpoModulesCore
     - React-Core
-  - ExpoModulesCore (2.4.2):
+  - ExpoModulesCore (2.5.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -317,39 +315,8 @@ PODS:
     - Yoga
   - ExpoSplashScreen (0.30.10):
     - ExpoModulesCore
-  - EXStructuredHeaders (4.1.0)
   - ExtensionStorage (1.0.0):
     - ExpoModulesCore
-  - EXUpdates (0.28.17):
-    - DoubleConversion
-    - EASClient
-    - EXManifests
-    - ExpoModulesCore
-    - EXStructuredHeaders
-    - EXUpdatesInterface
-    - glog
-    - hermes-engine
-    - RCT-Folly (= 2024.11.18.00)
-    - RCTRequired
-    - RCTTypeSafety
-    - ReachabilitySwift
-    - React-Core
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-hermes
-    - React-ImageManager
-    - React-jsi
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-renderercss
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - Yoga
   - EXUpdatesInterface (1.1.0):
     - ExpoModulesCore
   - fast_float (6.1.4)
@@ -401,7 +368,6 @@ PODS:
     - FBLazyVector (= 0.79.5)
     - RCTRequired (= 0.79.5)
     - React-Core (= 0.79.5)
-  - ReachabilitySwift (5.2.4)
   - React (0.79.5):
     - React-Core (= 0.79.5)
     - React-Core/DevSupport (= 0.79.5)
@@ -2203,10 +2169,10 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - SDWebImage (5.21.1):
-    - SDWebImage/Core (= 5.21.1)
-  - SDWebImage/Core (5.21.1)
-  - SDWebImageAVIFCoder (0.11.0):
+  - SDWebImage (5.21.2):
+    - SDWebImage/Core (= 5.21.2)
+  - SDWebImage/Core (5.21.2)
+  - SDWebImageAVIFCoder (0.11.1):
     - libavif/core (>= 0.11.0)
     - SDWebImage (~> 5.10)
   - SDWebImageSVGCoder (1.7.0):
@@ -2220,7 +2186,6 @@ PODS:
 DEPENDENCIES:
   - boost (from `../node_modules/react-native/third-party-podspecs/boost.podspec`)
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
-  - EASClient (from `../node_modules/expo-eas-client/ios`)
   - EXConstants (from `../node_modules/expo-constants/ios`)
   - EXJSONUtils (from `../node_modules/expo-json-utils/ios`)
   - EXManifests (from `../node_modules/expo-manifests/ios`)
@@ -2238,9 +2203,7 @@ DEPENDENCIES:
   - ExpoMediaLibrary (from `../node_modules/expo-media-library/ios`)
   - ExpoModulesCore (from `../node_modules/expo-modules-core`)
   - ExpoSplashScreen (from `../node_modules/expo-splash-screen/ios`)
-  - EXStructuredHeaders (from `../node_modules/expo-structured-headers/ios`)
   - "ExtensionStorage (from `../node_modules/@bacons/apple-targets/ios`)"
-  - EXUpdates (from `../node_modules/expo-updates/ios`)
   - EXUpdatesInterface (from `../node_modules/expo-updates-interface/ios`)
   - fast_float (from `../node_modules/react-native/third-party-podspecs/fast_float.podspec`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
@@ -2325,7 +2288,6 @@ SPEC REPOS:
     - libavif
     - libdav1d
     - libwebp
-    - ReachabilitySwift
     - SDWebImage
     - SDWebImageAVIFCoder
     - SDWebImageSVGCoder
@@ -2337,8 +2299,6 @@ EXTERNAL SOURCES:
     :podspec: "../node_modules/react-native/third-party-podspecs/boost.podspec"
   DoubleConversion:
     :podspec: "../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec"
-  EASClient:
-    :path: "../node_modules/expo-eas-client/ios"
   EXConstants:
     :path: "../node_modules/expo-constants/ios"
   EXJSONUtils:
@@ -2373,12 +2333,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-modules-core"
   ExpoSplashScreen:
     :path: "../node_modules/expo-splash-screen/ios"
-  EXStructuredHeaders:
-    :path: "../node_modules/expo-structured-headers/ios"
   ExtensionStorage:
     :path: "../node_modules/@bacons/apple-targets/ios"
-  EXUpdates:
-    :path: "../node_modules/expo-updates/ios"
   EXUpdatesInterface:
     :path: "../node_modules/expo-updates-interface/ios"
   fast_float:
@@ -2536,11 +2492,10 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   boost: 7e761d76ca2ce687f7cc98e698152abd03a18f90
   DoubleConversion: cb417026b2400c8f53ae97020b2be961b59470cb
-  EASClient: 5944ca4aea2836e5ecc5158381f3d4eb43b30e56
   EXConstants: 9d62a46a36eae6d28cb978efcbc68aef354d1704
   EXJSONUtils: 1d3e4590438c3ee593684186007028a14b3686cd
   EXManifests: f4cc4a62ee4f1c8a9cf2bb79d325eac6cb9f5684
-  Expo: 6e2b482fa24909b52b80ba00271e6d7742c1ef9f
+  Expo: f715b0c058ac26efde6fb3b4f18ffdd8bd933605
   expo-dev-client: f1b99dfea0c9174d2e4ec96c2c5461587dda1e86
   expo-dev-launcher: 27e8eba58d52b2f471b0c4001b0535a1c0b5610d
   expo-dev-menu: 2868212810f6651bc5c30e72c636ef64de31ec6b
@@ -2548,15 +2503,13 @@ SPEC CHECKSUMS:
   ExpoAsset: 7bdbbacf4e6752ae6e3cf70555cee076f6229e6e
   ExpoFileSystem: 9681caebda23fa1b38a12a9c68b2bade7072ce20
   ExpoFont: 091a47eeaa1b30b0b760aa1d0a2e7814e8bf6fe6
-  ExpoImage: 3ad41dfaa6d33e72ee1b7e2cead5f678fad8dd02
+  ExpoImage: 04ffc79f9a0391573b77efbc549d59c655caa5a8
   ExpoKeepAwake: e8dedc115d9f6f24b153ccd2d1d8efcdfd68a527
   ExpoLocation: 6ca806fc40d02be589782f1ca72fd7c220408c90
   ExpoMediaLibrary: 68f0c81280fe7efef3588ab498dae313b85932e9
-  ExpoModulesCore: 33476f0f608d791bbaf263af22a00d3b8877f6bc
+  ExpoModulesCore: 16f74d8df26d7e4b6bf7eb3d0effaf0f15df7b80
   ExpoSplashScreen: 6f9213be0c60f2756a2f8220c36f4b90c55e3dbd
-  EXStructuredHeaders: 32bec6771c2db18c4cd47cecae530d1d06cdf972
   ExtensionStorage: 158434def6cd14146ecacf5ac2db6345f8644c2d
-  EXUpdates: a89f631f0baa491daf161990c928caf1c8a9835b
   EXUpdatesInterface: 64f35449b8ef89ce08cdd8952a4d119b5de6821d
   fast_float: 06eeec4fe712a76acc9376682e4808b05ce978b6
   FBLazyVector: d2a9cd223302b6c9aa4aa34c1a775e9db609eb52
@@ -2570,7 +2523,6 @@ SPEC CHECKSUMS:
   RCTDeprecation: 5f638f65935e273753b1f31a365db6a8d6dc53b5
   RCTRequired: 8b46a520ea9071e2bc47d474aa9ca31b4a935bd8
   RCTTypeSafety: cc4740278c2a52cbf740592b0a0a40df1587c9ab
-  ReachabilitySwift: 32793e867593cfc1177f5d16491e3a197d2fccda
   React: 6393ae1807614f017a84805bf2417e3497f518a6
   React-callinvoker: c34f666f551f05a325b87e7e3e6df0e082fa3d99
   React-Core: fc07a4b69a963880b25142c51178f4cb75628c7d
@@ -2636,8 +2588,8 @@ SPEC CHECKSUMS:
   ReactCommon: 41137f7e87cf7fd1c041a7124dfa3d0d48aa43f3
   RNGestureHandler: ccf4105b125002bd88e39d2a1f2b7e6001bcdf34
   RNScreens: c2e3cc506212228c607b4785b315205e28acbf0f
-  SDWebImage: f29024626962457f3470184232766516dee8dfea
-  SDWebImageAVIFCoder: 00310d246aab3232ce77f1d8f0076f8c4b021d90
+  SDWebImage: 9f177d83116802728e122410fb25ad88f5c7608a
+  SDWebImageAVIFCoder: afe194a084e851f70228e4be35ef651df0fc5c57
   SDWebImageSVGCoder: 15a300a97ec1c8ac958f009c02220ac0402e936c
   SDWebImageWebPCoder: e38c0a70396191361d60c092933e22c20d5b1380
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748

@@ -2,7 +2,7 @@ import { observable, runInAction } from 'mobx'
 import { NavigationContainerRef, ParamListBase } from '@react-navigation/native'
 import { SCREENS } from '../navigation/navigation.types'
 import { StackParamList } from '../navigation/stackParams.types'
-import { NavigationRef } from '../navigation/MainStackNavigator'
+import { NavigationRef } from '../../App'
 
 interface IBaseViewModelProvider<T extends SCREENS> {
   screenName?: T

@@ -1,5 +1,4 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import { DefaultTheme, useTheme } from 'styled-components'
 import { MaterialIcons } from '@expo/vector-icons'
 import { StyleSheet } from 'react-native'
 import { StackParamList } from './stackParams.types'
@@ -7,23 +6,24 @@ import { SCREENS } from './navigation.types'
 import { MapScreen } from '../screens/home/map/Map.screen'
 import { PhotoHistoryScreen } from '../screens/home/photoHistory/PhotoHistory.screen'
 import { SettingsMenuScreen } from '../screens/settings/settingsMenu/SettingsMenu.screen'
+import { useTheme } from '@react-navigation/native'
 
 const Tab = createBottomTabNavigator<StackParamList>()
 
 export function BottomTabsNavigator() {
-  const theme: DefaultTheme = useTheme()
+  const { colors } = useTheme()
   return (
     <Tab.Navigator
       screenOptions={{
-        tabBarActiveTintColor: theme.colors.basePrimary,
-        tabBarInactiveTintColor: theme.colors.textThird,
+        tabBarActiveTintColor: colors.basePrimary,
+        tabBarInactiveTintColor: colors.textThird,
         tabBarStyle: {
-          backgroundColor: theme.colors.backgroundApp,
+          backgroundColor: colors.backgroundApp,
           borderTopWidth: 0,
         },
         headerShadowVisible: false,
         headerStyle: {
-          backgroundColor: theme.colors.backgroundApp,
+          backgroundColor: colors.backgroundApp,
         },
         headerTitle: '',
         tabBarHideOnKeyboard: true,

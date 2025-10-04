@@ -1,12 +1,13 @@
 import { FC } from 'react'
-import { DefaultTheme, useTheme } from 'styled-components'
-import RenderHtml from 'react-native-render-html'
 import { Image } from 'expo-image'
+import { View, Text } from 'react-native'
 import StandardAvatar from '../../../../../../assets/avatar.png'
-import { View } from 'react-native'
-import { CommentAuthorName, CommentContainer, DateText, s } from './style'
 import { IComment, Users } from '../../../../../types/apiPhotoComment'
 import { formatDate } from '../../../../../utils/getTime'
+import { useTheme } from '@react-navigation/native'
+import RenderHTML from 'react-native-render-html'
+import { Spacer } from '../../../../../components/ui/Spacer'
+import { s } from './style'
 
 type CommentProps = {
   comment: IComment
@@ -14,26 +15,39 @@ type CommentProps = {
 }
 
 export const Comment: FC<CommentProps> = ({ users, comment }) => {
-  const theme: DefaultTheme = useTheme()
-  const textHTML = {
-    html: `<span style="color: ${theme.colors.textSecond}; font-size: 13px; line-height: 20px; font-weight: 500;"> ${comment.txt} </span>`,
-  }
+  const { colors } = useTheme()
+  const commentHtml = { html: `<p>${comment.txt}</p>` }
   const date = formatDate(comment.stamp)
   const uri = users?.[comment.user]?.avatar
   return (
-    <CommentContainer isParent={comment.parent}>
+    <View style={[s.commentContainer, comment.parent ? s.width88 : s.width100]}>
       <Image
         source={uri ? { uri: `https://pastvu.com${uri}` } : StandardAvatar}
         style={s.image}
         cachePolicy="disk"
       />
-      <View style={s.CommentTextContainer}>
-        <View style={s.row}>
-          <CommentAuthorName>{comment.user}</CommentAuthorName>
-          <DateText>{date}</DateText>
-        </View>
-        <RenderHtml source={textHTML} />
+      <Spacer width={8} />
+      <View style={s.commentTextContainer}>
+        <Text selectable style={s.row}>
+          <Text style={[s.nameText, { color: colors.textFirst }]}>{comment.user}</Text>
+          <Spacer width={5} />
+          <Text style={[s.dateText, { color: colors.textThird }]}>{date}</Text>
+        </Text>
+        <RenderHTML
+          source={commentHtml}
+          baseStyle={{
+            fontSize: 13,
+            lineHeight: 20,
+            color: colors.textSecond,
+          }}
+          tagsStyles={{
+            a: {
+              color: colors.primary,
+              textDecorationLine: 'underline',
+            },
+          }}
+        />
       </View>
-    </CommentContainer>
+    </View>
   )
 }

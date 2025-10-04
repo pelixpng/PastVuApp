@@ -24,7 +24,12 @@
     },
     "production": {
       "channel": "production",
-      "autoIncrement": true
+      "android": {
+        "autoIncrement": "versionCode"
+      },
+      "ios": {
+        "simulator": false
+      }
     },
     "development-simulator": {
       "developmentClient": true,
