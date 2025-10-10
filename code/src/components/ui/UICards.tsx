@@ -1,6 +1,6 @@
+import { useTheme } from '@react-navigation/native'
 import { FC, ReactNode } from 'react'
-import { Platform } from 'react-native'
-import styled, { css } from 'styled-components/native'
+import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native'
 
 type UICardProps = {
   children: ReactNode[] | ReactNode
@@ -8,28 +8,34 @@ type UICardProps = {
 }
 
 export const UICard: FC<UICardProps> = ({ children, onPress }) => {
+  const { colors } = useTheme()
   if (onPress) {
-    return <TouchableContainer>{children}</TouchableContainer>
+    return (
+      <TouchableOpacity
+        onPress={onPress}
+        style={[s.container, { backgroundColor: colors.baseSecond }]}>
+        {children}
+      </TouchableOpacity>
+    )
   }
-  return <Container>{children}</Container>
+  return <View style={[s.container, { backgroundColor: colors.baseSecond }]}>{children}</View>
 }
 
-const sharedStyles = css`
-  padding: 16px;
-  align-items: flex-start;
-  gap: 12px;
-  border-radius: 16px;
-  margin: 8px 16px;
-  background: ${props => props.theme.colors.baseSecond};
-  ${Platform.OS === 'android'
-    ? 'elevation: 4;'
-    : 'shadow-color: rgba(0, 0, 0, 0.12); shadow-opacity: 1; shadow-radius: 4px; shadow-offset: 0px 4px;'}
-`
-
-const Container = styled.View`
-  ${sharedStyles}
-`
-
-const TouchableContainer = styled.TouchableOpacity`
-  ${sharedStyles}
-`
+const s = StyleSheet.create({
+  container: {
+    padding: 16,
+    borderRadius: 16,
+    marginHorizontal: 16,
+    ...Platform.select({
+      android: {
+        elevation: 4,
+      },
+      ios: {
+        shadowColor: 'rgba(0, 0, 0, 0.12)',
+        shadowOpacity: 1,
+        shadowRadius: 4,
+        shadowOffset: { width: 0, height: 4 },
+      },
+    }),
+  },
+})

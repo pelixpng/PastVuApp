@@ -6,7 +6,7 @@ import { Linking } from 'react-native'
 class SupportContactsVM extends BaseViewModelProvider<SCREENS.SUPPORT_CONTACTS> {
   links = {
     telegram: 'https://t.me/semenKuzminWork',
-    email: 'mailto:semeonky@gmail.com',
+    email: 'mailto:pastvumobile@gmail.com',
   }
 
   constructor() {

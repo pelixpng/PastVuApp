@@ -1,18 +1,18 @@
 import MapView, { Marker } from 'react-native-maps'
 import { Platform, StyleSheet, View } from 'react-native'
-import { DefaultTheme, useTheme } from 'styled-components/native'
 import { useVM } from '../../../hooks/useVM'
 import MapVM, { mapRef } from './Map.vm'
 import { LocationButton } from './components/LocationButton'
 import { ClusterMarker } from './components/markers/ClusterMarker'
 import { YearsSlider } from './components/yearsSlider/YearsSlider'
 import { observer } from 'mobx-react'
-import { SearchPlace } from './components/searchPlase/SearchPlace'
+import { SearchPlace } from './components/searchPlace/SearchPlace'
 import { HEIGHT, WIDTH } from '../../../constants/sizes'
+import { useTheme } from '@react-navigation/native'
 
 export const MapScreen = observer(() => {
   const vm = useVM(MapVM)
-  const theme: DefaultTheme = useTheme()
+  const { colors, names } = useTheme()
   return (
     <View style={s.block}>
       <SearchPlace
@@ -24,14 +24,14 @@ export const MapScreen = observer(() => {
       <MapView
         ref={mapRef}
         style={s.map}
-        userInterfaceStyle={theme.names.themeName}
-        customMapStyle={theme.colors.MapTheme}
+        userInterfaceStyle={names.themeName}
+        customMapStyle={colors.MapTheme}
         onRegionChangeComplete={vm.setCoordinate}
         showsUserLocation={true}
         showsMyLocationButton={false}
         initialRegion={vm.coordinates}
         showsPointsOfInterest={false}
-        loadingBackgroundColor={theme.colors.backgroundApp}
+        loadingBackgroundColor={colors.backgroundApp}
         moveOnMarkerPress={false}
         rotateEnabled={false}
         cameraZoomRange={{
@@ -48,10 +48,14 @@ export const MapScreen = observer(() => {
             rotation={marker.dir}
             pinColor={marker.color}
             onPress={() => vm.showPhoto(marker.cid, marker.title)}
-            style={Platform.OS === 'ios' && { transform: [{ rotate: `${marker.dir}deg` }] }}
+            style={
+              Platform.OS === 'ios' && {
+                transform: [{ rotate: `${marker.dir}deg` }],
+              }
+            }
             image={
               vm.mapMarkerType === 'new'
-                ? theme.names.themeName === 'light'
+                ? names.themeName === 'light'
                   ? marker.marker[0]
                   : marker.marker[1]
                 : undefined
@@ -63,8 +67,11 @@ export const MapScreen = observer(() => {
             key={index}
             coordinate={marker.location}
             tracksViewChanges={false}
+            image={names.themeName === 'light' ? marker.marker[0] : marker.marker[1]}
             onPress={() => vm.goToLocation(marker.location.latitude, marker.location.longitude)}>
-            <ClusterMarker count={marker.count} borderColor={theme.colors.markerBorder} />
+            {Platform.OS === 'ios' && (
+              <ClusterMarker count={marker.count} borderColor={colors.markerBorder} />
+            )}
           </Marker>
         ))}
       </MapView>

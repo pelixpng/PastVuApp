@@ -13,6 +13,7 @@ class AboutAppVM extends BaseViewModelProvider<SCREENS.ABOUT_APP> {
     aboutPastVu: 'https://docs.pastvu.com/about',
     pastVuAPI: 'https://docs.pastvu.com/dev/api',
     mapsPlatformAPI: 'https://developers.google.com/maps?hl=ru',
+    locationiq: 'https://locationiq.com',
   }
 
   constructor() {

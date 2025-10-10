@@ -1,5 +1,5 @@
 import { action, makeObservable, observable } from 'mobx'
-import { MMKVStorage } from '../../storage/storage'
+import { MMKVStorage } from '../../storage/mmkv'
 
 class ApiStore {
   @observable photoQualitySettings = MMKVStorage.get('qualityPhoto') ?? 'a'

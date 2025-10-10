@@ -1,4 +1,4 @@
-import { MMKVStorage } from '../../storage/storage'
+import { MMKVStorage } from '../../storage/mmkv'
 import { action, makeObservable, observable } from 'mobx'
 
 class MapStore {

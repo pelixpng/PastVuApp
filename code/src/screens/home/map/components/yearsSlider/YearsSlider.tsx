@@ -1,9 +1,9 @@
 import { FC, useState, memo } from 'react'
-import { DefaultTheme, useTheme } from 'styled-components'
 import { Slider } from '@miblanchard/react-native-slider'
-import { SliderComponentBack, CurrentYearsText, s, RangeYearsText } from './style'
-import { View } from 'react-native'
+import { s } from './style'
+import { View, Text } from 'react-native'
 import { YearsRangeType } from '../../../../../types/components'
+import { useTheme } from '@react-navigation/native'
 
 type YearsSliderComponentProps = {
   value: YearsRangeType
@@ -11,33 +11,33 @@ type YearsSliderComponentProps = {
 }
 
 const YearsSliderComponent: FC<YearsSliderComponentProps> = ({ value, setValue }) => {
-  const theme: DefaultTheme = useTheme()
+  const { colors } = useTheme()
   const [tmpRange, setTmpRange] = useState<YearsRangeType>(value)
   return (
-    <SliderComponentBack>
-      <CurrentYearsText>
+    <View style={[s.container, { backgroundColor: colors.backgroundApp }]}>
+      <Text style={[s.currentYearsText, { color: colors.textFirst }]}>
         {tmpRange[0]}-{tmpRange[1]}
-      </CurrentYearsText>
+      </Text>
       <Slider
         animateTransitions
-        maximumTrackTintColor={theme.colors.baseThird}
+        maximumTrackTintColor={colors.baseThird}
         maximumValue={2000}
-        minimumTrackTintColor={theme.colors.basePrimary}
+        minimumTrackTintColor={colors.basePrimary}
         minimumValue={1826}
         step={1}
-        thumbTintColor={theme.colors.basePrimary}
+        thumbTintColor={colors.basePrimary}
         thumbStyle={s.thumb}
         thumbTouchSize={{ width: 20, height: 20 }}
-        containerStyle={s.container}
+        containerStyle={s.containerSlider}
         value={tmpRange}
         onValueChange={setTmpRange}
         onSlidingComplete={setValue}
       />
       <View style={s.row}>
-        <RangeYearsText>1826</RangeYearsText>
-        <RangeYearsText>2000</RangeYearsText>
+        <Text style={[s.currentYearsText, { color: colors.textSecond }]}>1826</Text>
+        <Text style={[s.currentYearsText, { color: colors.textSecond }]}>2000</Text>
       </View>
-    </SliderComponentBack>
+    </View>
   )
 }
 

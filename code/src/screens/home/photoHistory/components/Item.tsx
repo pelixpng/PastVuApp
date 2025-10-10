@@ -1,7 +1,9 @@
 import { FC } from 'react'
 import { Image } from 'expo-image'
-import { Alert, TouchableOpacity, View } from 'react-native'
-import { DescriptionText, s, TitleText } from './style'
+import { Alert, TouchableOpacity, View, Text } from 'react-native'
+import { s } from './style'
+import { useTheme } from '@react-navigation/native'
+import { Spacer } from '../../../../components/ui/Spacer'
 
 type ItemHistoryProps = {
   onPress: () => void
@@ -11,6 +13,7 @@ type ItemHistoryProps = {
 }
 
 export const ItemHistory: FC<ItemHistoryProps> = ({ title, description, file, onPress }) => {
+  const { colors } = useTheme()
   return (
     <TouchableOpacity style={s.mainContainer} onPress={onPress}>
       <Image
@@ -19,9 +22,15 @@ export const ItemHistory: FC<ItemHistoryProps> = ({ title, description, file, on
         onError={() => Alert.alert('Ошибка', 'Не удалось загрузить изображение, попробуйте позже')}
         cachePolicy="disk"
       />
+      <Spacer width={12} />
       <View style={s.infoContainer}>
-        <TitleText numberOfLines={1}>{title}</TitleText>
-        <DescriptionText numberOfLines={2}>{description}</DescriptionText>
+        <Text numberOfLines={1} style={[s.titleText, { color: colors.textFirst }]}>
+          {title}
+        </Text>
+        <Spacer height={4} />
+        <Text numberOfLines={2} style={[s.descriptionText, { color: colors.textThird }]}>
+          {description}
+        </Text>
       </View>
     </TouchableOpacity>
   )

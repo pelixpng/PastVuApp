@@ -2,9 +2,10 @@
   "expo": {
     "name": "PastVu",
     "slug": "PastVuApp",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+    "newArchEnabled": true,
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
@@ -16,7 +17,7 @@
       "supportsTablet": false,
       "userInterfaceStyle": "automatic",
       "bundleIdentifier": "com.pelixpng.PastVuApp",
-      "buildNumber": "19",
+      "buildNumber": "54",
       "appleTeamId": "989AHJ2KDZ",
       "entitlements": {
         "com.apple.security.application-groups": ["group.com.pelixpng.PastVuApp"]
@@ -56,10 +57,6 @@
       "eas": {
         "projectId": "e18d3b69-bdd0-4b43-a4e2-02847112f893"
       }
-    },
-    "runtimeVersion": "1.0.0",
-    "updates": {
-      "url": "https://u.expo.dev/e18d3b69-bdd0-4b43-a4e2-02847112f893"
     },
     "plugins": [
       [

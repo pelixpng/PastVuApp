@@ -1,28 +1,31 @@
 import { FC, memo } from 'react'
-import styled from 'styled-components/native'
 import { MaterialIcons } from '@expo/vector-icons'
-import { DefaultTheme, useTheme } from 'styled-components'
+import { StyleSheet, TouchableOpacity } from 'react-native'
+import { useTheme } from '@react-navigation/native'
 
 type LocationButtonProps = {
   onPress: () => void
 }
 
 const GetLocationButton: FC<LocationButtonProps> = ({ onPress }) => {
-  const theme: DefaultTheme = useTheme()
+  const { colors } = useTheme()
   return (
-    <ContainerIcon onPress={onPress}>
-      <MaterialIcons name="my-location" size={24} color={theme.colors.textFirst} />
-    </ContainerIcon>
+    <TouchableOpacity
+      style={[s.container, { backgroundColor: colors.backgroundApp }]}
+      onPress={onPress}>
+      <MaterialIcons name="my-location" size={24} color={colors.textFirst} />
+    </TouchableOpacity>
   )
 }
 
-const ContainerIcon = styled.TouchableOpacity`
-  background-color: ${props => props.theme.colors.backgroundApp};
-  padding: 16px;
-  border-radius: 100px;
-  position: absolute;
-  bottom: 120px;
-  right: 16px;
-`
+const s = StyleSheet.create({
+  container: {
+    padding: 16,
+    borderRadius: 100,
+    position: 'absolute',
+    bottom: 120,
+    right: 16,
+  },
+})
 
 export const LocationButton = memo(GetLocationButton)

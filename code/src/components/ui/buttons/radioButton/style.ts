@@ -1,4 +1,3 @@
-import styled from 'styled-components/native'
 import { StyleSheet } from 'react-native'
 
 export const s = StyleSheet.create({
@@ -7,19 +6,14 @@ export const s = StyleSheet.create({
     gap: 12,
     flexDirection: 'row',
   },
+  radioButton: {
+    width: 24,
+    height: 24,
+    borderRadius: 50,
+  },
+  labelText: {
+    fontSize: 15,
+    lineHeight: 24,
+    fontWeight: '500',
+  },
 })
-export const LabelText = styled.Text`
-  font-size: 15px;
-  line-height: 24px;
-  font-weight: 500;
-  color: ${props => props.theme.colors.textFirst};
-`
-
-export const RadioButton = styled.View<{ isActive: boolean }>`
-  width: 24px;
-  height: 24px;
-  border-radius: 50px;
-  background-color: ${({ isActive, theme }) =>
-    isActive ? theme.colors.backgroundApp : theme.colors.baseFourth};
-  border: ${({ isActive, theme }) => (isActive ? `6px solid ${theme.colors.basePrimary}` : 'none')};
-`
