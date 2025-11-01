@@ -1,12 +1,11 @@
-import { WIDTH, INSET_TOP } from '../../../../../constants/sizes'
+import { SIZE } from '../../../../../constants/sizes'
 import { StyleSheet } from 'react-native'
 
 export const s = StyleSheet.create({
   container: {
-    width: WIDTH - 32,
+    width: SIZE.SCREEN_WIDTH - 16,
     position: 'absolute',
     zIndex: 9,
-    marginTop: INSET_TOP,
     alignSelf: 'center',
   },
   list: {

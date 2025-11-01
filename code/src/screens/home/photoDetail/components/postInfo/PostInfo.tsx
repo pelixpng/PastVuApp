@@ -1,19 +1,16 @@
 import { FC } from 'react'
 import { View, Text } from 'react-native'
-import { MaterialIcons } from '@expo/vector-icons'
 import { s } from './style'
 import { formatDate } from '../../../../../utils/getTime'
-import { MyButton } from '../../../../../components/ui/buttons/MyButton'
 import { useTheme } from '@react-navigation/native'
 import RenderHTML from 'react-native-render-html'
 import { Spacer } from '../../../../../components/ui/Spacer'
 
 type PostInfoProps = {
   postInfo: Photo
-  saveImage: () => void
 }
 
-export const PostInfo: FC<PostInfoProps> = ({ postInfo, saveImage }) => {
+export const PostInfo: FC<PostInfoProps> = ({ postInfo }) => {
   const { colors } = useTheme()
   const commentTotal = postInfo.ccount || 0
   const titlesRegion = postInfo.regions?.map(region => region.title_local).join(', ')
@@ -102,12 +99,6 @@ export const PostInfo: FC<PostInfoProps> = ({ postInfo, saveImage }) => {
           Последнее изменение {lastEditFormat}
         </Text>
       )}
-      <Spacer height={8} />
-      <MyButton
-        title={'Скачать изображение'}
-        children={<MaterialIcons name={'save-alt'} size={24} color={'white'} />}
-        func={saveImage}
-      />
       <Spacer height={12} />
       <View style={s.row}>
         <Text style={[s.commentHeaderText, { color: colors.textFirst }]}>Комментарии </Text>

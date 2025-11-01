@@ -5,17 +5,17 @@ import { IComment, Users } from '../../../types/apiPhotoComment'
 import ApiService from '../../../api/apiService'
 import { HistoryItem } from '../photoHistory/PhotoHistory.screen'
 import { MMKVStorage } from '../../../storage/mmkv'
-import { Alert, Platform } from 'react-native'
-import * as MediaLibrary from 'expo-media-library'
-import * as FileSystem from 'expo-file-system'
+import { Alert } from 'react-native'
 import ApiStore from '../../../store/global/Api.store'
 import { IosTargetStorage } from '../../../storage/appleTarget'
 import { ExtensionStorage } from '@bacons/apple-targets'
+import { savePhoto, sharePhoto } from '../../../utils/getPhoto'
 
 class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
   @observable comments: IComment[] = []
   @observable users: Users | null = null
   @observable postInfo: Photo | null = null
+  @observable isImageLoaded = false
 
   constructor() {
     super()
@@ -28,8 +28,8 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
   // ------------------------------------------ Computed ------------------------------------------
 
   @computed
-  get photoQuality() {
-    return ApiStore.photoQualitySettings
+  get imageLink() {
+    return `https://img.pastvu.com/${ApiStore.photoQualitySettings}/${this.postInfo?.file}`
   }
 
   // ------------------------------------------ Actions ------------------------------------------
@@ -50,7 +50,7 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
           MMKVStorage.set('History', [{ title, description, cid, file }, ...history])
           IosTargetStorage.set(
             'History',
-            JSON.stringify([{ title, description, cid, file }, ...history]), //сделать как в ммкв
+            JSON.stringify([{ title, description, cid, file }, ...history]),
           )
           ExtensionStorage.reloadWidget()
         }
@@ -70,31 +70,28 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
   }
 
   @action.bound
-  async saveImage() {
-    if (this.postInfo) {
-      try {
-        const { status } = await MediaLibrary.requestPermissionsAsync(true)
-        if (status !== 'granted') {
-          Alert.alert('Ошибка', 'Нет разрешения на сохранение изображений')
-          return
-        }
-        const fileUri = `https://img.pastvu.com/a/${this.postInfo.file}`
-        let localUri = fileUri
-        if (Platform.OS === 'android') {
-          const fileExtension = this.postInfo.file?.substring(this.postInfo.file.indexOf('.')) || ''
-          const fileName = `${this.postInfo.title?.substring(0, 15) || 'image'}${fileExtension}`
-          const downloadResult = await FileSystem.downloadAsync(
-            fileUri,
-            `${FileSystem.documentDirectory}${fileName}`,
-          )
-          localUri = downloadResult.uri
-        }
-        await MediaLibrary.saveToLibraryAsync(localUri)
-        Alert.alert('Готово', 'Фотография успешно сохранена в галерею')
-      } catch (error) {
-        Alert.alert('Ошибка', 'Не удалось сохранить изображение')
-      }
-    }
+  openFullScreenImage() {
+    this.navigateTo(SCREENS.FULL_SCREEN_IMAGE, {
+      title: this.postInfo!.title,
+      cid: this.screenParams.cid,
+      uri: this.imageLink,
+      file: this.postInfo!.file,
+    })
+  }
+
+  @action.bound
+  share() {
+    sharePhoto(this.postInfo!.title, this.screenParams.cid)
+  }
+
+  @action.bound
+  saveImage() {
+    savePhoto(this.postInfo!.title, this.postInfo!.file)
+  }
+
+  @action.bound
+  onImageLoad() {
+    this.isImageLoaded = true
   }
 }
 

@@ -18,7 +18,7 @@ export const AppSettingsScreen = observer(() => {
   const { colors } = useTheme()
   return (
     <Container isScroll>
-      <Spacer height={3} />
+      <Spacer height={18} />
       <UICard>
         <Text style={[s.titleText, { color: colors.textFirst }]}>Параметры карты</Text>
         <Spacer height={4} />

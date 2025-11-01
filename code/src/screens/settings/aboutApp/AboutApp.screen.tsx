@@ -12,11 +12,12 @@ export const AboutAppScreen = () => {
   const { colors } = useTheme()
   return (
     <Container isScroll>
+      <Spacer height={18} />
       <View style={s.block}>
         <Image style={s.image} source={require('../../../../assets/icon.png')} />
         <Spacer height={16} />
         <Text selectable style={[s.descriptionText, { color: colors.textSecond }]}>
-          Версия 2.1.0 от 30 сентября 2025 г.
+          Версия 2.2.0 от 1 ноября 2025 г.
         </Text>
       </View>
       <Spacer height={24} />

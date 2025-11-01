@@ -7,7 +7,7 @@ import { ClusterMarker } from './components/markers/ClusterMarker'
 import { YearsSlider } from './components/yearsSlider/YearsSlider'
 import { observer } from 'mobx-react'
 import { SearchPlace } from './components/searchPlace/SearchPlace'
-import { HEIGHT, WIDTH } from '../../../constants/sizes'
+import { SIZE } from '../../../constants/sizes'
 import { useTheme } from '@react-navigation/native'
 
 export const MapScreen = observer(() => {
@@ -84,7 +84,7 @@ export const MapScreen = observer(() => {
 const s = StyleSheet.create({
   block: { flex: 1 },
   map: {
-    width: WIDTH,
-    height: HEIGHT,
+    width: SIZE.SCREEN_WIDTH,
+    height: SIZE.SCREEN_HEIGHT,
   },
 })

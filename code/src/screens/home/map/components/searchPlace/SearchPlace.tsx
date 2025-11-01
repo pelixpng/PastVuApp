@@ -5,6 +5,7 @@ import { LocationItem } from '../../../../../types/apiPhotoList'
 import { s } from './style'
 import { useTheme } from '@react-navigation/native'
 import { Spacer } from '../../../../../components/ui/Spacer'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 type LocationSearchProps = {
   places: LocationItem[]
@@ -21,8 +22,9 @@ const LocationSearch: FC<LocationSearchProps> = ({
 }) => {
   const [isFocused, setIsFocused] = useState(false)
   const { colors } = useTheme()
+  const { top } = useSafeAreaInsets()
   return (
-    <View style={s.container}>
+    <View style={[s.container, { top }]}>
       <View style={[s.searchContainer, { backgroundColor: colors.backgroundApp }]}>
         <MaterialIcons name="search" size={24} color={colors.textThird} />
         <Spacer width={5} />

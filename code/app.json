@@ -2,7 +2,7 @@
   "expo": {
     "name": "PastVu",
     "slug": "PastVuApp",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "newArchEnabled": true,
@@ -17,7 +17,7 @@
       "supportsTablet": false,
       "userInterfaceStyle": "automatic",
       "bundleIdentifier": "com.pelixpng.PastVuApp",
-      "buildNumber": "54",
+      "buildNumber": "56",
       "appleTeamId": "989AHJ2KDZ",
       "entitlements": {
         "com.apple.security.application-groups": ["group.com.pelixpng.PastVuApp"]
@@ -45,7 +45,7 @@
         "resizeMode": "contain"
       },
       "package": "com.pelixpng.PastVuApp",
-      "versionCode": 20,
+      "versionCode": 31,
       "permissions": [
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE",

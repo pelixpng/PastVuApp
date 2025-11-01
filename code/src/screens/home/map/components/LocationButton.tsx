@@ -1,5 +1,5 @@
 import { FC, memo } from 'react'
-import { MaterialIcons } from '@expo/vector-icons'
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5'
 import { StyleSheet, TouchableOpacity } from 'react-native'
 import { useTheme } from '@react-navigation/native'
 
@@ -13,7 +13,7 @@ const GetLocationButton: FC<LocationButtonProps> = ({ onPress }) => {
     <TouchableOpacity
       style={[s.container, { backgroundColor: colors.backgroundApp }]}
       onPress={onPress}>
-      <MaterialIcons name="my-location" size={24} color={colors.textFirst} />
+      <FontAwesome5 name="location-arrow" size={24} color={colors.textFirst} />
     </TouchableOpacity>
   )
 }
@@ -23,8 +23,8 @@ const s = StyleSheet.create({
     padding: 16,
     borderRadius: 100,
     position: 'absolute',
-    bottom: 120,
-    right: 16,
+    bottom: 103,
+    right: 8,
   },
 })
 

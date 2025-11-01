@@ -9,10 +9,10 @@ export const SettingsMenuScreen = observer(() => {
   const vm = useVM(SettingsVM)
   return (
     <Container>
-      <Spacer height={3} />
+      <Spacer height={18} />
       <MenuButton
         onPress={vm.navToSettingsMap}
-        title={'Настройки'}
+        title={'Основные'}
         description={'Параметры интерфейса и карты'}
         icon={'settings'}
       />

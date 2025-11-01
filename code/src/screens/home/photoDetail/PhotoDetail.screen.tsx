@@ -1,20 +1,39 @@
-import { Alert, FlatList, StyleSheet, Text } from 'react-native'
+import { FlatList, StyleSheet, Text, View } from 'react-native'
 import { useVM } from '../../../hooks/useVM'
 import { observer } from 'mobx-react'
-import Pinchable from 'react-native-pinchable'
 import { Comment } from './components/comment/Comment'
-import { Image } from 'expo-image'
 import PhotoDetailVM from './PhotoDetail.vm'
 import { Container } from '../../../components/ui/Container'
-import { useTheme } from '@react-navigation/native'
+import { useNavigation, useTheme } from '@react-navigation/native'
 import { PostInfo } from './components/postInfo/PostInfo'
 import { Spacer } from '../../../components/ui/Spacer'
-import { useCallback } from 'react'
+import { useCallback, useLayoutEffect } from 'react'
+import { MaterialIcons } from '@expo/vector-icons'
+import { ImageZoom } from './components/imageView/ImageZoom'
 
 export const PhotoDetailScreen = observer(() => {
   const vm = useVM(PhotoDetailVM)
   const { colors } = useTheme()
   const renderItem = useCallback(({ item }) => <Comment comment={item} users={vm.users} />, [])
+  const navigation = useNavigation()
+  useLayoutEffect(() => {
+    if (!vm.postInfo) return
+    navigation.setOptions({
+      headerRight: () => (
+        <View style={s.backIcon}>
+          <MaterialIcons
+            name="save-alt"
+            size={24}
+            color={colors.textFirst}
+            onPress={vm.saveImage}
+          />
+          <Spacer width={24} />
+          <MaterialIcons name="share" size={24} color={colors.textFirst} onPress={vm.share} />
+        </View>
+      ),
+    })
+  }, [vm.postInfo, colors.textFirst, navigation])
+
   if (!vm.postInfo && !vm.users && vm.comments.length === 0) {
     return (
       <Container>
@@ -24,36 +43,32 @@ export const PhotoDetailScreen = observer(() => {
   }
   return (
     <Container>
-      <Pinchable style={s.pinchable} maximumZoomScale={10}>
-        <Image
-          source={{ uri: `https://img.pastvu.com/${vm.photoQuality}/${vm.postInfo?.file}` }}
-          style={s.image}
-          contentFit="contain"
-          onError={() =>
-            Alert.alert('Ошибка', 'Не удалось загрузить изображение, попробуйте позже')
-          }
-        />
-      </Pinchable>
-      <Spacer height={16} />
-      <FlatList
-        showsVerticalScrollIndicator={false}
-        data={vm.comments}
-        renderItem={renderItem}
-        ListHeaderComponent={<PostInfo postInfo={vm.postInfo!} saveImage={vm.saveImage} />}
-        style={s.listStyle}
-        keyExtractor={item => item.cid}
+      <ImageZoom
+        uri={vm.imageLink}
+        openFullScreenImage={vm.openFullScreenImage}
+        onImageLoaded={vm.onImageLoad}
       />
+      <Spacer height={16} />
+      {vm.isImageLoaded && (
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          data={vm.comments}
+          renderItem={renderItem}
+          ListHeaderComponent={<PostInfo postInfo={vm.postInfo!} />}
+          style={s.listStyle}
+          keyExtractor={item => item.cid}
+        />
+      )}
     </Container>
   )
 })
 
 const s = StyleSheet.create({
-  pinchable: { width: '100%', height: '40%' },
-  image: { flex: 1 },
   listStyle: { marginHorizontal: 16 },
   titleText: {
     fontSize: 13,
     lineHeight: 20,
     fontWeight: '800',
   },
+  backIcon: { flexDirection: 'row', marginRight: 16 },
 })

@@ -28,7 +28,7 @@ export const PhotoHistoryScreen = observer(() => {
       data={vm.photos}
       style={{ backgroundColor: colors.backgroundApp }}
       keyExtractor={item => item.cid}
-      ListHeaderComponent={<Spacer height={3} />}
+      ListHeaderComponent={<Spacer height={18} />}
       ItemSeparatorComponent={() => <Spacer height={16} />}
       renderItem={({ item }) => (
         <ItemHistory

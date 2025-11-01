@@ -92,8 +92,8 @@ android {
         applicationId 'com.pelixpng.PastVuApp'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 20
-        versionName "2.1.0"
+        versionCode 31
+        versionName "2.2.0"
     }
     signingConfigs {
         debug {

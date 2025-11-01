@@ -10,4 +10,5 @@ export enum SCREENS {
   SETTINGS_MENU = 'Settings Menu',
   //photo
   PHOTO_DETAIL = 'Photo Detail',
+  FULL_SCREEN_IMAGE = 'Full Screen Image',
 }

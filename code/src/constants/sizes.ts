@@ -1,6 +1,11 @@
 import { Dimensions } from 'react-native'
-import { initialWindowMetrics } from 'react-native-safe-area-context'
 
-export const INSET_TOP = initialWindowMetrics?.insets.top ?? 25
-export const WIDTH = Dimensions.get('screen').width
-export const HEIGHT = Dimensions.get('screen').height
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('screen')
+const { width: WINDOW_WIDTH, height: WINDOW_HEIGHT } = Dimensions.get('window')
+
+export const SIZE = {
+  SCREEN_WIDTH,
+  SCREEN_HEIGHT,
+  WINDOW_WIDTH,
+  WINDOW_HEIGHT,
+}

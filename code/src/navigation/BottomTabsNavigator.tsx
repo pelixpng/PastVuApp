@@ -26,6 +26,9 @@ export function BottomTabsNavigator() {
           backgroundColor: colors.backgroundApp,
         },
         headerTitle: '',
+        headerTitleAlign: 'left',
+        headerTitleStyle: s.headerTitleStyle,
+        headerTintColor: colors.textFirst,
         tabBarHideOnKeyboard: true,
         tabBarLabelStyle: s.tabBarLabelStyle,
       }}>
@@ -43,6 +46,7 @@ export function BottomTabsNavigator() {
         component={PhotoHistoryScreen}
         options={{
           title: 'История',
+          headerTitle: 'История',
           tabBarIcon: ({ color }) => <MaterialIcons name="history" size={24} color={color} />,
         }}
       />
@@ -51,6 +55,7 @@ export function BottomTabsNavigator() {
         component={SettingsMenuScreen}
         options={{
           title: 'Настройки',
+          headerTitle: 'Настройки',
           tabBarIcon: ({ color }) => <MaterialIcons name="settings" size={24} color={color} />,
         }}
       />
@@ -63,5 +68,10 @@ const s = StyleSheet.create({
     fontSize: 11,
     lineHeight: 16,
     fontWeight: '500',
+  },
+  headerTitleStyle: {
+    fontSize: 24,
+    lineHeight: 28,
+    fontWeight: 'bold',
   },
 })
