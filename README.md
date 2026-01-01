@@ -34,6 +34,16 @@ about the project [here](https://docs.pastvu.com/en/about). Platform source
   <img src="img/6.jpg" width="250" />
 </p>
 
+# Tablet UI
+
+<p align="center">
+  <img src="img/7.png" width="400" />
+  <img src="img/8.png" width="400" />
+  <img src="img/9.png" width="400" />
+  <img src="img/10.png" width="400" />
+  <img src="img/11.png" width="400" />
+</p>
+
 # System Requirements
 
 - **Android:** 7.0 and up

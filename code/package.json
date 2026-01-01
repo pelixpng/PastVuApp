@@ -21,13 +21,13 @@
     "expo-file-system": "~18.1.11",
     "expo-image": "~2.4.0",
     "expo-location": "~18.1.6",
-    "expo-media-library": "~17.1.7",
     "expo-splash-screen": "~0.30.10",
     "expo-status-bar": "~2.2.3",
     "mobx": "^6.12.0",
     "mobx-react": "^9.1.0",
     "react": "19.0.0",
     "react-native": "0.79.5",
+    "react-native-device-info": "^14.1.1",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-gradle-plugin": "^0.71.19",
     "react-native-maps": "1.20.1",
@@ -36,7 +36,9 @@
     "react-native-render-html": "^6.3.4",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.11.1",
-    "react-native-zoom-toolkit-swipe": "github:pelixpng/react-native-zoom-toolkit-swipe"
+    "react-native-zoom-toolkit-swipe": "github:pelixpng/react-native-zoom-toolkit-swipe",
+    "expo-screen-orientation": "~8.1.7",
+    "expo-media-library": "18.0.6"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

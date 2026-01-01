@@ -2,8 +2,8 @@
   "expo": {
     "name": "PastVu",
     "slug": "PastVuApp",
-    "version": "2.2.0",
-    "orientation": "portrait",
+    "version": "2.3.0",
+    "orientation": "default",
     "icon": "./assets/icon.png",
     "newArchEnabled": true,
     "userInterfaceStyle": "light",
@@ -14,10 +14,11 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": false,
+      "supportsTablet": true,
+      "requireFullScreen": true,
       "userInterfaceStyle": "automatic",
       "bundleIdentifier": "com.pelixpng.PastVuApp",
-      "buildNumber": "56",
+      "buildNumber": "65",
       "appleTeamId": "989AHJ2KDZ",
       "entitlements": {
         "com.apple.security.application-groups": ["group.com.pelixpng.PastVuApp"]
@@ -26,6 +27,9 @@
         "image": "./assets/splash.png",
         "backgroundColor": "#2D61A0",
         "resizeMode": "contain"
+      },
+      "infoPlist": {
+        "EXDefaultScreenOrientationMask": "UIInterfaceOrientationMaskAll"
       }
     },
     "android": {
@@ -45,10 +49,8 @@
         "resizeMode": "contain"
       },
       "package": "com.pelixpng.PastVuApp",
-      "versionCode": 31,
+      "versionCode": 33,
       "permissions": [
-        "android.permission.READ_EXTERNAL_STORAGE",
-        "android.permission.WRITE_EXTERNAL_STORAGE",
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION"
       ]
@@ -63,7 +65,7 @@
         "expo-media-library",
         {
           "savePhotosPermission": "Мы запрашиваем доступ для сохранения изображений в вашу фотогалерею, чтобы вы могли добавлять загруженные фотографии для дальнейшего просмотра и использования.",
-          "isAccessMediaLocationEnabled": false
+          "granularPermissions": []
         }
       ],
       [
