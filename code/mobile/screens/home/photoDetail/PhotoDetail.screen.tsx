@@ -22,6 +22,13 @@ export const PhotoDetailScreen = observer(() => {
       headerRight: () => (
         <View style={s.backIcon}>
           <MaterialIcons
+            name={vm.isFavorite ? 'favorite' : 'favorite-border'}
+            size={24}
+            color={vm.isFavorite ? '#FF6B6B' : colors.textFirst}
+            onPress={vm.toggleFavorite}
+          />
+          <Spacer width={24} />
+          <MaterialIcons
             name="save-alt"
             size={24}
             color={colors.textFirst}
@@ -32,7 +39,7 @@ export const PhotoDetailScreen = observer(() => {
         </View>
       ),
     })
-  }, [vm.postInfo, colors.textFirst, navigation])
+  }, [vm.postInfo, vm.isFavorite, colors.textFirst, navigation])
 
   if (!vm.postInfo && !vm.users) {
     return (

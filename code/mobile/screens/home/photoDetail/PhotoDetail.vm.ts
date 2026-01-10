@@ -16,6 +16,7 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
   @observable users: Users | null = null
   @observable postInfo: Photo | null = null
   @observable isImageLoaded = false
+  @observable isFavorite = false
 
   constructor() {
     super()
@@ -54,6 +55,10 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
           )
           ExtensionStorage.reloadWidget()
         }
+        // Проверяем, есть ли фото в избранном
+        const favorites: HistoryItem[] = MMKVStorage.get('Favorites') ?? []
+        this.isFavorite = favorites.some(item => item.cid === cid)
+
         if (result.photo?.ccount) {
           this.getComments()
         }
@@ -92,6 +97,28 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
   @action.bound
   onImageLoad() {
     this.isImageLoaded = true
+  }
+
+  @action.bound
+  toggleFavorite() {
+    const cid = this.screenParams.cid
+    const favorites: HistoryItem[] = MMKVStorage.get('Favorites') ?? []
+    const title = this.postInfo!.title
+    const description = `${this.postInfo!.y} ${this.postInfo!.regions
+      .map(region => region.title_local)
+      .join(', ')}`
+    const file = this.postInfo!.file
+
+    if (this.isFavorite) {
+      // Удаляем из избранного
+      const updatedFavorites = favorites.filter(item => item.cid !== cid)
+      MMKVStorage.set('Favorites', updatedFavorites)
+      this.isFavorite = false
+    } else {
+      // Добавляем в избранное
+      MMKVStorage.set('Favorites', [{ title, description, cid, file }, ...favorites])
+      this.isFavorite = true
+    }
   }
 }
 
