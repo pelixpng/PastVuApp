@@ -4,6 +4,7 @@ export type StackParamList = {
   [SCREENS.BOTTOM_TAB_NAVIGATOR]: undefined
   [SCREENS.MAP]: undefined
   [SCREENS.PHOTO_HISTORY]: undefined
+  [SCREENS.NEWS]: undefined
   [SCREENS.SETTINGS_MENU]: undefined
   [SCREENS.PHOTO_DETAIL]: { cid: string; title: string }
   [SCREENS.FULL_SCREEN_IMAGE]: { uri: string; title: string; cid: string; file: string }

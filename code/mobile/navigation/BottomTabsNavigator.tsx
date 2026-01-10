@@ -5,6 +5,7 @@ import { StackParamList } from './stackParams.types'
 import { SCREENS } from './navigation.types'
 import { MapScreen } from '../screens/home/map/Map.screen'
 import { PhotoHistoryScreen } from '../screens/home/photoHistory/PhotoHistory.screen'
+import { NewsScreen } from '../screens/home/news/News.screen'
 import { SettingsMenuScreen } from '../screens/settings/settingsMenu/SettingsMenu.screen'
 import { useTheme } from '@react-navigation/native'
 
@@ -14,6 +15,7 @@ export function BottomTabsNavigator() {
   const { colors } = useTheme()
   return (
     <Tab.Navigator
+      initialRouteName={SCREENS.MAP}
       screenOptions={{
         tabBarActiveTintColor: colors.basePrimary,
         tabBarInactiveTintColor: colors.textThird,
@@ -32,6 +34,15 @@ export function BottomTabsNavigator() {
         tabBarHideOnKeyboard: true,
         tabBarLabelStyle: s.tabBarLabelStyle,
       }}>
+      <Tab.Screen
+        name={SCREENS.NEWS}
+        component={NewsScreen}
+        options={{
+          title: 'Новости',
+          headerTitle: 'Новости',
+          tabBarIcon: ({ color }) => <MaterialIcons name="article" size={24} color={color} />,
+        }}
+      />
       <Tab.Screen
         name={SCREENS.MAP}
         component={MapScreen}
