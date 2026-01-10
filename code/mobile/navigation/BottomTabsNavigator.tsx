@@ -56,9 +56,9 @@ export function BottomTabsNavigator() {
         name={SCREENS.PHOTO_HISTORY}
         component={PhotoHistoryScreen}
         options={{
-          title: 'История',
-          headerTitle: 'История',
-          tabBarIcon: ({ color }) => <MaterialIcons name="history" size={24} color={color} />,
+          title: 'Коллекция',
+          headerTitle: 'Коллекция',
+          tabBarIcon: ({ color }) => <MaterialIcons name="favorite" size={24} color={color} />,
         }}
       />
       <Tab.Screen

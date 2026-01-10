@@ -11,6 +11,7 @@ type MMKVStorageType =
   | 'RangeYears'
   | 'RegionString'
   | 'History'
+  | 'Favorites'
   | 'mapProvider'
   | 'isShowCluster'
 
