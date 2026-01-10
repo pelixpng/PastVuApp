@@ -31,15 +31,11 @@ export const PhotoHistoryScreen = observer(() => {
       style={[{ backgroundColor: colors.backgroundApp }, s.container]}
       keyExtractor={item => item.cid}
       ListHeaderComponent={
-        <View>
-          <Spacer height={18} />
-          <SegmentedControl
-            options={vm.segmentOptions}
-            selectedValue={vm.selectedTab}
-            onChange={value => vm.setSelectedTab(value as CollectionTab)}
-          />
-          <Spacer height={18} />
-        </View>
+        <SegmentedControl
+          options={vm.segmentOptions}
+          selectedValue={vm.selectedTab}
+          onChange={value => vm.setSelectedTab(value as CollectionTab)}
+        />
       }
       ItemSeparatorComponent={() => <Spacer height={16} />}
       renderItem={({ item }) => (

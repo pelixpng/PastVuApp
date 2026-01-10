@@ -1,6 +1,12 @@
-import { FC } from 'react'
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import { FC, useEffect, useState } from 'react'
+import { View, Text, TouchableOpacity, StyleSheet, LayoutChangeEvent } from 'react-native'
 import { useTheme } from '@react-navigation/native'
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  interpolateColor,
+} from 'react-native-reanimated'
 
 export type SegmentedControlOption = {
   label: string
@@ -13,68 +19,158 @@ type SegmentedControlProps = {
   onChange: (value: string) => void
 }
 
-export const SegmentedControl: FC<SegmentedControlProps> = ({ options, selectedValue, onChange }) => {
+export const SegmentedControl: FC<SegmentedControlProps> = ({
+  options,
+  selectedValue,
+  onChange,
+}) => {
   const { colors } = useTheme()
+  const [segmentWidth, setSegmentWidth] = useState(0)
+  const selectedIndex = options.findIndex(opt => opt.value === selectedValue)
+  const translateX = useSharedValue(0)
+
+  useEffect(() => {
+    if (segmentWidth > 0) {
+      translateX.value = withSpring(selectedIndex * (segmentWidth + 6), {
+        damping: 20,
+        stiffness: 150,
+      })
+    }
+  }, [selectedIndex, segmentWidth, translateX])
+
+  const animatedIndicatorStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateX: translateX.value }],
+    }
+  })
+
+  const handleLayout = (event: LayoutChangeEvent) => {
+    const { width } = event.nativeEvent.layout
+    const itemWidth = (width - 6 * (options.length + 1)) / options.length
+    setSegmentWidth(itemWidth)
+  }
 
   return (
-    <View style={[s.container, { backgroundColor: colors.baseSecond }]}>
+    <View style={[s.container, { backgroundColor: colors.baseThird }]} onLayout={handleLayout}>
+      {segmentWidth > 0 && (
+        <Animated.View
+          style={[
+            s.indicator,
+            {
+              width: segmentWidth,
+              backgroundColor: colors.backgroundApp,
+            },
+            animatedIndicatorStyle,
+          ]}
+        />
+      )}
       {options.map((option, index) => {
         const isSelected = option.value === selectedValue
         const isFirst = index === 0
         const isLast = index === options.length - 1
 
         return (
-          <TouchableOpacity
+          <SegmentItem
             key={option.value}
-            style={[
-              s.segment,
-              isSelected && [s.segmentSelected, { backgroundColor: colors.backgroundApp }],
-              isFirst && s.segmentFirst,
-              isLast && s.segmentLast,
-            ]}
-            onPress={() => onChange(option.value)}
-            activeOpacity={0.7}>
-            <Text
-              style={[
-                s.segmentText,
-                { color: colors.textSecond },
-                isSelected && [s.segmentTextSelected, { color: colors.textFirst }],
-              ]}>
-              {option.label}
-            </Text>
-          </TouchableOpacity>
+            option={option}
+            isSelected={isSelected}
+            isFirst={isFirst}
+            isLast={isLast}
+            colors={colors}
+            onChange={onChange}
+          />
         )
       })}
     </View>
   )
 }
 
+type SegmentItemProps = {
+  option: SegmentedControlOption
+  isSelected: boolean
+  isFirst: boolean
+  isLast: boolean
+  colors: any
+  onChange: (value: string) => void
+}
+
+const SegmentItem: FC<SegmentItemProps> = ({
+  option,
+  isSelected,
+  isFirst,
+  isLast,
+  colors,
+  onChange,
+}) => {
+  const animation = useSharedValue(0)
+
+  useEffect(() => {
+    animation.value = withSpring(isSelected ? 1 : 0, {
+      damping: 15,
+      stiffness: 150,
+    })
+  }, [isSelected, animation])
+
+  const animatedTextStyle = useAnimatedStyle(() => {
+    const color = interpolateColor(
+      animation.value,
+      [0, 1],
+      [colors.textSecond, colors.textFirst],
+    )
+
+    return { color }
+  })
+
+  return (
+    <TouchableOpacity
+      style={[s.segment, isFirst && s.segmentFirst, isLast && s.segmentLast]}
+      onPress={() => onChange(option.value)}
+      activeOpacity={0.7}>
+      <Animated.Text
+        style={[s.segmentText, isSelected && s.segmentTextSelected, animatedTextStyle]}>
+        {option.label}
+      </Animated.Text>
+    </TouchableOpacity>
+  )
+}
+
 const s = StyleSheet.create({
   container: {
     flexDirection: 'row',
+    borderRadius: 16,
+    padding: 6,
+    gap: 6,
+    position: 'relative',
+  },
+  indicator: {
+    position: 'absolute',
+    left: 6,
+    top: 6,
+    bottom: 6,
     borderRadius: 12,
-    padding: 4,
-    gap: 4,
+    shadowColor: 'rgba(0, 0, 0, 0.1)',
+    shadowOpacity: 1,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
   },
   segment: {
     flex: 1,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  segmentBackground: {
+    borderRadius: 12,
   },
   segmentFirst: {},
   segmentLast: {},
-  segmentSelected: {
-    shadowColor: 'rgba(0, 0, 0, 0.08)',
-    shadowOpacity: 1,
-    shadowRadius: 2,
-    shadowOffset: { width: 0, height: 1 },
-    elevation: 2,
-  },
+  segmentSelected: {},
   segmentText: {
-    fontSize: 14,
+    fontSize: 15,
     lineHeight: 20,
     fontWeight: '500',
   },
