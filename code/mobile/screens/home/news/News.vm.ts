@@ -21,7 +21,8 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
   constructor() {
     super()
     makeObservable(this)
-    //this.loadNews()
+    this.loadNews()
+    this.loadPhotos()
   }
 
   // ------------------------------------------ Computed ------------------------------------------
@@ -47,6 +48,17 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
       console.log('❌ Error loading news:', error)
     } finally {
       this.loading = false
+    }
+  }
+
+  @action.bound
+  async loadPhotos() {
+    try {
+      const photosData = await ApiService.getRecentPhotos()
+      this.photos = photosData
+      console.log('✅ Photos loaded:', this.photos.length)
+    } catch (error) {
+      console.log('❌ Error loading photos:', error)
     }
   }
 }

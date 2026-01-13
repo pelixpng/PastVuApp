@@ -16,6 +16,55 @@ const BASE_URL = 'https://api.pastvu.com/api2'
 const PLACE_API_URL = 'https://us1.locationiq.com/v1'
 const PLACE_API_KEY = 'YOUR API KEY'
 
+let socketInstance: any = null
+
+const getSocket = () => {
+  if (!socketInstance) {
+    console.log('🔌 Creating new Socket.IO connection')
+    socketInstance = io('https://pastvu.com', {
+      path: '/socket.io/',
+      transports: ['polling', 'websocket'],
+      withCredentials: true,
+    })
+
+    socketInstance.on('connect', () => {
+      console.log('✅ Socket.IO connected, ID:', socketInstance.id)
+    })
+
+    socketInstance.on('disconnect', () => {
+      console.log('❌ Socket.IO disconnected')
+    })
+  } else {
+    console.log('♻️ Reusing existing Socket.IO connection, ID:', socketInstance.id)
+  }
+  return socketInstance
+}
+
+const socketEmit = (event: string, data: any): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    const socket = getSocket()
+
+    const onConnect = () => {
+      socket.emit(event, data, (resp: any) => {
+        if (resp?.result) {
+          resolve(resp.result)
+        } else {
+          reject(new Error(`No result in response for ${event}`))
+        }
+      })
+    }
+
+    if (socket.connected) {
+      onConnect()
+    } else {
+      socket.once('connect', onConnect)
+      socket.once('connect_error', (error: any) => {
+        reject(error)
+      })
+    }
+  })
+}
+
 export default class ApiService {
   static async getPhotoList(params: getPhotoListProps) {
     const response = await fetch(
@@ -103,30 +152,24 @@ export default class ApiService {
   }
 
   static async getNews() {
-    return new Promise<any[]>((resolve, reject) => {
-      const socket = io('https://pastvu.com', {
-        path: '/socket.io/',
-        transports: ['polling', 'websocket'],
-        withCredentials: true,
-      })
+    try {
+      const result = await socketEmit('index.giveAllNews', undefined)
+      console.log(`📊 Loaded ${result.news.length} news via Socket.IO`)
+      return result.news
+    } catch (error) {
+      console.log('❌ Error loading news:', error)
+      throw error
+    }
+  }
 
-      socket.on('connect', () => {
-        console.log('✅ Connected via Socket.IO')
-        socket.emit('index.giveAllNews', undefined, (resp: any) => {
-          socket.disconnect()
-          if (resp?.result?.news) {
-            console.log(`📊 Loaded ${resp.result.news.length} news via Socket.IO`)
-            resolve(resp.result.news)
-          } else {
-            reject(new Error('No news in response'))
-          }
-        })
-      })
-
-      socket.on('connect_error', (error) => {
-        socket.disconnect()
-        reject(error)
-      })
-    })
+  static async getRecentPhotos() {
+    try {
+      const result = await socketEmit('photo.givePublicIndex', undefined)
+      console.log(`📸 Loaded ${result.photos.length} recent photos via Socket.IO`)
+      return result.photos
+    } catch (error) {
+      console.log('❌ Error loading photos:', error)
+      throw error
+    }
   }
 }
