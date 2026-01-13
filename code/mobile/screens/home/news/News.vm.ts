@@ -55,6 +55,7 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
   async loadPhotos() {
     try {
       const photosData = await ApiService.getRecentPhotos()
+      console.log(photosData)
       this.photos = photosData
       console.log('✅ Photos loaded:', this.photos.length)
     } catch (error) {
