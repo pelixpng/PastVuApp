@@ -18,9 +18,23 @@ export const NewsScreen = observer(() => {
       />
       <FlatList
         data={vm.displayedData}
-        keyExtractor={item => item._id}
+        keyExtractor={item => item._id || item.cid}
         renderItem={({ item }) => (
-          <Text style={{ padding: 16, fontSize: 16, color: colors.text }}>{item.title}</Text>
+          <View style={{ padding: 16 }}>
+            <Text style={{ fontSize: 16, color: colors.text, fontWeight: 'bold' }}>
+              {item.title}
+            </Text>
+            {item.rs && (
+              <Text style={{ fontSize: 12, color: colors.text, opacity: 0.6, marginTop: 4 }}>
+                {vm.getRegionPath(item.rs)}
+              </Text>
+            )}
+            {item.year && (
+              <Text style={{ fontSize: 12, color: colors.text, opacity: 0.6, marginTop: 2 }}>
+                {item.year}
+              </Text>
+            )}
+          </View>
         )}
         ListEmptyComponent={
           <Text style={{ padding: 16, color: colors.text }}>

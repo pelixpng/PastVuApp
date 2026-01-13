@@ -12,6 +12,7 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
   @observable news: NewsItems[] = []
   @observable photos: any[] = []
   @observable loading: boolean = true
+  private regionsMap: Map<number, any> = new Map()
 
   segmentOptions: SegmentedControlOption[] = [
     { label: 'Посты', value: 'posts' },
@@ -21,6 +22,7 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
   constructor() {
     super()
     makeObservable(this)
+    this.loadRegions()
     this.loadNews()
     this.loadPhotos()
   }
@@ -55,12 +57,36 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
   async loadPhotos() {
     try {
       const photosData = await ApiService.getRecentPhotos()
-      console.log(photosData)
       this.photos = photosData
       console.log('✅ Photos loaded:', this.photos.length)
     } catch (error) {
       console.log('❌ Error loading photos:', error)
     }
+  }
+
+  @action.bound
+  async loadRegions() {
+    try {
+      const regionsData = await ApiService.getRegions()
+      // Создаем Map для быстрого поиска региона по ID
+      regionsData.forEach((region: any) => {
+        this.regionsMap.set(region.cid, region)
+      })
+      console.log('✅ Regions loaded:', regionsData.length)
+    } catch (error) {
+      console.log('❌ Error loading regions:', error)
+    }
+  }
+
+  // Helper метод для получения полного пути региона
+  getRegionPath(regionIds: number[]): string {
+    const names = regionIds
+      .map(id => {
+        const region = this.regionsMap.get(id)
+        return region?.title_local || region?.title_en
+      })
+      .filter(Boolean)
+    return names.join(' → ')
   }
 }
 

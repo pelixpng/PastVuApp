@@ -123,4 +123,15 @@ export default class ApiService {
       throw error
     }
   }
+
+  static async getRegions() {
+    try {
+      const result = await socketEmit('region.giveListPublic', undefined)
+      console.log(`🌍 Loaded ${result.regions.length} regions via Socket.IO`)
+      return result.regions
+    } catch (error) {
+      console.log('❌ Error loading regions:', error)
+      throw error
+    }
+  }
 }
