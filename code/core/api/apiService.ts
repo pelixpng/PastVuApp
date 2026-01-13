@@ -10,6 +10,7 @@ import {
 import { getColor } from '../utils/getColor'
 import { getAngle } from '../utils/getDirection'
 import { getMarker, getMarkerCluster } from '../utils/getMarker'
+import io from 'socket.io-client'
 
 const BASE_URL = 'https://api.pastvu.com/api2'
 const PLACE_API_URL = 'https://us1.locationiq.com/v1'
@@ -99,5 +100,33 @@ export default class ApiService {
       throw new Error(response.status.toString())
     }
     return (await response.json()) as LocationItem[]
+  }
+
+  static async getNews() {
+    return new Promise<any[]>((resolve, reject) => {
+      const socket = io('https://pastvu.com', {
+        path: '/socket.io/',
+        transports: ['polling', 'websocket'],
+        withCredentials: true,
+      })
+
+      socket.on('connect', () => {
+        console.log('✅ Connected via Socket.IO')
+        socket.emit('index.giveAllNews', undefined, (resp: any) => {
+          socket.disconnect()
+          if (resp?.result?.news) {
+            console.log(`📊 Loaded ${resp.result.news.length} news via Socket.IO`)
+            resolve(resp.result.news)
+          } else {
+            reject(new Error('No news in response'))
+          }
+        })
+      })
+
+      socket.on('connect_error', (error) => {
+        socket.disconnect()
+        reject(error)
+      })
+    })
   }
 }
