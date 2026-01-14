@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native'
 import { StackParamList } from './stackParams.types'
 import { SCREENS } from './navigation.types'
 import { MapScreen } from '../screens/home/map/Map.screen'
-import { PhotoHistoryScreen } from '../screens/home/photoHistory/PhotoHistory.screen'
+import { CollectionScreen } from '../screens/home/collection/Collection.screen'
 import { NewsScreen } from '../screens/home/news/News.screen'
 import { SettingsMenuScreen } from '../screens/settings/settingsMenu/SettingsMenu.screen'
 import { useTheme } from '@react-navigation/native'
@@ -54,7 +54,7 @@ export function BottomTabsNavigator() {
       />
       <Tab.Screen
         name={SCREENS.PHOTO_HISTORY}
-        component={PhotoHistoryScreen}
+        component={CollectionScreen}
         options={{
           title: 'Коллекция',
           headerTitle: 'Коллекция',

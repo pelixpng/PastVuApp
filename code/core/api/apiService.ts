@@ -105,7 +105,6 @@ export default class ApiService {
   static async getNews() {
     try {
       const result = await socketEmit('index.giveAllNews', undefined)
-      console.log(`📊 Loaded ${result.news.length} news via Socket.IO`)
       return result.news
     } catch (error) {
       console.log('❌ Error loading news:', error)
@@ -116,7 +115,6 @@ export default class ApiService {
   static async getRecentPhotos() {
     try {
       const result = await socketEmit('photo.givePublicIndex', undefined)
-      console.log(`📸 Loaded ${result.photos.length} recent photos via Socket.IO`)
       return result.photos
     } catch (error) {
       console.log('❌ Error loading photos:', error)
@@ -124,11 +122,14 @@ export default class ApiService {
     }
   }
 
-  static async getRegions() {
+  static async getRegions(): Promise<Map<number, any>> {
     try {
       const result = await socketEmit('region.giveListPublic', undefined)
-      console.log(`🌍 Loaded ${result.regions.length} regions via Socket.IO`)
-      return result.regions
+      const regionsMap = new Map<number, any>()
+      result.regions.forEach((region: any) => {
+        regionsMap.set(region.cid, region)
+      })
+      return regionsMap
     } catch (error) {
       console.log('❌ Error loading regions:', error)
       throw error

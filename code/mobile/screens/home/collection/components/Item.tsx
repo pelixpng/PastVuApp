@@ -5,14 +5,14 @@ import { s } from './style'
 import { useTheme } from '@react-navigation/native'
 import { Spacer } from '../../../../../core/components/ui/Spacer'
 
-type ItemHistoryProps = {
+export type PhotoListItemProps = {
   onPress: () => void
   title: string
   description: string
   file: string
 }
 
-export const ItemHistory: FC<ItemHistoryProps> = ({ title, description, file, onPress }) => {
+export const PhotoListItem: FC<PhotoListItemProps> = ({ title, description, file, onPress }) => {
   const { colors } = useTheme()
   return (
     <TouchableOpacity style={s.mainContainer} onPress={onPress}>

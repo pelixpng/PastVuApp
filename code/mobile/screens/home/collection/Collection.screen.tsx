@@ -1,23 +1,23 @@
 import { useCallback } from 'react'
-import { FlatList, StyleSheet, View } from 'react-native'
+import { FlatList, StyleSheet } from 'react-native'
 import { useFocusEffect, useTheme } from '@react-navigation/native'
 import { observer } from 'mobx-react'
-import PhotoHistoryVM, { CollectionTab } from './PhotoHistory.vm'
-import { ItemHistory } from './components/Item'
+import CollectionVM, { CollectionTab } from './Collection.vm'
+import { PhotoListItem } from './components/Item'
 import { MenuButton } from '../../../../core/components/ui/buttons/menuButton/MenuButton'
 import { Spacer } from '../../../../core/components/ui/Spacer'
 import { useVM } from '../../../../core/hooks/useVM'
 import { SegmentedControl } from '../../../../core/components/ui/segmentedControl/SegmentedControl'
 
-export interface HistoryItem {
+export interface CollectionItem {
   title: string
   description: string
   cid: string
   file: string
 }
 
-export const PhotoHistoryScreen = observer(() => {
-  const vm = useVM(PhotoHistoryVM)
+export const CollectionScreen = observer(() => {
+  const vm = useVM(CollectionVM)
   const { colors } = useTheme()
   useFocusEffect(
     useCallback(() => {
@@ -39,7 +39,7 @@ export const PhotoHistoryScreen = observer(() => {
       }
       ItemSeparatorComponent={() => <Spacer height={16} />}
       renderItem={({ item }) => (
-        <ItemHistory
+        <PhotoListItem
           title={item.title}
           description={item.description}
           file={item.file}

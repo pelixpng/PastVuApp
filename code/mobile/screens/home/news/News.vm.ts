@@ -3,14 +3,17 @@ import { SCREENS } from '../../../navigation/navigation.types'
 import { BaseViewModelProvider } from '../../../provider/vm.provider'
 import { SegmentedControlOption } from '../../../../core/components/ui/segmentedControl/SegmentedControl'
 import ApiService from '../../../../core/api/apiService'
-import { NewsItems } from '../../../../core/types/apiNews'
+import { NewsItems, NewsPhoto } from '../../../../core/types/apiNews'
+import { CollectionItem } from '../collection/Collection.screen'
+import { getRegionPath } from '../../../../core/utils/getRegionPath'
 
 export type NewsTab = 'posts' | 'photos'
 
 class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
   @observable selectedTab: NewsTab = 'posts'
   @observable news: NewsItems[] = []
-  @observable photos: any[] = []
+  @observable photos: NewsPhoto[] = []
+  @observable historyItems: CollectionItem[] = []
   @observable loading: boolean = true
   private regionsMap: Map<number, any> = new Map()
 
@@ -29,8 +32,8 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
 
   // ------------------------------------------ Computed ------------------------------------------
   @computed
-  get displayedData(): any[] {
-    return this.selectedTab === 'posts' ? this.news : this.photos
+  get displayedData(): NewsItems[] | CollectionItem[] {
+    return this.selectedTab === 'posts' ? this.news : this.historyItems
   }
 
   // ------------------------------------------ Actions ------------------------------------------
@@ -57,8 +60,12 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
   async loadPhotos() {
     try {
       const photosData = await ApiService.getRecentPhotos()
-      this.photos = photosData
-      console.log('✅ Photos loaded:', this.photos.length)
+      this.historyItems = photosData.map((photo: NewsPhoto) => ({
+        title: photo.title,
+        description: `${photo.year}, ${getRegionPath(photo.rs, this.regionsMap)}`,
+        cid: photo.cid.toString(),
+        file: photo.file,
+      }))
     } catch (error) {
       console.log('❌ Error loading photos:', error)
     }
@@ -67,26 +74,10 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
   @action.bound
   async loadRegions() {
     try {
-      const regionsData = await ApiService.getRegions()
-      // Создаем Map для быстрого поиска региона по ID
-      regionsData.forEach((region: any) => {
-        this.regionsMap.set(region.cid, region)
-      })
-      console.log('✅ Regions loaded:', regionsData.length)
+      this.regionsMap = await ApiService.getRegions()
     } catch (error) {
       console.log('❌ Error loading regions:', error)
     }
-  }
-
-  // Helper метод для получения полного пути региона
-  getRegionPath(regionIds: number[]): string {
-    const names = regionIds
-      .map(id => {
-        const region = this.regionsMap.get(id)
-        return region?.title_local || region?.title_en
-      })
-      .filter(Boolean)
-    return names.join(' → ')
   }
 }
 

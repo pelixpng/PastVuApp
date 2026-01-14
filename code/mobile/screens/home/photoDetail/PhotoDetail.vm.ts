@@ -1,6 +1,6 @@
 import { action, autorun, computed, makeObservable, observable } from 'mobx'
 import { SCREENS } from '../../../navigation/navigation.types'
-import { HistoryItem } from '../photoHistory/PhotoHistory.screen'
+import { CollectionItem } from '../collection/Collection.screen'
 import { Alert } from 'react-native'
 import { ExtensionStorage } from '@bacons/apple-targets'
 import { BaseViewModelProvider } from '../../../provider/vm.provider'
@@ -41,7 +41,7 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
       .then(async ({ result }) => {
         this.postInfo = result.photo
         const cid = this.screenParams.cid
-        const history: HistoryItem[] = MMKVStorage.get('History') ?? []
+        const history: CollectionItem[] = MMKVStorage.get('History') ?? []
         const title = result.photo.title
         const description = `${result.photo.y} ${result.photo.regions
           .map(region => region.title_local)
@@ -55,8 +55,7 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
           )
           ExtensionStorage.reloadWidget()
         }
-        // Проверяем, есть ли фото в избранном
-        const favorites: HistoryItem[] = MMKVStorage.get('Favorites') ?? []
+        const favorites: CollectionItem[] = MMKVStorage.get('Favorites') ?? []
         this.isFavorite = favorites.some(item => item.cid === cid)
 
         if (result.photo?.ccount) {
@@ -102,20 +101,18 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
   @action.bound
   toggleFavorite() {
     const cid = this.screenParams.cid
-    const favorites: HistoryItem[] = MMKVStorage.get('Favorites') ?? []
+    const favorites: CollectionItem[] = MMKVStorage.get('Favorites') ?? []
     const title = this.postInfo!.title
-    const description = `${this.postInfo!.y} ${this.postInfo!.regions
-      .map(region => region.title_local)
-      .join(', ')}`
+    const description = `${this.postInfo!.y} ${this.postInfo!.regions.map(
+      region => region.title_local,
+    ).join(', ')}`
     const file = this.postInfo!.file
 
     if (this.isFavorite) {
-      // Удаляем из избранного
       const updatedFavorites = favorites.filter(item => item.cid !== cid)
       MMKVStorage.set('Favorites', updatedFavorites)
       this.isFavorite = false
     } else {
-      // Добавляем в избранное
       MMKVStorage.set('Favorites', [{ title, description, cid, file }, ...favorites])
       this.isFavorite = true
     }

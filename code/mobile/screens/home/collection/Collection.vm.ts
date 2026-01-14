@@ -1,15 +1,15 @@
 import { action, computed, makeObservable, observable } from 'mobx'
 import { SCREENS } from '../../../navigation/navigation.types'
-import { HistoryItem } from './PhotoHistory.screen'
+import { CollectionItem } from './Collection.screen'
 import { BaseViewModelProvider } from '../../../provider/vm.provider'
 import { MMKVStorage } from '../../../../core/storage/mmkv'
 import { SegmentedControlOption } from '../../../../core/components/ui/segmentedControl/SegmentedControl'
 
 export type CollectionTab = 'favorites' | 'viewed'
 
-class PhotoHistoryVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
-  @observable.ref photos: HistoryItem[] = []
-  @observable.ref favorites: HistoryItem[] = []
+class CollectionVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
+  @observable.ref photos: CollectionItem[] = []
+  @observable.ref favorites: CollectionItem[] = []
   @observable selectedTab: CollectionTab = 'viewed'
 
   segmentOptions: SegmentedControlOption[] = [
@@ -23,7 +23,7 @@ class PhotoHistoryVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
   }
   // ------------------------------------------ Computed ------------------------------------------
   @computed
-  get displayedData(): HistoryItem[] {
+  get displayedData(): CollectionItem[] {
     return this.selectedTab === 'viewed' ? this.photos : this.favorites
   }
 
@@ -46,4 +46,4 @@ class PhotoHistoryVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
   }
 }
 
-export default PhotoHistoryVM
+export default CollectionVM
