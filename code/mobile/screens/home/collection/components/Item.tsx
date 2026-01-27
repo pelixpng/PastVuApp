@@ -23,7 +23,7 @@ export const PhotoListItem: FC<PhotoListItemProps> = ({
 }) => {
   const { colors } = useTheme()
   return (
-    <TouchableOpacity style={s.mainContainer} onPress={onPress}>
+    <TouchableOpacity style={s.mainContainer} onPress={onPress} onLongPress={onRemove}>
       <Image
         source={{ uri: `https://img.pastvu.com/h/${file}` }}
         style={s.image}
