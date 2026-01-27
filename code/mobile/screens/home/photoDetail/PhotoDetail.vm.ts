@@ -1,7 +1,7 @@
 import { action, autorun, computed, makeObservable, observable } from 'mobx'
 import { SCREENS } from '../../../navigation/navigation.types'
 import { CollectionItem } from '../collection/Collection.screen'
-import { Alert } from 'react-native'
+import { Alert, Linking } from 'react-native'
 import { ExtensionStorage } from '@bacons/apple-targets'
 import { BaseViewModelProvider } from '../../../provider/vm.provider'
 import { IComment, Users } from '../../../../core/types/apiPhotoComment'
@@ -17,12 +17,17 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
   @observable postInfo: Photo | null = null
   @observable isImageLoaded = false
   @observable isFavorite = false
+  @observable activeCid: string | null = null
+  @observable.ref cidHistory: string[] = []
 
   constructor() {
     super()
     makeObservable(this)
     autorun(() => {
-      this.screenParams?.cid && this.getPhotoInfo()
+      if (this.screenParams?.cid) {
+        this.activeCid = this.screenParams.cid
+        this.getPhotoInfo()
+      }
     })
   }
 
@@ -33,14 +38,19 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
     return `https://img.pastvu.com/${ApiStore.photoQualitySettings}/${this.postInfo?.file}`
   }
 
+  @computed
+  get canGoBack() {
+    return this.cidHistory.length > 0
+  }
+
   // ------------------------------------------ Actions ------------------------------------------
 
   @action.bound
   async getPhotoInfo() {
-    await ApiService.getPhotoInfo(this.screenParams.cid)
+    await ApiService.getPhotoInfo(this.activeCid!)
       .then(async ({ result }) => {
         this.postInfo = result.photo
-        const cid = this.screenParams.cid
+        const cid = this.activeCid!
         const history: CollectionItem[] = MMKVStorage.get('History') ?? []
         const title = result.photo.title
         const description = `${result.photo.y} ${result.photo.regions
@@ -67,7 +77,7 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
 
   @action.bound
   async getComments() {
-    await ApiService.getComments(this.screenParams.cid).then(({ users, comments }) => {
+    await ApiService.getComments(this.activeCid!).then(({ users, comments }) => {
       this.users = users
       this.comments = comments
     })
@@ -77,7 +87,7 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
   openFullScreenImage() {
     this.navigateTo(SCREENS.FULL_SCREEN_IMAGE, {
       title: this.postInfo!.title,
-      cid: this.screenParams.cid,
+      cid: this.activeCid!,
       uri: this.imageLink,
       file: this.postInfo!.file,
     })
@@ -85,7 +95,7 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
 
   @action.bound
   share() {
-    sharePhoto(this.postInfo!.title, this.screenParams.cid)
+    sharePhoto(this.postInfo!.title, this.activeCid!)
   }
 
   @action.bound
@@ -100,7 +110,7 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
 
   @action.bound
   toggleFavorite() {
-    const cid = this.screenParams.cid
+    const cid = this.activeCid!
     const favorites: CollectionItem[] = MMKVStorage.get('Favorites') ?? []
     const title = this.postInfo!.title
     const description = `${this.postInfo!.y} ${this.postInfo!.regions.map(
@@ -116,6 +126,32 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
       MMKVStorage.set('Favorites', [{ title, description, cid, file }, ...favorites])
       this.isFavorite = true
     }
+  }
+
+  @action.bound
+  openPhotoFromLink(href: string) {
+    const match = href.match(/\/p\/(\d+)/)
+    if (match) {
+      this.cidHistory = [...this.cidHistory, this.activeCid!]
+      this.activeCid = match[1]
+      this.isImageLoaded = false
+      this.comments = []
+      this.getPhotoInfo()
+    } else {
+      Linking.openURL(href)
+    }
+  }
+
+  @action.bound
+  goBackToPhoto() {
+    if (this.cidHistory.length === 0) return false
+    const previousCid = this.cidHistory[this.cidHistory.length - 1]
+    this.cidHistory = this.cidHistory.slice(0, -1)
+    this.activeCid = previousCid
+    this.isImageLoaded = false
+    this.comments = []
+    this.getPhotoInfo()
+    return true
   }
 }
 

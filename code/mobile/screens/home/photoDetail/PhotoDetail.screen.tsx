@@ -2,11 +2,12 @@ import { FlatList, StyleSheet, Text, View } from 'react-native'
 import { observer } from 'mobx-react'
 import { Comment } from './components/comment/Comment'
 import PhotoDetailVM from './PhotoDetail.vm'
+import { IComment } from '../../../../core/types/apiPhotoComment'
 import { Container } from '../../../../core/components/ui/Container'
 import { useNavigation, useTheme } from '@react-navigation/native'
 import { PostInfo } from './components/postInfo/PostInfo'
 import { Spacer } from '../../../../core/components/ui/Spacer'
-import { useCallback, useLayoutEffect } from 'react'
+import { useCallback, useEffect, useLayoutEffect } from 'react'
 import { MaterialIcons } from '@expo/vector-icons'
 import { ImageZoom } from './components/imageView/ImageZoom'
 import { useVM } from '../../../../core/hooks/useVM'
@@ -14,7 +15,12 @@ import { useVM } from '../../../../core/hooks/useVM'
 export const PhotoDetailScreen = observer(() => {
   const vm = useVM(PhotoDetailVM)
   const { colors } = useTheme()
-  const renderItem = useCallback(({ item }) => <Comment comment={item} users={vm.users} />, [])
+  const renderItem = useCallback(
+    ({ item }: { item: IComment }) => (
+      <Comment comment={item} users={vm.users} onLinkPress={vm.openPhotoFromLink} />
+    ),
+    [],
+  )
   const navigation = useNavigation()
   useLayoutEffect(() => {
     if (!vm.postInfo) return
@@ -41,6 +47,15 @@ export const PhotoDetailScreen = observer(() => {
     })
   }, [vm.postInfo, vm.isFavorite, colors.textFirst, navigation])
 
+  useEffect(() => {
+    return navigation.addListener('beforeRemove', e => {
+      if (vm.canGoBack) {
+        e.preventDefault()
+        vm.goBackToPhoto()
+      }
+    })
+  }, [navigation, vm.canGoBack])
+
   if (!vm.postInfo && !vm.users) {
     return (
       <Container>
@@ -61,7 +76,7 @@ export const PhotoDetailScreen = observer(() => {
           showsVerticalScrollIndicator={false}
           data={vm.comments}
           renderItem={renderItem}
-          ListHeaderComponent={<PostInfo postInfo={vm.postInfo!} />}
+          ListHeaderComponent={<PostInfo postInfo={vm.postInfo!} onLinkPress={vm.openPhotoFromLink} />}
           style={s.listStyle}
           keyExtractor={item => item.cid}
         />

@@ -8,9 +8,10 @@ import { formatDate } from '../../../../../../core/utils/getTime'
 
 type PostInfoProps = {
   postInfo: Photo
+  onLinkPress?: (href: string) => void
 }
 
-export const PostInfo: FC<PostInfoProps> = ({ postInfo }) => {
+export const PostInfo: FC<PostInfoProps> = ({ postInfo, onLinkPress }) => {
   const { colors } = useTheme()
   const commentTotal = postInfo.ccount || 0
   const titlesRegion = postInfo.regions?.map(region => region.title_local).join(', ')
@@ -44,9 +45,12 @@ export const PostInfo: FC<PostInfoProps> = ({ postInfo }) => {
           }}
           tagsStyles={{
             a: {
-              color: colors.primary,
+              color: colors.basePrimary,
               textDecorationLine: 'underline',
             },
+          }}
+          renderersProps={{
+            a: { onPress: (_, href) => onLinkPress?.(href) },
           }}
         />
       )}
@@ -67,9 +71,12 @@ export const PostInfo: FC<PostInfoProps> = ({ postInfo }) => {
             fontWeight: '500',
           },
           a: {
-            color: colors.primary,
+            color: colors.basePrimary,
             textDecorationLine: 'underline',
           },
+        }}
+        renderersProps={{
+          a: { onPress: (_, href) => onLinkPress?.(href) },
         }}
       />
       <RenderHTML
@@ -88,9 +95,12 @@ export const PostInfo: FC<PostInfoProps> = ({ postInfo }) => {
             fontWeight: '500',
           },
           a: {
-            color: colors.primary,
+            color: colors.basePrimary,
             textDecorationLine: 'underline',
           },
+        }}
+        renderersProps={{
+          a: { onPress: (_, href) => onLinkPress?.(href) },
         }}
       />
       <Spacer height={8} />
