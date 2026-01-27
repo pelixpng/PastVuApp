@@ -9,7 +9,6 @@ import type { CollectionItem } from '../collection/Collection.screen'
 import { PhotoListItem } from '../collection/components/Item'
 import { Spacer } from '../../../../core/components/ui/Spacer'
 import { PostListItem } from './components/PostListItem/PostListItem'
-//import {} from '@react-navigation/'
 
 export const NewsScreen = observer(() => {
   const vm = useVM(NewsVM)
@@ -17,11 +16,13 @@ export const NewsScreen = observer(() => {
 
   return (
     <View style={[{ backgroundColor: colors.backgroundApp }, s.container]}>
+      <Spacer height={18} />
       <SegmentedControl
         options={vm.segmentOptions}
         selectedValue={vm.selectedTab}
         onChange={value => vm.setSelectedTab(value as NewsTab)}
       />
+      <Spacer height={16} />
       <View style={s.listContainer}>
         <View style={[s.list, vm.selectedTab === 'posts' ? s.listVisible : s.listHidden]}>
           <FlatList<NewsItems>

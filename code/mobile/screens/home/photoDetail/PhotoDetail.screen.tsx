@@ -24,7 +24,7 @@ export const PhotoDetailScreen = observer(() => {
           <MaterialIcons
             name={vm.isFavorite ? 'favorite' : 'favorite-border'}
             size={24}
-            color={vm.isFavorite ? '#FF6B6B' : colors.textFirst}
+            color={colors.textFirst}
             onPress={vm.toggleFavorite}
           />
           <Spacer width={24} />

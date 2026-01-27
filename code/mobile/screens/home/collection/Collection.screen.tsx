@@ -31,11 +31,15 @@ export const CollectionScreen = observer(() => {
       style={[{ backgroundColor: colors.backgroundApp }, s.container]}
       keyExtractor={item => item.cid}
       ListHeaderComponent={
-        <SegmentedControl
-          options={vm.segmentOptions}
-          selectedValue={vm.selectedTab}
-          onChange={value => vm.setSelectedTab(value as CollectionTab)}
-        />
+        <>
+          <Spacer height={18} />
+          <SegmentedControl
+            options={vm.segmentOptions}
+            selectedValue={vm.selectedTab}
+            onChange={value => vm.setSelectedTab(value as CollectionTab)}
+          />
+          <Spacer height={16} />
+        </>
       }
       ItemSeparatorComponent={() => <Spacer height={16} />}
       renderItem={({ item }) => (
@@ -44,6 +48,7 @@ export const CollectionScreen = observer(() => {
           description={item.description}
           file={item.file}
           onPress={() => vm.openPhoto(item.cid, item.title)}
+          onRemove={() => vm.removePhoto(item.cid)}
         />
       )}
       ListEmptyComponent={

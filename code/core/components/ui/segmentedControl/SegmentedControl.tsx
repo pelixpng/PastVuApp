@@ -112,11 +112,7 @@ const SegmentItem: FC<SegmentItemProps> = ({
   }, [isSelected, animation])
 
   const animatedTextStyle = useAnimatedStyle(() => {
-    const color = interpolateColor(
-      animation.value,
-      [0, 1],
-      [colors.textSecond, colors.textFirst],
-    )
+    const color = interpolateColor(animation.value, [0, 1], [colors.textSecond, colors.textFirst])
 
     return { color }
   })
@@ -137,8 +133,8 @@ const SegmentItem: FC<SegmentItemProps> = ({
 const s = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    borderRadius: 16,
-    padding: 6,
+    borderRadius: 99,
+    padding: 4,
     gap: 6,
     position: 'relative',
   },
@@ -147,7 +143,7 @@ const s = StyleSheet.create({
     left: 6,
     top: 6,
     bottom: 6,
-    borderRadius: 12,
+    borderRadius: 99,
     shadowColor: 'rgba(0, 0, 0, 0.1)',
     shadowOpacity: 1,
     shadowRadius: 4,
@@ -158,23 +154,22 @@ const s = StyleSheet.create({
     flex: 1,
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
   },
   segmentBackground: {
-    borderRadius: 12,
+    borderRadius: 0,
   },
   segmentFirst: {},
   segmentLast: {},
   segmentSelected: {},
   segmentText: {
-    fontSize: 15,
+    fontSize: 13,
     lineHeight: 20,
     fontWeight: '500',
   },
   segmentTextSelected: {
-    fontWeight: '600',
+    fontWeight: '800',
   },
 })

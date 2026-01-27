@@ -1,6 +1,7 @@
 import { FC } from 'react'
 import { Image } from 'expo-image'
 import { Alert, TouchableOpacity, View, Text } from 'react-native'
+import { MaterialIcons, Feather } from '@expo/vector-icons'
 import { s } from './style'
 import { useTheme } from '@react-navigation/native'
 import { Spacer } from '../../../../../core/components/ui/Spacer'
@@ -10,9 +11,16 @@ export type PhotoListItemProps = {
   title: string
   description: string
   file: string
+  onRemove?: () => void
 }
 
-export const PhotoListItem: FC<PhotoListItemProps> = ({ title, description, file, onPress }) => {
+export const PhotoListItem: FC<PhotoListItemProps> = ({
+  title,
+  description,
+  file,
+  onPress,
+  onRemove,
+}) => {
   const { colors } = useTheme()
   return (
     <TouchableOpacity style={s.mainContainer} onPress={onPress}>
@@ -32,6 +40,11 @@ export const PhotoListItem: FC<PhotoListItemProps> = ({ title, description, file
           {description}
         </Text>
       </View>
+      {onRemove && (
+        <TouchableOpacity style={s.removeButton} onPress={onRemove}>
+          <Feather name="more-horizontal" size={25} color={colors.textThird} />
+        </TouchableOpacity>
+      )}
     </TouchableOpacity>
   )
 }

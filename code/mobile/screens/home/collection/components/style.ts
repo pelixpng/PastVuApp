@@ -6,8 +6,11 @@ export const s = StyleSheet.create({
     height: 80,
     borderRadius: 16,
   },
-  mainContainer: { flexDirection: 'row' },
+  mainContainer: { flexDirection: 'row', alignItems: 'center' },
   infoContainer: { flex: 1 },
+  removeButton: {
+    padding: 6,
+  },
   titleText: {
     fontSize: 13,
     lineHeight: 20,

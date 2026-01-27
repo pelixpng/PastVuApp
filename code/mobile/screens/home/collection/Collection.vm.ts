@@ -10,11 +10,11 @@ export type CollectionTab = 'favorites' | 'viewed'
 class CollectionVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
   @observable.ref photos: CollectionItem[] = []
   @observable.ref favorites: CollectionItem[] = []
-  @observable selectedTab: CollectionTab = 'viewed'
+  @observable selectedTab: CollectionTab = 'favorites'
 
   segmentOptions: SegmentedControlOption[] = [
     { label: 'Избранное', value: 'favorites' },
-    { label: 'Просмотренное', value: 'viewed' },
+    { label: 'Просмотренн', value: 'viewed' },
   ]
 
   constructor() {
@@ -43,6 +43,17 @@ class CollectionVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
   @action.bound
   openPhoto(cid: string, title: string) {
     this.navigateTo(SCREENS.PHOTO_DETAIL, { cid: cid, title: title })
+  }
+
+  @action.bound
+  removePhoto(cid: string) {
+    if (this.selectedTab === 'viewed') {
+      this.photos = this.photos.filter(photo => photo.cid !== cid)
+      MMKVStorage.set('History', this.photos)
+    } else {
+      this.favorites = this.favorites.filter(photo => photo.cid !== cid)
+      MMKVStorage.set('Favorites', this.favorites)
+    }
   }
 }
 

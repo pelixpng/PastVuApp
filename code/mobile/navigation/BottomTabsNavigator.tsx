@@ -35,15 +35,6 @@ export function BottomTabsNavigator() {
         tabBarLabelStyle: s.tabBarLabelStyle,
       }}>
       <Tab.Screen
-        name={SCREENS.NEWS}
-        component={NewsScreen}
-        options={{
-          title: 'Новости',
-          headerTitle: 'Новости',
-          tabBarIcon: ({ color }) => <MaterialIcons name="article" size={24} color={color} />,
-        }}
-      />
-      <Tab.Screen
         name={SCREENS.MAP}
         component={MapScreen}
         options={{
@@ -59,6 +50,15 @@ export function BottomTabsNavigator() {
           title: 'Коллекция',
           headerTitle: 'Коллекция',
           tabBarIcon: ({ color }) => <MaterialIcons name="favorite" size={24} color={color} />,
+        }}
+      />
+      <Tab.Screen
+        name={SCREENS.NEWS}
+        component={NewsScreen}
+        options={{
+          title: 'Новости',
+          headerTitle: 'Новости',
+          tabBarIcon: ({ color }) => <MaterialIcons name="article" size={24} color={color} />,
         }}
       />
       <Tab.Screen
