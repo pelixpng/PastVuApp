@@ -11,6 +11,8 @@ class CollectionVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
   @observable.ref photos: CollectionItem[] = []
   @observable.ref favorites: CollectionItem[] = []
   @observable selectedTab: CollectionTab = 'favorites'
+  @observable isDeleteModalVisible = false
+  @observable pendingDeleteCid: string | null = null
 
   segmentOptions: SegmentedControlOption[] = [
     { label: 'Избранное', value: 'favorites' },
@@ -25,6 +27,13 @@ class CollectionVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
   @computed
   get displayedData(): CollectionItem[] {
     return this.selectedTab === 'viewed' ? this.photos : this.favorites
+  }
+
+  @computed
+  get deleteConfirmationTitle(): string {
+    return this.selectedTab === 'viewed'
+      ? 'Удалить запись из истории?'
+      : 'Удалить запись из избранного?'
   }
 
   // ------------------------------------------ Actions ------------------------------------------
@@ -46,14 +55,29 @@ class CollectionVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
   }
 
   @action.bound
-  removePhoto(cid: string) {
+  showDeleteConfirmation(cid: string) {
+    this.pendingDeleteCid = cid
+    this.isDeleteModalVisible = true
+  }
+
+  @action.bound
+  hideDeleteConfirmation() {
+    this.isDeleteModalVisible = false
+    this.pendingDeleteCid = null
+  }
+
+  @action.bound
+  confirmDelete() {
+    if (!this.pendingDeleteCid) return
+
     if (this.selectedTab === 'viewed') {
-      this.photos = this.photos.filter(photo => photo.cid !== cid)
+      this.photos = this.photos.filter(photo => photo.cid !== this.pendingDeleteCid)
       MMKVStorage.set('History', this.photos)
     } else {
-      this.favorites = this.favorites.filter(photo => photo.cid !== cid)
+      this.favorites = this.favorites.filter(photo => photo.cid !== this.pendingDeleteCid)
       MMKVStorage.set('Favorites', this.favorites)
     }
+    this.hideDeleteConfirmation()
   }
 }
 

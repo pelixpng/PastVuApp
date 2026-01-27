@@ -79,6 +79,11 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
       console.log('❌ Error loading regions:', error)
     }
   }
+
+  @action.bound
+  openPhoto(cid: string, title: string) {
+    this.navigateTo(SCREENS.PHOTO_DETAIL, { cid: cid, title: title })
+  }
 }
 
 export default NewsVM

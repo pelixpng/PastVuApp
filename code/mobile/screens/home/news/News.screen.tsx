@@ -60,7 +60,7 @@ export const NewsScreen = observer(() => {
                 title={item.title}
                 description={item.description}
                 file={item.file}
-                onPress={() => {}}
+                onPress={() => vm.openPhoto(item.cid, item.title)}
               />
             )}
             ListEmptyComponent={
