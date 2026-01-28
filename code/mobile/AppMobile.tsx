@@ -20,6 +20,7 @@ import { PhotoDetailScreen } from './screens/home/photoDetail/PhotoDetail.screen
 import { AboutAppScreen } from './screens/settings/aboutApp/AboutApp.screen'
 import { AppSettingsScreen } from './screens/settings/appSettings/AppSettings.screen'
 import { SupportContactsScreen } from './screens/settings/supportContacts/SupportContacts.screen'
+import { NewsPostScreen } from './screens/home/newsPost/NewsPost.screen'
 
 export const Stack = createStackNavigator<StackParamList>()
 export let NavigationRef = createRef<NavigationContainerRef<ParamListBase>>()
@@ -104,6 +105,7 @@ export default observer(function AppMobile() {
             headerTitle: 'Обратная связь',
           }}
         />
+        <Stack.Screen name={SCREENS.NEWS_POST} component={NewsPostScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   )

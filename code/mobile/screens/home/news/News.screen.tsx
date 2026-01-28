@@ -36,7 +36,7 @@ export const NewsScreen = observer(() => {
                 pdate={item.pdate}
                 ccount={item.ccount}
                 user={item.user}
-                onPress={() => {}}
+                onPress={() => vm.openPost(item)}
               />
             )}
             ListEmptyComponent={

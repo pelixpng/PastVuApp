@@ -84,6 +84,11 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
   openPhoto(cid: string, title: string) {
     this.navigateTo(SCREENS.PHOTO_DETAIL, { cid: cid, title: title })
   }
+
+  @action.bound
+  openPost(post: NewsItems) {
+    this.navigateTo(SCREENS.NEWS_POST, post)
+  }
 }
 
 export default NewsVM

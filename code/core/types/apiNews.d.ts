@@ -7,6 +7,7 @@ export interface NewsUser {
 export interface NewsItems {
   _id: string
   title: string
+  txt: string
   cid: number
   pdate: string
   notice: string
