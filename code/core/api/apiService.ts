@@ -112,6 +112,27 @@ export default class ApiService {
     }
   }
 
+  static async getNewsComments(cid: number) {
+    try {
+      const result = await socketEmit('comment.giveForObj', { cid, type: 'news' })
+      let convertComments: IComment[] = []
+      function getConvertComments(comments: IComment[]) {
+        for (let comment of comments) {
+          convertComments.push(comment)
+          comment.comments && getConvertComments(comment.comments)
+        }
+      }
+      getConvertComments(result.comments)
+      return {
+        users: result.users,
+        comments: convertComments,
+      }
+    } catch (error) {
+      console.log('❌ Error loading news comments:', error)
+      throw error
+    }
+  }
+
   static async getRecentPhotos() {
     try {
       const result = await socketEmit('photo.givePublicIndex', undefined)

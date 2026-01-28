@@ -1,5 +1,5 @@
 import { action, autorun, computed, makeObservable, observable } from 'mobx'
-import { Linking } from 'react-native'
+import { Linking, Share } from 'react-native'
 import { SCREENS } from '../../../navigation/navigation.types'
 import { BaseViewModelProvider } from '../../../provider/vm.provider'
 import { IComment, Users } from '../../../../core/types/apiPhotoComment'
@@ -30,14 +30,13 @@ class NewsPostVM extends BaseViewModelProvider<SCREENS.NEWS_POST> {
 
   @action.bound
   async getComments() {
-    // try {. не работает
-    //   const { users, comments } = await ApiService.getComments(this.screenParams.cid.toString())
-    //   console.log('Loaded comments:', comments)
-    //   this.users = users
-    //   this.comments = comments
-    // } catch (error) {
-    //   console.log('Error loading comments:', error)
-    // }
+    try {
+      const { users, comments } = await ApiService.getNewsComments(this.screenParams.cid)
+      this.users = users
+      this.comments = comments
+    } catch (error) {
+      console.log('Error loading news comments:', error)
+    }
   }
 
   @action.bound
@@ -49,6 +48,13 @@ class NewsPostVM extends BaseViewModelProvider<SCREENS.NEWS_POST> {
     } else {
       Linking.openURL(href)
     }
+  }
+
+  @action.bound
+  share() {
+    Share.share({
+      message: `${this.screenParams.title}: https://pastvu.com/news/${this.screenParams.cid}`,
+    })
   }
 }
 

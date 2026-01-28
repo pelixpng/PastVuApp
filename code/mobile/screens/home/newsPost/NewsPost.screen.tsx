@@ -1,9 +1,10 @@
 import { FlatList, StyleSheet, Text, View } from 'react-native'
 import { observer } from 'mobx-react'
 import { Image } from 'expo-image'
-import { useTheme } from '@react-navigation/native'
+import { useNavigation, useTheme } from '@react-navigation/native'
 import RenderHTML from 'react-native-render-html'
-import { useCallback } from 'react'
+import { useCallback, useLayoutEffect } from 'react'
+import { MaterialIcons } from '@expo/vector-icons'
 import NewsPostVM from './NewsPost.vm'
 import { Comment } from '../photoDetail/components/comment/Comment'
 import { Container } from '../../../../core/components/ui/Container'
@@ -16,6 +17,21 @@ import StandardAvatar from '../../../../assets/avatar.png'
 export const NewsPostScreen = observer(() => {
   const vm = useVM(NewsPostVM)
   const { colors } = useTheme()
+  const navigation = useNavigation()
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <MaterialIcons
+          name="share"
+          size={24}
+          color={colors.textFirst}
+          onPress={vm.share}
+          style={s.shareIcon}
+        />
+      ),
+    })
+  }, [colors.textFirst, navigation, vm.share])
 
   const renderItem = useCallback(
     ({ item }: { item: IComment }) => (
@@ -89,6 +105,9 @@ export const NewsPostScreen = observer(() => {
 const s = StyleSheet.create({
   list: {
     paddingHorizontal: 16,
+  },
+  shareIcon: {
+    marginRight: 16,
   },
   headerContainer: {
     paddingTop: 16,
