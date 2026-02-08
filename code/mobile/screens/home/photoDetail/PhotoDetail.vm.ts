@@ -129,14 +129,28 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
   }
 
   @action.bound
-  openPhotoFromLink(href: string) {
-    const match = href.match(/\/p\/(\d+)/)
-    if (match) {
+  async openPhotoFromLink(href: string) {
+    const photoMatch = href.match(/\/p\/(\d+)/)
+    const newsMatch = href.match(/\/news\/(\d+)/)
+    if (photoMatch) {
       this.cidHistory = [...this.cidHistory, this.activeCid!]
-      this.activeCid = match[1]
+      this.activeCid = photoMatch[1]
       this.isImageLoaded = false
       this.comments = []
       this.getPhotoInfo()
+    } else if (newsMatch) {
+      try {
+        const cid = Number(newsMatch[1])
+        const news = await ApiService.getNews()
+        const post = news.find((n: { cid: number }) => n.cid === cid)
+        if (post) {
+          this.navigateTo(SCREENS.NEWS_POST, post)
+        } else {
+          Linking.openURL(`https://pastvu.com/news/${cid}`)
+        }
+      } catch {
+        Linking.openURL(`https://pastvu.com/news/${newsMatch[1]}`)
+      }
     } else {
       Linking.openURL(href)
     }
