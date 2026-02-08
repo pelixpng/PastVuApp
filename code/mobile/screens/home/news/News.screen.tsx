@@ -27,7 +27,7 @@ export const NewsScreen = observer(() => {
         <View style={[s.list, vm.selectedTab === 'posts' ? s.listVisible : s.listHidden]}>
           <FlatList<NewsItems>
             data={vm.news}
-            ItemSeparatorComponent={() => <Spacer height={16} />}
+            ItemSeparatorComponent={() => <Spacer height={8} />}
             keyExtractor={item => item._id}
             renderItem={({ item }) => (
               <PostListItem

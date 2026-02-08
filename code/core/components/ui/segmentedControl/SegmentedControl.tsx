@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react'
-import { View, Text, TouchableOpacity, StyleSheet, LayoutChangeEvent } from 'react-native'
+import { View, TouchableOpacity, StyleSheet, LayoutChangeEvent } from 'react-native'
 import { useTheme } from '@react-navigation/native'
 import Animated, {
   useSharedValue,
@@ -153,7 +153,7 @@ const s = StyleSheet.create({
   segment: {
     flex: 1,
     paddingVertical: 10,
-    paddingHorizontal: 20,
+    //paddingHorizontal: 20,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',

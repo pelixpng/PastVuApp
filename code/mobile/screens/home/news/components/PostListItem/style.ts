@@ -3,8 +3,7 @@ import { StyleSheet } from 'react-native'
 export const s = StyleSheet.create({
   mainContainer: {
     padding: 16,
-    borderRadius: 12,
-    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+    borderRadius: 16,
   },
   infoContainer: {
     flex: 1,
@@ -16,22 +15,33 @@ export const s = StyleSheet.create({
   avatar: {
     width: 32,
     height: 32,
-    borderRadius: 16,
+    borderRadius: 99,
   },
   userNameText: {
     fontSize: 13,
     lineHeight: 20,
-    fontWeight: '600',
+    fontWeight: '800',
   },
   titleText: {
     fontSize: 15,
     lineHeight: 22,
-    fontWeight: '700',
+    fontWeight: '800',
   },
-  noticeText: {
-    fontWeight: '400',
-    fontSize: 14,
+  noticeContainer: {
+    maxHeight: 60,
+    overflow: 'hidden',
+  },
+  showMoreText: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    fontWeight: '800',
+    fontSize: 13,
     lineHeight: 20,
+    paddingLeft: 4,
+    shadowOffset: { width: -20, height: 0 },
+    shadowOpacity: 1,
+    shadowRadius: 6,
   },
   footerContainer: {
     flexDirection: 'row',

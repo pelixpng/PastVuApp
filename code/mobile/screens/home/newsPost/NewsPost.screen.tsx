@@ -52,17 +52,20 @@ export const NewsPostScreen = observer(() => {
           cachePolicy="disk"
         />
         <Spacer width={8} />
-        <Text style={[s.userName, { color: colors.textFirst }]}>
-          {vm.post?.user?.disp || vm.post?.user?.login}
-        </Text>
+        <View>
+          <Text style={[s.userName, { color: colors.textFirst }]}>
+            {vm.post?.user?.disp || vm.post?.user?.login}
+          </Text>
+          <Text style={[s.date, { color: colors.textThird }]}>{formattedDate}</Text>
+        </View>
       </View>
       <Spacer height={12} />
       <Text style={[s.title, { color: colors.textFirst }]}>{vm.post?.title}</Text>
-      <Spacer height={8} />
+      <Spacer height={12} />
       <RenderHTML
         source={{ html: `<p>${vm.post?.txt || ''}</p>` }}
         baseStyle={{
-          fontSize: 14,
+          fontSize: 13,
           lineHeight: 20,
           color: colors.textSecond,
         }}
@@ -76,9 +79,7 @@ export const NewsPostScreen = observer(() => {
           a: { onPress: (_, href) => vm.openPhotoFromLink(href) },
         }}
       />
-      <Spacer height={12} />
-      <Text style={[s.date, { color: colors.textThird }]}>{formattedDate}</Text>
-      <Spacer height={16} />
+      <Spacer height={24} />
       <View style={s.commentsHeader}>
         <Text style={[s.commentsTitle, { color: colors.textFirst }]}>Комментарии </Text>
         <Text style={[s.commentsCount, { color: colors.textThird }]}>{vm.post?.ccount || 0}</Text>
@@ -110,38 +111,41 @@ const s = StyleSheet.create({
     marginRight: 16,
   },
   headerContainer: {
-    paddingTop: 16,
+    paddingTop: 18,
   },
   userRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   avatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 99,
   },
   userName: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 13,
+    lineHeight: 20,
+    fontWeight: '800',
   },
   title: {
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 20,
+    fontWeight: '800',
     lineHeight: 24,
   },
   date: {
     fontSize: 13,
+    lineHeight: 20,
+    fontWeight: '500',
   },
   commentsHeader: {
     flexDirection: 'row',
   },
   commentsTitle: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 17,
+    fontWeight: '800',
   },
   commentsCount: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 17,
+    fontWeight: '800',
   },
 })

@@ -16,6 +16,7 @@ export interface CustomTheme extends Theme {
     selectedItem: string
     basePrimary: string
     baseFourth: string
+    baseFifth: string
     MapTheme: any
     markerBorder: string
   }
@@ -36,6 +37,7 @@ export const LightTheme: CustomTheme = {
     baseThird: '#EDEDED',
     basePrimary: '#428BF9',
     baseFourth: '#EDEDED',
+    baseFifth: '#F6F6F6',
     selectedItem: '#E8F1FF',
     MapTheme: MapLight,
     markerBorder: 'rgba(0, 0, 0, 0.20)',
@@ -57,6 +59,7 @@ export const DarkTheme: CustomTheme = {
     baseThird: '#232325',
     basePrimary: '#428BF9',
     baseFourth: '#444444',
+    baseFifth: '#202020',
     selectedItem: '#202020',
     MapTheme: MapDark,
     markerBorder: 'rgba(0, 0, 0, 0.50)',

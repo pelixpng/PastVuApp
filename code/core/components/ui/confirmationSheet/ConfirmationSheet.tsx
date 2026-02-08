@@ -1,7 +1,13 @@
 import { FC, useEffect } from 'react'
 import { Modal, Text, TouchableOpacity, StyleSheet, Pressable } from 'react-native'
 import { useTheme } from '@react-navigation/native'
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 'react-native-reanimated'
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  runOnJS,
+} from 'react-native-reanimated'
+import { Spacer } from '../Spacer'
 
 export interface ConfirmationSheetProps {
   visible: boolean
@@ -57,14 +63,17 @@ export const ConfirmationSheet: FC<ConfirmationSheetProps> = ({
     <Modal visible={visible} transparent animationType="none" onRequestClose={handleClose}>
       <Animated.View style={[s.overlay, overlayStyle]}>
         <Pressable style={s.overlayPressable} onPress={handleClose} />
-        <Animated.View style={[s.container, { backgroundColor: colors.baseSecond }, containerStyle]}>
-          <Text style={[s.title, { color: colors.textSecond }]}>{title}</Text>
+        <Animated.View
+          style={[s.container, { backgroundColor: colors.baseSecond }, containerStyle]}>
+          <Text style={[s.title, { color: colors.textThird }]}>{title}</Text>
+          <Spacer height={17} />
           <TouchableOpacity
-            style={[s.button, { borderColor: colors.baseThird }]}
+            style={[s.button, { backgroundColor: colors.baseFourth }]}
             onPress={handleConfirm}
             activeOpacity={0.7}>
             <Text style={[s.confirmText, { color: colors.textFirst }]}>{confirmText}</Text>
           </TouchableOpacity>
+          <Spacer height={8} />
           <TouchableOpacity style={s.cancelButton} onPress={handleClose} activeOpacity={0.7}>
             <Text style={[s.cancelText, { color: colors.textFirst }]}>{cancelText}</Text>
           </TouchableOpacity>
@@ -77,40 +86,39 @@ export const ConfirmationSheet: FC<ConfirmationSheetProps> = ({
 const s = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'flex-end',
   },
   overlayPressable: {
     flex: 1,
   },
   container: {
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    paddingBottom: 34,
-    paddingTop: 24,
-    paddingHorizontal: 16,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingBottom: 16,
+    paddingTop: 29,
+    paddingHorizontal: 24,
   },
   title: {
-    fontSize: 16,
+    fontSize: 13,
     textAlign: 'center',
-    marginBottom: 16,
+    fontWeight: '500',
   },
   button: {
-    paddingVertical: 16,
+    paddingVertical: 10,
     borderRadius: 12,
-    borderWidth: 1,
     alignItems: 'center',
-    marginBottom: 8,
   },
   confirmText: {
-    fontSize: 16,
+    fontSize: 15,
+    fontWeight: '800',
   },
   cancelButton: {
-    paddingVertical: 16,
+    paddingVertical: 10,
     alignItems: 'center',
   },
   cancelText: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 15,
+    fontWeight: '800',
   },
 })

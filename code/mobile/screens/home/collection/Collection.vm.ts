@@ -16,7 +16,7 @@ class CollectionVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
 
   segmentOptions: SegmentedControlOption[] = [
     { label: 'Избранное', value: 'favorites' },
-    { label: 'Просмотренн', value: 'viewed' },
+    { label: 'Недавние', value: 'viewed' },
   ]
 
   constructor() {

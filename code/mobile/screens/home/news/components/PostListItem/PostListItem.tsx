@@ -1,6 +1,7 @@
 import { FC } from 'react'
 import { TouchableOpacity, View, Text } from 'react-native'
 import { Image } from 'expo-image'
+import RenderHTML from 'react-native-render-html'
 import { s } from './style'
 import { useTheme } from '@react-navigation/native'
 import { Spacer } from '../../../../../../core/components/ui/Spacer'
@@ -30,7 +31,9 @@ export const PostListItem: FC<PostListItemProps> = ({
   const formattedDate = formatDate(pdate)
 
   return (
-    <TouchableOpacity style={s.mainContainer} onPress={onPress}>
+    <TouchableOpacity
+      style={[s.mainContainer, { backgroundColor: colors.baseFifth }]}
+      onPress={onPress}>
       <View style={s.infoContainer}>
         <View style={s.headerContainer}>
           <Image
@@ -43,20 +46,41 @@ export const PostListItem: FC<PostListItemProps> = ({
             {user.disp || user.login}
           </Text>
         </View>
-        <Spacer height={12} />
-        <Text numberOfLines={2} style={[s.titleText, { color: colors.textFirst }]}>
+        <Spacer height={8} />
+        <Text numberOfLines={1} style={[s.titleText, { color: colors.textFirst }]}>
           {title}
         </Text>
         <Spacer height={8} />
-        <Text numberOfLines={3} style={[s.noticeText, { color: colors.textSecond }]}>
-          {notice}
-        </Text>
+        <View style={s.noticeContainer}>
+          <RenderHTML
+            source={{ html: notice }}
+            baseStyle={{
+              color: colors.textSecond,
+              fontWeight: '500',
+              fontSize: 13,
+              lineHeight: 20,
+            }}
+          />
+          <Text
+            style={[
+              s.showMoreText,
+              {
+                color: colors.textSecond,
+                backgroundColor: colors.baseFifth,
+                shadowColor: colors.baseFifth,
+              },
+            ]}>
+            Показать ещё
+          </Text>
+        </View>
         <Spacer height={8} />
         <View style={s.footerContainer}>
           <Text style={[s.dateText, { color: colors.textThird }]}>{formattedDate}</Text>
-          <Text style={[s.commentsText, { color: colors.textThird }]}>
-            {ccount} {ccount === 1 ? 'комментарий' : 'комментариев'}
-          </Text>
+          {ccount > 0 && (
+            <Text style={[s.commentsText, { color: colors.textThird }]}>
+              {ccount} {ccount === 1 ? 'комментарий' : 'комментариев'}
+            </Text>
+          )}
         </View>
       </View>
     </TouchableOpacity>

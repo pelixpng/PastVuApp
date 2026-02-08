@@ -57,7 +57,7 @@ export function BottomTabsNavigator() {
         component={NewsScreen}
         options={{
           title: 'Новости',
-          headerTitle: 'Новости',
+          headerTitle: 'Новое на PastVu',
           tabBarIcon: ({ color }) => <MaterialIcons name="article" size={24} color={color} />,
         }}
       />
