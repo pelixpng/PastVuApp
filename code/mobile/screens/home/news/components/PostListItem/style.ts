@@ -27,10 +27,7 @@ export const s = StyleSheet.create({
     lineHeight: 22,
     fontWeight: '800',
   },
-  noticeContainer: {
-    maxHeight: 60,
-    overflow: 'hidden',
-  },
+  noticeContainer: {},
   showMoreText: {
     position: 'absolute',
     bottom: 0,

@@ -50,29 +50,37 @@ export const PostListItem: FC<PostListItemProps> = ({
         <Text numberOfLines={1} style={[s.titleText, { color: colors.textFirst }]}>
           {title}
         </Text>
-        <Spacer height={8} />
-        <View style={s.noticeContainer}>
-          <RenderHTML
-            source={{ html: notice }}
-            baseStyle={{
-              color: colors.textSecond,
-              fontWeight: '500',
-              fontSize: 13,
-              lineHeight: 20,
-            }}
-          />
-          <Text
-            style={[
-              s.showMoreText,
-              {
-                color: colors.textSecond,
-                backgroundColor: colors.baseFifth,
-                shadowColor: colors.baseFifth,
-              },
-            ]}>
-            Показать ещё
-          </Text>
-        </View>
+        {notice ? (
+          <>
+            <Spacer height={8} />
+            <View style={s.noticeContainer}>
+              <RenderHTML
+                source={{ html: notice }}
+                baseStyle={{
+                  color: colors.textSecond,
+                  fontWeight: '500',
+                  fontSize: 13,
+                  lineHeight: 20,
+                }}
+                tagsStyles={{
+                  p: { margin: 0, padding: 0 },
+                  body: { margin: 0, padding: 0 },
+                }}
+              />
+              <Text
+                style={[
+                  s.showMoreText,
+                  {
+                    color: colors.textSecond,
+                    backgroundColor: colors.baseFifth,
+                    shadowColor: colors.baseFifth,
+                  },
+                ]}>
+                Показать ещё
+              </Text>
+            </View>
+          </>
+        ) : null}
         <Spacer height={8} />
         <View style={s.footerContainer}>
           <Text style={[s.dateText, { color: colors.textThird }]}>{formattedDate}</Text>

@@ -292,7 +292,7 @@
 		};
 		XX4900AA1C8EB252D2F743XX /* widget */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = XX44F36F9FF713076D1631XX /* Build configuration list for PBXNativeTarget "widget" */;
+			buildConfigurationList = XX7DACAB1CF4E58C57A3E1XX /* Build configuration list for PBXNativeTarget "widget" */;
 			buildPhases = (
 				XX074B8811C1CF8E8A3D74XX /* Frameworks */,
 				XXDC105B0E28F884B8E02DXX /* Sources */,
@@ -312,7 +312,7 @@
 		};
 		XX5CB36A5D43E9DE05B477XX /* PastVu */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = XXB36D6E079203FBE16386XX /* Build configuration list for PBXNativeTarget "PastVu" */;
+			buildConfigurationList = XXE3829CADC7BBB4E7D2D4XX /* Build configuration list for PBXNativeTarget "PastVu" */;
 			buildPhases = (
 				XXE45443DC38DCFE1DB622XX /* Sources */,
 				XXFA5A8CCDD805DF7AEF9CXX /* Resources */,
@@ -760,6 +760,47 @@
 			};
 			name = Release;
 		};
+		XX050953A0B6BA0E9287E6XX /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = ../targets/widget/generated.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 65;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 989AHJ2KDZ;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ../targets/widget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = widget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 2.3.0;
+				MTL_FAST_MATH = YES;
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
+				PRODUCT_BUNDLE_IDENTIFIER = com.pelixpng.PastVuApp.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		XX2CB9295E1B6587C48C3CXX /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -801,7 +842,7 @@
 			};
 			name = Debug;
 		};
-		XX2DD8DC7692B148A7A844XX /* Release */ = {
+		XX606BD2D1561ABBFE32C5XX /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -891,47 +932,6 @@
 			};
 			name = Debug;
 		};
-		XXA5970F6C51E1CBBD27B8XX /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_ENTITLEMENTS = ../targets/widget/generated.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 65;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = 989AHJ2KDZ;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = ../targets/widget/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = widget;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 2.3.0;
-				MTL_FAST_MATH = YES;
-				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
-				PRODUCT_BUNDLE_IDENTIFIER = com.pelixpng.PastVuApp.widget;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -953,20 +953,20 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		XX44F36F9FF713076D1631XX /* Build configuration list for PBXNativeTarget "widget" */ = {
+		XX7DACAB1CF4E58C57A3E1XX /* Build configuration list for PBXNativeTarget "widget" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				XX2CB9295E1B6587C48C3CXX /* Debug */,
-				XXA5970F6C51E1CBBD27B8XX /* Release */,
+				XX050953A0B6BA0E9287E6XX /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		XXB36D6E079203FBE16386XX /* Build configuration list for PBXNativeTarget "PastVu" */ = {
+		XXE3829CADC7BBB4E7D2D4XX /* Build configuration list for PBXNativeTarget "PastVu" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				XXA083369EED05ECB7A96CXX /* Debug */,
-				XX2DD8DC7692B148A7A844XX /* Release */,
+				XX606BD2D1561ABBFE32C5XX /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

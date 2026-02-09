@@ -26,7 +26,7 @@ const LocationSearch: FC<LocationSearchProps> = ({
   return (
     <View style={[s.container, { top }]}>
       <View style={[s.searchContainer, { backgroundColor: colors.backgroundApp }]}>
-        <MaterialIcons name="search" size={24} color={colors.textThird} />
+        <MaterialIcons name="search" size={25} color={colors.textThird} />
         <Spacer width={5} />
         <TextInput
           style={[s.input, { color: colors.textFirst }]}
@@ -40,7 +40,7 @@ const LocationSearch: FC<LocationSearchProps> = ({
         {query.length > 0 && (
           <MaterialIcons
             name="close"
-            size={20}
+            size={21}
             color={colors.textThird}
             onPress={() => setQueryPlace('')}
           />

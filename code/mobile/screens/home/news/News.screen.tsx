@@ -22,12 +22,12 @@ export const NewsScreen = observer(() => {
         selectedValue={vm.selectedTab}
         onChange={value => vm.setSelectedTab(value as NewsTab)}
       />
-      <Spacer height={16} />
       <View style={s.listContainer}>
         <View style={[s.list, vm.selectedTab === 'posts' ? s.listVisible : s.listHidden]}>
           <FlatList<NewsItems>
             data={vm.news}
             ItemSeparatorComponent={() => <Spacer height={8} />}
+            ListHeaderComponent={() => <Spacer height={16} />}
             keyExtractor={item => item._id}
             renderItem={({ item }) => (
               <PostListItem
@@ -54,6 +54,7 @@ export const NewsScreen = observer(() => {
           <FlatList<CollectionItem>
             data={vm.historyItems}
             ItemSeparatorComponent={() => <Spacer height={16} />}
+            ListHeaderComponent={() => <Spacer height={16} />}
             keyExtractor={item => item.cid.toString()}
             renderItem={({ item }) => (
               <PhotoListItem
