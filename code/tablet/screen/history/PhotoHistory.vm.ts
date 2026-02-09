@@ -1,5 +1,5 @@
 import { action, computed, makeObservable, observable, runInAction } from 'mobx'
-import { HistoryItem } from './PhotoHistory.screen'
+import { CollectionItem } from './PhotoHistory.screen'
 import { MMKVStorage } from '../../../core/storage/mmkv'
 import { BaseViewModelProvider } from '../../provider/vm.provider'
 import { SCREENS } from '../../navigation/navigation.types'
@@ -8,10 +8,17 @@ import ApiStore from '../../../core/store/Api.store'
 import { savePhoto, sharePhoto } from '../../../core/utils/getPhoto'
 import ApiService from '../../../core/api/apiService'
 import { Alert, Linking } from 'react-native'
+import { SegmentedControlOption } from '../../../core/components/ui/segmentedControl/SegmentedControl'
 
-class PhotoHistoryVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
-  @observable.ref photos: HistoryItem[] = []
+export type CollectionTab = 'favorites' | 'viewed'
+
+class CollectionVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
+  @observable.ref photos: CollectionItem[] = []
+  @observable.ref favorites: CollectionItem[] = []
+  @observable selectedTab: CollectionTab = 'favorites'
   @observable selectedItem: string | null = null
+  @observable isDeleteModalVisible = false
+  @observable pendingDeleteCid: string | null = null
 
   //photo detail
   @observable.ref comments: IComment[] = []
@@ -19,12 +26,30 @@ class PhotoHistoryVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
   @observable.ref postInfo: Photo | null = null
   @observable showLoader = false
   @observable isImageLoaded = false
-  //
+  @observable isFavorite = false
+
+  segmentOptions: SegmentedControlOption[] = [
+    { label: 'Избранное', value: 'favorites' },
+    { label: 'Недавние', value: 'viewed' },
+  ]
+
   constructor() {
     super()
     makeObservable(this)
   }
   // ------------------------------------------ Computed -----------------------------------------
+  @computed
+  get displayedData(): CollectionItem[] {
+    return this.selectedTab === 'viewed' ? this.photos : this.favorites
+  }
+
+  @computed
+  get deleteConfirmationTitle(): string {
+    return this.selectedTab === 'viewed'
+      ? 'Удалить запись из истории?'
+      : 'Удалить запись из избранного?'
+  }
+
   // photo detail
   @computed
   get imageLink() {
@@ -35,6 +60,38 @@ class PhotoHistoryVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
   @action.bound
   getPhotos() {
     this.photos = MMKVStorage.get('History') ?? []
+    this.favorites = MMKVStorage.get('Favorites') ?? []
+  }
+
+  @action.bound
+  setSelectedTab(tab: CollectionTab) {
+    this.selectedTab = tab
+  }
+
+  @action.bound
+  showDeleteConfirmation(cid: string) {
+    this.pendingDeleteCid = cid
+    this.isDeleteModalVisible = true
+  }
+
+  @action.bound
+  hideDeleteConfirmation() {
+    this.isDeleteModalVisible = false
+    this.pendingDeleteCid = null
+  }
+
+  @action.bound
+  confirmDelete() {
+    if (!this.pendingDeleteCid) return
+
+    if (this.selectedTab === 'viewed') {
+      this.photos = this.photos.filter(photo => photo.cid !== this.pendingDeleteCid)
+      MMKVStorage.set('History', this.photos)
+    } else {
+      this.favorites = this.favorites.filter(photo => photo.cid !== this.pendingDeleteCid)
+      MMKVStorage.set('Favorites', this.favorites)
+    }
+    this.hideDeleteConfirmation()
   }
 
   @action.bound
@@ -60,6 +117,8 @@ class PhotoHistoryVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
     await ApiService.getPhotoInfo(cid)
       .then(async ({ result }) => {
         this.postInfo = result.photo
+        const favorites: CollectionItem[] = MMKVStorage.get('Favorites') ?? []
+        this.isFavorite = favorites.some(item => item.cid === cid)
         if (result.photo?.ccount) {
           this.getComments(cid)
         }
@@ -93,6 +152,26 @@ class PhotoHistoryVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
   }
 
   @action.bound
+  toggleFavorite() {
+    const cid = this.postInfo!.cid.toString()
+    const favorites: CollectionItem[] = MMKVStorage.get('Favorites') ?? []
+    const title = this.postInfo!.title
+    const description = `${this.postInfo!.y} ${this.postInfo!.regions
+      .map(region => region.title_local)
+      .join(', ')}`
+    const file = this.postInfo!.file
+
+    if (this.isFavorite) {
+      const updatedFavorites = favorites.filter(item => item.cid !== cid)
+      MMKVStorage.set('Favorites', updatedFavorites)
+      this.isFavorite = false
+    } else {
+      MMKVStorage.set('Favorites', [{ title, description, cid, file }, ...favorites])
+      this.isFavorite = true
+    }
+  }
+
+  @action.bound
   openPhotoFromLink(href: string) {
     const photoMatch = href.match(/\/p\/(\d+)/)
     if (photoMatch) {
@@ -113,4 +192,4 @@ class PhotoHistoryVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
   }
 }
 
-export default PhotoHistoryVM
+export default CollectionVM

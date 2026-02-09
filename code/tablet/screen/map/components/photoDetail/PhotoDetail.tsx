@@ -22,6 +22,8 @@ type PhotoDetailProps = {
   closePhoto: () => void
   openFullScreen: () => void
   onLinkPress?: (href: string) => void
+  isFavorite?: boolean
+  toggleFavorite?: () => void
 }
 
 export const PhotoDetail: FC<PhotoDetailProps> = ({
@@ -36,6 +38,8 @@ export const PhotoDetail: FC<PhotoDetailProps> = ({
   saveImage,
   share,
   onLinkPress,
+  isFavorite,
+  toggleFavorite,
 }) => {
   const { width } = useWindowDimensions()
   const { top } = useSafeAreaInsets()
@@ -51,6 +55,13 @@ export const PhotoDetail: FC<PhotoDetailProps> = ({
       <View style={[s.header, { marginTop: top + 5, marginBottom: 5 }]}>
         <MaterialIcons name="arrow-back" size={24} color={colors.textFirst} onPress={closePhoto} />
         <View style={s.iconContainer}>
+          <MaterialIcons
+            name={isFavorite ? 'favorite' : 'favorite-border'}
+            size={24}
+            color={colors.textFirst}
+            onPress={toggleFavorite}
+          />
+          <Spacer width={24} />
           <MaterialIcons name="save-alt" size={24} color={colors.textFirst} onPress={saveImage} />
           <Spacer width={24} />
           <MaterialIcons name="share" size={24} color={colors.textFirst} onPress={share} />

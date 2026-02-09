@@ -18,4 +18,7 @@ export const s = StyleSheet.create({
     fontSize: 13,
     lineHeight: 20,
   },
+  removeButton: {
+    padding: 6,
+  },
 })

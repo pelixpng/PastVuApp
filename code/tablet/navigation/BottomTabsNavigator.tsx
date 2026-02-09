@@ -5,7 +5,7 @@ import { StackParamList } from './stackParams.types'
 import { SCREENS } from './navigation.types'
 import { useTheme } from '@react-navigation/native'
 import { MapScreen } from '../screen/map/Map.screen'
-import { PhotoHistoryScreen } from '../screen/history/PhotoHistory.screen'
+import { CollectionScreen } from '../screen/history/PhotoHistory.screen'
 import { SettingsMenuScreen } from '../screen/settings/settingsMenu/SettingsMenu.screen'
 
 const Tab = createBottomTabNavigator<StackParamList>()
@@ -48,11 +48,11 @@ export function BottomTabsNavigator() {
       />
       <Tab.Screen
         name={SCREENS.PHOTO_HISTORY}
-        component={PhotoHistoryScreen}
+        component={CollectionScreen}
         options={{
-          title: 'История',
-          headerTitle: 'История',
-          tabBarIcon: ({ color }) => <MaterialIcons name="history" size={24} color={color} />,
+          title: 'Коллекция',
+          headerTitle: 'Коллекция',
+          tabBarIcon: ({ color }) => <MaterialIcons name="favorite" size={24} color={color} />,
         }}
       />
       <Tab.Screen

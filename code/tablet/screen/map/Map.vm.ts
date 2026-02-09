@@ -20,7 +20,7 @@ import { BaseViewModelProvider } from '../../provider/vm.provider'
 import { SCREENS } from '../../navigation/navigation.types'
 import { IComment, Users } from '../../../core/types/apiPhotoComment'
 import { IosTargetStorage } from '../../../core/storage/appleTarget'
-import { HistoryItem } from '../history/PhotoHistory.screen'
+import { CollectionItem } from '../history/PhotoHistory.screen'
 import { ExtensionStorage } from '@bacons/apple-targets'
 import { Linking } from 'react-native'
 import { savePhoto, sharePhoto } from '../../../core/utils/getPhoto'
@@ -48,6 +48,7 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
   @observable.ref postInfo: Photo | null = null
   @observable showPhotoDetail = false
   @observable isImageLoaded = false
+  @observable isFavorite = false
 
   constructor() {
     super()
@@ -266,7 +267,9 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
     await ApiService.getPhotoInfo(cid)
       .then(async ({ result }) => {
         this.postInfo = result.photo
-        const history: HistoryItem[] = MMKVStorage.get('History') ?? []
+        const favorites: CollectionItem[] = MMKVStorage.get('Favorites') ?? []
+        this.isFavorite = favorites.some(item => item.cid === cid)
+        const history: CollectionItem[] = MMKVStorage.get('History') ?? []
         const title = result.photo.title
         const description = `${result.photo.y} ${result.photo.regions
           .map(region => region.title_local)
@@ -300,6 +303,26 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
   @action.bound
   onImageLoad() {
     this.isImageLoaded = true
+  }
+
+  @action.bound
+  toggleFavorite() {
+    const cid = this.postInfo!.cid.toString()
+    const favorites: CollectionItem[] = MMKVStorage.get('Favorites') ?? []
+    const title = this.postInfo!.title
+    const description = `${this.postInfo!.y} ${this.postInfo!.regions
+      .map(region => region.title_local)
+      .join(', ')}`
+    const file = this.postInfo!.file
+
+    if (this.isFavorite) {
+      const updatedFavorites = favorites.filter(item => item.cid !== cid)
+      MMKVStorage.set('Favorites', updatedFavorites)
+      this.isFavorite = false
+    } else {
+      MMKVStorage.set('Favorites', [{ title, description, cid, file }, ...favorites])
+      this.isFavorite = true
+    }
   }
 
   @action.bound

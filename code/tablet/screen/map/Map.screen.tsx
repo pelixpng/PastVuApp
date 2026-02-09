@@ -95,6 +95,8 @@ export const MapScreen = observer(() => {
           imageLink={vm.imageLink}
           isImageLoaded={vm.isImageLoaded}
           onLinkPress={vm.openPhotoFromLink}
+          isFavorite={vm.isFavorite}
+          toggleFavorite={vm.toggleFavorite}
         />
       )}
       <LocationButton onPress={vm.getCurrentLocation} />
