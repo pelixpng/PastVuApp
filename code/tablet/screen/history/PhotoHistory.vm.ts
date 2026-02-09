@@ -7,7 +7,7 @@ import { IComment, Users } from '../../../core/types/apiPhotoComment'
 import ApiStore from '../../../core/store/Api.store'
 import { savePhoto, sharePhoto } from '../../../core/utils/getPhoto'
 import ApiService from '../../../core/api/apiService'
-import { Alert } from 'react-native'
+import { Alert, Linking } from 'react-native'
 
 class PhotoHistoryVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
   @observable.ref photos: HistoryItem[] = []
@@ -90,6 +90,16 @@ class PhotoHistoryVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
   @action.bound
   onImageLoad() {
     this.isImageLoaded = true
+  }
+
+  @action.bound
+  openPhotoFromLink(href: string) {
+    const photoMatch = href.match(/\/p\/(\d+)/)
+    if (photoMatch) {
+      this.showPhoto(photoMatch[1])
+    } else {
+      Linking.openURL(href)
+    }
   }
 
   @action.bound

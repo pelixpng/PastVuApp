@@ -21,6 +21,7 @@ type PhotoDetailProps = {
   onImageLoaded: () => void
   closePhoto: () => void
   openFullScreen: () => void
+  onLinkPress?: (href: string) => void
 }
 
 export const PhotoDetail: FC<PhotoDetailProps> = ({
@@ -34,13 +35,14 @@ export const PhotoDetail: FC<PhotoDetailProps> = ({
   openFullScreen,
   saveImage,
   share,
+  onLinkPress,
 }) => {
   const { width } = useWindowDimensions()
   const { top } = useSafeAreaInsets()
   const { colors } = useTheme()
   const topLoader = top + 40
   const modalWidth = width * 0.67 - 32
-  const renderItem = useCallback(({ item }) => <Comment comment={item} users={users} />, [users])
+  const renderItem = useCallback(({ item }) => <Comment comment={item} users={users} onLinkPress={onLinkPress} />, [users, onLinkPress])
   return (
     <Animated.View
       entering={SlideInRight.duration(600)}
@@ -72,6 +74,7 @@ export const PhotoDetail: FC<PhotoDetailProps> = ({
             imageLink={imageLink}
             onImageLoaded={onImageLoaded}
             openFullScreen={openFullScreen}
+            onLinkPress={onLinkPress}
           />
         }
       />

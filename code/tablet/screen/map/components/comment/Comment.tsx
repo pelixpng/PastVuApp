@@ -12,9 +12,10 @@ import { Spacer } from '../../../../../core/components/ui/Spacer'
 type CommentProps = {
   comment: IComment
   users: Users | null
+  onLinkPress?: (href: string) => void
 }
 
-export const Comment: FC<CommentProps> = ({ users, comment }) => {
+export const Comment: FC<CommentProps> = ({ users, comment, onLinkPress }) => {
   const { colors } = useTheme()
   const commentHtml = { html: `<p>${comment.txt}</p>` }
   const date = formatDate(comment.stamp)
@@ -44,6 +45,11 @@ export const Comment: FC<CommentProps> = ({ users, comment }) => {
             a: {
               color: colors.primary,
               textDecorationLine: 'underline',
+            },
+          }}
+          renderersProps={{
+            a: {
+              onPress: (_, href) => onLinkPress?.(href),
             },
           }}
         />

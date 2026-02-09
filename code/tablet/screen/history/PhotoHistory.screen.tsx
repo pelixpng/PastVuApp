@@ -80,6 +80,7 @@ export const PhotoHistoryScreen = observer(() => {
         isImageLoaded={vm.isImageLoaded}
         showLoader={vm.showLoader}
         openFullScreen={vm.openFullScreenImage}
+        onLinkPress={vm.openPhotoFromLink}
       />
     </Container>
   )

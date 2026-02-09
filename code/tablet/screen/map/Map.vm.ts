@@ -22,6 +22,7 @@ import { IComment, Users } from '../../../core/types/apiPhotoComment'
 import { IosTargetStorage } from '../../../core/storage/appleTarget'
 import { HistoryItem } from '../history/PhotoHistory.screen'
 import { ExtensionStorage } from '@bacons/apple-targets'
+import { Linking } from 'react-native'
 import { savePhoto, sharePhoto } from '../../../core/utils/getPhoto'
 
 const startRegion: Region = {
@@ -299,6 +300,16 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
   @action.bound
   onImageLoad() {
     this.isImageLoaded = true
+  }
+
+  @action.bound
+  openPhotoFromLink(href: string) {
+    const photoMatch = href.match(/\/p\/(\d+)/)
+    if (photoMatch) {
+      this.showPhoto(photoMatch[1])
+    } else {
+      Linking.openURL(href)
+    }
   }
 
   @action.bound

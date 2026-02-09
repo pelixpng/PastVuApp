@@ -15,6 +15,7 @@ type PhotoDetailProps = {
   showLoader: boolean
   onImageLoaded: () => void
   openFullScreen: () => void
+  onLinkPress?: (href: string) => void
 }
 
 export const PhotoDetail: FC<PhotoDetailProps> = ({
@@ -26,11 +27,12 @@ export const PhotoDetail: FC<PhotoDetailProps> = ({
   isImageLoaded,
   showLoader,
   openFullScreen,
+  onLinkPress,
 }) => {
   const { colors } = useTheme()
   const { width } = useWindowDimensions()
   const modalWidth = width * 0.67 - 32
-  const renderItem = useCallback(({ item }) => <Comment comment={item} users={users} />, [users])
+  const renderItem = useCallback(({ item }) => <Comment comment={item} users={users} onLinkPress={onLinkPress} />, [users, onLinkPress])
   return (
     <View style={[s.modal, { width: modalWidth }]}>
       {!isImageLoaded && (
@@ -51,6 +53,7 @@ export const PhotoDetail: FC<PhotoDetailProps> = ({
             imageLink={imageLink}
             onImageLoaded={onImageLoaded}
             openFullScreen={openFullScreen}
+            onLinkPress={onLinkPress}
           />
         }
       />

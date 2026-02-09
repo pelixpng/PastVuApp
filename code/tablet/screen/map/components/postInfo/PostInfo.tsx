@@ -12,6 +12,7 @@ type PostInfoProps = {
   imageLink: string
   onImageLoaded: () => void
   openFullScreen: () => void
+  onLinkPress?: (href: string) => void
 }
 
 export const PostInfo: FC<PostInfoProps> = ({
@@ -19,6 +20,7 @@ export const PostInfo: FC<PostInfoProps> = ({
   imageLink,
   onImageLoaded,
   openFullScreen,
+  onLinkPress,
 }) => {
   const { colors } = useTheme()
   const commentTotal = postInfo?.ccount || 0
@@ -64,6 +66,9 @@ export const PostInfo: FC<PostInfoProps> = ({
                 textDecorationLine: 'underline',
               },
             }}
+            renderersProps={{
+              a: { onPress: (_, href) => onLinkPress?.(href) },
+            }}
           />
         )}
         <Spacer height={8} />
@@ -87,6 +92,9 @@ export const PostInfo: FC<PostInfoProps> = ({
               textDecorationLine: 'underline',
             },
           }}
+          renderersProps={{
+            a: { onPress: (_, href) => onLinkPress?.(href) },
+          }}
         />
         <RenderHTML
           source={sourceHTML}
@@ -107,6 +115,9 @@ export const PostInfo: FC<PostInfoProps> = ({
               color: colors.primary,
               textDecorationLine: 'underline',
             },
+          }}
+          renderersProps={{
+            a: { onPress: (_, href) => onLinkPress?.(href) },
           }}
         />
         <Spacer height={8} />
