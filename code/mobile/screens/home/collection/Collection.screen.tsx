@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { FlatList, StyleSheet } from 'react-native'
+import { FlatList, StyleSheet, View } from 'react-native'
 import { useFocusEffect, useTheme } from '@react-navigation/native'
 import { observer } from 'mobx-react'
 import CollectionVM, { CollectionTab } from './Collection.vm'
@@ -27,22 +27,18 @@ export const CollectionScreen = observer(() => {
   )
 
   return (
-    <>
+    <View style={[{ backgroundColor: colors.backgroundApp }, s.container]}>
+      <Spacer height={18} />
+      <SegmentedControl
+        options={vm.segmentOptions}
+        selectedValue={vm.selectedTab}
+        onChange={value => vm.setSelectedTab(value as CollectionTab)}
+      />
       <FlatList
         data={vm.displayedData}
-        style={[{ backgroundColor: colors.backgroundApp }, s.container]}
+        style={s.list}
         keyExtractor={item => item.cid}
-        ListHeaderComponent={
-          <>
-            <Spacer height={18} />
-            <SegmentedControl
-              options={vm.segmentOptions}
-              selectedValue={vm.selectedTab}
-              onChange={value => vm.setSelectedTab(value as CollectionTab)}
-            />
-            <Spacer height={16} />
-          </>
-        }
+        ListHeaderComponent={() => <Spacer height={16} />}
         ItemSeparatorComponent={() => <Spacer height={16} />}
         renderItem={({ item }) => (
           <PhotoListItem
@@ -71,10 +67,11 @@ export const CollectionScreen = observer(() => {
         onConfirm={vm.confirmDelete}
         onCancel={vm.hideDeleteConfirmation}
       />
-    </>
+    </View>
   )
 })
 
 const s = StyleSheet.create({
-  container: { paddingHorizontal: 16 },
+  container: { flex: 1, paddingHorizontal: 16 },
+  list: { flex: 1 },
 })
