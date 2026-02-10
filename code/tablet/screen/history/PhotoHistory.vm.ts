@@ -43,13 +43,6 @@ class CollectionVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
     return this.selectedTab === 'viewed' ? this.photos : this.favorites
   }
 
-  @computed
-  get deleteConfirmationTitle(): string {
-    return this.selectedTab === 'viewed'
-      ? 'Удалить запись из истории?'
-      : 'Удалить запись из избранного?'
-  }
-
   // photo detail
   @computed
   get imageLink() {
@@ -69,29 +62,38 @@ class CollectionVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
   }
 
   @action.bound
-  showDeleteConfirmation(cid: string) {
-    this.pendingDeleteCid = cid
+  showDeleteModal(cid?: string) {
+    this.pendingDeleteCid = cid ?? this.postInfo?.cid.toString() ?? null
     this.isDeleteModalVisible = true
   }
 
   @action.bound
-  hideDeleteConfirmation() {
+  hideDeleteModal() {
     this.isDeleteModalVisible = false
     this.pendingDeleteCid = null
+  }
+
+  @computed
+  get deleteConfirmationTitle(): string {
+    return this.selectedTab === 'viewed'
+      ? 'Удалить запись из истории?'
+      : 'Удалить запись из избранного?'
   }
 
   @action.bound
   confirmDelete() {
     if (!this.pendingDeleteCid) return
-
     if (this.selectedTab === 'viewed') {
       this.photos = this.photos.filter(photo => photo.cid !== this.pendingDeleteCid)
       MMKVStorage.set('History', this.photos)
     } else {
       this.favorites = this.favorites.filter(photo => photo.cid !== this.pendingDeleteCid)
       MMKVStorage.set('Favorites', this.favorites)
+      if (this.postInfo?.cid.toString() === this.pendingDeleteCid) {
+        this.isFavorite = false
+      }
     }
-    this.hideDeleteConfirmation()
+    this.hideDeleteModal()
   }
 
   @action.bound

@@ -1,5 +1,14 @@
 import { useCallback, useLayoutEffect } from 'react'
-import { FlatList, StyleSheet, useWindowDimensions, View } from 'react-native'
+import {
+  FlatList,
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+} from 'react-native'
 import { useFocusEffect, useNavigation, useTheme } from '@react-navigation/native'
 import { observer } from 'mobx-react'
 import CollectionVM, { CollectionTab } from './PhotoHistory.vm'
@@ -11,7 +20,6 @@ import { PhotoDetail } from './components/photoDetail/PhotoDetail'
 import { Container } from '../../../core/components/ui/Container'
 import { MaterialIcons } from '@expo/vector-icons'
 import { SegmentedControl } from '../../../core/components/ui/segmentedControl/SegmentedControl'
-import { ConfirmationSheet } from '../../../core/components/ui/confirmationSheet/ConfirmationSheet'
 
 export interface CollectionItem {
   title: string
@@ -51,6 +59,13 @@ export const CollectionScreen = observer(() => {
           />
           <Spacer width={24} />
           <MaterialIcons name="share" size={24} color={colors.textFirst} onPress={vm.share} />
+          <Spacer width={24} />
+          <MaterialIcons
+            name="delete-outline"
+            size={24}
+            color={colors.textFirst}
+            onPress={() => vm.showDeleteModal()}
+          />
         </View>
       ),
     })
@@ -79,19 +94,21 @@ export const CollectionScreen = observer(() => {
               file={item.file}
               isSelected={vm.selectedItem === item.cid}
               onPress={() => vm.showPhoto(item.cid)}
-              onRemove={() => vm.showDeleteConfirmation(item.cid)}
+              onRemove={() => vm.showDeleteModal(item.cid)}
             />
           )}
           ListEmptyComponent={
-            <MenuButton
-              title={vm.selectedTab === 'viewed' ? 'История просмотра' : 'Избранное'}
-              description={
-                vm.selectedTab === 'viewed'
-                  ? 'История сохраняет последние 1000 просмотренных фотографий'
-                  : 'Здесь будут отображаться ваши избранные фотографии'
-              }
-              icon={'history'}
-            />
+            <View style={s.emptyContainer}>
+              <MenuButton
+                title={vm.selectedTab === 'viewed' ? 'История просмотра' : 'Избранное'}
+                description={
+                  vm.selectedTab === 'viewed'
+                    ? 'История сохраняет последние 1000 просмотренных фотографий'
+                    : 'Здесь будут отображаться ваши избранные фотографии'
+                }
+                icon={'history'}
+              />
+            </View>
           }
         />
       </View>
@@ -106,18 +123,74 @@ export const CollectionScreen = observer(() => {
         openFullScreen={vm.openFullScreenImage}
         onLinkPress={vm.openPhotoFromLink}
       />
-      <ConfirmationSheet
+      <Modal
         visible={vm.isDeleteModalVisible}
-        title={vm.deleteConfirmationTitle}
-        onConfirm={vm.confirmDelete}
-        onCancel={vm.hideDeleteConfirmation}
-      />
+        transparent
+        animationType="fade"
+        supportedOrientations={['landscape']}
+        onRequestClose={vm.hideDeleteModal}>
+        <Pressable style={s.overlay} onPress={vm.hideDeleteModal}>
+          <View style={[s.modalContainer, { backgroundColor: colors.baseSecond }]}>
+            <Text style={[s.modalTitle, { color: colors.textThird }]}>
+              {vm.deleteConfirmationTitle}
+            </Text>
+            <Spacer height={17} />
+            <TouchableOpacity
+              style={[s.modalButton, { backgroundColor: colors.baseFourth }]}
+              onPress={vm.confirmDelete}
+              activeOpacity={0.7}>
+              <Text style={[s.modalButtonText, { color: colors.textFirst }]}>Удалить</Text>
+            </TouchableOpacity>
+            <Spacer height={8} />
+            <TouchableOpacity
+              style={s.modalCancelButton}
+              onPress={vm.hideDeleteModal}
+              activeOpacity={0.7}>
+              <Text style={[s.modalButtonText, { color: colors.textFirst }]}>Отменить</Text>
+            </TouchableOpacity>
+          </View>
+        </Pressable>
+      </Modal>
     </Container>
   )
 })
 
 const s = StyleSheet.create({
+  emptyContainer: { paddingHorizontal: 16, paddingTop: 16 },
   header: { flexDirection: 'row', marginRight: 16 },
   segmentHeader: { paddingHorizontal: 16 },
   list: { flex: 1 },
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    borderRadius: 32,
+    paddingBottom: 16,
+    paddingTop: 29,
+    paddingHorizontal: 24,
+    width: 360,
+  },
+  modalTitle: {
+    fontSize: 14,
+    lineHeight: 20,
+    textAlign: 'center',
+    fontWeight: '400',
+  },
+  modalButton: {
+    paddingVertical: 10,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  modalButtonText: {
+    fontSize: 15,
+    lineHeight: 24,
+    fontWeight: '800',
+  },
+  modalCancelButton: {
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
 })
