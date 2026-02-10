@@ -1,5 +1,5 @@
 import { action, computed, makeObservable, observable, runInAction } from 'mobx'
-import { CollectionItem } from './PhotoHistory.screen'
+import { CollectionItem } from './Collection.screen'
 import { MMKVStorage } from '../../../core/storage/mmkv'
 import { BaseViewModelProvider } from '../../provider/vm.provider'
 import { SCREENS } from '../../navigation/navigation.types'
@@ -166,9 +166,12 @@ class CollectionVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
     if (this.isFavorite) {
       const updatedFavorites = favorites.filter(item => item.cid !== cid)
       MMKVStorage.set('Favorites', updatedFavorites)
+      this.favorites = updatedFavorites
       this.isFavorite = false
     } else {
-      MMKVStorage.set('Favorites', [{ title, description, cid, file }, ...favorites])
+      const updatedFavorites = [{ title, description, cid, file }, ...favorites]
+      MMKVStorage.set('Favorites', updatedFavorites)
+      this.favorites = updatedFavorites
       this.isFavorite = true
     }
   }

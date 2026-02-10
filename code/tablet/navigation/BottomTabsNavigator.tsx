@@ -5,7 +5,7 @@ import { StackParamList } from './stackParams.types'
 import { SCREENS } from './navigation.types'
 import { useTheme } from '@react-navigation/native'
 import { MapScreen } from '../screen/map/Map.screen'
-import { CollectionScreen } from '../screen/history/PhotoHistory.screen'
+import { CollectionScreen } from '../screen/collection/Collection.screen'
 import { SettingsMenuScreen } from '../screen/settings/settingsMenu/SettingsMenu.screen'
 
 const Tab = createBottomTabNavigator<StackParamList>()
