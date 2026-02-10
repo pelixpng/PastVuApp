@@ -14,7 +14,7 @@ export const SettingsMenuScreen = observer(() => {
   return (
     <Container row>
       <View style={[{ width: widthMenu }, s.menu]}>
-        <Spacer height={4} />
+        <Spacer height={18} />
         <MenuButton
           onPress={() => vm.selectMenu('appSettings')}
           title={'Основные'}

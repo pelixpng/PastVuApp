@@ -10,7 +10,7 @@ export const AboutAppScreen = () => {
   const { colors } = useTheme()
   return (
     <Container isScroll style={s.container}>
-      <Spacer height={4} />
+      <Spacer height={18} />
       <View style={s.block}>
         <Image style={s.image} source={require('../../../../assets/icon.png')} />
         <Spacer height={16} />

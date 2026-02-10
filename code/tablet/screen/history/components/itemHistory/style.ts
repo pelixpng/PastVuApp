@@ -6,7 +6,12 @@ export const s = StyleSheet.create({
     height: 80,
     borderRadius: 16,
   },
-  mainContainer: { flexDirection: 'row', borderRadius: 16 },
+  mainContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
   infoContainer: { flex: 1 },
   titleText: {
     fontSize: 13,

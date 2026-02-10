@@ -10,7 +10,7 @@ export const SupportContactsScreen = () => {
   const { colors } = useTheme()
   return (
     <Container style={s.container}>
-      <Spacer height={4} />
+      <Spacer height={18} />
       <UICard>
         <Text style={[s.titleText, { color: colors.textFirst }]}>Нужна помощь?</Text>
         <Spacer height={4} />

@@ -5,6 +5,7 @@ import { IComment, Users } from '../../../../../core/types/apiPhotoComment'
 import { s } from './style'
 import { PostInfo } from '../../../map/components/postInfo/PostInfo'
 import { Comment } from '../../../map/components/comment/Comment'
+import { Spacer } from '../../../../../core/components/ui/Spacer'
 
 type PhotoDetailProps = {
   comments: IComment[]
@@ -32,9 +33,13 @@ export const PhotoDetail: FC<PhotoDetailProps> = ({
   const { colors } = useTheme()
   const { width } = useWindowDimensions()
   const modalWidth = width * 0.67 - 32
-  const renderItem = useCallback(({ item }) => <Comment comment={item} users={users} onLinkPress={onLinkPress} />, [users, onLinkPress])
+  const renderItem = useCallback(
+    ({ item }) => <Comment comment={item} users={users} onLinkPress={onLinkPress} />,
+    [users, onLinkPress],
+  )
   return (
     <View style={[s.modal, { width: modalWidth }]}>
+      <Spacer height={18} />
       {!isImageLoaded && (
         <View style={[s.loaderContainer, { backgroundColor: colors.backgroundApp }]}>
           {showLoader && (

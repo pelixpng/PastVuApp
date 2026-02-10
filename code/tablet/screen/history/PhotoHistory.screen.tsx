@@ -57,20 +57,21 @@ export const CollectionScreen = observer(() => {
   }, [vm.postInfo, vm.isFavorite, colors.textFirst, navigation])
   return (
     <Container row>
-      <View style={{ width: listWidth, paddingLeft: 16 }}>
+      <View style={{ width: listWidth }}>
         <Spacer height={18} />
-        <SegmentedControl
-          options={vm.segmentOptions}
-          selectedValue={vm.selectedTab}
-          onChange={value => vm.setSelectedTab(value as CollectionTab)}
-        />
+        <View style={{ paddingHorizontal: 16 }}>
+          <SegmentedControl
+            options={vm.segmentOptions}
+            selectedValue={vm.selectedTab}
+            onChange={value => vm.setSelectedTab(value as CollectionTab)}
+          />
+        </View>
         <FlatList
           data={vm.displayedData}
           style={s.list}
           ListFooterComponent={<Spacer height={80} />}
           keyExtractor={item => item.cid}
-          ListHeaderComponent={() => <Spacer height={16} />}
-          ItemSeparatorComponent={() => <Spacer height={16} />}
+          ListHeaderComponent={() => <Spacer height={8} />}
           renderItem={({ item }) => (
             <ItemHistory
               title={item.title}
@@ -117,5 +118,6 @@ export const CollectionScreen = observer(() => {
 
 const s = StyleSheet.create({
   header: { flexDirection: 'row', marginRight: 16 },
+  segmentHeader: { paddingHorizontal: 16 },
   list: { flex: 1 },
 })

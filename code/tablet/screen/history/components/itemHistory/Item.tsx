@@ -25,11 +25,14 @@ export const ItemHistory: FC<ItemHistoryProps> = ({
 }) => {
   const { colors } = useTheme()
   const backgroundColor = useMemo(
-    () => (isSelected ? colors.selectedItem : null),
+    () => (isSelected ? colors.baseThird : null),
     [isSelected, colors],
   )
   return (
-    <TouchableOpacity style={[s.mainContainer, { backgroundColor }]} onPress={onPress} onLongPress={onRemove}>
+    <TouchableOpacity
+      style={[s.mainContainer, { backgroundColor }]}
+      onPress={onPress}
+      onLongPress={onRemove}>
       <Image
         source={{ uri: `https://img.pastvu.com/h/${file}` }}
         style={s.image}
@@ -40,7 +43,7 @@ export const ItemHistory: FC<ItemHistoryProps> = ({
         <Text numberOfLines={1} style={[s.titleText, { color: colors.textFirst }]}>
           {title}
         </Text>
-        <Spacer height={4} />
+        <Spacer height={2} />
         <Text numberOfLines={2} style={[s.descriptionText, { color: colors.textThird }]}>
           {description}
         </Text>
