@@ -121,6 +121,16 @@ class CollectionVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
         this.postInfo = result.photo
         const favorites: CollectionItem[] = MMKVStorage.get('Favorites') ?? []
         this.isFavorite = favorites.some(item => item.cid === cid)
+        const title = result.photo.title
+        const description = `${result.photo.y} ${result.photo.regions
+          .map(region => region.title_local)
+          .join(', ')}`
+        const file = result.photo.file
+        if (!this.photos.some(item => item.cid === cid)) {
+          const updatedHistory = [{ title, description, cid, file }, ...this.photos]
+          MMKVStorage.set('History', updatedHistory)
+          this.photos = updatedHistory
+        }
         if (result.photo?.ccount) {
           this.getComments(cid)
         }
