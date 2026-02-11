@@ -1,5 +1,5 @@
 import { FC, useMemo } from 'react'
-import { Pressable, View, Text, useWindowDimensions } from 'react-native'
+import { TouchableOpacity, View, Text, useWindowDimensions } from 'react-native'
 import { Image } from 'expo-image'
 import RenderHTML from 'react-native-render-html'
 import { useTheme } from '@react-navigation/native'
@@ -39,7 +39,7 @@ export const PostListItem: FC<PostListItemProps> = ({
   )
 
   return (
-    <Pressable
+    <TouchableOpacity
       style={[s.mainContainer, { backgroundColor }]}
       onPress={onPress}>
       <View style={s.headerContainer}>
@@ -98,6 +98,6 @@ export const PostListItem: FC<PostListItemProps> = ({
           </Text>
         )}
       </View>
-    </Pressable>
+    </TouchableOpacity>
   )
 }
