@@ -67,6 +67,16 @@ export const NewsDetail: FC<NewsDetailProps> = ({ post, comments, users, onLinkP
       <RenderHTML
         source={{ html: `<p>${post.txt || ''}</p>` }}
         contentWidth={detailWidth - 32}
+        domVisitors={{
+          onElement: (el) => {
+            if (el.tagName === 'img') {
+              const src = el.attribs?.src
+              if (!src || src === 'about:///blank' || src === 'about:blank') {
+                el.tagName = 'span'
+              }
+            }
+          },
+        }}
         baseStyle={{
           fontSize: 13,
           lineHeight: 20,
@@ -76,6 +86,9 @@ export const NewsDetail: FC<NewsDetailProps> = ({ post, comments, users, onLinkP
           a: {
             color: colors.basePrimary,
             textDecorationLine: 'underline',
+          },
+          img: {
+            maxWidth: detailWidth - 32,
           },
         }}
         renderersProps={{

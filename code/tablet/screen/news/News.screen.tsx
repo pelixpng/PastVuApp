@@ -28,7 +28,6 @@ export const NewsScreen = observer(() => {
   const navigation = useNavigation()
   const { width } = useWindowDimensions()
   const listWidth = width * 0.33
-
   useLayoutEffect(() => {
     if (vm.selectedTab === 'photos' && vm.postInfo) {
       navigation.setOptions({

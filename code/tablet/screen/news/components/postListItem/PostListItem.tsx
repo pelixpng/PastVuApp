@@ -1,5 +1,5 @@
 import { FC, useMemo } from 'react'
-import { TouchableOpacity, View, Text } from 'react-native'
+import { Pressable, View, Text, useWindowDimensions } from 'react-native'
 import { Image } from 'expo-image'
 import RenderHTML from 'react-native-render-html'
 import { useTheme } from '@react-navigation/native'
@@ -29,6 +29,8 @@ export const PostListItem: FC<PostListItemProps> = ({
   isSelected,
 }) => {
   const { colors } = useTheme()
+  const { width } = useWindowDimensions()
+  const contentWidth = width * 0.33 - 32
   const avatarUri = user.avatar ? `https://pastvu.com/_a/h/${user.avatar}` : null
   const formattedDate = formatDate(pdate)
   const backgroundColor = useMemo(
@@ -37,7 +39,7 @@ export const PostListItem: FC<PostListItemProps> = ({
   )
 
   return (
-    <TouchableOpacity
+    <Pressable
       style={[s.mainContainer, { backgroundColor }]}
       onPress={onPress}>
       <View style={s.headerContainer}>
@@ -58,9 +60,10 @@ export const PostListItem: FC<PostListItemProps> = ({
       {notice ? (
         <>
           <Spacer height={4} />
-          <View style={s.noticeContainer}>
+          <View style={s.noticeContainer} pointerEvents="none">
             <RenderHTML
               source={{ html: notice }}
+              contentWidth={contentWidth}
               baseStyle={{
                 color: colors.textSecond,
                 fontWeight: '500',
@@ -95,6 +98,6 @@ export const PostListItem: FC<PostListItemProps> = ({
           </Text>
         )}
       </View>
-    </TouchableOpacity>
+    </Pressable>
   )
 }
