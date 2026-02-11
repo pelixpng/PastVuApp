@@ -15,7 +15,7 @@ export const AboutAppScreen = () => {
         <Image style={s.image} source={require('../../../../assets/icon.png')} />
         <Spacer height={16} />
         <Text selectable style={[s.descriptionText, { color: colors.textSecond }]}>
-          Версия 2.3.0 от 22 декабря 2025 г.
+          Версия 2.4.0 от 20 февраля 2026 г.
         </Text>
       </View>
       <Spacer height={24} />
