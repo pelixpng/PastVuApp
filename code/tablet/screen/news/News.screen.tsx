@@ -76,64 +76,61 @@ export const NewsScreen = observer(() => {
             onChange={value => vm.setSelectedTab(value as NewsTab)}
           />
         </View>
-        <View style={s.listContainer}>
-          <View style={[s.listWrapper, vm.selectedTab === 'posts' ? s.listVisible : s.listHidden]}>
-            <FlatList<NewsItems>
-              data={vm.displayedPosts}
-              style={s.list}
-              ListHeaderComponent={() => <Spacer height={8} />}
-              ListFooterComponent={<Spacer height={80} />}
-              keyExtractor={item => item._id}
-              renderItem={({ item }) => (
-                <PostListItem
-                  title={item.title}
-                  notice={item.notice}
-                  pdate={item.pdate}
-                  ccount={item.ccount}
-                  user={item.user}
-                  isSelected={vm.selectedPostId === item._id}
-                  onPress={() => vm.openPost(item)}
-                />
-              )}
-              ListEmptyComponent={
-                vm.loading ? (
-                  <View style={s.emptyContainer}>
-                    <ActivityIndicator size="large" color="gray" />
-                  </View>
-                ) : (
-                  <Text style={{ padding: 16, color: colors.text }}>Нет постов</Text>
-                )
-              }
-            />
-          </View>
-          <View style={[s.listWrapper, vm.selectedTab === 'photos' ? s.listVisible : s.listHidden]}>
-            <FlatList<CollectionItem>
-              data={vm.displayedPhotos}
-              style={s.list}
-              ListHeaderComponent={() => <Spacer height={8} />}
-              ListFooterComponent={<Spacer height={80} />}
-              keyExtractor={item => item.cid}
-              renderItem={({ item }) => (
-                <ItemHistory
-                  title={item.title}
-                  description={item.description}
-                  file={item.file}
-                  isSelected={vm.selectedPhotoCid === item.cid}
-                  onPress={() => vm.showPhoto(item.cid)}
-                />
-              )}
-              ListEmptyComponent={
-                vm.loading ? (
-                  <View style={s.emptyContainer}>
-                    <ActivityIndicator size="large" color="gray" />
-                  </View>
-                ) : (
-                  <Text style={{ padding: 16, color: colors.text }}>Нет фотографий</Text>
-                )
-              }
-            />
-          </View>
-        </View>
+        {vm.selectedTab === 'posts' ? (
+          <FlatList<NewsItems>
+            data={vm.displayedPosts}
+            style={s.list}
+            ListHeaderComponent={() => <Spacer height={8} />}
+            ListFooterComponent={<Spacer height={80} />}
+            keyExtractor={item => item._id}
+            renderItem={({ item }) => (
+              <PostListItem
+                title={item.title}
+                notice={item.notice}
+                pdate={item.pdate}
+                ccount={item.ccount}
+                user={item.user}
+                isSelected={vm.selectedPostId === item._id}
+                onPress={() => vm.openPost(item)}
+              />
+            )}
+            ListEmptyComponent={
+              vm.loading ? (
+                <View style={s.emptyContainer}>
+                  <ActivityIndicator size="large" color="gray" />
+                </View>
+              ) : (
+                <Text style={{ padding: 16, color: colors.text }}>Нет постов</Text>
+              )
+            }
+          />
+        ) : (
+          <FlatList<CollectionItem>
+            data={vm.displayedPhotos}
+            style={s.list}
+            ListHeaderComponent={() => <Spacer height={8} />}
+            ListFooterComponent={<Spacer height={80} />}
+            keyExtractor={item => item.cid}
+            renderItem={({ item }) => (
+              <ItemHistory
+                title={item.title}
+                description={item.description}
+                file={item.file}
+                isSelected={vm.selectedPhotoCid === item.cid}
+                onPress={() => vm.showPhoto(item.cid)}
+              />
+            )}
+            ListEmptyComponent={
+              vm.loading ? (
+                <View style={s.emptyContainer}>
+                  <ActivityIndicator size="large" color="gray" />
+                </View>
+              ) : (
+                <Text style={{ padding: 16, color: colors.text }}>Нет фотографий</Text>
+              )
+            }
+          />
+        )}
       </View>
       {vm.selectedTab === 'posts' ? (
         <NewsDetail
@@ -162,24 +159,6 @@ export const NewsScreen = observer(() => {
 const s = StyleSheet.create({
   header: { flexDirection: 'row', marginRight: 16 },
   list: { flex: 1 },
-  listContainer: {
-    flex: 1,
-    position: 'relative',
-  },
-  listWrapper: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  listVisible: {
-    zIndex: 1,
-  },
-  listHidden: {
-    zIndex: 0,
-    opacity: 0,
-  },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
