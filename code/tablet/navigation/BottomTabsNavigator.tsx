@@ -6,6 +6,7 @@ import { SCREENS } from './navigation.types'
 import { useTheme } from '@react-navigation/native'
 import { MapScreen } from '../screen/map/Map.screen'
 import { CollectionScreen } from '../screen/collection/Collection.screen'
+import { NewsScreen } from '../screen/news/News.screen'
 import { SettingsMenuScreen } from '../screen/settings/settingsMenu/SettingsMenu.screen'
 
 const Tab = createBottomTabNavigator<StackParamList>()
@@ -53,6 +54,15 @@ export function BottomTabsNavigator() {
           title: 'Коллекция',
           headerTitle: 'Коллекция',
           tabBarIcon: ({ color }) => <MaterialIcons name="favorite" size={24} color={color} />,
+        }}
+      />
+      <Tab.Screen
+        name={SCREENS.NEWS}
+        component={NewsScreen}
+        options={{
+          title: 'Новости',
+          headerTitle: 'Новое на PastVu',
+          tabBarIcon: ({ color }) => <MaterialIcons name="article" size={24} color={color} />,
         }}
       />
       <Tab.Screen
