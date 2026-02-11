@@ -34,14 +34,12 @@ export const PostListItem: FC<PostListItemProps> = ({
   const avatarUri = user.avatar ? `https://pastvu.com/_a/h/${user.avatar}` : null
   const formattedDate = formatDate(pdate)
   const backgroundColor = useMemo(
-    () => (isSelected ? colors.baseThird : null),
+    () => (isSelected ? colors.baseThird : colors.baseFifth),
     [isSelected, colors],
   )
 
   return (
-    <TouchableOpacity
-      style={[s.mainContainer, { backgroundColor }]}
-      onPress={onPress}>
+    <TouchableOpacity style={[s.mainContainer, { backgroundColor }]} onPress={onPress}>
       <View style={s.headerContainer}>
         <Image
           source={avatarUri ? { uri: avatarUri } : StandardAvatar}
@@ -49,9 +47,7 @@ export const PostListItem: FC<PostListItemProps> = ({
           cachePolicy="disk"
         />
         <Spacer width={8} />
-        <Text style={[s.userNameText, { color: colors.textFirst }]}>
-          {user.disp || user.login}
-        </Text>
+        <Text style={[s.userNameText, { color: colors.textFirst }]}>{user.disp || user.login}</Text>
       </View>
       <Spacer height={8} />
       <Text numberOfLines={1} style={[s.titleText, { color: colors.textFirst }]}>
@@ -80,8 +76,8 @@ export const PostListItem: FC<PostListItemProps> = ({
                 s.showMoreText,
                 {
                   color: colors.textSecond,
-                  backgroundColor: isSelected ? colors.baseThird : colors.backgroundApp,
-                  shadowColor: isSelected ? colors.baseThird : colors.backgroundApp,
+                  backgroundColor: isSelected ? colors.baseThird : colors.baseFifth,
+                  shadowColor: isSelected ? colors.baseThird : colors.baseFifth,
                 },
               ]}>
               Показать ещё

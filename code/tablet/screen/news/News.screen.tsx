@@ -78,9 +78,10 @@ export const NewsScreen = observer(() => {
         {vm.selectedTab === 'posts' ? (
           <FlatList<NewsItems>
             data={vm.displayedPosts}
-            style={s.list}
-            ListHeaderComponent={() => <Spacer height={8} />}
+            style={s.postListContainer}
+            ListHeaderComponent={() => <Spacer height={16} />}
             ListFooterComponent={<Spacer height={80} />}
+            ItemSeparatorComponent={() => <Spacer height={8} />}
             keyExtractor={item => item._id}
             renderItem={({ item }) => (
               <PostListItem
@@ -158,6 +159,7 @@ export const NewsScreen = observer(() => {
 const s = StyleSheet.create({
   header: { flexDirection: 'row', marginRight: 16 },
   list: { flex: 1 },
+  postListContainer: { flex: 1, paddingHorizontal: 16 },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',

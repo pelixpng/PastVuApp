@@ -59,13 +59,6 @@ export const CollectionScreen = observer(() => {
           />
           <Spacer width={24} />
           <MaterialIcons name="share" size={24} color={colors.textFirst} onPress={vm.share} />
-          <Spacer width={24} />
-          <MaterialIcons
-            name="delete-outline"
-            size={24}
-            color={colors.textFirst}
-            onPress={() => vm.showDeleteModal()}
-          />
         </View>
       ),
     })
@@ -74,7 +67,7 @@ export const CollectionScreen = observer(() => {
     <Container row>
       <View style={{ width: listWidth }}>
         <Spacer height={18} />
-        <View style={{ paddingHorizontal: 16 }}>
+        <View style={s.segmentHeader}>
           <SegmentedControl
             options={vm.segmentOptions}
             selectedValue={vm.selectedTab}
