@@ -17,6 +17,7 @@ import { Container } from '../../../core/components/ui/Container'
 import { SegmentedControl } from '../../../core/components/ui/segmentedControl/SegmentedControl'
 import { PostListItem } from './components/postListItem/PostListItem'
 import { NewsDetail } from './components/newsDetail/NewsDetail'
+import { PhotoDetail } from '../collection/components/photoDetail/PhotoDetail'
 import { ItemHistory } from '../collection/components/itemHistory/Item'
 import type { NewsItems } from '../../../core/types/apiNews'
 import type { CollectionItem } from '../collection/Collection.screen'
@@ -29,15 +30,40 @@ export const NewsScreen = observer(() => {
   const listWidth = width * 0.33
 
   useLayoutEffect(() => {
-    if (!vm.activePost) return
-    navigation.setOptions({
-      headerRight: () => (
-        <View style={s.header}>
-          <MaterialIcons name="share" size={24} color={colors.textFirst} />
-        </View>
-      ),
-    })
-  }, [vm.activePost, colors.textFirst, navigation])
+    if (vm.selectedTab === 'photos' && vm.postInfo) {
+      navigation.setOptions({
+        headerRight: () => (
+          <View style={s.header}>
+            <MaterialIcons
+              name={vm.isFavorite ? 'favorite' : 'favorite-border'}
+              size={24}
+              color={colors.textFirst}
+              onPress={vm.toggleFavorite}
+            />
+            <Spacer width={24} />
+            <MaterialIcons
+              name="save-alt"
+              size={24}
+              color={colors.textFirst}
+              onPress={vm.saveImage}
+            />
+            <Spacer width={24} />
+            <MaterialIcons name="share" size={24} color={colors.textFirst} onPress={vm.share} />
+          </View>
+        ),
+      })
+    } else if (vm.selectedTab === 'posts' && vm.activePost) {
+      navigation.setOptions({
+        headerRight: () => (
+          <View style={s.header}>
+            <MaterialIcons name="share" size={24} color={colors.textFirst} />
+          </View>
+        ),
+      })
+    } else {
+      navigation.setOptions({ headerRight: undefined })
+    }
+  }, [vm.selectedTab, vm.activePost, vm.postInfo, vm.isFavorite, colors.textFirst, navigation])
 
   return (
     <Container row>
@@ -92,7 +118,8 @@ export const NewsScreen = observer(() => {
                   title={item.title}
                   description={item.description}
                   file={item.file}
-                  onPress={() => vm.openPhoto(item.cid)}
+                  isSelected={vm.selectedPhotoCid === item.cid}
+                  onPress={() => vm.showPhoto(item.cid)}
                 />
               )}
               ListEmptyComponent={
@@ -108,12 +135,26 @@ export const NewsScreen = observer(() => {
           </View>
         </View>
       </View>
-      <NewsDetail
-        post={vm.activePost}
-        comments={vm.comments}
-        users={vm.users}
-        onLinkPress={vm.openPhotoFromLink}
-      />
+      {vm.selectedTab === 'posts' ? (
+        <NewsDetail
+          post={vm.activePost}
+          comments={vm.postComments}
+          users={vm.postUsers}
+          onLinkPress={vm.openPhotoFromLink}
+        />
+      ) : (
+        <PhotoDetail
+          postInfo={vm.postInfo}
+          comments={vm.photoComments}
+          users={vm.photoUsers}
+          onImageLoaded={vm.onImageLoad}
+          imageLink={vm.imageLink}
+          isImageLoaded={vm.isImageLoaded}
+          showLoader={vm.showLoader}
+          openFullScreen={vm.openFullScreenImage}
+          onLinkPress={vm.openPhotoFromLink}
+        />
+      )}
     </Container>
   )
 })
