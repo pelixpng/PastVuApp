@@ -17,8 +17,7 @@ export interface CollectionItem {
   file: string
 }
 
-const ListHeader = () => <Spacer height={16} />
-const ItemSeparator = () => <Spacer height={16} />
+const Separator = () => <Spacer height={16} />
 
 const keyExtractor = (item: CollectionItem) => item.cid
 
@@ -58,8 +57,8 @@ export const CollectionScreen = observer(() => {
         data={vm.displayedData}
         keyExtractor={keyExtractor}
         contentContainerStyle={s.padding}
-        ListHeaderComponent={ListHeader}
-        ItemSeparatorComponent={ItemSeparator}
+        ListHeaderComponent={Separator}
+        ItemSeparatorComponent={Separator}
         renderItem={renderItem}
         initialNumToRender={10}
         maxToRenderPerBatch={5}

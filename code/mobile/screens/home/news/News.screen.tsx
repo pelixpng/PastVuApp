@@ -11,9 +11,8 @@ import { PhotoListItem } from '../collection/components/Item'
 import { Spacer } from '../../../../core/components/ui/Spacer'
 import { PostListItem } from './components/PostListItem/PostListItem'
 
-const PostSeparator = () => <Spacer height={8} />
-const PhotoSeparator = () => <Spacer height={16} />
-const ListHeader = () => <Spacer height={16} />
+const Separator8 = () => <Spacer height={8} />
+const Separator16 = () => <Spacer height={16} />
 
 export const NewsScreen = observer(() => {
   const vm = useVM(NewsVM)
@@ -57,8 +56,8 @@ export const NewsScreen = observer(() => {
         {vm.selectedTab === 'posts' ? (
           <FlatList<NewsItems>
             data={vm.news}
-            ItemSeparatorComponent={PostSeparator}
-            ListHeaderComponent={ListHeader}
+            ItemSeparatorComponent={Separator8}
+            ListHeaderComponent={Separator16}
             keyExtractor={postKeyExtractor}
             renderItem={renderPost}
             initialNumToRender={10}
@@ -77,8 +76,8 @@ export const NewsScreen = observer(() => {
         ) : (
           <FlatList<CollectionItem>
             data={vm.historyItems}
-            ItemSeparatorComponent={PhotoSeparator}
-            ListHeaderComponent={ListHeader}
+            ItemSeparatorComponent={Separator16}
+            ListHeaderComponent={Separator16}
             keyExtractor={photoKeyExtractor}
             renderItem={renderPhoto}
             initialNumToRender={10}

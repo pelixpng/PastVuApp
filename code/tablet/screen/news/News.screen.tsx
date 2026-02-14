@@ -22,8 +22,7 @@ import { ItemHistory } from '../collection/components/itemHistory/Item'
 import type { NewsItems } from '../../../core/types/apiNews'
 import type { CollectionItem } from '../collection/Collection.screen'
 
-const PostSeparator = () => <Spacer height={8} />
-const PhotoSeparator = () => <Spacer height={8} />
+const Separator = () => <Spacer height={8} />
 const ListHeader = () => <Spacer height={16} />
 const ListFooter = () => <Spacer height={80} />
 
@@ -117,7 +116,7 @@ export const NewsScreen = observer(() => {
             style={s.postListContainer}
             ListHeaderComponent={ListHeader}
             ListFooterComponent={ListFooter}
-            ItemSeparatorComponent={PostSeparator}
+            ItemSeparatorComponent={Separator}
             keyExtractor={postKeyExtractor}
             renderItem={renderPost}
             initialNumToRender={10}
@@ -139,7 +138,7 @@ export const NewsScreen = observer(() => {
             style={s.list}
             ListHeaderComponent={ListHeader}
             ListFooterComponent={ListFooter}
-            ItemSeparatorComponent={PhotoSeparator}
+            ItemSeparatorComponent={Separator}
             keyExtractor={photoKeyExtractor}
             renderItem={renderPhoto}
             initialNumToRender={10}
