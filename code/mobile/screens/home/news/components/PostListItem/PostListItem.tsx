@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import { FC, memo, useState, useEffect } from 'react'
 import { TouchableOpacity, View, Text } from 'react-native'
 import { Image } from 'expo-image'
 import RenderHTML from 'react-native-render-html'
@@ -18,7 +18,9 @@ export type PostListItemProps = {
   user: NewsUser
 }
 
-export const PostListItem: FC<PostListItemProps> = ({
+const stripHtml = (html: string) => html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+
+export const PostListItem: FC<PostListItemProps> = memo(({
   title,
   notice,
   pdate,
@@ -29,6 +31,14 @@ export const PostListItem: FC<PostListItemProps> = ({
   const { colors } = useTheme()
   const avatarUri = user.avatar ? `https://pastvu.com/_a/h/${user.avatar}` : null
   const formattedDate = formatDate(pdate)
+  const [htmlReady, setHtmlReady] = useState(false)
+
+  useEffect(() => {
+    if (notice) {
+      const frame = requestAnimationFrame(() => setHtmlReady(true))
+      return () => cancelAnimationFrame(frame)
+    }
+  }, [notice])
 
   return (
     <TouchableOpacity
@@ -54,19 +64,32 @@ export const PostListItem: FC<PostListItemProps> = ({
           <>
             <Spacer height={8} />
             <View style={s.noticeContainer}>
-              <RenderHTML
-                source={{ html: notice }}
-                baseStyle={{
-                  color: colors.textSecond,
-                  fontWeight: '500',
-                  fontSize: 13,
-                  lineHeight: 20,
-                }}
-                tagsStyles={{
-                  p: { margin: 0, padding: 0 },
-                  body: { margin: 0, padding: 0 },
-                }}
-              />
+              {htmlReady ? (
+                <RenderHTML
+                  source={{ html: notice }}
+                  baseStyle={{
+                    color: colors.textSecond,
+                    fontWeight: '500',
+                    fontSize: 13,
+                    lineHeight: 20,
+                  }}
+                  tagsStyles={{
+                    p: { margin: 0, padding: 0 },
+                    body: { margin: 0, padding: 0 },
+                  }}
+                />
+              ) : (
+                <Text
+                  style={{
+                    color: colors.textSecond,
+                    fontWeight: '500',
+                    fontSize: 13,
+                    lineHeight: 20,
+                  }}
+                  numberOfLines={4}>
+                  {stripHtml(notice)}
+                </Text>
+              )}
               <Text
                 style={[
                   s.showMoreText,
@@ -93,4 +116,4 @@ export const PostListItem: FC<PostListItemProps> = ({
       </View>
     </TouchableOpacity>
   )
-}
+})

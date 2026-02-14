@@ -1,6 +1,7 @@
 import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native'
 import { useTheme } from '@react-navigation/native'
 import { observer } from 'mobx-react'
+import { useCallback } from 'react'
 import NewsVM, { NewsTab } from './News.vm'
 import { useVM } from '../../../../core/hooks/useVM'
 import { SegmentedControl } from '../../../../core/components/ui/segmentedControl/SegmentedControl'
@@ -10,9 +11,39 @@ import { PhotoListItem } from '../collection/components/Item'
 import { Spacer } from '../../../../core/components/ui/Spacer'
 import { PostListItem } from './components/PostListItem/PostListItem'
 
+const PostSeparator = () => <Spacer height={8} />
+const PhotoSeparator = () => <Spacer height={16} />
+const ListHeader = () => <Spacer height={16} />
+
 export const NewsScreen = observer(() => {
   const vm = useVM(NewsVM)
   const { colors } = useTheme()
+
+  const renderPost = useCallback(
+    ({ item }: { item: NewsItems }) => (
+      <PostListItem
+        title={item.title}
+        notice={item.notice}
+        pdate={item.pdate}
+        ccount={item.ccount}
+        user={item.user}
+        onPress={() => vm.openPost(item)}
+      />
+    ),
+    [vm],
+  )
+
+  const renderPhoto = useCallback(
+    ({ item }: { item: CollectionItem }) => (
+      <PhotoListItem
+        title={item.title}
+        description={item.description}
+        file={item.file}
+        onPress={() => vm.openPhoto(item.cid, item.title)}
+      />
+    ),
+    [vm],
+  )
 
   return (
     <View style={[{ backgroundColor: colors.backgroundApp }, s.container]}>
@@ -23,22 +54,16 @@ export const NewsScreen = observer(() => {
         onChange={value => vm.setSelectedTab(value as NewsTab)}
       />
       <View style={s.listContainer}>
-        <View style={[s.list, vm.selectedTab === 'posts' ? s.listVisible : s.listHidden]}>
+        {vm.selectedTab === 'posts' ? (
           <FlatList<NewsItems>
             data={vm.news}
-            ItemSeparatorComponent={() => <Spacer height={8} />}
-            ListHeaderComponent={() => <Spacer height={16} />}
-            keyExtractor={item => item._id}
-            renderItem={({ item }) => (
-              <PostListItem
-                title={item.title}
-                notice={item.notice}
-                pdate={item.pdate}
-                ccount={item.ccount}
-                user={item.user}
-                onPress={() => vm.openPost(item)}
-              />
-            )}
+            ItemSeparatorComponent={PostSeparator}
+            ListHeaderComponent={ListHeader}
+            keyExtractor={postKeyExtractor}
+            renderItem={renderPost}
+            initialNumToRender={10}
+            maxToRenderPerBatch={5}
+            windowSize={5}
             ListEmptyComponent={
               vm.loading ? (
                 <View style={s.emptyContainer}>
@@ -49,21 +74,16 @@ export const NewsScreen = observer(() => {
               )
             }
           />
-        </View>
-        <View style={[s.list, vm.selectedTab === 'photos' ? s.listVisible : s.listHidden]}>
+        ) : (
           <FlatList<CollectionItem>
             data={vm.historyItems}
-            ItemSeparatorComponent={() => <Spacer height={16} />}
-            ListHeaderComponent={() => <Spacer height={16} />}
-            keyExtractor={item => item.cid.toString()}
-            renderItem={({ item }) => (
-              <PhotoListItem
-                title={item.title}
-                description={item.description}
-                file={item.file}
-                onPress={() => vm.openPhoto(item.cid, item.title)}
-              />
-            )}
+            ItemSeparatorComponent={PhotoSeparator}
+            ListHeaderComponent={ListHeader}
+            keyExtractor={photoKeyExtractor}
+            renderItem={renderPhoto}
+            initialNumToRender={10}
+            maxToRenderPerBatch={5}
+            windowSize={5}
             ListEmptyComponent={
               vm.loading ? (
                 <View style={s.emptyContainer}>
@@ -74,11 +94,14 @@ export const NewsScreen = observer(() => {
               )
             }
           />
-        </View>
+        )}
       </View>
     </View>
   )
 })
+
+const postKeyExtractor = (item: NewsItems) => item._id
+const photoKeyExtractor = (item: CollectionItem) => item.cid.toString()
 
 const s = StyleSheet.create({
   container: {
@@ -87,21 +110,6 @@ const s = StyleSheet.create({
   },
   listContainer: {
     flex: 1,
-    position: 'relative',
-  },
-  list: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  listVisible: {
-    zIndex: 1,
-  },
-  listHidden: {
-    zIndex: 0,
-    opacity: 0,
   },
   emptyContainer: {
     flex: 1,
