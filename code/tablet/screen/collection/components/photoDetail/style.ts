@@ -26,4 +26,13 @@ export const s = StyleSheet.create({
     position: 'absolute',
     zIndex: 40,
   },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 15,
+    fontWeight: '500',
+  },
 })

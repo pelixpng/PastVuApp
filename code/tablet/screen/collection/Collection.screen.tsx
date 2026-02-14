@@ -28,6 +28,11 @@ export interface CollectionItem {
   file: string
 }
 
+const ListHeader = () => <Spacer height={8} />
+const ListFooter = () => <Spacer height={80} />
+
+const keyExtractor = (item: CollectionItem) => item.cid
+
 export const CollectionScreen = observer(() => {
   const vm = useVM(CollectionVM)
   const { colors } = useTheme()
@@ -63,6 +68,21 @@ export const CollectionScreen = observer(() => {
       ),
     })
   }, [vm.postInfo, vm.isFavorite, colors.textFirst, navigation])
+
+  const renderItem = useCallback(
+    ({ item }: { item: CollectionItem }) => (
+      <ItemHistory
+        title={item.title}
+        description={item.description}
+        file={item.file}
+        isSelected={vm.selectedItem === item.cid}
+        onPress={() => vm.showPhoto(item.cid)}
+        onRemove={() => vm.showDeleteModal(item.cid)}
+      />
+    ),
+    [vm],
+  )
+
   return (
     <Container row>
       <View style={{ width: listWidth }}>
@@ -77,19 +97,13 @@ export const CollectionScreen = observer(() => {
         <FlatList
           data={vm.displayedData}
           style={s.list}
-          ListFooterComponent={<Spacer height={80} />}
-          keyExtractor={item => item.cid}
-          ListHeaderComponent={() => <Spacer height={8} />}
-          renderItem={({ item }) => (
-            <ItemHistory
-              title={item.title}
-              description={item.description}
-              file={item.file}
-              isSelected={vm.selectedItem === item.cid}
-              onPress={() => vm.showPhoto(item.cid)}
-              onRemove={() => vm.showDeleteModal(item.cid)}
-            />
-          )}
+          ListFooterComponent={ListFooter}
+          keyExtractor={keyExtractor}
+          ListHeaderComponent={ListHeader}
+          renderItem={renderItem}
+          initialNumToRender={10}
+          maxToRenderPerBatch={5}
+          windowSize={5}
           ListEmptyComponent={
             <View style={s.emptyContainer}>
               <MenuButton

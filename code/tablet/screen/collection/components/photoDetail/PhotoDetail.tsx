@@ -37,6 +37,19 @@ export const PhotoDetail: FC<PhotoDetailProps> = ({
     ({ item }) => <Comment comment={item} users={users} onLinkPress={onLinkPress} />,
     [users, onLinkPress],
   )
+  if (!postInfo) {
+    return (
+      <View style={[s.modal, { width: modalWidth }]}>
+        <Spacer height={18} />
+        <View style={s.emptyContainer}>
+          <Text style={[s.emptyText, { color: colors.textThird }]}>
+            Выберите фото для просмотра
+          </Text>
+        </View>
+      </View>
+    )
+  }
+
   return (
     <View style={[s.modal, { width: modalWidth }]}>
       <Spacer height={18} />
