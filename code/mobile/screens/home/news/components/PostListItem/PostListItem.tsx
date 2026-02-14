@@ -2,6 +2,7 @@ import { FC, memo, useState, useEffect } from 'react'
 import { TouchableOpacity, View, Text } from 'react-native'
 import { Image } from 'expo-image'
 import RenderHTML from 'react-native-render-html'
+import { LinearGradient } from 'expo-linear-gradient'
 import { s } from './style'
 import { useTheme } from '@react-navigation/native'
 import { Spacer } from '../../../../../../core/components/ui/Spacer'
@@ -89,17 +90,22 @@ export const PostListItem: FC<PostListItemProps> = memo(
                     {stripHtml(notice)}
                   </Text>
                 )}
-                <Text
-                  style={[
-                    s.showMoreText,
-                    {
-                      color: colors.textSecond,
-                      backgroundColor: colors.baseFifth,
-                      shadowColor: colors.baseFifth,
-                    },
-                  ]}>
-                  Показать ещё
-                </Text>
+                <LinearGradient
+                  colors={[colors.baseFifth + '99', colors.baseFifth]}
+                  start={{ x: 0, y: 0.5 }}
+                  end={{ x: 0.5, y: 0.5 }}
+                  style={s.showMoreGradient}>
+                  <Text
+                    style={[
+                      s.showMoreText,
+                      {
+                        color: colors.textSecond,
+                        backgroundColor: colors.baseFifth,
+                      },
+                    ]}>
+                    Показать ещё
+                  </Text>
+                </LinearGradient>
               </View>
             </>
           ) : null}

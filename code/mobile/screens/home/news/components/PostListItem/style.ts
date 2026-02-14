@@ -28,17 +28,18 @@ export const s = StyleSheet.create({
     fontWeight: '800',
   },
   noticeContainer: {},
-  showMoreText: {
+  showMoreGradient: {
     position: 'absolute',
     bottom: 0,
     right: 0,
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    paddingLeft: 40,
+  },
+  showMoreText: {
     fontWeight: '800',
     fontSize: 13,
     lineHeight: 20,
-    paddingLeft: 4,
-    shadowOffset: { width: -20, height: 0 },
-    shadowOpacity: 1,
-    shadowRadius: 6,
   },
   footerContainer: {
     flexDirection: 'row',
