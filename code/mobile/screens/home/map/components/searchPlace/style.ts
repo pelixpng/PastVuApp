@@ -9,7 +9,7 @@ export const s = StyleSheet.create({
   },
   list: {
     paddingTop: 12,
-    paddingBottom: 16,
+    paddingBottom: 12,
     paddingLeft: 20,
     paddingRight: 8,
     borderRadius: 12,
@@ -35,12 +35,11 @@ export const s = StyleSheet.create({
   ball: {
     width: 9,
     height: 9,
-    borderRadius: 20,
+    borderRadius: 50,
     alignSelf: 'center',
   },
   resultText: {
     fontSize: 14,
-    lineHeight: 20,
     fontWeight: 'medium',
   },
 })

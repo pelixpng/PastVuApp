@@ -2,7 +2,7 @@
   "expo": {
     "name": "PastVu",
     "slug": "PastVuApp",
-    "version": "2.3.0",
+    "version": "2.4.0",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "newArchEnabled": true,
@@ -27,6 +27,10 @@
         "image": "./assets/splash.png",
         "backgroundColor": "#2D61A0",
         "resizeMode": "contain"
+      },
+      "icon": {
+        "light": "./assets/icon.png",
+        "dark": "./assets/iconDark.png"
       },
       "infoPlist": {
         "EXDefaultScreenOrientationMask": "UIInterfaceOrientationMaskAll"

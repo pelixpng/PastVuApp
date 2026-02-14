@@ -29,15 +29,17 @@ export const CollectionScreen = observer(() => {
   return (
     <View style={[{ backgroundColor: colors.backgroundApp }, s.container]}>
       <Spacer height={18} />
-      <SegmentedControl
-        options={vm.segmentOptions}
-        selectedValue={vm.selectedTab}
-        onChange={value => vm.setSelectedTab(value as CollectionTab)}
-      />
+      <View style={s.padding}>
+        <SegmentedControl
+          options={vm.segmentOptions}
+          selectedValue={vm.selectedTab}
+          onChange={value => vm.setSelectedTab(value as CollectionTab)}
+        />
+      </View>
       <FlatList
         data={vm.displayedData}
-        style={s.list}
         keyExtractor={item => item.cid}
+        contentContainerStyle={s.padding}
         ListHeaderComponent={() => <Spacer height={16} />}
         ItemSeparatorComponent={() => <Spacer height={16} />}
         renderItem={({ item }) => (
@@ -72,6 +74,6 @@ export const CollectionScreen = observer(() => {
 })
 
 const s = StyleSheet.create({
-  container: { flex: 1, paddingHorizontal: 16 },
-  list: { flex: 1 },
+  container: { flex: 1 },
+  padding: { paddingHorizontal: 16 },
 })

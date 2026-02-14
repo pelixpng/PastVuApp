@@ -16,7 +16,7 @@ export default function App() {
       )
     }
     lockOrientation()
-  }, [])
+  }, [isShowTabletUI])
 
   return isShowTabletUI ? <AppTablet /> : <AppMobile />
 }

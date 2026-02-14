@@ -14,7 +14,7 @@ import { socketEmit } from './socketService'
 
 const BASE_URL = 'https://api.pastvu.com/api2'
 const PLACE_API_URL = 'https://us1.locationiq.com/v1'
-const PLACE_API_KEY = 'YOUR API KEY'
+const PLACE_API_KEY = 'YOUR_API_KEY'
 
 export default class ApiService {
   static async getPhotoList(params: getPhotoListProps) {
