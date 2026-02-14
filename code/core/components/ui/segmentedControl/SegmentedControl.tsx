@@ -148,15 +148,14 @@ const s = StyleSheet.create({
     shadowOpacity: 1,
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 2 },
-    elevation: 3,
   },
   segment: {
     flex: 1,
     paddingVertical: 10,
-    //paddingHorizontal: 20,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
+    zIndex: 1,
   },
   segmentBackground: {
     borderRadius: 0,
