@@ -1,7 +1,6 @@
-import { FC, memo, useState, useEffect } from 'react'
+import { FC, memo } from 'react'
 import { TouchableOpacity, View, Text } from 'react-native'
 import { Image } from 'expo-image'
-import RenderHTML from 'react-native-render-html'
 import { LinearGradient } from 'expo-linear-gradient'
 import { s } from './style'
 import { useTheme } from '@react-navigation/native'
@@ -22,7 +21,7 @@ export type PostListItemProps = {
 const stripHtml = (html: string) =>
   html
     .replace(/<[^>]*>/g, ' ')
-    .replace(/&nbsp;/g, ' ')
+    .replace(/&[a-zA-Z]+;/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
 
@@ -31,14 +30,6 @@ export const PostListItem: FC<PostListItemProps> = memo(
     const { colors } = useTheme()
     const avatarUri = user.avatar ? `https://pastvu.com/_a/h/${user.avatar}` : null
     const formattedDate = formatDate(pdate)
-    const [htmlReady, setHtmlReady] = useState(false)
-
-    useEffect(() => {
-      if (notice) {
-        const frame = requestAnimationFrame(() => setHtmlReady(true))
-        return () => cancelAnimationFrame(frame)
-      }
-    }, [notice])
 
     return (
       <TouchableOpacity
@@ -64,32 +55,16 @@ export const PostListItem: FC<PostListItemProps> = memo(
             <>
               <Spacer height={8} />
               <View style={s.noticeContainer}>
-                {htmlReady ? (
-                  <RenderHTML
-                    source={{ html: notice }}
-                    baseStyle={{
-                      color: colors.textSecond,
-                      fontWeight: '500',
-                      fontSize: 13,
-                      lineHeight: 20,
-                    }}
-                    tagsStyles={{
-                      p: { margin: 0, padding: 0 },
-                      body: { margin: 0, padding: 0 },
-                    }}
-                  />
-                ) : (
-                  <Text
-                    style={{
-                      color: colors.textSecond,
-                      fontWeight: '500',
-                      fontSize: 13,
-                      lineHeight: 20,
-                    }}
-                    numberOfLines={10}>
-                    {stripHtml(notice)}
-                  </Text>
-                )}
+                <Text
+                  style={{
+                    color: colors.textSecond,
+                    fontWeight: '500',
+                    fontSize: 13,
+                    lineHeight: 20,
+                  }}
+                  numberOfLines={3}>
+                  {stripHtml(notice)}
+                </Text>
                 <LinearGradient
                   colors={[colors.baseFifth + '99', colors.baseFifth]}
                   start={{ x: 0, y: 0.5 }}

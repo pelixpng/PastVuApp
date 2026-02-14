@@ -1,7 +1,6 @@
-import { FC, memo, useMemo, useState, useEffect } from 'react'
-import { TouchableOpacity, View, Text, useWindowDimensions } from 'react-native'
+import { FC, memo, useMemo } from 'react'
+import { TouchableOpacity, View, Text } from 'react-native'
 import { Image } from 'expo-image'
-import RenderHTML from 'react-native-render-html'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useTheme } from '@react-navigation/native'
 import { s } from './style'
@@ -23,15 +22,13 @@ export type PostListItemProps = {
 const stripHtml = (html: string) =>
   html
     .replace(/<[^>]*>/g, ' ')
-    .replace(/&nbsp;/g, ' ')
+    .replace(/&[a-zA-Z]+;/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
 
 export const PostListItem: FC<PostListItemProps> = memo(
   ({ title, notice, pdate, ccount, user, onPress, isSelected }) => {
     const { colors } = useTheme()
-    const { width } = useWindowDimensions()
-    const contentWidth = width * 0.33 - 32
     const avatarUri = user.avatar ? `https://pastvu.com/_a/h/${user.avatar}` : null
     const formattedDate = formatDate(pdate)
     const backgroundColor = useMemo(
@@ -39,14 +36,6 @@ export const PostListItem: FC<PostListItemProps> = memo(
       [isSelected, colors],
     )
     const gradientBg = isSelected ? colors.baseThird : colors.baseFifth
-    const [htmlReady, setHtmlReady] = useState(false)
-
-    useEffect(() => {
-      if (notice) {
-        const frame = requestAnimationFrame(() => setHtmlReady(true))
-        return () => cancelAnimationFrame(frame)
-      }
-    }, [notice])
 
     return (
       <TouchableOpacity style={[s.mainContainer, { backgroundColor }]} onPress={onPress}>
@@ -69,33 +58,16 @@ export const PostListItem: FC<PostListItemProps> = memo(
           <>
             <Spacer height={4} />
             <View style={s.noticeContainer} pointerEvents="none">
-              {htmlReady ? (
-                <RenderHTML
-                  source={{ html: notice }}
-                  contentWidth={contentWidth}
-                  baseStyle={{
-                    color: colors.textSecond,
-                    fontWeight: '500',
-                    fontSize: 13,
-                    lineHeight: 20,
-                  }}
-                  tagsStyles={{
-                    p: { margin: 0, padding: 0 },
-                    body: { margin: 0, padding: 0 },
-                  }}
-                />
-              ) : (
-                <Text
-                  style={{
-                    color: colors.textSecond,
-                    fontWeight: '500',
-                    fontSize: 13,
-                    lineHeight: 20,
-                  }}
-                  numberOfLines={10}>
-                  {stripHtml(notice)}
-                </Text>
-              )}
+              <Text
+                style={{
+                  color: colors.textSecond,
+                  fontWeight: '500',
+                  fontSize: 13,
+                  lineHeight: 20,
+                }}
+                numberOfLines={3}>
+                {stripHtml(notice)}
+              </Text>
               <LinearGradient
                 colors={[gradientBg + '99', gradientBg]}
                 start={{ x: 0, y: 0.5 }}
