@@ -17,6 +17,11 @@ export interface CollectionItem {
   file: string
 }
 
+const ListHeader = () => <Spacer height={16} />
+const ItemSeparator = () => <Spacer height={16} />
+
+const keyExtractor = (item: CollectionItem) => item.cid
+
 export const CollectionScreen = observer(() => {
   const vm = useVM(CollectionVM)
   const { colors } = useTheme()
@@ -24,6 +29,19 @@ export const CollectionScreen = observer(() => {
     useCallback(() => {
       vm.getPhotos()
     }, [vm]),
+  )
+
+  const renderItem = useCallback(
+    ({ item }: { item: CollectionItem }) => (
+      <PhotoListItem
+        title={item.title}
+        description={item.description}
+        file={item.file}
+        onPress={() => vm.openPhoto(item.cid, item.title)}
+        onRemove={() => vm.showDeleteConfirmation(item.cid)}
+      />
+    ),
+    [vm],
   )
 
   return (
@@ -38,19 +56,14 @@ export const CollectionScreen = observer(() => {
       </View>
       <FlatList
         data={vm.displayedData}
-        keyExtractor={item => item.cid}
+        keyExtractor={keyExtractor}
         contentContainerStyle={s.padding}
-        ListHeaderComponent={() => <Spacer height={16} />}
-        ItemSeparatorComponent={() => <Spacer height={16} />}
-        renderItem={({ item }) => (
-          <PhotoListItem
-            title={item.title}
-            description={item.description}
-            file={item.file}
-            onPress={() => vm.openPhoto(item.cid, item.title)}
-            onRemove={() => vm.showDeleteConfirmation(item.cid)}
-          />
-        )}
+        ListHeaderComponent={ListHeader}
+        ItemSeparatorComponent={ItemSeparator}
+        renderItem={renderItem}
+        initialNumToRender={10}
+        maxToRenderPerBatch={5}
+        windowSize={5}
         ListEmptyComponent={
           <MenuButton
             title={vm.selectedTab === 'viewed' ? 'История просмотра' : 'Избранное'}
