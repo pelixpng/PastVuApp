@@ -1,4 +1,4 @@
-import { useLayoutEffect } from 'react'
+import { useCallback, useLayoutEffect } from 'react'
 import {
   ActivityIndicator,
   FlatList,
@@ -21,6 +21,14 @@ import { PhotoDetail } from '../collection/components/photoDetail/PhotoDetail'
 import { ItemHistory } from '../collection/components/itemHistory/Item'
 import type { NewsItems } from '../../../core/types/apiNews'
 import type { CollectionItem } from '../collection/Collection.screen'
+
+const PostSeparator = () => <Spacer height={8} />
+const PhotoSeparator = () => <Spacer height={8} />
+const ListHeader = () => <Spacer height={16} />
+const ListFooter = () => <Spacer height={80} />
+
+const postKeyExtractor = (item: NewsItems) => item._id
+const photoKeyExtractor = (item: CollectionItem) => item.cid
 
 export const NewsScreen = observer(() => {
   const vm = useVM(NewsVM)
@@ -64,6 +72,34 @@ export const NewsScreen = observer(() => {
     }
   }, [vm.selectedTab, vm.activePost, vm.postInfo, vm.isFavorite, colors.textFirst, navigation])
 
+  const renderPost = useCallback(
+    ({ item }: { item: NewsItems }) => (
+      <PostListItem
+        title={item.title}
+        notice={item.notice}
+        pdate={item.pdate}
+        ccount={item.ccount}
+        user={item.user}
+        isSelected={vm.selectedPostId === item._id}
+        onPress={() => vm.openPost(item)}
+      />
+    ),
+    [vm],
+  )
+
+  const renderPhoto = useCallback(
+    ({ item }: { item: CollectionItem }) => (
+      <ItemHistory
+        title={item.title}
+        description={item.description}
+        file={item.file}
+        isSelected={vm.selectedPhotoCid === item.cid}
+        onPress={() => vm.showPhoto(item.cid)}
+      />
+    ),
+    [vm],
+  )
+
   return (
     <Container row>
       <View style={{ width: listWidth }}>
@@ -79,21 +115,14 @@ export const NewsScreen = observer(() => {
           <FlatList<NewsItems>
             data={vm.displayedPosts}
             style={s.postListContainer}
-            ListHeaderComponent={() => <Spacer height={16} />}
-            ListFooterComponent={<Spacer height={80} />}
-            ItemSeparatorComponent={() => <Spacer height={8} />}
-            keyExtractor={item => item._id}
-            renderItem={({ item }) => (
-              <PostListItem
-                title={item.title}
-                notice={item.notice}
-                pdate={item.pdate}
-                ccount={item.ccount}
-                user={item.user}
-                isSelected={vm.selectedPostId === item._id}
-                onPress={() => vm.openPost(item)}
-              />
-            )}
+            ListHeaderComponent={ListHeader}
+            ListFooterComponent={ListFooter}
+            ItemSeparatorComponent={PostSeparator}
+            keyExtractor={postKeyExtractor}
+            renderItem={renderPost}
+            initialNumToRender={10}
+            maxToRenderPerBatch={5}
+            windowSize={5}
             ListEmptyComponent={
               vm.loading ? (
                 <View style={s.emptyContainer}>
@@ -108,18 +137,14 @@ export const NewsScreen = observer(() => {
           <FlatList<CollectionItem>
             data={vm.displayedPhotos}
             style={s.list}
-            ListHeaderComponent={() => <Spacer height={8} />}
-            ListFooterComponent={<Spacer height={80} />}
-            keyExtractor={item => item.cid}
-            renderItem={({ item }) => (
-              <ItemHistory
-                title={item.title}
-                description={item.description}
-                file={item.file}
-                isSelected={vm.selectedPhotoCid === item.cid}
-                onPress={() => vm.showPhoto(item.cid)}
-              />
-            )}
+            ListHeaderComponent={ListHeader}
+            ListFooterComponent={ListFooter}
+            ItemSeparatorComponent={PhotoSeparator}
+            keyExtractor={photoKeyExtractor}
+            renderItem={renderPhoto}
+            initialNumToRender={10}
+            maxToRenderPerBatch={5}
+            windowSize={5}
             ListEmptyComponent={
               vm.loading ? (
                 <View style={s.emptyContainer}>
