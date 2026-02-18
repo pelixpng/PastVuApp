@@ -19,6 +19,8 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
   @observable news: NewsItems[] = []
   @observable historyItems: CollectionItem[] = []
   @observable loading = true
+  @observable newsError = false
+  @observable photosError = false
   @observable selectedPostId: string | null = null
 
   // post detail
@@ -46,9 +48,14 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
   constructor() {
     super()
     makeObservable(this)
-    this.loadRegions()
-    this.loadNews()
-    this.loadPhotos()
+    this.loadAll()
+  }
+
+  private async loadAll() {
+    try {
+      await this.loadRegions()
+    } catch {}
+    await Promise.allSettled([this.loadNews(), this.loadPhotos()])
   }
 
   @computed
@@ -72,6 +79,18 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
   }
 
   @action.bound
+  async retry() {
+    if (this.regionsMap.size === 0) {
+      await this.loadRegions()
+    }
+    if (this.selectedTab === 'posts') {
+      await this.loadNews()
+    } else {
+      await this.loadPhotos()
+    }
+  }
+
+  @action.bound
   setSelectedTab(tab: NewsTab) {
     this.selectedTab = tab
   }
@@ -80,14 +99,16 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
   async loadNews() {
     try {
       this.loading = true
+      this.newsError = false
       const newsData = await ApiService.getNews()
       runInAction(() => {
         this.news = newsData
         this.loading = false
       })
-    } catch (error) {
+    } catch {
       runInAction(() => {
         this.loading = false
+        this.newsError = true
       })
     }
   }
@@ -95,6 +116,7 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
   @action.bound
   async loadPhotos() {
     try {
+      this.photosError = false
       const photosData = await ApiService.getRecentPhotos()
       runInAction(() => {
         this.historyItems = photosData.map((photo: any) => ({
@@ -104,8 +126,10 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
           file: photo.file,
         }))
       })
-    } catch (error) {
-      console.log('Error loading photos:', error)
+    } catch {
+      runInAction(() => {
+        this.photosError = true
+      })
     }
   }
 
@@ -113,8 +137,7 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
   async loadRegions() {
     try {
       this.regionsMap = await ApiService.getRegions()
-    } catch (error) {
-      console.log('Error loading regions:', error)
+    } catch {
     }
   }
 
@@ -122,6 +145,7 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
 
   @action.bound
   openPost(post: NewsItems) {
+    this.selectedPhotoCid = null
     this.selectedPostId = post._id
     this.activePost = post
     this.postHistory = []
@@ -139,9 +163,7 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
         this.postUsers = users
         this.postComments = comments
       })
-    } catch (error) {
-      console.log('Error loading news comments:', error)
-    }
+    } catch {}
   }
 
   @action.bound
@@ -186,6 +208,15 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
   // -------------------------------- Photo detail --------------------------------
 
   @action.bound
+  closePhoto() {
+    this.selectedPhotoCid = null
+    this.postInfo = null
+    this.photoComments = []
+    this.photoUsers = null
+    this.isImageLoaded = false
+  }
+
+  @action.bound
   showPhoto(cid: string) {
     if (cid !== this.postInfo?.cid.toString()) {
       if (this.postInfo) {
@@ -211,6 +242,17 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
           this.postInfo = result.photo
           const favorites: CollectionItem[] = MMKVStorage.get('Favorites') ?? []
           this.isFavorite = favorites.some(item => item.cid === cid)
+
+          const history: CollectionItem[] = MMKVStorage.get('History') ?? []
+          if (!history.some(item => item.cid === cid)) {
+            const title = result.photo.title
+            const description = `${result.photo.y} ${result.photo.regions
+              .map((region: any) => region.title_local)
+              .join(', ')}`
+            const file = result.photo.file
+            const updatedHistory = [{ title, description, cid, file }, ...history]
+            MMKVStorage.set('History', updatedHistory)
+          }
         })
         if (result.photo?.ccount) {
           this.getPhotoComments(cid)

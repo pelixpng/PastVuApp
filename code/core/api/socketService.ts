@@ -2,24 +2,15 @@ import io from 'socket.io-client'
 
 let socketInstance: any = null
 
+const SOCKET_TIMEOUT = 15000
+
 const getSocket = () => {
   if (!socketInstance) {
-    console.log('🔌 Creating new Socket.IO connection')
     socketInstance = io('https://pastvu.com', {
       path: '/socket.io/',
       transports: ['polling', 'websocket'],
       withCredentials: true,
     })
-
-    socketInstance.on('connect', () => {
-      console.log('✅ Socket.IO connected, ID:', socketInstance.id)
-    })
-
-    socketInstance.on('disconnect', () => {
-      console.log('❌ Socket.IO disconnected')
-    })
-  } else {
-    console.log('♻️ Reusing existing Socket.IO connection, ID:', socketInstance.id)
   }
   return socketInstance
 }
@@ -28,8 +19,29 @@ export const socketEmit = (event: string, data: any): Promise<any> => {
   return new Promise((resolve, reject) => {
     const socket = getSocket()
 
+    const cleanup = () => {
+      clearTimeout(timer)
+      socket.off('connect', onConnect)
+      socket.off('connect_error', onError)
+    }
+
+    const timer = setTimeout(() => {
+      cleanup()
+      reject(new Error(`Socket timeout for ${event} after ${SOCKET_TIMEOUT}ms`))
+    }, SOCKET_TIMEOUT)
+
     const onConnect = () => {
+      doEmit()
+    }
+
+    const onError = (error: any) => {
+      cleanup()
+      reject(error)
+    }
+
+    const doEmit = () => {
       socket.emit(event, data, (resp: any) => {
+        cleanup()
         if (resp?.result) {
           resolve(resp.result)
         } else {
@@ -39,19 +51,16 @@ export const socketEmit = (event: string, data: any): Promise<any> => {
     }
 
     if (socket.connected) {
-      onConnect()
+      doEmit()
     } else {
       socket.once('connect', onConnect)
-      socket.once('connect_error', (error: any) => {
-        reject(error)
-      })
+      socket.once('connect_error', onError)
     }
   })
 }
 
 export const disconnectSocket = () => {
   if (socketInstance) {
-    console.log('🔌 Disconnecting Socket.IO')
     socketInstance.disconnect()
     socketInstance = null
   }

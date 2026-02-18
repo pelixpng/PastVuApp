@@ -36,8 +36,19 @@ export const NewsScreen = observer(() => {
   const { width } = useWindowDimensions()
   const listWidth = width * 0.33
   useLayoutEffect(() => {
-    if (vm.selectedTab === 'photos' && vm.postInfo) {
+    if (vm.selectedPhotoCid && vm.postInfo) {
       navigation.setOptions({
+        headerLeft: vm.selectedTab === 'posts'
+          ? () => (
+              <MaterialIcons
+                name="arrow-back"
+                size={24}
+                color={colors.textFirst}
+                style={{ marginLeft: 16 }}
+                onPress={vm.closePhoto}
+              />
+            )
+          : undefined,
         headerRight: () => (
           <View style={s.header}>
             <MaterialIcons
@@ -60,6 +71,17 @@ export const NewsScreen = observer(() => {
       })
     } else if (vm.selectedTab === 'posts' && vm.activePost) {
       navigation.setOptions({
+        headerLeft: vm.canGoBack
+          ? () => (
+              <MaterialIcons
+                name="arrow-back"
+                size={24}
+                color={colors.textFirst}
+                style={{ marginLeft: 16 }}
+                onPress={vm.goBackToPost}
+              />
+            )
+          : undefined,
         headerRight: () => (
           <View style={s.header}>
             <MaterialIcons name="share" size={24} color={colors.textFirst} />
@@ -67,9 +89,9 @@ export const NewsScreen = observer(() => {
         ),
       })
     } else {
-      navigation.setOptions({ headerRight: undefined })
+      navigation.setOptions({ headerLeft: undefined, headerRight: undefined })
     }
-  }, [vm.selectedTab, vm.activePost, vm.postInfo, vm.isFavorite, colors.textFirst, navigation])
+  }, [vm.selectedPhotoCid, vm.selectedTab, vm.activePost, vm.postInfo, vm.isFavorite, vm.canGoBack, colors.textFirst, navigation])
 
   const renderPost = useCallback(
     ({ item }: { item: NewsItems }) => (
@@ -127,6 +149,11 @@ export const NewsScreen = observer(() => {
                 <View style={s.emptyContainer}>
                   <ActivityIndicator size="large" color="gray" />
                 </View>
+              ) : vm.newsError ? (
+                <View style={s.emptyContainer}>
+                  <Text style={{ color: colors.text, marginBottom: 12 }}>Не удалось загрузить новости</Text>
+                  <Text onPress={vm.retry} style={s.retryText}>Обновить</Text>
+                </View>
               ) : (
                 <Text style={{ padding: 16, color: colors.text }}>Нет постов</Text>
               )
@@ -149,6 +176,11 @@ export const NewsScreen = observer(() => {
                 <View style={s.emptyContainer}>
                   <ActivityIndicator size="large" color="gray" />
                 </View>
+              ) : vm.photosError ? (
+                <View style={s.emptyContainer}>
+                  <Text style={{ color: colors.text, marginBottom: 12 }}>Не удалось загрузить фотографии</Text>
+                  <Text onPress={vm.retry} style={s.retryText}>Обновить</Text>
+                </View>
               ) : (
                 <Text style={{ padding: 16, color: colors.text }}>Нет фотографий</Text>
               )
@@ -156,14 +188,7 @@ export const NewsScreen = observer(() => {
           />
         )}
       </View>
-      {vm.selectedTab === 'posts' ? (
-        <NewsDetail
-          post={vm.activePost}
-          comments={vm.postComments}
-          users={vm.postUsers}
-          onLinkPress={vm.openPhotoFromLink}
-        />
-      ) : (
+      {vm.selectedPhotoCid ? (
         <PhotoDetail
           postInfo={vm.postInfo}
           comments={vm.photoComments}
@@ -173,6 +198,13 @@ export const NewsScreen = observer(() => {
           isImageLoaded={vm.isImageLoaded}
           showLoader={vm.showLoader}
           openFullScreen={vm.openFullScreenImage}
+          onLinkPress={vm.openPhotoFromLink}
+        />
+      ) : (
+        <NewsDetail
+          post={vm.activePost}
+          comments={vm.postComments}
+          users={vm.postUsers}
           onLinkPress={vm.openPhotoFromLink}
         />
       )}
@@ -189,5 +221,11 @@ const s = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 32,
+  },
+  retryText: {
+    color: '#428BF9',
+    fontSize: 16,
+    fontWeight: '600',
+    marginTop: 8,
   },
 })

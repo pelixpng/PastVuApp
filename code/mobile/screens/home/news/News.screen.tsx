@@ -68,6 +68,11 @@ export const NewsScreen = observer(() => {
                 <View style={s.emptyContainer}>
                   <ActivityIndicator size="large" color="gray" />
                 </View>
+              ) : vm.newsError ? (
+                <View style={s.emptyContainer}>
+                  <Text style={{ color: colors.text, marginBottom: 12 }}>Не удалось загрузить новости</Text>
+                  <Text onPress={vm.retry} style={s.retryText}>Обновить</Text>
+                </View>
               ) : (
                 <Text style={{ padding: 16, color: colors.text }}>Нет постов</Text>
               )
@@ -87,6 +92,11 @@ export const NewsScreen = observer(() => {
               vm.loading ? (
                 <View style={s.emptyContainer}>
                   <ActivityIndicator size="large" color="gray" />
+                </View>
+              ) : vm.photosError ? (
+                <View style={s.emptyContainer}>
+                  <Text style={{ color: colors.text, marginBottom: 12 }}>Не удалось загрузить фотографии</Text>
+                  <Text onPress={vm.retry} style={s.retryText}>Обновить</Text>
                 </View>
               ) : (
                 <Text style={{ padding: 16, color: colors.text }}>Нет фотографий</Text>
@@ -115,5 +125,11 @@ const s = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 32,
+  },
+  retryText: {
+    color: '#428BF9',
+    fontSize: 16,
+    fontWeight: '600',
+    marginTop: 8,
   },
 })

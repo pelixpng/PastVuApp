@@ -15,6 +15,8 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
   @observable photos: NewsPhoto[] = []
   @observable historyItems: CollectionItem[] = []
   @observable loading: boolean = true
+  @observable newsError = false
+  @observable photosError = false
   private regionsMap: Map<number, any> = new Map()
 
   segmentOptions: SegmentedControlOption[] = [
@@ -25,9 +27,12 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
   constructor() {
     super()
     makeObservable(this)
-    this.loadRegions()
-    this.loadNews()
-    this.loadPhotos()
+    this.loadAll()
+  }
+
+  private async loadAll() {
+    await this.loadRegions()
+    await Promise.allSettled([this.loadNews(), this.loadPhotos()])
   }
 
   // ------------------------------------------ Computed ------------------------------------------
@@ -44,13 +49,27 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
   }
 
   @action.bound
+  async retry() {
+    if (this.regionsMap.size === 0) {
+      await this.loadRegions()
+    }
+    if (this.selectedTab === 'posts') {
+      await this.loadNews()
+    } else {
+      await this.loadPhotos()
+    }
+  }
+
+  @action.bound
   async loadNews() {
     try {
       this.loading = true
+      this.newsError = false
       const newsData = await ApiService.getNews()
       this.news = newsData
     } catch (error) {
       console.log('❌ Error loading news:', error)
+      this.newsError = true
     } finally {
       this.loading = false
     }
@@ -59,6 +78,7 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
   @action.bound
   async loadPhotos() {
     try {
+      this.photosError = false
       const photosData = await ApiService.getRecentPhotos()
       this.historyItems = photosData.map((photo: NewsPhoto) => ({
         title: photo.title,
@@ -68,6 +88,7 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
       }))
     } catch (error) {
       console.log('❌ Error loading photos:', error)
+      this.photosError = true
     }
   }
 

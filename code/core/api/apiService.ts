@@ -103,57 +103,37 @@ export default class ApiService {
   }
 
   static async getNews() {
-    try {
-      const result = await socketEmit('index.giveAllNews', undefined)
-      return result.news
-    } catch (error) {
-      console.log('❌ Error loading news:', error)
-      throw error
-    }
+    const result = await socketEmit('index.giveAllNews', undefined)
+    return result.news
   }
 
   static async getNewsComments(cid: number) {
-    try {
-      const result = await socketEmit('comment.giveForObj', { cid, type: 'news' })
-      let convertComments: IComment[] = []
-      function getConvertComments(comments: IComment[]) {
-        for (let comment of comments) {
-          convertComments.push(comment)
-          comment.comments && getConvertComments(comment.comments)
-        }
+    const result = await socketEmit('comment.giveForObj', { cid, type: 'news' })
+    let convertComments: IComment[] = []
+    function getConvertComments(comments: IComment[]) {
+      for (let comment of comments) {
+        convertComments.push(comment)
+        comment.comments && getConvertComments(comment.comments)
       }
-      getConvertComments(result.comments)
-      return {
-        users: result.users,
-        comments: convertComments,
-      }
-    } catch (error) {
-      console.log('❌ Error loading news comments:', error)
-      throw error
+    }
+    getConvertComments(result.comments)
+    return {
+      users: result.users,
+      comments: convertComments,
     }
   }
 
   static async getRecentPhotos() {
-    try {
-      const result = await socketEmit('photo.givePublicIndex', undefined)
-      return result.photos
-    } catch (error) {
-      console.log('❌ Error loading photos:', error)
-      throw error
-    }
+    const result = await socketEmit('photo.givePublicIndex', undefined)
+    return result.photos
   }
 
   static async getRegions(): Promise<Map<number, any>> {
-    try {
-      const result = await socketEmit('region.giveListPublic', undefined)
-      const regionsMap = new Map<number, any>()
-      result.regions.forEach((region: any) => {
-        regionsMap.set(region.cid, region)
-      })
-      return regionsMap
-    } catch (error) {
-      console.log('❌ Error loading regions:', error)
-      throw error
-    }
+    const result = await socketEmit('region.giveListPublic', undefined)
+    const regionsMap = new Map<number, any>()
+    result.regions.forEach((region: any) => {
+      regionsMap.set(region.cid, region)
+    })
+    return regionsMap
   }
 }
