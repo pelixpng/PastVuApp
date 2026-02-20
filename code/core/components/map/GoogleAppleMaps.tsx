@@ -65,9 +65,7 @@ export const GoogleAppleMaps = ({
               }
               image={
                 mapMarkerType === 'new'
-                  ? names.themeName === 'light'
-                    ? marker.marker[0]
-                    : marker.marker[1]
+                  ? { uri: names.themeName === 'light' ? marker.marker[0] : marker.marker[1] }
                   : undefined
               }
             />
@@ -78,12 +76,11 @@ export const GoogleAppleMaps = ({
               key={index}
               coordinate={marker.location}
               tracksViewChanges={false}
-              //image={{ uri: 'Dot-pin-2000-night' }}
-              //image={names.themeName === 'light' ? marker.marker[0] : marker.marker[1]}
+              image={Platform.OS === 'android' ? { uri: names.themeName === 'light' ? marker.marker[0] : marker.marker[1] } : undefined}
               onPress={() => onGoToLocation(marker.location.latitude, marker.location.longitude)}>
-              {/* {Platform.OS === 'ios' && (
+              {Platform.OS === 'ios' && (
                 <ClusterMarker count={marker.count} borderColor={colors.markerBorder} />
-              )} */}
+              )}
             </Marker>
           )
         }
