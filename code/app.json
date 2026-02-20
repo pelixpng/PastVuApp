@@ -78,7 +78,8 @@
           "locationWhenInUsePermission": "Доступ к геолокации позволяет нам показать на карте интересны фотографии рядом с вами."
         }
       ],
-      "@bacons/apple-targets"
+      "@bacons/apple-targets",
+      "./plugins/withMapMarkers"
     ]
   }
 }
