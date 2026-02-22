@@ -2320,6 +2320,9 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - RNYamap (1.0.3):
+    - React
+    - YandexMapsMobile (= 4.19.0-lite)
   - SDWebImage (5.21.5):
     - SDWebImage/Core (= 5.21.5)
   - SDWebImage/Core (5.21.5)
@@ -2332,6 +2335,7 @@ PODS:
     - libwebp (~> 1.0)
     - SDWebImage/Core (~> 5.17)
   - SocketRocket (0.7.1)
+  - YandexMapsMobile (4.19.0-lite)
   - Yoga (0.0.0)
 
 DEPENDENCIES:
@@ -2435,6 +2439,7 @@ DEPENDENCIES:
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
+  - RNYamap (from `../node_modules/react-native-yamap-lite`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -2447,6 +2452,7 @@ SPEC REPOS:
     - SDWebImageSVGCoder
     - SDWebImageWebPCoder
     - SocketRocket
+    - YandexMapsMobile
 
 EXTERNAL SOURCES:
   boost:
@@ -2646,6 +2652,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
     :path: "../node_modules/react-native-screens"
+  RNYamap:
+    :path: "../node_modules/react-native-yamap-lite"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -2751,11 +2759,13 @@ SPEC CHECKSUMS:
   RNGestureHandler: ccf4105b125002bd88e39d2a1f2b7e6001bcdf34
   RNReanimated: 8b24b49fc13fce9a6e1729ccff645a63d2b7a6d1
   RNScreens: c2e3cc506212228c607b4785b315205e28acbf0f
+  RNYamap: a51e7d87ef98571e9d3d714c47ce488e6cdcd354
   SDWebImage: e9c98383c7572d713c1a0d7dd2783b10599b9838
   SDWebImageAVIFCoder: afe194a084e851f70228e4be35ef651df0fc5c57
   SDWebImageSVGCoder: 15a300a97ec1c8ac958f009c02220ac0402e936c
   SDWebImageWebPCoder: e38c0a70396191361d60c092933e22c20d5b1380
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
+  YandexMapsMobile: b3fc2404ba4583998ac0b0ab805cf93d9ab6eb86
   Yoga: adb397651e1c00672c12e9495babca70777e411e
 
 PODFILE CHECKSUM: 3f817330607d228ae89f3492eb13c09ae230d700

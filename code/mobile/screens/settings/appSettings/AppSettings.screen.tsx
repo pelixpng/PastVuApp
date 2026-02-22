@@ -107,6 +107,20 @@ export const AppSettingsScreen = observer(() => {
         />
       </UICard>
       <Spacer height={16} />
+      <UICard>
+        <Text style={[s.titleText, { color: colors.textFirst }]}>Картографический сервис</Text>
+        <Spacer height={4} />
+        <Text style={[s.descriptionText, { color: colors.textSecond }]}>
+          Выбор провайдера карты.
+        </Text>
+        <Spacer height={12} />
+        <RadioButtons
+          options={vm.mapProviderOptions}
+          selectedValue={MapStore.mapProvider}
+          setValue={MapStore.setMapProvider}
+        />
+      </UICard>
+      <Spacer height={16} />
       {Platform.OS === 'android' && (
         <>
           <UICard>

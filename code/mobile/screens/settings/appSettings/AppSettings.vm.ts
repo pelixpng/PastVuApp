@@ -1,4 +1,5 @@
 import { makeObservable } from 'mobx'
+import { Platform } from 'react-native'
 import { SCREENS } from '../../../navigation/navigation.types'
 import { OptionsRadioButton } from '../../../../core/components/ui/buttons/radioButton/RadioButtons'
 import { BaseViewModelProvider } from '../../../provider/vm.provider'
@@ -27,6 +28,10 @@ class AppSettingsVM extends BaseViewModelProvider<SCREENS.APP_SETTINGS> {
   markerTypeOptions: OptionsRadioButton[] = [
     { label: 'Новый', value: 'new' },
     { label: 'Старый', value: 'old' },
+  ]
+  mapProviderOptions: OptionsRadioButton[] = [
+    { label: Platform.OS === 'ios' ? 'Apple Maps' : 'Google Maps', value: Platform.OS === 'ios' ? 'apple' : 'google' },
+    { label: 'Яндекс Карты', value: 'yandex' },
   ]
   constructor() {
     super()

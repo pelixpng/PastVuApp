@@ -1,4 +1,3 @@
-import { Platform } from 'react-native'
 import { IComment, IComments } from '../types/apiPhotoComment'
 import {
   LocationItem,
@@ -47,7 +46,7 @@ export default class ApiService {
       : json.result.clusters.map(cluster => ({
           _type: 'cluster' as const,
           count: Math.min(cluster.c, 999),
-          marker: Platform.OS === 'android' ? getMarkerClusterName(cluster.c) : [],
+          marker: getMarkerClusterName(cluster.c),
           location: {
             latitude: cluster.geo[0],
             longitude: cluster.geo[1],

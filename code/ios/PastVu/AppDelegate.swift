@@ -1,6 +1,7 @@
 import Expo
 import React
 import ReactAppDependencyProvider
+import YandexMapsMobile
 
 @UIApplicationMain
 public class AppDelegate: ExpoAppDelegate {
@@ -19,6 +20,12 @@ public class AppDelegate: ExpoAppDelegate {
 
     reactNativeDelegate = delegate
     reactNativeFactory = factory
+
+    // Инициализация SDK Yandex Maps перед стартом React Native
+    YMKMapKit.setLocale("ru_RU")
+    YMKMapKit.setApiKey("YOUR_YANDEX_MAPS_API_KEY") // Замените на ваш API-ключ
+    YMKMapKit.initialize()
+
     bindReactNativeFactory(factory)
 
 #if os(iOS) || os(tvOS)

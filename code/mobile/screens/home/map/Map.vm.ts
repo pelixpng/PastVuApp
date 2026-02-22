@@ -2,6 +2,7 @@ import * as Location from 'expo-location'
 import { action, autorun, computed, makeObservable, observable, reaction, runInAction } from 'mobx'
 import { Alert, Keyboard, Platform } from 'react-native'
 import MapView, { Region } from 'react-native-maps'
+import { YaMap, Animation } from 'react-native-yamap-lite'
 import { SCREENS } from '../../../navigation/navigation.types'
 import { createRef } from 'react'
 import { BaseViewModelProvider } from '../../../provider/vm.provider'
@@ -27,6 +28,7 @@ const startRegion: Region = {
 }
 
 export const mapRef = createRef<MapView>()
+export const yamapRef = createRef<YaMap>()
 
 class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
   @observable.ref photoCollection: { markers: MapMarker[] } = { markers: [] }
@@ -108,7 +110,7 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
   goToLocation(latitude: number, longitude: number) {
     Keyboard.dismiss()
     this.places = []
-    const zoomLevel = ApiStore.showCluster ? getZoom(this.coordinates.latitudeDelta) + 1.2 : 14
+    const zoomLevel = 16
     const altitude = Platform.OS === 'ios' ? zoomLevelToAltitude(zoomLevel) : undefined
     const camera = {
       center: {
@@ -121,6 +123,38 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
     }
     if (mapRef.current) {
       mapRef.current.animateCamera(camera, { duration: 2000 })
+    }
+    if (yamapRef.current) {
+      yamapRef.current.setCenter({ lat: latitude, lon: longitude }, 16, 0, 0, 1, Animation.SMOOTH)
+    }
+  }
+
+  @action.bound
+  zoomToCluster(latitude: number, longitude: number) {
+    const currentZoom = getZoom(this.coordinates.latitudeDelta)
+    const zoomLevel = currentZoom + 1
+    const altitude = Platform.OS === 'ios' ? zoomLevelToAltitude(zoomLevel) : undefined
+    const camera = {
+      center: {
+        latitude,
+        longitude,
+      },
+      heading: 0,
+      pitch: 0,
+      ...(Platform.OS === 'ios' ? { altitude } : { zoom: zoomLevel }),
+    }
+    if (mapRef.current) {
+      mapRef.current.animateCamera(camera, { duration: 500 })
+    }
+    if (yamapRef.current) {
+      yamapRef.current.setCenter(
+        { lat: latitude, lon: longitude },
+        zoomLevel,
+        0,
+        0,
+        0.5,
+        Animation.SMOOTH,
+      )
     }
   }
 

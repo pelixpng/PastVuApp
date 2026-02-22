@@ -20,6 +20,7 @@
     "expo-dev-client": "~5.2.4",
     "expo-file-system": "~18.1.11",
     "expo-image": "~2.4.0",
+    "expo-linear-gradient": "~14.1.5",
     "expo-location": "~18.1.6",
     "expo-media-library": "18.0.6",
     "expo-screen-orientation": "~8.1.7",
@@ -38,9 +39,9 @@
     "react-native-render-html": "^6.3.4",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.11.1",
+    "react-native-yamap-lite": "^1.0.3",
     "react-native-zoom-toolkit-swipe": "github:pelixpng/react-native-zoom-toolkit-swipe",
-    "socket.io-client": "^4.8.3",
-    "expo-linear-gradient": "~14.1.5"
+    "socket.io-client": "^4.8.3"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
