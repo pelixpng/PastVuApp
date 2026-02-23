@@ -76,7 +76,11 @@ export const GoogleAppleMaps = ({
               key={index}
               coordinate={marker.location}
               tracksViewChanges={false}
-              image={Platform.OS === 'android' ? { uri: names.themeName === 'light' ? marker.marker[0] : marker.marker[1] } : undefined}
+              image={
+                Platform.OS === 'android'
+                  ? { uri: names.themeName === 'light' ? marker.marker[0] : marker.marker[1] }
+                  : undefined
+              }
               onPress={() => onGoToLocation(marker.location.latitude, marker.location.longitude)}>
               {Platform.OS === 'ios' && (
                 <ClusterMarker count={marker.count} borderColor={colors.markerBorder} />
