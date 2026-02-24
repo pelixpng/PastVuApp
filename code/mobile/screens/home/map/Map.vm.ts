@@ -2,9 +2,9 @@ import * as Location from 'expo-location'
 import { action, autorun, computed, makeObservable, observable, reaction, runInAction } from 'mobx'
 import { Alert, Keyboard, Platform } from 'react-native'
 import MapView, { Region } from 'react-native-maps'
-import { YaMap, Animation } from 'react-native-yamap-lite'
+import { YaMap } from 'react-native-yamap-lite'
 import { SCREENS } from '../../../navigation/navigation.types'
-import { createRef } from 'react'
+import React, { createRef } from 'react'
 import { BaseViewModelProvider } from '../../../provider/vm.provider'
 import {
   getClustersPhotosProps,
@@ -28,7 +28,7 @@ const startRegion: Region = {
 }
 
 export const mapRef = createRef<MapView>()
-export const yamapRef = createRef<YaMap>()
+export const yamapRef = createRef<React.ComponentRef<typeof YaMap>>()
 
 class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
   @observable.ref photoCollection: { markers: MapMarker[] } = { markers: [] }
@@ -125,7 +125,7 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
       mapRef.current.animateCamera(camera, { duration: 2000 })
     }
     if (yamapRef.current) {
-      yamapRef.current.setCenter({ lat: latitude, lon: longitude }, 16, 0, 0, 1, Animation.SMOOTH)
+      yamapRef.current.setCenter({ lat: latitude, lon: longitude }, 16, 0, 0, 2000, 'SMOOTH')
     }
   }
 
@@ -147,14 +147,7 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
       mapRef.current.animateCamera(camera, { duration: 500 })
     }
     if (yamapRef.current) {
-      yamapRef.current.setCenter(
-        { lat: latitude, lon: longitude },
-        zoomLevel,
-        0,
-        0,
-        0.5,
-        Animation.SMOOTH,
-      )
+      yamapRef.current.setCenter({ lat: latitude, lon: longitude }, zoomLevel, 0, 0, 1000, 'SMOOTH')
     }
   }
 

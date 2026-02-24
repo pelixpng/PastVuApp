@@ -290,7 +290,7 @@
 		};
 		XX4900AA1C8EB252D2F743XX /* widget */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = XX7DACAB1CF4E58C57A3E1XX /* Build configuration list for PBXNativeTarget "widget" */;
+			buildConfigurationList = XX44F36F9FF713076D1631XX /* Build configuration list for PBXNativeTarget "widget" */;
 			buildPhases = (
 				XX074B8811C1CF8E8A3D74XX /* Frameworks */,
 				XXDC105B0E28F884B8E02DXX /* Sources */,
@@ -310,7 +310,7 @@
 		};
 		XX5CB36A5D43E9DE05B477XX /* PastVu */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = XXE3829CADC7BBB4E7D2D4XX /* Build configuration list for PBXNativeTarget "PastVu" */;
+			buildConfigurationList = XXB36D6E079203FBE16386XX /* Build configuration list for PBXNativeTarget "PastVu" */;
 			buildPhases = (
 				XXE45443DC38DCFE1DB622XX /* Sources */,
 				XXFA5A8CCDD805DF7AEF9CXX /* Resources */,
@@ -889,7 +889,7 @@
 				DEVELOPMENT_TEAM = 989AHJ2KDZ;
 			};
 		};
-		XX606BD2D1561ABBFE32C5XX /* Release */ = {
+		XX2DD8DC7692B148A7A844XX /* Release */ = {
 			isa = XCBuildConfiguration;
 			name = Release;
 			buildSettings = {
@@ -924,6 +924,50 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 9.4;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				CODE_SIGN_ENTITLEMENTS = ../targets/watch/generated.entitlements;
+				DEVELOPMENT_ASSET_PATHS = "\"../targets/watch/preview\"";
+				DEVELOPMENT_TEAM = 989AHJ2KDZ;
+			};
+		};
+		XX606BD2D1561ABBFE32C5XX /* Release */ = {
+			isa = XCBuildConfiguration;
+			name = Release;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 65;
+				ENABLE_PREVIEWS = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = ../targets/watch/Info.plist;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = PastVu;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.pelixpng.PastVuApp;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 2.4.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pelixpng.PastVuApp.watch;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				WATCHOS_DEPLOYMENT_TARGET = 9.4;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				COPY_PHASE_STRIP = NO;
@@ -974,6 +1018,46 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				CODE_SIGN_ENTITLEMENTS = ../targets/watch/generated.entitlements;
 				DEVELOPMENT_ASSET_PATHS = "\"../targets/watch/preview\"";
+				DEVELOPMENT_TEAM = 989AHJ2KDZ;
+			};
+		};
+		XXA5970F6C51E1CBBD27B8XX /* Release */ = {
+			isa = XCBuildConfiguration;
+			name = Release;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 65;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ../targets/widget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = widget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 2.4.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pelixpng.PastVuApp.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				CODE_SIGN_ENTITLEMENTS = ../targets/widget/generated.entitlements;
 				DEVELOPMENT_TEAM = 989AHJ2KDZ;
 			};
 		};
@@ -1043,21 +1127,21 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		XX7DACAB1CF4E58C57A3E1XX /* Build configuration list for PBXNativeTarget "widget" */ = {
+		XX44F36F9FF713076D1631XX /* Build configuration list for PBXNativeTarget "widget" */ = {
 			isa = XCConfigurationList;
 			defaultConfigurationIsVisible = 0;
 			buildConfigurations = (
 				XX2CB9295E1B6587C48C3CXX /* Debug */,
-				XX050953A0B6BA0E9287E6XX /* Release */,
+				XXA5970F6C51E1CBBD27B8XX /* Release */,
 			);
 			defaultConfigurationName = Release;
 		};
-		XXE3829CADC7BBB4E7D2D4XX /* Build configuration list for PBXNativeTarget "PastVu" */ = {
+		XXB36D6E079203FBE16386XX /* Build configuration list for PBXNativeTarget "PastVu" */ = {
 			isa = XCConfigurationList;
 			defaultConfigurationIsVisible = 0;
 			buildConfigurations = (
 				XXA083369EED05ECB7A96CXX /* Debug */,
-				XX606BD2D1561ABBFE32C5XX /* Release */,
+				XX2DD8DC7692B148A7A844XX /* Release */,
 			);
 			defaultConfigurationName = Release;
 		};

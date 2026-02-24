@@ -70,7 +70,6 @@ export const YandexMaps = ({
         nightMode={names.themeName === 'dark'}
         showUserPosition={false}
         minZoomPreference={4}
-        //mapType={'vector'}
         initialRegion={yamapInitialRegion}
         onCameraPositionChangeEnd={handleCameraChange}>
         {markers.map((marker, index) => {
