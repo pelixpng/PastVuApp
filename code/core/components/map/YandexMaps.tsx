@@ -1,6 +1,13 @@
-import { YaMap, Marker, CameraPosition } from 'react-native-yamap-lite'
-import { StyleSheet, View, NativeSyntheticEvent, LayoutChangeEvent } from 'react-native'
-import { RefObject, useEffect, useRef, useState } from 'react'
+import { YaMap, Marker } from 'react-native-yamap-lite'
+import { StyleSheet, View, LayoutChangeEvent } from 'react-native'
+
+type CameraPosition = {
+  nativeEvent: {
+    point: { lat: number; lon: number }
+    zoom: number
+  }
+}
+import { RefObject, useRef, useState } from 'react'
 import { useTheme } from '@react-navigation/native'
 import { Region } from 'react-native-maps'
 import { MapMarker } from '../../types/apiPhotoList'
@@ -34,7 +41,7 @@ export const YandexMaps = ({
     zoom: getZoom(initialRegion.latitudeDelta),
   }).current
 
-  const handleCameraChange = (e: NativeSyntheticEvent<CameraPosition>) => {
+  const handleCameraChange = (e: CameraPosition) => {
     const { point, zoom } = e.nativeEvent
     const latitudeDelta = 360 / Math.pow(2, zoom)
     onRegionChangeComplete({
@@ -63,7 +70,7 @@ export const YandexMaps = ({
         nightMode={names.themeName === 'dark'}
         showUserPosition={false}
         minZoomPreference={4}
-        mapType={'vector'}
+        //mapType={'vector'}
         initialRegion={yamapInitialRegion}
         onCameraPositionChangeEnd={handleCameraChange}>
         {markers.map((marker, index) => {

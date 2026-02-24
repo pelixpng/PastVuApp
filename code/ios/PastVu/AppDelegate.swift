@@ -39,6 +39,16 @@ public class AppDelegate: ExpoAppDelegate {
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 
+  public override func applicationDidBecomeActive(_ application: UIApplication) {
+    YMKMapKit.sharedInstance().onStart()
+    super.applicationDidBecomeActive(application)
+  }
+
+  public override func applicationWillResignActive(_ application: UIApplication) {
+    YMKMapKit.sharedInstance().onStop()
+    super.applicationWillResignActive(application)
+  }
+
   // Linking API
   public override func application(
     _ app: UIApplication,
