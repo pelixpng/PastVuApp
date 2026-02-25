@@ -37,10 +37,13 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
   @observable.ref places: LocationItem[] = []
   @observable queryPlace = ''
   private timeoutId: NodeJS.Timeout | null = null
+  private collectionTimeoutId: NodeJS.Timeout | null = null
   constructor() {
     super()
     autorun(() => {
-      this.coordinates && this.getPhotoCollection()
+      if (!this.coordinates) return
+      if (this.collectionTimeoutId) clearTimeout(this.collectionTimeoutId)
+      this.collectionTimeoutId = setTimeout(() => this.getPhotoCollection(), 300)
     })
     reaction(
       () => this.yearsRange,
