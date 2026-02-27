@@ -52,12 +52,12 @@ export const CollectionScreen = observer(() => {
           selectedValue={vm.selectedTab}
           onChange={value => vm.setSelectedTab(value as CollectionTab)}
         />
+        <Spacer height={16} />
       </View>
       <FlatList
         data={vm.displayedData}
         keyExtractor={keyExtractor}
         contentContainerStyle={s.padding}
-        ListHeaderComponent={Separator}
         ItemSeparatorComponent={Separator}
         renderItem={renderItem}
         initialNumToRender={10}

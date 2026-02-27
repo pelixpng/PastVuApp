@@ -52,12 +52,12 @@ export const NewsScreen = observer(() => {
         selectedValue={vm.selectedTab}
         onChange={value => vm.setSelectedTab(value as NewsTab)}
       />
+      <Spacer height={16} />
       <View style={s.listContainer}>
         {vm.selectedTab === 'posts' ? (
           <FlatList<NewsItems>
             data={vm.news}
             ItemSeparatorComponent={Separator8}
-            ListHeaderComponent={Separator16}
             keyExtractor={postKeyExtractor}
             renderItem={renderPost}
             initialNumToRender={10}
@@ -70,8 +70,12 @@ export const NewsScreen = observer(() => {
                 </View>
               ) : vm.newsError ? (
                 <View style={s.emptyContainer}>
-                  <Text style={{ color: colors.text, marginBottom: 12 }}>Не удалось загрузить новости</Text>
-                  <Text onPress={vm.retry} style={s.retryText}>Обновить</Text>
+                  <Text style={{ color: colors.text, marginBottom: 12 }}>
+                    Не удалось загрузить новости
+                  </Text>
+                  <Text onPress={vm.retry} style={s.retryText}>
+                    Обновить
+                  </Text>
                 </View>
               ) : (
                 <Text style={{ padding: 16, color: colors.text }}>Нет постов</Text>
@@ -82,7 +86,6 @@ export const NewsScreen = observer(() => {
           <FlatList<CollectionItem>
             data={vm.historyItems}
             ItemSeparatorComponent={Separator16}
-            ListHeaderComponent={Separator16}
             keyExtractor={photoKeyExtractor}
             renderItem={renderPhoto}
             initialNumToRender={10}
@@ -95,8 +98,12 @@ export const NewsScreen = observer(() => {
                 </View>
               ) : vm.photosError ? (
                 <View style={s.emptyContainer}>
-                  <Text style={{ color: colors.text, marginBottom: 12 }}>Не удалось загрузить фотографии</Text>
-                  <Text onPress={vm.retry} style={s.retryText}>Обновить</Text>
+                  <Text style={{ color: colors.text, marginBottom: 12 }}>
+                    Не удалось загрузить фотографии
+                  </Text>
+                  <Text onPress={vm.retry} style={s.retryText}>
+                    Обновить
+                  </Text>
                 </View>
               ) : (
                 <Text style={{ padding: 16, color: colors.text }}>Нет фотографий</Text>
