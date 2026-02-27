@@ -44,7 +44,6 @@ class AppSettingsVM extends BaseViewModelProvider<SCREENS.APP_SETTINGS> {
   // ------------------------------------------ Computed ------------------------------------------
   // ------------------------------------------ Actions ------------------------------------------
   setMapProvider = (value: string) => {
-    MapStore.setMapProvider(value)
     if (value === 'yandex') {
       Alert.alert(
         'Яндекс Карты (Beta)',
@@ -55,6 +54,7 @@ class AppSettingsVM extends BaseViewModelProvider<SCREENS.APP_SETTINGS> {
         [{ text: 'Понятно' }],
       )
     }
+    MapStore.setMapProvider(value)
   }
 }
 
