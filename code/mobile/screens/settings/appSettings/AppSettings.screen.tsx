@@ -16,6 +16,7 @@ import ThemeStore from '../../../../core/store/Theme.store'
 export const AppSettingsScreen = observer(() => {
   const vm = useVM(AppSettingsVM)
   const { colors } = useTheme()
+
   return (
     <Container isScroll pdHorizontal={16}>
       <Spacer height={18} />
@@ -96,18 +97,6 @@ export const AppSettingsScreen = observer(() => {
       </UICard>
       <Spacer height={16} />
       <UICard>
-        <Text style={[s.titleText, { color: colors.textFirst }]}>Тип карты</Text>
-        <Spacer height={4} />
-        <Text style={[s.descriptionText, { color: colors.textSecond }]}>Выбор слоя карты.</Text>
-        <Spacer height={12} />
-        <RadioButtons
-          options={vm.mapTypeOptions}
-          selectedValue={MapStore.mapType}
-          setValue={MapStore.setMapType}
-        />
-      </UICard>
-      <Spacer height={16} />
-      <UICard>
         <Text style={[s.titleText, { color: colors.textFirst }]}>Картографический сервис</Text>
         <Spacer height={4} />
         <Text style={[s.descriptionText, { color: colors.textSecond }]}>
@@ -117,10 +106,26 @@ export const AppSettingsScreen = observer(() => {
         <RadioButtons
           options={vm.mapProviderOptions}
           selectedValue={MapStore.mapProvider}
-          setValue={MapStore.setMapProvider}
+          setValue={vm.setMapProvider}
         />
       </UICard>
       <Spacer height={16} />
+      {MapStore.mapProvider !== 'yandex' && (
+        <>
+          <UICard>
+            <Text style={[s.titleText, { color: colors.textFirst }]}>Тип карты</Text>
+            <Spacer height={4} />
+            <Text style={[s.descriptionText, { color: colors.textSecond }]}>Выбор слоя карты.</Text>
+            <Spacer height={12} />
+            <RadioButtons
+              options={vm.mapTypeOptions}
+              selectedValue={MapStore.mapType}
+              setValue={MapStore.setMapType}
+            />
+          </UICard>
+          <Spacer height={16} />
+        </>
+      )}
       {Platform.OS === 'android' && (
         <>
           <UICard>
