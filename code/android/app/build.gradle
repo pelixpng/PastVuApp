@@ -90,10 +90,10 @@ android {
     namespace 'com.pelixpng.PastVuApp'
     defaultConfig {
         applicationId 'com.pelixpng.PastVuApp'
-        minSdkVersion rootProject.ext.minSdkVersion
+        minSdkVersion 26
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 34
-        versionName "2.4.0"
+        versionName "2.5.0"
     }
     signingConfigs {
         debug {
@@ -150,6 +150,7 @@ android {
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
+    implementation('com.yandex.android:maps.mobile:4.24.0-lite')
 
     def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true";
     def isWebpEnabled = (findProperty('expo.webp.enabled') ?: "") == "true";

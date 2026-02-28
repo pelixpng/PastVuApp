@@ -2,7 +2,7 @@
   "expo": {
     "name": "PastVu",
     "slug": "PastVuApp",
-    "version": "2.4.0",
+    "version": "2.5.0",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "newArchEnabled": true,
@@ -37,6 +37,7 @@
       }
     },
     "android": {
+      "minSdkVersion": 26,
       "softwareKeyboardLayoutMode": "pan",
       "config": {
         "googleMaps": {
