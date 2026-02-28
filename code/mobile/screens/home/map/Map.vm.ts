@@ -133,24 +133,30 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
   }
 
   @action.bound
-  zoomToCluster(latitude: number, longitude: number) {
-    const currentZoom = getZoom(this.coordinates.latitudeDelta)
-    const zoomLevel = currentZoom + 1
-    const altitude = Platform.OS === 'ios' ? zoomLevelToAltitude(zoomLevel) : undefined
-    const camera = {
-      center: {
-        latitude,
-        longitude,
-      },
-      heading: 0,
-      pitch: 0,
-      ...(Platform.OS === 'ios' ? { altitude } : { zoom: zoomLevel }),
-    }
-    if (mapRef.current) {
-      mapRef.current.animateCamera(camera, { duration: 500 })
-    }
-    if (yamapRef.current) {
-      yamapRef.current.setCenter({ lat: latitude, lon: longitude }, zoomLevel, 0, 0, 1000, 'SMOOTH')
+  async zoomToCluster(latitude: number, longitude: number) {
+    if (MapStore.mapProvider === 'yandex' && yamapRef.current) {
+      const yaMapZoom = (await yamapRef.current.getCameraPosition()).zoom
+      yamapRef.current.setCenter(
+        { lat: latitude, lon: longitude },
+        yaMapZoom + 1,
+        0,
+        0,
+        1000,
+        'SMOOTH',
+      )
+    } else {
+      const currentZoom = getZoom(this.coordinates.latitudeDelta)
+      const zoomLevel = currentZoom + 1
+      const altitude = Platform.OS === 'ios' ? zoomLevelToAltitude(zoomLevel) : undefined
+      const camera = {
+        center: { latitude, longitude },
+        heading: 0,
+        pitch: 0,
+        ...(Platform.OS === 'ios' ? { altitude } : { zoom: zoomLevel }),
+      }
+      if (mapRef.current) {
+        mapRef.current.animateCamera(camera, { duration: 500 })
+      }
     }
   }
 

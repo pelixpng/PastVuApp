@@ -1,5 +1,5 @@
 import { StyleSheet, View } from 'react-native'
-import MapVM, { mapRef } from './Map.vm'
+import MapVM, { mapRef, yamapRef } from './Map.vm'
 import { LocationButton } from './components/LocationButton'
 import { YearsSlider } from './components/yearsSlider/YearsSlider'
 import { observer } from 'mobx-react'
@@ -21,7 +21,7 @@ export const MapScreen = observer(() => {
       />
       {MapStore.mapProvider === 'yandex' ? (
         <YandexMaps
-          mapRef={mapRef}
+          mapRef={yamapRef}
           markers={vm.photoCollection.markers}
           mapMarkerType={vm.mapMarkerType}
           initialRegion={vm.coordinates}

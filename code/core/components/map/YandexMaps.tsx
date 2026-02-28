@@ -5,9 +5,10 @@ import { useTheme } from '@react-navigation/native'
 import { Region } from 'react-native-maps'
 import { MapMarker } from '../../types/apiPhotoList'
 import { getZoom } from '../../utils/getMapData'
-import { yamapRef } from '../../../mobile/screens/home/map/Map.vm'
+import { isTablet } from 'react-native-device-info'
 
 const TILE_SIZE = 256
+const MIN_ZOOM = isTablet() ? 5 : 4
 
 type CameraPosition = {
   nativeEvent: {
@@ -27,6 +28,7 @@ type Props = {
 }
 
 export const YandexMaps = ({
+  mapRef,
   markers,
   initialRegion,
   onRegionChangeComplete,
@@ -57,11 +59,11 @@ export const YandexMaps = ({
 
   return (
     <YaMap
-      ref={yamapRef}
+      ref={mapRef}
       style={s.flexOne}
       nightMode={names.themeName === 'dark'}
       showUserPosition={false}
-      minZoomPreference={4}
+      minZoomPreference={MIN_ZOOM}
       initialRegion={yamapInitialRegion}
       onCameraPositionChangeEnd={handleCameraChange}>
       {markers.map((marker, index) => {
