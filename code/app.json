@@ -54,7 +54,7 @@
         "resizeMode": "contain"
       },
       "package": "com.pelixpng.PastVuApp",
-      "versionCode": 34,
+      "versionCode": 40,
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION"

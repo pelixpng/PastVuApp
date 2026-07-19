@@ -39,7 +39,6 @@
     "react-native-render-html": "^6.3.4",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.11.1",
-    "react-native-yamap-lite": "github:pelixpng/react-native-yamap-lite-pastvu",
     "react-native-zoom-toolkit-swipe": "github:pelixpng/react-native-zoom-toolkit-swipe",
     "socket.io-client": "^4.8.3"
   },

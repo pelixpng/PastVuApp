@@ -1,4 +1,3 @@
-import { Platform } from 'react-native'
 import { OptionsRadioButton } from '../components/ui/buttons/radioButton/RadioButtons'
 
 const showClusterOptions: OptionsRadioButton[] = [
@@ -25,19 +24,10 @@ const markerTypeOptions: OptionsRadioButton[] = [
   { label: 'Новый', value: 'new' },
   { label: 'Старый', value: 'old' },
 ]
-const mapProviderOptions: OptionsRadioButton[] = [
-  {
-    label: Platform.OS === 'ios' ? 'Apple Maps' : 'Google Maps',
-    value: Platform.OS === 'ios' ? 'apple' : 'google',
-  },
-  { label: 'Яндекс Карты (Beta)', value: 'yandex' },
-]
-
 export const SettingsOptions = {
   showClusterOptions,
   themeOptions,
   photoQualityOptions,
   mapTypeOptions,
   markerTypeOptions,
-  mapProviderOptions,
 }

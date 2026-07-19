@@ -97,35 +97,17 @@ export const AppSettingsScreen = observer(() => {
       </UICard>
       <Spacer height={16} />
       <UICard>
-        <Text style={[s.titleText, { color: colors.textFirst }]}>Картографический сервис</Text>
+        <Text style={[s.titleText, { color: colors.textFirst }]}>Тип карты</Text>
         <Spacer height={4} />
-        <Text style={[s.descriptionText, { color: colors.textSecond }]}>
-          Выбор провайдера карты.
-        </Text>
+        <Text style={[s.descriptionText, { color: colors.textSecond }]}>Выбор слоя карты.</Text>
         <Spacer height={12} />
         <RadioButtons
-          options={vm.mapProviderOptions}
-          selectedValue={MapStore.mapProvider}
-          setValue={vm.setMapProvider}
+          options={vm.mapTypeOptions}
+          selectedValue={MapStore.mapType}
+          setValue={MapStore.setMapType}
         />
       </UICard>
       <Spacer height={16} />
-      {MapStore.mapProvider !== 'yandex' && (
-        <>
-          <UICard>
-            <Text style={[s.titleText, { color: colors.textFirst }]}>Тип карты</Text>
-            <Spacer height={4} />
-            <Text style={[s.descriptionText, { color: colors.textSecond }]}>Выбор слоя карты.</Text>
-            <Spacer height={12} />
-            <RadioButtons
-              options={vm.mapTypeOptions}
-              selectedValue={MapStore.mapType}
-              setValue={MapStore.setMapType}
-            />
-          </UICard>
-          <Spacer height={16} />
-        </>
-      )}
       {Platform.OS === 'android' && (
         <>
           <UICard>

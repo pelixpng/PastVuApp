@@ -5,13 +5,14 @@ import { useTheme } from '@react-navigation/native'
 
 type LocationButtonProps = {
   onPress: () => void
+  isTablet?: boolean
 }
 
-const GetLocationButton: FC<LocationButtonProps> = ({ onPress }) => {
+const GetLocationButton: FC<LocationButtonProps> = ({ onPress, isTablet }) => {
   const { colors } = useTheme()
   return (
     <TouchableOpacity
-      style={[s.container, { backgroundColor: colors.backgroundApp }]}
+      style={[s.container, { backgroundColor: colors.backgroundApp, bottom: isTablet ? 24 : 103 }]}
       onPress={onPress}>
       <FontAwesome5 name="location-arrow" size={24} color={colors.textFirst} />
     </TouchableOpacity>
@@ -23,7 +24,6 @@ const s = StyleSheet.create({
     padding: 16,
     borderRadius: 100,
     position: 'absolute',
-    bottom: 103,
     right: 8,
   },
 })

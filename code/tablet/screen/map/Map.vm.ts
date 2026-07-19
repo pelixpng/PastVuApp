@@ -2,8 +2,7 @@ import * as Location from 'expo-location'
 import { action, autorun, computed, makeObservable, observable, reaction, runInAction } from 'mobx'
 import { Alert, Keyboard, Platform } from 'react-native'
 import MapView, { Region } from 'react-native-maps'
-import { YaMap } from 'react-native-yamap-lite'
-import React, { createRef } from 'react'
+import { createRef } from 'react'
 import {
   getClustersPhotosProps,
   getPhotoListProps,
@@ -34,7 +33,6 @@ const startRegion: Region = {
 }
 
 export const mapRef = createRef<MapView>()
-export const yamapRef = createRef<React.ComponentRef<typeof YaMap>>()
 
 class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
   //map data
@@ -135,9 +133,6 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
     if (mapRef.current) {
       mapRef.current.animateCamera(camera, { duration: 2000 })
     }
-    if (yamapRef.current) {
-      yamapRef.current.setCenter({ lat: latitude, lon: longitude }, 16, 0, 0, 2000, 'SMOOTH')
-    }
   }
 
   @action.bound
@@ -237,29 +232,17 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
 
   @action.bound
   async zoomToCluster(latitude: number, longitude: number) {
-    if (MapStore.mapProvider === 'yandex' && yamapRef.current) {
-      const yaMapZoom = (await yamapRef.current.getCameraPosition()).zoom
-      yamapRef.current.setCenter(
-        { lat: latitude, lon: longitude },
-        yaMapZoom + 1,
-        0,
-        0,
-        1000,
-        'SMOOTH',
-      )
-    } else {
-      const currentZoom = getZoom(this.coordinates.latitudeDelta)
-      const zoomLevel = currentZoom + 1
-      const altitude = Platform.OS === 'ios' ? zoomLevelToAltitude(zoomLevel) : undefined
-      const camera = {
-        center: { latitude, longitude },
-        heading: 0,
-        pitch: 0,
-        ...(Platform.OS === 'ios' ? { altitude } : { zoom: zoomLevel }),
-      }
-      if (mapRef.current) {
-        mapRef.current.animateCamera(camera, { duration: 500 })
-      }
+    const currentZoom = getZoom(this.coordinates.latitudeDelta)
+    const zoomLevel = currentZoom + 1
+    const altitude = Platform.OS === 'ios' ? zoomLevelToAltitude(zoomLevel) : undefined
+    const camera = {
+      center: { latitude, longitude },
+      heading: 0,
+      pitch: 0,
+      ...(Platform.OS === 'ios' ? { altitude } : { zoom: zoomLevel }),
+    }
+    if (mapRef.current) {
+      mapRef.current.animateCamera(camera, { duration: 500 })
     }
   }
 

@@ -15,7 +15,7 @@ export const AboutAppScreen = () => {
         <Image style={s.image} source={require('../../../../assets/icon.png')} />
         <Spacer height={16} />
         <Text selectable style={[s.descriptionText, { color: colors.textSecond }]}>
-          Версия 2.5.0 от 28 февраля 2026 г.
+          Версия 2.5.0 от 5 марта 2026 г.
         </Text>
       </View>
       <Spacer height={24} />
@@ -52,7 +52,7 @@ export const AboutAppScreen = () => {
         <Text style={[s.descriptionText, { color: colors.textSecond }]}>
           Для получения фотографий и информации о них используется открытое API проекта PastVu. Для
           поиска мест используется сервис LocationIQ. На Android карта отображается через Google
-          Maps Platform, на iOS — через Apple Maps.
+          Maps Platform, на iOS — через Apple Maps. Также доступны Яндекс Карты.
         </Text>
         <Spacer height={16} />
         <MyButton title={'PastVu API'} func={() => Linking.openURL(Links.pastVuAPI)} />
