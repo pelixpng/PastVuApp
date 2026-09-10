@@ -5,56 +5,40 @@
     "version": "2.5.0",
     "orientation": "default",
     "icon": "./assets/icon.png",
-    "newArchEnabled": true,
     "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#2D61A0"
-    },
     "assetBundlePatterns": ["assets/*.png"],
+    "locales": {
+      "ru": "./locales/ru.json",
+      "en": "./locales/en.json"
+    },
     "ios": {
       "supportsTablet": true,
       "requireFullScreen": true,
       "userInterfaceStyle": "automatic",
       "bundleIdentifier": "com.pelixpng.PastVuApp",
-      "buildNumber": "65",
+      "buildNumber": "66",
       "appleTeamId": "989AHJ2KDZ",
       "entitlements": {
         "com.apple.security.application-groups": ["group.com.pelixpng.PastVuApp"]
       },
-      "splash": {
-        "image": "./assets/splash.png",
-        "backgroundColor": "#2D61A0",
-        "resizeMode": "contain"
-      },
-      "icon": {
-        "light": "./assets/icon.png",
-        "dark": "./assets/iconDark.png"
-      },
+      "icon": "./assets/PastVu.icon",
       "infoPlist": {
         "EXDefaultScreenOrientationMask": "UIInterfaceOrientationMaskAll"
       }
     },
     "android": {
-      "minSdkVersion": 26,
       "softwareKeyboardLayoutMode": "pan",
       "config": {
         "googleMaps": {
-          "apiKey": "YOUR_API_KEY"
+          "apiKey": "${MAPS_API_KEY}"
         }
       },
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "splash": {
-        "image": "./assets/splashAndroid.png",
-        "backgroundColor": "#2D61A0",
-        "resizeMode": "contain"
-      },
       "package": "com.pelixpng.PastVuApp",
-      "versionCode": 40,
+      "versionCode": 42,
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION"
@@ -66,6 +50,20 @@
       }
     },
     "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#2D61A0",
+          "android": {
+            "image": "./assets/splashAndroid.png",
+            "resizeMode": "contain",
+            "backgroundColor": "#2D61A0"
+          },
+          "enableFullScreenImage_legacy": true
+        }
+      ],
       [
         "expo-media-library",
         {
@@ -80,7 +78,22 @@
         }
       ],
       "@bacons/apple-targets",
-      "./plugins/withMapMarkers"
+      "./plugins/withMapMarkers",
+      "./plugins/withReleaseSigning",
+      "./plugins/withLintConfig",
+      "./plugins/withMapsKeyPlaceholder",
+      "expo-image",
+      "expo-localization",
+      [
+        "expo-localization",
+        {
+          "supportedLocales": [
+            "ru",
+            "en"
+          ],
+          "allowDynamicLocaleChangesAndroid": true
+        }
+      ]
     ]
   }
 }

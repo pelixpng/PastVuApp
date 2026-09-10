@@ -5,6 +5,7 @@ import { useTheme } from '@react-navigation/native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { LocationItem } from '../../types/apiPhotoList'
 import { Spacer } from '../ui/Spacer'
+import { t } from '../../i18n'
 
 type SearchPlaceProps = {
   places: LocationItem[]
@@ -38,7 +39,7 @@ const LocationSearch: FC<SearchPlaceProps> = ({
         <Spacer width={5} />
         <TextInput
           style={[s.input, { color: colors.textFirst }]}
-          placeholder="Поиск..."
+          placeholder={t('map.searchPlaceholder')}
           placeholderTextColor={colors.textSecond}
           value={query}
           onChangeText={setQueryPlace}

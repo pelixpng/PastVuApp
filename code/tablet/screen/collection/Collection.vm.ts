@@ -6,9 +6,10 @@ import { SCREENS } from '../../navigation/navigation.types'
 import { IComment, Users } from '../../../core/types/apiPhotoComment'
 import ApiStore from '../../../core/store/Api.store'
 import { savePhoto, sharePhoto } from '../../../core/utils/getPhoto'
-import ApiService from '../../../core/api/apiService'
+import * as PhotoPost from '../../../core/services/photoPost'
 import { Alert, Linking } from 'react-native'
 import { SegmentedControlOption } from '../../../core/components/ui/segmentedControl/SegmentedControl'
+import { t } from '../../../core/i18n'
 
 export type CollectionTab = 'favorites' | 'viewed'
 
@@ -28,10 +29,15 @@ class CollectionVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
   @observable isImageLoaded = false
   @observable isFavorite = false
 
-  segmentOptions: SegmentedControlOption[] = [
-    { label: 'Избранное', value: 'favorites' },
-    { label: 'Недавние', value: 'viewed' },
-  ]
+  // A getter, not a field: a field is evaluated once when the view model is constructed and
+  // would keep the language that was active back then.
+  @computed
+  get segmentOptions(): SegmentedControlOption[] {
+    return [
+      { label: t('collection.favorites'), value: 'favorites' },
+      { label: t('collection.recent'), value: 'viewed' },
+    ]
+  }
 
   constructor() {
     super()
@@ -47,6 +53,11 @@ class CollectionVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
   @computed
   get imageLink() {
     return `https://img.pastvu.com/${ApiStore.photoQualitySettings}/${this.postInfo?.file}`
+  }
+
+  @computed
+  get imageResolution() {
+    return this.postInfo ? PhotoPost.photoResolution(this.postInfo) : undefined
   }
   // ------------------------------------------ Actions ------------------------------------------
 
@@ -76,8 +87,8 @@ class CollectionVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
   @computed
   get deleteConfirmationTitle(): string {
     return this.selectedTab === 'viewed'
-      ? 'Удалить запись из истории?'
-      : 'Удалить запись из избранного?'
+      ? t('collection.removeFromHistory')
+      : t('collection.removeFromFavorites')
   }
 
   @action.bound
@@ -116,36 +127,22 @@ class CollectionVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
 
   @action.bound
   async getPhotoInfo(cid: string) {
-    await ApiService.getPhotoInfo(cid)
-      .then(async ({ result }) => {
-        this.postInfo = result.photo
-        const favorites: CollectionItem[] = MMKVStorage.get('Favorites') ?? []
-        this.isFavorite = favorites.some(item => item.cid === cid)
-        const title = result.photo.title
-        const description = `${result.photo.y} ${result.photo.regions
-          .map(region => region.title_local)
-          .join(', ')}`
-        const file = result.photo.file
-        if (!this.photos.some(item => item.cid === cid)) {
-          const updatedHistory = [{ title, description, cid, file }, ...this.photos]
-          MMKVStorage.set('History', updatedHistory)
-          this.photos = updatedHistory
-        }
-        if (result.photo?.ccount) {
-          this.getComments(cid)
-        }
-      })
-      .catch(() => Alert.alert('Ошибка', 'Не удалось загрузить информацию о фото'))
-  }
-
-  @action.bound
-  async getComments(cid: string) {
-    await ApiService.getComments(cid).then(({ users, comments }) => {
+    try {
+      const { photo, users, comments } = await PhotoPost.loadPost(cid)
+      // Another photo may have been selected while this request was in flight; without this the
+      // slower, older response would overwrite the newer one.
+      if (this.selectedItem !== cid) return
+      const updatedHistory = PhotoPost.recordHistory(photo, cid, this.photos)
       runInAction(() => {
+        this.postInfo = photo
         this.users = users
         this.comments = comments
+        this.isFavorite = PhotoPost.isFavorite(cid)
+        this.photos = updatedHistory
       })
-    })
+    } catch {
+      Alert.alert(t('common.error'), t('photo.infoError'))
+    }
   }
 
   @action.bound

@@ -14,6 +14,7 @@ type MMKVStorageType =
   | 'Favorites'
   | 'isShowCluster'
   | 'isFirstLaunch'
+  | 'locale'
 
 type TValue = string | number | object
 

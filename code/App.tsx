@@ -5,6 +5,7 @@ import { useEffect } from 'react'
 import * as ScreenOrientation from 'expo-screen-orientation'
 import { Alert } from 'react-native'
 import { MMKVStorage } from './core/storage/mmkv'
+import { t } from './core/i18n'
 
 export default function App() {
   const typeDevice = getDeviceType()
@@ -24,13 +25,11 @@ export default function App() {
     const isFirstLaunch = MMKVStorage.get('isFirstLaunch')
     if (isFirstLaunch) return
     MMKVStorage.set('isFirstLaunch', 'done')
+    // Triggered by the device locale, since the notice is about where the user is rather than
+    // which language they read in -- but worded in the interface language, which can differ.
     const locale = Intl.DateTimeFormat().resolvedOptions().locale
     if (locale.toLowerCase().includes('ru')) {
-      Alert.alert(
-        'Для пользователей из России',
-        'Из-за блокировки Cloudflare приложение и сайт Pastvu.com могут временно не работать на территории России.',
-        [{ text: 'OK' }],
-      )
+      Alert.alert(t('firstLaunch.russiaTitle'), t('firstLaunch.russiaText'), [{ text: 'OK' }])
     }
   }, [])
 

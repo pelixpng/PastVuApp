@@ -9,11 +9,12 @@ import {
 import { getColor } from '../utils/getColor'
 import { getAngle } from '../utils/getDirection'
 import { getMarkerName, getMarkerClusterName } from '../utils/getMarker'
+import Constants from 'expo-constants'
 import { socketEmit } from './socketService'
 
 const BASE_URL = 'https://api.pastvu.com/api2'
 const PLACE_API_URL = 'https://us1.locationiq.com/v1'
-const PLACE_API_KEY = 'YOUR_API_KEY'
+const PLACE_API_KEY = Constants.expoConfig?.extra?.placeApiKey ?? ''
 
 export default class ApiService {
   static async getPhotoList(params: getPhotoListProps) {

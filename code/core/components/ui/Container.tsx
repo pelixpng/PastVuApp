@@ -1,6 +1,7 @@
 import { useTheme } from '@react-navigation/native'
 import { FC, ReactNode } from 'react'
 import { View, ScrollView, StyleSheet, StyleProp, ViewStyle } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 type ContainerProps = {
   isScroll?: boolean
@@ -11,6 +12,7 @@ type ContainerProps = {
 }
 
 export const Container: FC<ContainerProps> = ({ children, isScroll, row, pdHorizontal, style }) => {
+  const insets = useSafeAreaInsets()
   const { colors } = useTheme()
 
   const containerStyle: StyleProp<ViewStyle> = [
@@ -24,7 +26,15 @@ export const Container: FC<ContainerProps> = ({ children, isScroll, row, pdHoriz
   ]
 
   if (isScroll) {
-    return <ScrollView style={containerStyle}>{children}</ScrollView>
+    // Without this the content of a scrollable screen ends under the system navigation buttons,
+    // with no way to scroll past them.
+    return (
+      <ScrollView
+        style={containerStyle}
+        contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}>
+        {children}
+      </ScrollView>
+    )
   }
 
   return <View style={containerStyle}>{children}</View>

@@ -21,6 +21,8 @@ import { PhotoDetail } from '../collection/components/photoDetail/PhotoDetail'
 import { ItemHistory } from '../collection/components/itemHistory/Item'
 import type { NewsItems } from '../../../core/types/apiNews'
 import type { CollectionItem } from '../collection/Collection.screen'
+import { t } from '../../../core/i18n'
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
 
 const Separator = () => <Spacer height={8} />
 const ListHeader = () => <Spacer height={16} />
@@ -32,6 +34,7 @@ const photoKeyExtractor = (item: CollectionItem) => item.cid
 export const NewsScreen = observer(() => {
   const vm = useVM(NewsVM)
   const { colors } = useTheme()
+  const tabBarHeight = useBottomTabBarHeight()
   const navigation = useNavigation()
   const { width } = useWindowDimensions()
   const listWidth = width * 0.33
@@ -136,6 +139,8 @@ export const NewsScreen = observer(() => {
           <FlatList<NewsItems>
             data={vm.displayedPosts}
             style={s.postListContainer}
+            // The tablet tab bar floats over the content, so the list needs to end above it.
+            contentContainerStyle={{ paddingBottom: tabBarHeight + 16 }}
             ListHeaderComponent={ListHeader}
             ListFooterComponent={ListFooter}
             ItemSeparatorComponent={Separator}
@@ -151,11 +156,11 @@ export const NewsScreen = observer(() => {
                 </View>
               ) : vm.newsError ? (
                 <View style={s.emptyContainer}>
-                  <Text style={{ color: colors.text, marginBottom: 12 }}>Не удалось загрузить новости</Text>
-                  <Text onPress={vm.retry} style={s.retryText}>Обновить</Text>
+                  <Text style={{ color: colors.text, marginBottom: 12 }}>{t('news.postsError')}</Text>
+                  <Text onPress={vm.retry} style={s.retryText}>{t('common.retry')}</Text>
                 </View>
               ) : (
-                <Text style={{ padding: 16, color: colors.text }}>Нет постов</Text>
+                <Text style={{ padding: 16, color: colors.text }}>{t('news.noPosts')}</Text>
               )
             }
           />
@@ -163,6 +168,7 @@ export const NewsScreen = observer(() => {
           <FlatList<CollectionItem>
             data={vm.displayedPhotos}
             style={s.list}
+            contentContainerStyle={{ paddingBottom: tabBarHeight + 16 }}
             ListHeaderComponent={ListHeader}
             ListFooterComponent={ListFooter}
             ItemSeparatorComponent={Separator}
@@ -178,11 +184,11 @@ export const NewsScreen = observer(() => {
                 </View>
               ) : vm.photosError ? (
                 <View style={s.emptyContainer}>
-                  <Text style={{ color: colors.text, marginBottom: 12 }}>Не удалось загрузить фотографии</Text>
-                  <Text onPress={vm.retry} style={s.retryText}>Обновить</Text>
+                  <Text style={{ color: colors.text, marginBottom: 12 }}>{t('news.photosError')}</Text>
+                  <Text onPress={vm.retry} style={s.retryText}>{t('common.retry')}</Text>
                 </View>
               ) : (
-                <Text style={{ padding: 16, color: colors.text }}>Нет фотографий</Text>
+                <Text style={{ padding: 16, color: colors.text }}>{t('news.noPhotos')}</Text>
               )
             }
           />

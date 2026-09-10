@@ -38,7 +38,7 @@ export const GoogleAppleMaps = ({
       showsUserLocation={true}
       showsMyLocationButton={false}
       initialRegion={initialRegion}
-      showsPointsOfInterest={false}
+      showsPointsOfInterests={false}
       loadingBackgroundColor={colors.backgroundApp}
       moveOnMarkerPress={false}
       rotateEnabled={false}
@@ -48,11 +48,13 @@ export const GoogleAppleMaps = ({
         animated: false,
       }}
       mapType={mapType}>
-      {markers.map((marker, index) => {
+      {markers.map(marker => {
         if (marker._type === 'photo') {
           return (
             <Marker
-              key={index}
+              // Keyed by identity, not by array index: the list mixes photos and clusters, so an
+              // index key made React reuse a photo's marker for a cluster and vice versa.
+              key={`photo-${marker.cid}`}
               coordinate={marker.location}
               tracksViewChanges={false}
               rotation={marker.dir}
@@ -73,7 +75,7 @@ export const GoogleAppleMaps = ({
         } else {
           return (
             <Marker
-              key={index}
+              key={`cluster-${marker.location.latitude},${marker.location.longitude}`}
               coordinate={marker.location}
               tracksViewChanges={false}
               image={

@@ -4,6 +4,7 @@ import { CollectionItem } from './Collection.screen'
 import { BaseViewModelProvider } from '../../../provider/vm.provider'
 import { MMKVStorage } from '../../../../core/storage/mmkv'
 import { SegmentedControlOption } from '../../../../core/components/ui/segmentedControl/SegmentedControl'
+import { t } from '../../../../core/i18n'
 
 export type CollectionTab = 'favorites' | 'viewed'
 
@@ -14,10 +15,15 @@ class CollectionVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
   @observable isDeleteModalVisible = false
   @observable pendingDeleteCid: string | null = null
 
-  segmentOptions: SegmentedControlOption[] = [
-    { label: 'Избранное', value: 'favorites' },
-    { label: 'Недавние', value: 'viewed' },
-  ]
+  // A getter, not a field: a field is evaluated once when the view model is constructed and
+  // would keep the language that was active back then.
+  @computed
+  get segmentOptions(): SegmentedControlOption[] {
+    return [
+      { label: t('collection.favorites'), value: 'favorites' },
+      { label: t('collection.recent'), value: 'viewed' },
+    ]
+  }
 
   constructor() {
     super()
@@ -32,8 +38,8 @@ class CollectionVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
   @computed
   get deleteConfirmationTitle(): string {
     return this.selectedTab === 'viewed'
-      ? 'Удалить запись из истории?'
-      : 'Удалить запись из избранного?'
+      ? t('collection.removeFromHistory')
+      : t('collection.removeFromFavorites')
   }
 
   // ------------------------------------------ Actions ------------------------------------------

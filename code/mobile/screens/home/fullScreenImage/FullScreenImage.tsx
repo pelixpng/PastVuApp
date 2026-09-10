@@ -36,7 +36,7 @@ export const FullScreenImage = () => {
 
   const translateY = useSharedValue(0)
   const isClosing = useSharedValue(false)
-  const swipeTimeout = useRef<NodeJS.Timeout | null>(null)
+  const swipeTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useAnimatedReaction(
     () => isClosing.value,

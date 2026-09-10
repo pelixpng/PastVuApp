@@ -9,6 +9,7 @@ import { IComment, Users } from '../../../../../core/types/apiPhotoComment'
 import { PostInfo } from '../postInfo/PostInfo'
 import { Comment } from '../comment/Comment'
 import { s } from './style'
+import { t } from '../../../../../core/i18n'
 
 type PhotoDetailProps = {
   comments: IComment[]
@@ -42,11 +43,11 @@ export const PhotoDetail: FC<PhotoDetailProps> = ({
   toggleFavorite,
 }) => {
   const { width } = useWindowDimensions()
-  const { top } = useSafeAreaInsets()
+  const { top, bottom } = useSafeAreaInsets()
   const { colors } = useTheme()
   const topLoader = top + 40
   const modalWidth = width * 0.67 - 32
-  const renderItem = useCallback(({ item }) => <Comment comment={item} users={users} onLinkPress={onLinkPress} />, [users, onLinkPress])
+  const renderItem = useCallback(({ item }: { item: IComment }) => <Comment comment={item} users={users} onLinkPress={onLinkPress} />, [users, onLinkPress])
   return (
     <Animated.View
       entering={SlideInRight.duration(600)}
@@ -70,10 +71,11 @@ export const PhotoDetail: FC<PhotoDetailProps> = ({
       {!isImageLoaded && (
         <View
           style={[s.loaderContainer, { backgroundColor: colors.backgroundApp, top: topLoader }]}>
-          <Text style={[s.titleText, { color: colors.textSecond }]}>Загрузка...</Text>
+          <Text style={[s.titleText, { color: colors.textSecond }]}>{t('common.loading')}</Text>
         </View>
       )}
       <FlatList
+        contentContainerStyle={{ paddingBottom: bottom + 16 }}
         style={s.postInfoContainer}
         showsVerticalScrollIndicator={false}
         data={comments}

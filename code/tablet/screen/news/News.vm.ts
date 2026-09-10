@@ -11,6 +11,7 @@ import { CollectionItem } from '../collection/Collection.screen'
 import { IComment, Users } from '../../../core/types/apiPhotoComment'
 import { getRegionPath } from '../../../core/utils/getRegionPath'
 import { savePhoto, sharePhoto } from '../../../core/utils/getPhoto'
+import { t } from '../../../core/i18n'
 
 export type NewsTab = 'posts' | 'photos'
 
@@ -40,10 +41,15 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
 
   private regionsMap: Map<number, any> = new Map()
 
-  segmentOptions: SegmentedControlOption[] = [
-    { label: 'Новости', value: 'posts' },
-    { label: 'Фото', value: 'photos' },
-  ]
+  // A getter, not a field: a field is evaluated once when the view model is constructed and
+  // would keep the language that was active back then.
+  @computed
+  get segmentOptions(): SegmentedControlOption[] {
+    return [
+      { label: t('news.posts'), value: 'posts' },
+      { label: t('news.photos'), value: 'photos' },
+    ]
+  }
 
   constructor() {
     super()
@@ -258,7 +264,7 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
           this.getPhotoComments(cid)
         }
       })
-      .catch(() => Alert.alert('Ошибка', 'Не удалось загрузить информацию о фото'))
+      .catch(() => Alert.alert(t('common.error'), t('photo.infoError')))
   }
 
   @action.bound

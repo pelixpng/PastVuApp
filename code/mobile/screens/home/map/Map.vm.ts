@@ -18,24 +18,22 @@ import MapStore from '../../../../core/store/Map.store'
 import ApiStore from '../../../../core/store/Api.store'
 import { getPolygon, getZoom, zoomLevelToAltitude } from '../../../../core/utils/getMapData'
 import ApiService from '../../../../core/api/apiService'
-
-const startRegion: Region = {
-  latitude: 55.763307,
-  longitude: 37.576945,
-  latitudeDelta: 0.01,
-  longitudeDelta: 0.01,
-}
+import { t } from '../../../../core/i18n'
+import { defaultRegion } from '../../../../core/constants/map'
 
 export const mapRef = createRef<MapView>()
 
+/** Matches `cameraZoomRange.minCenterCoordinateDistance` on the MapView. */
+const MIN_ALTITUDE = 100
+
 class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
   @observable.ref photoCollection: { markers: MapMarker[] } = { markers: [] }
-  @observable.ref coordinates: Region = MMKVStorage.get('RegionString') ?? startRegion
+  @observable.ref coordinates: Region = MMKVStorage.get('RegionString') ?? defaultRegion()
   @observable.ref yearsRange: YearsRangeType = MMKVStorage.get('RangeYears') ?? [1840, 2000]
   @observable.ref places: LocationItem[] = []
   @observable queryPlace = ''
-  private timeoutId: NodeJS.Timeout | null = null
-  private collectionTimeoutId: NodeJS.Timeout | null = null
+  private timeoutId: ReturnType<typeof setTimeout> | null = null
+  private collectionTimeoutId: ReturnType<typeof setTimeout> | null = null
   constructor() {
     super()
     autorun(() => {
@@ -88,6 +86,20 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
 
   @action.bound
   setCoordinate(cord: Region) {
+    const prev = this.coordinates
+    // The map re-emits onRegionChangeComplete with an unchanged region when its view is
+    // reattached (e.g. returning to the tab). `coordinates` is an observable.ref, so assigning an
+    // equal-but-new object still counts as a change and makes the autorun refetch the markers,
+    // which visibly redraws the whole map.
+    if (
+      prev &&
+      prev.latitude === cord.latitude &&
+      prev.longitude === cord.longitude &&
+      prev.latitudeDelta === cord.latitudeDelta &&
+      prev.longitudeDelta === cord.longitudeDelta
+    ) {
+      return
+    }
     this.coordinates = cord
     MMKVStorage.set('RegionString', this.coordinates)
   }
@@ -129,18 +141,21 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
 
   @action.bound
   async zoomToCluster(latitude: number, longitude: number) {
-    const currentZoom = getZoom(this.coordinates.latitudeDelta)
-    const zoomLevel = currentZoom + 1
-    const altitude = Platform.OS === 'ios' ? zoomLevelToAltitude(zoomLevel) : undefined
-    const camera = {
-      center: { latitude, longitude },
-      heading: 0,
-      pitch: 0,
-      ...(Platform.OS === 'ios' ? { altitude } : { zoom: zoomLevel }),
-    }
-    if (mapRef.current) {
-      mapRef.current.animateCamera(camera, { duration: 500 })
-    }
+    const map = mapRef.current
+    if (!map) return
+    // Step from the camera's own zoom rather than from `getZoom(latitudeDelta)`: that helper
+    // buckets the delta for the API's `z` parameter and reads about one level lower than the
+    // camera actually is, so near zoom 17 it kept asking the camera to move where it already was
+    // and tapping a cluster did nothing. Halving the altitude is one zoom level on iOS.
+    const current = await map.getCamera()
+    const step =
+      Platform.OS === 'ios'
+        ? { altitude: Math.max((current.altitude ?? zoomLevelToAltitude(16)) / 2, MIN_ALTITUDE) }
+        : { zoom: (current.zoom ?? getZoom(this.coordinates.latitudeDelta)) + 1 }
+    map.animateCamera(
+      { center: { latitude, longitude }, heading: 0, pitch: 0, ...step },
+      { duration: 500 },
+    )
   }
 
   @action.bound
@@ -206,7 +221,7 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
         markers: [...this.photoCollection.markers, ...uniquePhotos],
       }
     } catch (error) {
-      Alert.alert('Ошибка', 'Не удалось загрузить метки')
+      Alert.alert(t('common.error'), t('map.markersError'))
     }
   }
 
@@ -216,10 +231,7 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
       this.places = await ApiService.searchPlace(this.queryPlace)
     } catch (error: any) {
       if (error.message === '429') {
-        Alert.alert(
-          'Ошибка',
-          'Лимит поиска для всех пользователей исчерпан. Попробуйте через пару минут или завтра 🪫',
-        )
+        Alert.alert(t('common.error'), t('map.searchLimit'))
       }
     }
   }

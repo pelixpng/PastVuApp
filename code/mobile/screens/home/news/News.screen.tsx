@@ -10,6 +10,7 @@ import type { CollectionItem } from '../collection/Collection.screen'
 import { PhotoListItem } from '../collection/components/Item'
 import { Spacer } from '../../../../core/components/ui/Spacer'
 import { PostListItem } from './components/PostListItem/PostListItem'
+import { t } from '../../../../core/i18n'
 
 const Separator8 = () => <Spacer height={8} />
 const Separator16 = () => <Spacer height={16} />
@@ -71,14 +72,14 @@ export const NewsScreen = observer(() => {
               ) : vm.newsError ? (
                 <View style={s.emptyContainer}>
                   <Text style={{ color: colors.text, marginBottom: 12 }}>
-                    Не удалось загрузить новости
+                    {t('news.postsError')}
                   </Text>
                   <Text onPress={vm.retry} style={s.retryText}>
-                    Обновить
+                    {t('common.retry')}
                   </Text>
                 </View>
               ) : (
-                <Text style={{ padding: 16, color: colors.text }}>Нет постов</Text>
+                <Text style={{ padding: 16, color: colors.text }}>{t('news.noPosts')}</Text>
               )
             }
           />
@@ -99,14 +100,14 @@ export const NewsScreen = observer(() => {
               ) : vm.photosError ? (
                 <View style={s.emptyContainer}>
                   <Text style={{ color: colors.text, marginBottom: 12 }}>
-                    Не удалось загрузить фотографии
+                    {t('news.photosError')}
                   </Text>
                   <Text onPress={vm.retry} style={s.retryText}>
-                    Обновить
+                    {t('common.retry')}
                   </Text>
                 </View>
               ) : (
-                <Text style={{ padding: 16, color: colors.text }}>Нет фотографий</Text>
+                <Text style={{ padding: 16, color: colors.text }}>{t('news.noPhotos')}</Text>
               )
             }
           />

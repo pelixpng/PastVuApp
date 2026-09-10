@@ -1,0 +1,60 @@
+{
+  "fill" : {
+    "solid" : "display-p3:0.88235,0.31765,0.32941,1.00000"
+  },
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "fill-specializations" : [
+            {
+              "appearance" : "dark",
+              "value" : "none"
+            },
+            {
+              "appearance" : "tinted",
+              "value" : "automatic"
+            }
+          ],
+          "glass" : true,
+          "hidden" : false,
+          "image-name" : "Star 4.svg",
+          "name" : "Star 4",
+          "position" : {
+            "scale" : 8.2,
+            "translation-in-points" : [
+              -0.00011266853982760949,
+              0.39969527096809543
+            ]
+          }
+        },
+        {
+          "hidden" : false,
+          "image-name" : "App Icon 2.svg",
+          "name" : "App Icon 2",
+          "position" : {
+            "scale" : 9.099999999999998,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}

@@ -13,10 +13,13 @@ import { useVM } from '../../../../core/hooks/useVM'
 import { IComment } from '../../../../core/types/apiPhotoComment'
 import { formatDate } from '../../../../core/utils/getTime'
 import StandardAvatar from '../../../../assets/avatar.png'
+import { t } from '../../../../core/i18n'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 export const NewsPostScreen = observer(() => {
   const vm = useVM(NewsPostVM)
   const { colors } = useTheme()
+  const insets = useSafeAreaInsets()
   const navigation = useNavigation()
 
   useLayoutEffect(() => {
@@ -81,7 +84,7 @@ export const NewsPostScreen = observer(() => {
       />
       <Spacer height={24} />
       <View style={s.commentsHeader}>
-        <Text style={[s.commentsTitle, { color: colors.textFirst }]}>Комментарии </Text>
+        <Text style={[s.commentsTitle, { color: colors.textFirst }]}>{t('photo.comments')} </Text>
         <Text style={[s.commentsCount, { color: colors.textThird }]}>{vm.post?.ccount || 0}</Text>
       </View>
       <Spacer height={12} />
@@ -91,6 +94,9 @@ export const NewsPostScreen = observer(() => {
   return (
     <Container>
       <FlatList
+        // The screen runs edge to edge, so the last comments ended up under the system navigation
+        // buttons with no way to scroll past them.
+        contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}
         data={vm.comments}
         renderItem={renderItem}
         keyExtractor={item => item.cid}

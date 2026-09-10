@@ -39,8 +39,8 @@ const YearsSliderComponent: FC<YearsSliderProps> = ({ value, setValue, isTablet 
         thumbTouchSize={{ width: 20, height: 20 }}
         containerStyle={s.containerSlider}
         value={tmpRange}
-        onValueChange={setTmpRange}
-        onSlidingComplete={setValue}
+        onValueChange={value => setTmpRange(value as YearsRangeType)}
+        onSlidingComplete={value => setValue(value as YearsRangeType)}
       />
       <View style={s.row}>
         <Text style={[s.currentYearsText, { color: colors.textSecond }]}>1826</Text>

@@ -16,39 +16,37 @@ import MapStore from '../../../core/store/Map.store'
 import ApiStore from '../../../core/store/Api.store'
 import { getPolygon, getZoom, zoomLevelToAltitude } from '../../../core/utils/getMapData'
 import ApiService from '../../../core/api/apiService'
+import * as PhotoPost from '../../../core/services/photoPost'
 import { BaseViewModelProvider } from '../../provider/vm.provider'
 import { SCREENS } from '../../navigation/navigation.types'
 import { IComment, Users } from '../../../core/types/apiPhotoComment'
-import { IosTargetStorage } from '../../../core/storage/appleTarget'
 import { CollectionItem } from '../collection/Collection.screen'
-import { ExtensionStorage } from '@bacons/apple-targets'
 import { Linking } from 'react-native'
 import { savePhoto, sharePhoto } from '../../../core/utils/getPhoto'
-
-const startRegion: Region = {
-  latitude: 55.763307,
-  longitude: 37.576945,
-  latitudeDelta: 0.01,
-  longitudeDelta: 0.01,
-}
+import { t } from '../../../core/i18n'
+import { defaultRegion } from '../../../core/constants/map'
 
 export const mapRef = createRef<MapView>()
+
+/** Matches `cameraZoomRange.minCenterCoordinateDistance` on the MapView. */
+const MIN_ALTITUDE = 100
 
 class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
   //map data
   @observable.ref photoCollection: { markers: MapMarker[] } = { markers: [] }
-  @observable.ref coordinates: Region = MMKVStorage.get('RegionString') ?? startRegion
+  @observable.ref coordinates: Region = MMKVStorage.get('RegionString') ?? defaultRegion()
   @observable.ref yearsRange: YearsRangeType = MMKVStorage.get('RangeYears') ?? [1840, 2000]
   @observable queryPlace = ''
   @observable.ref places: LocationItem[] = []
-  private timeoutId: NodeJS.Timeout | null = null
-  private collectionTimeoutId: NodeJS.Timeout | null = null
+  private timeoutId: ReturnType<typeof setTimeout> | null = null
+  private collectionTimeoutId: ReturnType<typeof setTimeout> | null = null
   //photo detail
   @observable.ref comments: IComment[] = []
   @observable.ref users: Users | null = null
   @observable.ref postInfo: Photo | null = null
   @observable showPhotoDetail = false
   @observable isImageLoaded = false
+  @observable activeCid: string | null = null
   @observable isFavorite = false
 
   constructor() {
@@ -100,6 +98,11 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
     return `https://img.pastvu.com/${ApiStore.photoQualitySettings}/${this.postInfo?.file}`
   }
 
+  @computed
+  get imageResolution() {
+    return this.postInfo ? PhotoPost.photoResolution(this.postInfo) : undefined
+  }
+
   // ------------------------------------------ Actions ------------------------------------------
 
   // map data
@@ -111,6 +114,20 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
 
   @action.bound
   setCoordinate(cord: Region) {
+    const prev = this.coordinates
+    // The map re-emits onRegionChangeComplete with an unchanged region when its view is
+    // reattached (e.g. returning to the tab). `coordinates` is an observable.ref, so assigning an
+    // equal-but-new object still counts as a change and makes the autorun refetch the markers,
+    // which visibly redraws the whole map.
+    if (
+      prev &&
+      prev.latitude === cord.latitude &&
+      prev.longitude === cord.longitude &&
+      prev.latitudeDelta === cord.latitudeDelta &&
+      prev.longitudeDelta === cord.longitudeDelta
+    ) {
+      return
+    }
     this.coordinates = cord
     MMKVStorage.set('RegionString', this.coordinates)
   }
@@ -198,7 +215,7 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
         markers: [...this.photoCollection.markers, ...uniquePhotos],
       }
     } catch (error) {
-      Alert.alert('Ошибка', 'Не удалось загрузить метки')
+      Alert.alert(t('common.error'), t('map.markersError'))
     }
   }
 
@@ -220,10 +237,7 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
       this.places = await ApiService.searchPlace(this.queryPlace)
     } catch (error: any) {
       if (error.message === '429') {
-        Alert.alert(
-          'Ошибка',
-          'Лимит поиска для всех пользователей исчерпан. Попробуйте через пару минут или завтра 🪫',
-        )
+        Alert.alert(t('common.error'), t('map.searchLimit'))
       }
     }
   }
@@ -232,23 +246,27 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
 
   @action.bound
   async zoomToCluster(latitude: number, longitude: number) {
-    const currentZoom = getZoom(this.coordinates.latitudeDelta)
-    const zoomLevel = currentZoom + 1
-    const altitude = Platform.OS === 'ios' ? zoomLevelToAltitude(zoomLevel) : undefined
-    const camera = {
-      center: { latitude, longitude },
-      heading: 0,
-      pitch: 0,
-      ...(Platform.OS === 'ios' ? { altitude } : { zoom: zoomLevel }),
-    }
-    if (mapRef.current) {
-      mapRef.current.animateCamera(camera, { duration: 500 })
-    }
+    const map = mapRef.current
+    if (!map) return
+    // Step from the camera's own zoom rather than from `getZoom(latitudeDelta)`: that helper
+    // buckets the delta for the API's `z` parameter and reads about one level lower than the
+    // camera actually is, so near zoom 17 it kept asking the camera to move where it already was
+    // and tapping a cluster did nothing. Halving the altitude is one zoom level on iOS.
+    const current = await map.getCamera()
+    const step =
+      Platform.OS === 'ios'
+        ? { altitude: Math.max((current.altitude ?? zoomLevelToAltitude(16)) / 2, MIN_ALTITUDE) }
+        : { zoom: (current.zoom ?? getZoom(this.coordinates.latitudeDelta)) + 1 }
+    map.animateCamera(
+      { center: { latitude, longitude }, heading: 0, pitch: 0, ...step },
+      { duration: 500 },
+    )
   }
 
   @action.bound
   showPhoto(cid: string, _title?: string) {
     this.showPhotoDetail = true
+    this.activeCid = cid
     if (this.postInfo) {
       runInAction(() => {
         this.postInfo = null
@@ -264,6 +282,7 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
   closePhoto() {
     runInAction(() => {
       this.showPhotoDetail = false
+      this.activeCid = null
       this.postInfo = null
       this.comments = []
       this.users = null
@@ -283,40 +302,21 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
 
   @action.bound
   async getPhotoInfo(cid: string) {
-    await ApiService.getPhotoInfo(cid)
-      .then(async ({ result }) => {
-        this.postInfo = result.photo
-        const favorites: CollectionItem[] = MMKVStorage.get('Favorites') ?? []
-        this.isFavorite = favorites.some(item => item.cid === cid)
-        const history: CollectionItem[] = MMKVStorage.get('History') ?? []
-        const title = result.photo.title
-        const description = `${result.photo.y} ${result.photo.regions
-          .map(region => region.title_local)
-          .join(', ')}`
-        const file = result.photo.file
-        if (!history.some(item => item.cid === cid)) {
-          MMKVStorage.set('History', [{ title, description, cid, file }, ...history])
-          IosTargetStorage.set(
-            'History',
-            JSON.stringify([{ title, description, cid, file }, ...history]),
-          )
-          ExtensionStorage.reloadWidget()
-        }
-        if (result.photo?.ccount) {
-          this.getComments(cid)
-        }
-      })
-      .catch(() => Alert.alert('Ошибка', 'Не удалось загрузить информацию о фото'))
-  }
-
-  @action.bound
-  async getComments(cid: string) {
-    await ApiService.getComments(cid).then(({ users, comments }) => {
+    try {
+      const { photo, users, comments } = await PhotoPost.loadPost(cid)
+      // Another photo may have been opened, or the panel closed, while this request was in
+      // flight; without this the slower, older response would overwrite the newer one.
+      if (this.activeCid !== cid) return
       runInAction(() => {
+        this.postInfo = photo
         this.users = users
         this.comments = comments
+        this.isFavorite = PhotoPost.isFavorite(cid)
       })
-    })
+      PhotoPost.recordHistory(photo, cid)
+    } catch {
+      Alert.alert(t('common.error'), t('photo.infoError'))
+    }
   }
 
   @action.bound

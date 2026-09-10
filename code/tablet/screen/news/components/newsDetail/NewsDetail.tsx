@@ -9,6 +9,8 @@ import { Comment } from '../../../map/components/comment/Comment'
 import { Spacer } from '../../../../../core/components/ui/Spacer'
 import { formatDate } from '../../../../../core/utils/getTime'
 import StandardAvatar from '../../../../../assets/avatar.png'
+import { t } from '../../../../../core/i18n'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 type NewsDetailProps = {
   post: NewsItems | null
@@ -19,6 +21,7 @@ type NewsDetailProps = {
 
 export const NewsDetail: FC<NewsDetailProps> = ({ post, comments, users, onLinkPress }) => {
   const { colors } = useTheme()
+  const { bottom } = useSafeAreaInsets()
   const { width } = useWindowDimensions()
   const detailWidth = width * 0.67 - 32
 
@@ -35,7 +38,7 @@ export const NewsDetail: FC<NewsDetailProps> = ({ post, comments, users, onLinkP
         <Spacer height={18} />
         <View style={s.emptyContainer}>
           <Text style={[s.emptyText, { color: colors.textThird }]}>
-            Выберите новость для просмотра
+            {t('news.selectPost')}
           </Text>
         </View>
       </View>
@@ -97,7 +100,7 @@ export const NewsDetail: FC<NewsDetailProps> = ({ post, comments, users, onLinkP
       />
       <Spacer height={24} />
       <View style={s.commentsHeader}>
-        <Text style={[s.commentsTitle, { color: colors.textFirst }]}>Комментарии </Text>
+        <Text style={[s.commentsTitle, { color: colors.textFirst }]}>{t('photo.comments')} </Text>
         <Text style={[s.commentsCount, { color: colors.textThird }]}>{post.ccount || 0}</Text>
       </View>
       <Spacer height={12} />
@@ -108,6 +111,7 @@ export const NewsDetail: FC<NewsDetailProps> = ({ post, comments, users, onLinkP
     <View style={[s.container, { width: detailWidth }]}>
       <Spacer height={18} />
       <FlatList
+        contentContainerStyle={{ paddingBottom: bottom + 16 }}
         showsVerticalScrollIndicator={false}
         data={comments}
         renderItem={renderItem}

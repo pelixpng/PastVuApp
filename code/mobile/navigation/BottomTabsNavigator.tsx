@@ -8,14 +8,19 @@ import { CollectionScreen } from '../screens/home/collection/Collection.screen'
 import { NewsScreen } from '../screens/home/news/News.screen'
 import { SettingsMenuScreen } from '../screens/settings/settingsMenu/SettingsMenu.screen'
 import { useTheme } from '@react-navigation/native'
+import { t } from '../../core/i18n'
+import { observer } from 'mobx-react'
 
 const Tab = createBottomTabNavigator<StackParamList>()
 
-export function BottomTabsNavigator() {
+export const BottomTabsNavigator = observer(function BottomTabsNavigator() {
   const { colors } = useTheme()
   return (
     <Tab.Navigator
       initialRouteName={SCREENS.MAP}
+      // Keep inactive tabs attached: detaching tears the native MapView out of the hierarchy, and
+      // rebuilding it on return redraws the map and loses part of the markers.
+      detachInactiveScreens={false}
       screenOptions={{
         tabBarActiveTintColor: colors.basePrimary,
         tabBarInactiveTintColor: colors.textThird,
@@ -39,7 +44,7 @@ export function BottomTabsNavigator() {
         component={MapScreen}
         options={{
           headerShown: false,
-          title: 'Карта',
+          title: t('tabs.map'),
           tabBarIcon: ({ color }) => <MaterialIcons name="map" size={24} color={color} />,
         }}
       />
@@ -47,8 +52,8 @@ export function BottomTabsNavigator() {
         name={SCREENS.PHOTO_HISTORY}
         component={CollectionScreen}
         options={{
-          title: 'Коллекция',
-          headerTitle: 'Коллекция',
+          title: t('tabs.collection'),
+          headerTitle: t('tabs.collection'),
           tabBarIcon: ({ color }) => <MaterialIcons name="favorite" size={24} color={color} />,
         }}
       />
@@ -56,8 +61,8 @@ export function BottomTabsNavigator() {
         name={SCREENS.NEWS}
         component={NewsScreen}
         options={{
-          title: 'Новости',
-          headerTitle: 'Новое на PastVu',
+          title: t('tabs.news'),
+          headerTitle: t('headers.news'),
           tabBarIcon: ({ color }) => <MaterialIcons name="article" size={24} color={color} />,
         }}
       />
@@ -65,14 +70,14 @@ export function BottomTabsNavigator() {
         name={SCREENS.SETTINGS_MENU}
         component={SettingsMenuScreen}
         options={{
-          title: 'Настройки',
-          headerTitle: 'Настройки',
+          title: t('tabs.settings'),
+          headerTitle: t('tabs.settings'),
           tabBarIcon: ({ color }) => <MaterialIcons name="settings" size={24} color={color} />,
         }}
       />
     </Tab.Navigator>
   )
-}
+})
 
 const s = StyleSheet.create({
   tabBarLabelStyle: {

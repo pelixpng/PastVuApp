@@ -10,6 +10,8 @@ import ThemeStore from '../../../../core/store/Theme.store'
 import { SliderComponent } from '../../../../mobile/screens/settings/appSettings/components/settingsSlider/SliderSettings'
 import { SettingsOptions } from '../../../../core/constants/settings'
 import { observer } from 'mobx-react'
+import { t } from '../../../../core/i18n'
+import LocaleStore from '../../../../core/store/Locale.store'
 
 export const AppSettingsScreen = observer(() => {
   const { colors } = useTheme()
@@ -17,14 +19,14 @@ export const AppSettingsScreen = observer(() => {
     <Container isScroll style={s.container}>
       <Spacer height={18} />
       <UICard>
-        <Text style={[s.titleText, { color: colors.textFirst }]}>Параметры карты</Text>
+        <Text style={[s.titleText, { color: colors.textFirst }]}>{t('appSettings.mapSection')}</Text>
         <Spacer height={4} />
         <Text style={[s.descriptionText, { color: colors.textSecond }]}>
-          Сгруппировать фото на карте (как на веб версии) ?
+          {t('appSettings.clusterQuestion')}
         </Text>
         <Spacer height={12} />
         <RadioButtons
-          options={SettingsOptions.showClusterOptions}
+          options={SettingsOptions.showClusterOptions()}
           selectedValue={ApiStore.showCluster}
           setValue={ApiStore.setShowCluster}
         />
@@ -32,12 +34,11 @@ export const AppSettingsScreen = observer(() => {
         {ApiStore.showCluster === 'no' && (
           <>
             <Text style={[s.descriptionText, { color: colors.textSecond }]}>
-              Настройка расстояния поиска фотографий от текущих координат, количества запрашиваемых
-              фотографий при изменении координат, максимального количество фотографий на карте.
+              {t('appSettings.searchHint')}
             </Text>
             <Spacer height={12} />
             <SliderComponent
-              title="Максимальное расстояние в метрах"
+              title={t('appSettings.maxDistance')}
               maxValue={10000}
               minValue={0}
               value={ApiStore.maxDistance}
@@ -47,7 +48,7 @@ export const AppSettingsScreen = observer(() => {
             <SliderComponent
               value={ApiStore.requestCountPhoto}
               setValue={ApiStore.setRequestCountPhoto}
-              title={'Количество запрашиваемых фото '}
+              title={t('appSettings.requestCount')}
               minValue={0}
               maxValue={30}
             />
@@ -55,7 +56,7 @@ export const AppSettingsScreen = observer(() => {
             <SliderComponent
               value={MapStore.maxPhotoOnMap}
               setValue={MapStore.setMaxPhotoMap}
-              title={'Количество фото на карте'}
+              title={t('appSettings.maxOnMap')}
               minValue={0}
               maxValue={800}
             />
@@ -64,41 +65,56 @@ export const AppSettingsScreen = observer(() => {
       </UICard>
       <Spacer height={16} />
       <UICard>
-        <Text style={[s.titleText, { color: colors.textFirst }]}>Тема</Text>
+        <Text style={[s.titleText, { color: colors.textFirst }]}>{t('appSettings.themeSection')}</Text>
         <Spacer height={4} />
         <Text style={[s.descriptionText, { color: colors.textSecond }]}>
-          Цветовая схема приложения.
+          {t('appSettings.themeHint')}
         </Text>
         <Spacer height={12} />
         <RadioButtons
-          options={SettingsOptions.themeOptions}
+          options={SettingsOptions.themeOptions()}
           selectedValue={ThemeStore.selectedTheme}
           setValue={ThemeStore.setTheme}
         />
       </UICard>
       <Spacer height={16} />
       <UICard>
-        <Text style={[s.titleText, { color: colors.textFirst }]}>Фото</Text>
+        <Text style={[s.titleText, { color: colors.textFirst }]}>
+          {t('appSettings.languageSection')}
+        </Text>
         <Spacer height={4} />
         <Text style={[s.descriptionText, { color: colors.textSecond }]}>
-          Качество загружаемых фотографий, при плохом интернет соединении рекомендуется понизить
-          качество до миниатюры.
+          {t('appSettings.languageHint')}
         </Text>
         <Spacer height={12} />
         <RadioButtons
-          options={SettingsOptions.photoQualityOptions}
+          options={SettingsOptions.languageOptions()}
+          selectedValue={LocaleStore.preference}
+          setValue={LocaleStore.setLocale}
+        />
+      </UICard>
+      <Spacer height={16} />
+      <UICard>
+        <Text style={[s.titleText, { color: colors.textFirst }]}>{t('appSettings.photoSection')}</Text>
+        <Spacer height={4} />
+        <Text style={[s.descriptionText, { color: colors.textSecond }]}>
+          {t('appSettings.photoHint')}
+        </Text>
+        <Spacer height={12} />
+        <RadioButtons
+          options={SettingsOptions.photoQualityOptions()}
           selectedValue={ApiStore.photoQualitySettings}
           setValue={ApiStore.setPhotoQuality}
         />
       </UICard>
       <Spacer height={16} />
       <UICard>
-        <Text style={[s.titleText, { color: colors.textFirst }]}>Тип карты</Text>
+        <Text style={[s.titleText, { color: colors.textFirst }]}>{t('appSettings.mapTypeSection')}</Text>
         <Spacer height={4} />
-        <Text style={[s.descriptionText, { color: colors.textSecond }]}>Выбор слоя карты.</Text>
+        <Text style={[s.descriptionText, { color: colors.textSecond }]}>{t('appSettings.mapTypeHint')}</Text>
         <Spacer height={12} />
         <RadioButtons
-          options={SettingsOptions.mapTypeOptions}
+          options={SettingsOptions.mapTypeOptions()}
           selectedValue={MapStore.mapType}
           setValue={MapStore.setMapType}
         />
@@ -107,14 +123,14 @@ export const AppSettingsScreen = observer(() => {
       {Platform.OS === 'android' && (
         <>
           <UICard>
-            <Text style={[s.titleText, { color: colors.textFirst }]}>Тип маркера</Text>
+            <Text style={[s.titleText, { color: colors.textFirst }]}>{t('appSettings.markerSection')}</Text>
             <Spacer height={4} />
             <Text style={[s.descriptionText, { color: colors.textSecond }]}>
-              Выбор типа маркера на Google Maps.
+              {t('appSettings.markerHint')}
             </Text>
             <Spacer height={12} />
             <RadioButtons
-              options={SettingsOptions.markerTypeOptions}
+              options={SettingsOptions.markerTypeOptions()}
               selectedValue={MapStore.markerType}
               setValue={MapStore.setMarkerType}
             />

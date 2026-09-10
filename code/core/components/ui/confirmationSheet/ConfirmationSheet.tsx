@@ -8,6 +8,7 @@ import Animated, {
   runOnJS,
 } from 'react-native-reanimated'
 import { Spacer } from '../Spacer'
+import { t } from '../../../i18n'
 
 export interface ConfirmationSheetProps {
   visible: boolean
@@ -21,8 +22,8 @@ export interface ConfirmationSheetProps {
 export const ConfirmationSheet: FC<ConfirmationSheetProps> = ({
   visible,
   title,
-  confirmText = 'Удалить',
-  cancelText = 'Отменить',
+  confirmText = t('common.delete'),
+  cancelText = t('common.cancel'),
   onConfirm,
   onCancel,
 }) => {
