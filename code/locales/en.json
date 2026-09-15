@@ -1,0 +1,5 @@
+{
+  "NSLocationWhenInUseUsageDescription": "Location access lets the app show photos taken near you on the map.",
+  "NSPhotoLibraryAddUsageDescription": "Photo library access lets the app save photos you download, so you can view and use them later.",
+  "NSPhotoLibraryUsageDescription": "Photo library access lets the app save photos you download, so you can view and use them later."
+}

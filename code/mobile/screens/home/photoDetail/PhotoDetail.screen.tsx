@@ -11,10 +11,13 @@ import { useCallback, useEffect, useLayoutEffect } from 'react'
 import { MaterialIcons } from '@expo/vector-icons'
 import { ImageZoom } from './components/imageView/ImageZoom'
 import { useVM } from '../../../../core/hooks/useVM'
+import { t } from '../../../../core/i18n'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 export const PhotoDetailScreen = observer(() => {
   const vm = useVM(PhotoDetailVM)
   const { colors } = useTheme()
+  const insets = useSafeAreaInsets()
   const renderItem = useCallback(
     ({ item }: { item: IComment }) => (
       <Comment comment={item} users={vm.users} onLinkPress={vm.openPhotoFromLink} />
@@ -56,10 +59,10 @@ export const PhotoDetailScreen = observer(() => {
     })
   }, [navigation, vm.canGoBack])
 
-  if (!vm.postInfo && !vm.users) {
+  if (!vm.postInfo) {
     return (
       <Container>
-        <Text style={[s.titleText, { color: colors.textFirst }]}>Загрузка...</Text>
+        <Text style={[s.titleText, { color: colors.textFirst }]}>{t('common.loading')}</Text>
       </Container>
     )
   }
@@ -67,20 +70,26 @@ export const PhotoDetailScreen = observer(() => {
     <Container>
       <ImageZoom
         uri={vm.imageLink}
+        resolution={vm.imageResolution}
         openFullScreenImage={vm.openFullScreenImage}
         onImageLoaded={vm.onImageLoad}
       />
       <Spacer height={16} />
-      {vm.isImageLoaded && (
-        <FlatList
-          showsVerticalScrollIndicator={false}
-          data={vm.comments}
-          renderItem={renderItem}
-          ListHeaderComponent={<PostInfo postInfo={vm.postInfo!} onLinkPress={vm.openPhotoFromLink} />}
-          style={s.listStyle}
-          keyExtractor={item => item.cid}
-        />
-      )}
+      {/* Not gated on the image: ImageZoom only mounts its <Image> once it has resolved the remote
+          dimensions, so tying the text to that hid the whole post until the image was ready -- and
+          hid it forever when the image failed to resolve. */}
+      <FlatList
+        // The screen runs edge to edge, so the last comments ended up under the system navigation
+        // buttons with no way to scroll past them.
+        contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}
+        showsVerticalScrollIndicator={false}
+        data={vm.comments}
+        renderItem={renderItem}
+        extraData={vm.users}
+        ListHeaderComponent={<PostInfo postInfo={vm.postInfo} onLinkPress={vm.openPhotoFromLink} />}
+        style={s.listStyle}
+        keyExtractor={item => item.cid}
+      />
     </Container>
   )
 })

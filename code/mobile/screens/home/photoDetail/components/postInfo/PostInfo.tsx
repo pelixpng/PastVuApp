@@ -5,6 +5,7 @@ import { useTheme } from '@react-navigation/native'
 import RenderHTML from 'react-native-render-html'
 import { Spacer } from '../../../../../../core/components/ui/Spacer'
 import { formatDate } from '../../../../../../core/utils/getTime'
+import { t } from '../../../../../../core/i18n'
 
 type PostInfoProps = {
   postInfo: Photo
@@ -18,10 +19,10 @@ export const PostInfo: FC<PostInfoProps> = ({ postInfo, onLinkPress }) => {
   const locationText = postInfo.y + ', ' + titlesRegion
   const descriptionHTML = { html: `<p>${postInfo.desc}</p>` }
   const sourceHTML = {
-    html: `<p><strong>Источник:</strong> <span>${postInfo.source || 'Отсутствует'}</span></p>`,
+    html: `<p><strong>${t('photo.source')}:</strong> <span>${postInfo.source || t('photo.sourceMissing')}</span></p>`,
   }
   const authorHTML = {
-    html: `<p><strong>Автор:</strong> <span>${postInfo.author || 'Неизвестен'}</span></p>`,
+    html: `<p><strong>${t('photo.author')}:</strong> <span>${postInfo.author || t('photo.authorUnknown')}</span></p>`,
   }
   const lastEditFormat = formatDate(postInfo.cdate)
   return (
@@ -106,12 +107,12 @@ export const PostInfo: FC<PostInfoProps> = ({ postInfo, onLinkPress }) => {
       <Spacer height={8} />
       {lastEditFormat && (
         <Text selectable style={[s.postLocationText, { color: colors.textThird }]}>
-          Последнее изменение {lastEditFormat}
+          {t('photo.lastModified')} {lastEditFormat}
         </Text>
       )}
       <Spacer height={12} />
       <View style={s.row}>
-        <Text style={[s.commentHeaderText, { color: colors.textFirst }]}>Комментарии </Text>
+        <Text style={[s.commentHeaderText, { color: colors.textFirst }]}>{t('photo.comments')} </Text>
         <Text style={[s.commentHeaderText, { color: colors.textThird }]}>{commentTotal}</Text>
       </View>
       <Spacer height={12} />

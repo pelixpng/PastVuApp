@@ -6,6 +6,7 @@ import ApiService from '../../../../core/api/apiService'
 import { NewsItems, NewsPhoto } from '../../../../core/types/apiNews'
 import { CollectionItem } from '../collection/Collection.screen'
 import { getRegionPath } from '../../../../core/utils/getRegionPath'
+import { t } from '../../../../core/i18n'
 
 export type NewsTab = 'posts' | 'photos'
 
@@ -19,10 +20,15 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
   @observable photosError = false
   private regionsMap: Map<number, any> = new Map()
 
-  segmentOptions: SegmentedControlOption[] = [
-    { label: 'Посты', value: 'posts' },
-    { label: 'Фото', value: 'photos' },
-  ]
+  // A getter, not a field: a field is evaluated once when the view model is constructed and
+  // would keep the language that was active back then.
+  @computed
+  get segmentOptions(): SegmentedControlOption[] {
+    return [
+      { label: t('news.posts'), value: 'posts' },
+      { label: t('news.photos'), value: 'photos' },
+    ]
+  }
 
   constructor() {
     super()

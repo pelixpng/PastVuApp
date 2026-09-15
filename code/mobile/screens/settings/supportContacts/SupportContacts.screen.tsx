@@ -5,27 +5,28 @@ import { useTheme } from '@react-navigation/native'
 import { Linking, StyleSheet, Text } from 'react-native'
 import { Spacer } from '../../../../core/components/ui/Spacer'
 import { Links } from '../../../../core/constants/links'
+import { t } from '../../../../core/i18n'
+import { observer } from 'mobx-react'
 
-export const SupportContactsScreen = () => {
+export const SupportContactsScreen = observer(() => {
   const { colors } = useTheme()
   return (
     <Container pdHorizontal={16}>
       <Spacer height={18} />
       <UICard>
-        <Text style={[s.titleText, { color: colors.textFirst }]}>Нужна помощь?</Text>
+        <Text style={[s.titleText, { color: colors.textFirst }]}>{t('support.title')}</Text>
         <Spacer height={4} />
         <Text style={[s.descriptionText, { color: colors.textSecond }]}>
-          Если у вас возникли проблемы во время использования приложения, вы можете связаться с
-          разработчиком через почту или телеграмм.
+          {t('support.text')}
         </Text>
         <Spacer height={16} />
         <MyButton title={'Telegram'} func={() => Linking.openURL(Links.telegramDeveloper)} />
         <Spacer height={16} />
-        <MyButton title={'Почта'} func={() => Linking.openURL(Links.emailDeveloper)} />
+        <MyButton title={t('support.email')} func={() => Linking.openURL(Links.emailDeveloper)} />
       </UICard>
     </Container>
   )
-}
+})
 
 const s = StyleSheet.create({
   descriptionText: {

@@ -1,4 +1,3 @@
-import { Platform } from 'react-native'
 import { IComment, IComments } from '../types/apiPhotoComment'
 import {
   LocationItem,
@@ -9,12 +8,13 @@ import {
 } from '../types/apiPhotoList'
 import { getColor } from '../utils/getColor'
 import { getAngle } from '../utils/getDirection'
-import { getMarker, getMarkerCluster } from '../utils/getMarker'
+import { getMarkerName, getMarkerClusterName } from '../utils/getMarker'
+import Constants from 'expo-constants'
 import { socketEmit } from './socketService'
 
 const BASE_URL = 'https://api.pastvu.com/api2'
 const PLACE_API_URL = 'https://us1.locationiq.com/v1'
-const PLACE_API_KEY = 'YOUR_API_KEY'
+const PLACE_API_KEY = Constants.expoConfig?.extra?.placeApiKey ?? ''
 
 export default class ApiService {
   static async getPhotoList(params: getPhotoListProps) {
@@ -31,7 +31,7 @@ export default class ApiService {
       cid: photo.cid.toString(),
       year: photo.year,
       dir: getAngle(photo.dir),
-      marker: getMarker(photo.year, photo.dir),
+      marker: getMarkerName(photo.year, photo.dir),
       color: getColor(photo.year),
     }))
   }
@@ -47,7 +47,7 @@ export default class ApiService {
       : json.result.clusters.map(cluster => ({
           _type: 'cluster' as const,
           count: Math.min(cluster.c, 999),
-          marker: Platform.OS === 'android' ? getMarkerCluster(cluster.c) : [],
+          marker: getMarkerClusterName(cluster.c),
           location: {
             latitude: cluster.geo[0],
             longitude: cluster.geo[1],
@@ -59,7 +59,7 @@ export default class ApiService {
       title: photo.title,
       year: photo.year,
       dir: getAngle(photo.dir),
-      marker: getMarker(photo.year, photo.dir),
+      marker: getMarkerName(photo.year, photo.dir),
       color: getColor(photo.year),
       location: {
         latitude: photo.geo[0],

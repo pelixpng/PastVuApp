@@ -5,6 +5,7 @@ import { MaterialIcons, Feather } from '@expo/vector-icons'
 import { s } from './style'
 import { useTheme } from '@react-navigation/native'
 import { Spacer } from '../../../../../core/components/ui/Spacer'
+import { t } from '../../../../../core/i18n'
 
 export type PhotoListItemProps = {
   onPress: () => void
@@ -27,7 +28,7 @@ export const PhotoListItem: FC<PhotoListItemProps> = ({
       <Image
         source={{ uri: `https://img.pastvu.com/h/${file}` }}
         style={s.image}
-        onError={() => Alert.alert('Ошибка', 'Не удалось загрузить изображение, попробуйте позже')}
+        onError={() => Alert.alert(t('common.error'), t('photo.imageError'))}
         cachePolicy="disk"
       />
       <Spacer width={12} />

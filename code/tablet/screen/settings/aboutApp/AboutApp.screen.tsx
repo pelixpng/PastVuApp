@@ -5,8 +5,13 @@ import { useTheme } from '@react-navigation/native'
 import { UICard } from '../../../../core/components/ui/UICards'
 import { Spacer } from '../../../../core/components/ui/Spacer'
 import { Links } from '../../../../core/constants/links'
+import { formatLongDate, t } from '../../../../core/i18n'
+import { observer } from 'mobx-react'
 
-export const AboutAppScreen = () => {
+const APP_VERSION = '2.5.0'
+const RELEASE_DATE = new Date('2026-09-07')
+
+export const AboutAppScreen = observer(() => {
   const { colors } = useTheme()
   return (
     <Container isScroll style={s.container}>
@@ -15,44 +20,40 @@ export const AboutAppScreen = () => {
         <Image style={s.image} source={require('../../../../assets/icon.png')} />
         <Spacer height={16} />
         <Text selectable style={[s.descriptionText, { color: colors.textSecond }]}>
-          Версия 2.4.0 от 20 февраля 2026 г.
+          {t('about.version', { version: APP_VERSION, date: formatLongDate(RELEASE_DATE) })}
         </Text>
       </View>
       <Spacer height={24} />
       <UICard>
-        <Text style={[s.titleText, { color: colors.textFirst }]}>Что такое PastVu?</Text>
+        <Text style={[s.titleText, { color: colors.textFirst }]}>{t('about.whatIsTitle')}</Text>
         <Spacer height={4} />
         <Text style={[s.descriptionText, { color: colors.textSecond }]}>
-          Данное приложение является мобильной версией проекта PastVu, а также имеет полностью
-          открытый исходный код. PastVu - проект по сбору свидетельств прошлого в фотографиях,
-          взгляд на историю среды обитания человечества.
+          {t('about.whatIsText')}
         </Text>
         <Spacer height={16} />
-        <MyButton title={'Наш Telegram канал'} func={() => Linking.openURL(Links.telegramChanel)} />
+        <MyButton title={t('about.telegramChannel')} func={() => Linking.openURL(Links.telegramChanel)} />
         <Spacer height={16} />
-        <MyButton title={'О проекте PastVu'} func={() => Linking.openURL(Links.aboutPastVu)} />
+        <MyButton title={t('about.aboutPastVu')} func={() => Linking.openURL(Links.aboutPastVu)} />
         <Spacer height={16} />
         <View style={s.row}>
           <MyButton
             fullWidth
-            title={'Web версия PastVu'}
+            title={t('about.webVersion')}
             func={() => Linking.openURL(Links.telegramDesigner)}
           />
           <MyButton
             fullWidth
-            title={'GitHub приложения'}
+            title={t('about.github')}
             func={() => Linking.openURL(Links.sourceCode)}
           />
         </View>
       </UICard>
       <Spacer height={16} />
       <UICard>
-        <Text style={[s.titleText, { color: colors.textFirst }]}>Используемые ресурсы</Text>
+        <Text style={[s.titleText, { color: colors.textFirst }]}>{t('about.creditsTitle')}</Text>
         <Spacer height={4} />
         <Text style={[s.descriptionText, { color: colors.textSecond }]}>
-          Для получения фотографий и информации о них используется открытое API проекта PastVu. Для
-          поиска мест используется сервис LocationIQ. На Android карта отображается через Google
-          Maps Platform, на iOS — через Apple Maps.
+          {t('about.creditsText')}
         </Text>
         <Spacer height={16} />
         <MyButton title={'PastVu API'} func={() => Linking.openURL(Links.pastVuAPI)} />
@@ -68,21 +69,21 @@ export const AboutAppScreen = () => {
       </UICard>
       <Spacer height={16} />
       <UICard>
-        <Text style={[s.titleText, { color: colors.textFirst }]}>Разработчики</Text>
+        <Text style={[s.titleText, { color: colors.textFirst }]}>{t('about.teamTitle')}</Text>
         <Spacer height={4} />
         <Text style={[s.descriptionText, { color: colors.textSecond }]}>
-          Персоны участвовавшие в разработке и отладке приложения.
+          {t('about.teamText')}
         </Text>
         <Spacer height={16} />
         <View style={s.row}>
           <MyButton
             fullWidth
-            title={'Семён Кузьмин • Разработчик'}
+            title={t('about.developer')}
             func={() => Linking.openURL(Links.telegramDeveloper)}
           />
           <MyButton
             fullWidth
-            title={'Артём Костюченко • Дизайнер'}
+            title={t('about.designer')}
             func={() => Linking.openURL(Links.telegramDesigner)}
           />
         </View>
@@ -90,7 +91,7 @@ export const AboutAppScreen = () => {
       <Spacer height={16} />
     </Container>
   )
-}
+})
 
 const s = StyleSheet.create({
   block: { width: '100%', alignItems: 'center' },

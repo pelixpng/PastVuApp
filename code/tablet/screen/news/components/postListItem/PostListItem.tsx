@@ -8,6 +8,7 @@ import { Spacer } from '../../../../../core/components/ui/Spacer'
 import { NewsUser } from '../../../../../core/types/apiNews'
 import { formatDate } from '../../../../../core/utils/getTime'
 import StandardAvatar from '../../../../../assets/avatar.png'
+import { t } from '../../../../../core/i18n'
 
 export type PostListItemProps = {
   onPress: () => void
@@ -81,7 +82,7 @@ export const PostListItem: FC<PostListItemProps> = memo(
                       backgroundColor: gradientBg,
                     },
                   ]}>
-                  Показать ещё
+                  {t('common.showMore')}
                 </Text>
               </LinearGradient>
             </View>
@@ -92,7 +93,7 @@ export const PostListItem: FC<PostListItemProps> = memo(
           <Text style={[s.dateText, { color: colors.textThird }]}>{formattedDate}</Text>
           {ccount > 0 && (
             <Text style={[s.commentsText, { color: colors.textThird }]}>
-              {ccount} {ccount === 1 ? 'комментарий' : 'комментариев'}
+              {t('photo.commentsCount', { count: ccount })}
             </Text>
           )}
         </View>

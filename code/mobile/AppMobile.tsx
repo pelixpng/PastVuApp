@@ -21,6 +21,7 @@ import { AboutAppScreen } from './screens/settings/aboutApp/AboutApp.screen'
 import { AppSettingsScreen } from './screens/settings/appSettings/AppSettings.screen'
 import { SupportContactsScreen } from './screens/settings/supportContacts/SupportContacts.screen'
 import { NewsPostScreen } from './screens/home/newsPost/NewsPost.screen'
+import { t } from '../core/i18n'
 
 export const Stack = createStackNavigator<StackParamList>()
 export let NavigationRef = createRef<NavigationContainerRef<ParamListBase>>()
@@ -88,21 +89,21 @@ export default observer(function AppMobile() {
           name={SCREENS.ABOUT_APP}
           component={AboutAppScreen}
           options={{
-            headerTitle: 'О приложении',
+            headerTitle: t('settingsMenu.about'),
           }}
         />
         <Stack.Screen
           name={SCREENS.APP_SETTINGS}
           component={AppSettingsScreen}
           options={{
-            headerTitle: 'Основные',
+            headerTitle: t('settingsMenu.general'),
           }}
         />
         <Stack.Screen
           name={SCREENS.SUPPORT_CONTACTS}
           component={SupportContactsScreen}
           options={{
-            headerTitle: 'Обратная связь',
+            headerTitle: t('settingsMenu.feedback'),
           }}
         />
         <Stack.Screen name={SCREENS.NEWS_POST} component={NewsPostScreen} />

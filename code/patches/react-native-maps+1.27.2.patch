@@ -1,0 +1,181 @@
+diff --git a/node_modules/react-native-maps/android/src/main/java/com/rnmaps/fabric/MarkerManager.java b/node_modules/react-native-maps/android/src/main/java/com/rnmaps/fabric/MarkerManager.java
+index c2ea41f..356395b 100644
+--- a/node_modules/react-native-maps/android/src/main/java/com/rnmaps/fabric/MarkerManager.java
++++ b/node_modules/react-native-maps/android/src/main/java/com/rnmaps/fabric/MarkerManager.java
+@@ -220,6 +220,15 @@ public class MarkerManager extends ViewGroupManager<MapMarker> implements RNMaps
+ 
+     @Override
+     public void setPinColor(MapMarker view, @Nullable Integer value) {
++        // The prop is declared @Nullable and Fabric does hand null in: when a recycled marker view
++        // no longer carries a pinColor (e.g. a photo marker reused as a cluster while panning), the
++        // prop is reset to null and unboxing it below threw NPE. Fall back to MapMarker's default
++        // hue, which is what a marker without pinColor renders as.
++        if (value == null) {
++            view.setMarkerHue(0.0f);
++            view.setUpdated(true);
++            return;
++        }
+         float[] hsv = new float[3];
+         Color.colorToHSV(value, hsv);
+         // NOTE: android only supports a hue
+diff --git a/node_modules/react-native-maps/ios/AirMaps/AIRMap.mm b/node_modules/react-native-maps/ios/AirMaps/AIRMap.mm
+index f7da1e0..6550079 100644
+--- a/node_modules/react-native-maps/ios/AirMaps/AIRMap.mm
++++ b/node_modules/react-native-maps/ios/AirMaps/AIRMap.mm
+@@ -157,7 +157,12 @@ - (void)insertReactSubview:(id<RCTComponent>)subview atIndex:(NSInteger)atIndex
+             [self insertReactSubview:(UIView *)childSubviews[i] atIndex:atIndex];
+         }
+     }
+-    [_reactSubviews insertObject:(UIView *)subview atIndex:(NSUInteger) atIndex];
++    // Fabric's index addresses its own child list, which can drift from `_reactSubviews` when the
++    // map view survives a mount/unmount cycle -- returning to this tab drops the annotations from
++    // `_reactSubviews` while Fabric still counts them. The next insert then lands past the end and
++    // NSMutableArray throws, taking the app down as soon as new markers arrive. Clamp instead.
++    NSUInteger insertionIndex = MIN((NSUInteger)MAX(atIndex, (NSInteger)0), _reactSubviews.count);
++    [_reactSubviews insertObject:(UIView *)subview atIndex:insertionIndex];
+ }
+ #pragma clang diagnostic pop
+ 
+diff --git a/node_modules/react-native-maps/ios/AirMaps/AIRMapMarker.m b/node_modules/react-native-maps/ios/AirMaps/AIRMapMarker.m
+index 89dfd9a..c4a6d29 100644
+--- a/node_modules/react-native-maps/ios/AirMaps/AIRMapMarker.m
++++ b/node_modules/react-native-maps/ios/AirMaps/AIRMapMarker.m
+@@ -366,6 +366,17 @@ - (void)setImageSrc:(NSString *)imageSrc
+         _reloadImageCancellationBlock();
+         _reloadImageCancellationBlock = nil;
+     }
++    // Bridgeless (New Architecture) has no `RCTBridge.currentBridge`, so the ImageLoader lookup
++    // below silently resolves to nil and the marker never gets an image -- and it cannot fall back
++    // to a pin either, since `shouldUsePinView` returns NO whenever `imageSrc` is set. Named images
++    // (asset catalog / bundled resources) resolve synchronously without any bridge, so try that
++    // first and only reach for the loader when the name is not a local resource.
++    UIImage *namedImage = [UIImage imageNamed:_imageSrc];
++    if (namedImage) {
++        self.image = namedImage;
++        return;
++    }
++
+     __weak __typeof(self) weakSelf = self;
+ 
+     _reloadImageCancellationBlock = [[[RCTBridge currentBridge] moduleForName:@"ImageLoader"] loadImageWithURLRequest:[RCTConvert NSURLRequest:_imageSrc]
+diff --git a/node_modules/react-native-maps/ios/AirMaps/RNMapsMapView.mm b/node_modules/react-native-maps/ios/AirMaps/RNMapsMapView.mm
+index 447520d..59b6753 100644
+--- a/node_modules/react-native-maps/ios/AirMaps/RNMapsMapView.mm
++++ b/node_modules/react-native-maps/ios/AirMaps/RNMapsMapView.mm
+@@ -37,6 +37,8 @@ @interface RNMapsMapView () <RCTRNMapsMapViewViewProtocol>
+ @end
+ 
+ @implementation RNMapsMapView {
++    // Children Fabric considers mounted, kept so a re-created AIRMap can get them back.
++    NSMutableArray<UIView *> *_mountedChildren;
+     AIRMap *_view;
+     AIRMapManager* _legacyMapManager;
+ }
+@@ -132,6 +134,14 @@ - (void) prepareMapView
+ 
+     self.contentView = _view;
+ 
++    // The component view outlives its AIRMap: leaving this tab runs `prepareForRecycle`, which
++    // drops the map, and coming back builds a fresh one. Fabric does not re-mount the children --
++    // from its side they never left -- so the new map would come up with no markers at all. Put
++    // the ones it still considers mounted back.
++    for (NSUInteger i = 0; i < _mountedChildren.count; i++) {
++        [_view insertReactSubview:(id<RCTComponent>)_mountedChildren[i] atIndex:(NSInteger)i];
++    }
++
+     _view.onLongPress = [self](NSDictionary* dictionary) {
+         if (_eventEmitter) {
+             // Extract values from the NSDictionary
+@@ -437,30 +447,40 @@ - (instancetype)initWithFrame:(CGRect)frame
+ 
+ 
+ - (void)mountChildComponentView:(UIView<RCTComponentViewProtocol> *)childComponentView index:(NSInteger)index{
++    UIView *child = nil;
+     id<RCTComponent> paperView = [childComponentView getPaperViewFromChildComponentView];
+     if (paperView){
+-        [_view insertReactSubview:paperView atIndex:index];
++        child = (UIView *)paperView;
+     } else if ([childComponentView isKindOfClass:[RNMapsMarkerView class]]){
+         RNMapsMarkerView* fabricMarker = (RNMapsMarkerView *) childComponentView;
+-        [_view insertReactSubview:[fabricMarker marker] atIndex:index];
++        child = (UIView *)[fabricMarker marker];
+     }
+     else  {
+-        [_view insertReactSubview:childComponentView atIndex:index];
++        child = childComponentView;
++    }
++    if (!_mountedChildren) {
++        _mountedChildren = [NSMutableArray new];
+     }
++    [_mountedChildren insertObject:child
++                           atIndex:MIN((NSUInteger)MAX(index, (NSInteger)0), _mountedChildren.count)];
++    [_view insertReactSubview:(id<RCTComponent>)child atIndex:index];
+ }
+ 
+ - (void) unmountChildComponentView:(UIView<RCTComponentViewProtocol> *)childComponentView index:(NSInteger)index
+ {
++    UIView *child = nil;
+     id<RCTComponent> paperView = [childComponentView getPaperViewFromChildComponentView];
+     if (paperView){
+-        [_view removeReactSubview:paperView];
++        child = (UIView *)paperView;
+     }
+     else if ([childComponentView isKindOfClass:[RNMapsMarkerView class]]){
+        RNMapsMarkerView* fabricMarker = (RNMapsMarkerView *) childComponentView;
+-        [_view removeReactSubview:[fabricMarker marker]];
++        child = (UIView *)[fabricMarker marker];
+    } else {
+-        [_view removeReactSubview:childComponentView];
++        child = childComponentView;
+     }
++    [_mountedChildren removeObjectIdenticalTo:child];
++    [_view removeReactSubview:(id<RCTComponent>)child];
+ }
+ 
+ MKMapType mapRNTypeToMKMapType(RNMapsMapViewMapType rnMapType) {
+diff --git a/node_modules/react-native-maps/ios/AirMaps/RNMapsMarkerView.mm b/node_modules/react-native-maps/ios/AirMaps/RNMapsMarkerView.mm
+index be7e91d..9811695 100644
+--- a/node_modules/react-native-maps/ios/AirMaps/RNMapsMarkerView.mm
++++ b/node_modules/react-native-maps/ios/AirMaps/RNMapsMarkerView.mm
+@@ -427,10 +427,40 @@ - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &
+         }
+     }
+ 
+-
+     [super updateProps:props oldProps:oldProps];
++
++    [self syncTransformToAnnotation];
++}
++
++- (void)updateLayoutMetrics:(const LayoutMetrics &)layoutMetrics
++           oldLayoutMetrics:(const LayoutMetrics &)oldLayoutMetrics
++{
++    [super updateLayoutMetrics:layoutMetrics oldLayoutMetrics:oldLayoutMetrics];
++
++    // `super` re-resolves the transform whenever the layout size changes, so mirror it again.
++    [self syncTransformToAnnotation];
+ }
+ 
++// The marker is an MKAnnotationView owned by MapKit, not a subview of this component view, so the
++// `transform` that `super` applies lands on a wrapper the map never renders and the marker stays
++// unrotated. Upstream supports the `rotation` prop on Android only; on iOS a rotate style is the
++// sole way to orient a marker, so mirror the resolved transform onto the annotation.
++//
++// Resolve it from the props rather than reading back `self.layer.transform`: component views are
++// recycled, and `super` only touches the layer when the prop actually changed. A view that
++// previously carried a rotated photo marker and is reused for an unrotated cluster keeps the stale
++// matrix on its layer, which then gets copied onto the cluster -- clusters visibly spun.
++//
++// `props.transform.matrix` on its own is always identity: React Native keeps the prop as
++// unresolved operations and only computes the real matrix in `resolveTransform`.
++- (void)syncTransformToAnnotation
++{
++    if (!_view) {
++        return;
++    }
++    const auto &viewProps = *std::static_pointer_cast<RNMapsMarkerProps const>(_props);
++    _view.layer.transform = RCTCATransform3DFromTransformMatrix(viewProps.resolveTransform(_layoutMetrics));
++}
+ 
+ @end
+ 

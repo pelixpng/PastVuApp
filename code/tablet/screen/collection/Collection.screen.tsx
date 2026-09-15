@@ -20,6 +20,8 @@ import { PhotoDetail } from './components/photoDetail/PhotoDetail'
 import { Container } from '../../../core/components/ui/Container'
 import { MaterialIcons } from '@expo/vector-icons'
 import { SegmentedControl } from '../../../core/components/ui/segmentedControl/SegmentedControl'
+import { t } from '../../../core/i18n'
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
 
 export interface CollectionItem {
   title: string
@@ -35,6 +37,7 @@ const keyExtractor = (item: CollectionItem) => item.cid
 
 export const CollectionScreen = observer(() => {
   const vm = useVM(CollectionVM)
+  const tabBarHeight = useBottomTabBarHeight()
   const { colors } = useTheme()
   const navigation = useNavigation()
   const { width } = useWindowDimensions()
@@ -97,6 +100,8 @@ export const CollectionScreen = observer(() => {
         <FlatList
           data={vm.displayedData}
           style={s.list}
+          // The tablet tab bar floats over the content, so the list needs to end above it.
+          contentContainerStyle={{ paddingBottom: tabBarHeight + 16 }}
           ListFooterComponent={ListFooter}
           keyExtractor={keyExtractor}
           ListHeaderComponent={ListHeader}
@@ -107,11 +112,11 @@ export const CollectionScreen = observer(() => {
           ListEmptyComponent={
             <View style={s.emptyContainer}>
               <MenuButton
-                title={vm.selectedTab === 'viewed' ? 'История просмотра' : 'Избранное'}
+                title={vm.selectedTab === 'viewed' ? t('collection.historyTitle') : t('collection.favorites')}
                 description={
                   vm.selectedTab === 'viewed'
-                    ? 'История сохраняет последние 1000 просмотренных фотографий'
-                    : 'Здесь будут отображаться ваши избранные фотографии'
+                    ? t('collection.historyHint')
+                    : t('collection.favoritesHint')
                 }
                 icon={'history'}
               />
@@ -146,14 +151,14 @@ export const CollectionScreen = observer(() => {
               style={[s.modalButton, { backgroundColor: colors.baseFourth }]}
               onPress={vm.confirmDelete}
               activeOpacity={0.7}>
-              <Text style={[s.modalButtonText, { color: colors.textFirst }]}>Удалить</Text>
+              <Text style={[s.modalButtonText, { color: colors.textFirst }]}>{t('common.delete')}</Text>
             </TouchableOpacity>
             <Spacer height={8} />
             <TouchableOpacity
               style={s.modalCancelButton}
               onPress={vm.hideDeleteModal}
               activeOpacity={0.7}>
-              <Text style={[s.modalButtonText, { color: colors.textFirst }]}>Отменить</Text>
+              <Text style={[s.modalButtonText, { color: colors.textFirst }]}>{t('common.cancel')}</Text>
             </TouchableOpacity>
           </View>
         </Pressable>

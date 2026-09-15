@@ -1,15 +1,13 @@
-import { action, autorun, computed, makeObservable, observable } from 'mobx'
+import { action, autorun, computed, makeObservable, observable, runInAction } from 'mobx'
 import { SCREENS } from '../../../navigation/navigation.types'
-import { CollectionItem } from '../collection/Collection.screen'
 import { Alert, Linking } from 'react-native'
-import { ExtensionStorage } from '@bacons/apple-targets'
 import { BaseViewModelProvider } from '../../../provider/vm.provider'
 import { IComment, Users } from '../../../../core/types/apiPhotoComment'
 import ApiService from '../../../../core/api/apiService'
-import { MMKVStorage } from '../../../../core/storage/mmkv'
-import { IosTargetStorage } from '../../../../core/storage/appleTarget'
 import { savePhoto, sharePhoto } from '../../../../core/utils/getPhoto'
 import ApiStore from '../../../../core/store/Api.store'
+import * as PhotoPost from '../../../../core/services/photoPost'
+import { t } from '../../../../core/i18n'
 
 class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
   @observable comments: IComment[] = []
@@ -39,6 +37,11 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
   }
 
   @computed
+  get imageResolution() {
+    return this.postInfo ? PhotoPost.photoResolution(this.postInfo) : undefined
+  }
+
+  @computed
   get canGoBack() {
     return this.cidHistory.length > 0
   }
@@ -47,40 +50,22 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
 
   @action.bound
   async getPhotoInfo() {
-    await ApiService.getPhotoInfo(this.activeCid!)
-      .then(async ({ result }) => {
-        this.postInfo = result.photo
-        const cid = this.activeCid!
-        const history: CollectionItem[] = MMKVStorage.get('History') ?? []
-        const title = result.photo.title
-        const description = `${result.photo.y} ${result.photo.regions
-          .map(region => region.title_local)
-          .join(', ')}`
-        const file = result.photo.file
-        if (!history.some(item => item.cid === cid)) {
-          MMKVStorage.set('History', [{ title, description, cid, file }, ...history])
-          IosTargetStorage.set(
-            'History',
-            JSON.stringify([{ title, description, cid, file }, ...history]),
-          )
-          ExtensionStorage.reloadWidget()
-        }
-        const favorites: CollectionItem[] = MMKVStorage.get('Favorites') ?? []
-        this.isFavorite = favorites.some(item => item.cid === cid)
-
-        if (result.photo?.ccount) {
-          this.getComments()
-        }
+    const cid = this.activeCid!
+    try {
+      const { photo, users, comments } = await PhotoPost.loadPost(cid)
+      // Another photo may have been opened while this request was in flight (comments link into
+      // other posts). Without this the slower, older response would overwrite the newer one.
+      if (this.activeCid !== cid) return
+      runInAction(() => {
+        this.postInfo = photo
+        this.users = users
+        this.comments = comments
+        this.isFavorite = PhotoPost.isFavorite(cid)
       })
-      .catch(() => Alert.alert('Ошибка', 'Не удалось загрузить информацию о фото'))
-  }
-
-  @action.bound
-  async getComments() {
-    await ApiService.getComments(this.activeCid!).then(({ users, comments }) => {
-      this.users = users
-      this.comments = comments
-    })
+      PhotoPost.recordHistory(photo, cid)
+    } catch {
+      Alert.alert(t('common.error'), t('photo.infoError'))
+    }
   }
 
   @action.bound
@@ -110,22 +95,7 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
 
   @action.bound
   toggleFavorite() {
-    const cid = this.activeCid!
-    const favorites: CollectionItem[] = MMKVStorage.get('Favorites') ?? []
-    const title = this.postInfo!.title
-    const description = `${this.postInfo!.y} ${this.postInfo!.regions.map(
-      region => region.title_local,
-    ).join(', ')}`
-    const file = this.postInfo!.file
-
-    if (this.isFavorite) {
-      const updatedFavorites = favorites.filter(item => item.cid !== cid)
-      MMKVStorage.set('Favorites', updatedFavorites)
-      this.isFavorite = false
-    } else {
-      MMKVStorage.set('Favorites', [{ title, description, cid, file }, ...favorites])
-      this.isFavorite = true
-    }
+    this.isFavorite = PhotoPost.toggleFavorite(this.postInfo!, this.activeCid!)
   }
 
   @action.bound
@@ -136,6 +106,8 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
       this.cidHistory = [...this.cidHistory, this.activeCid!]
       this.activeCid = photoMatch[1]
       this.isImageLoaded = false
+      this.postInfo = null
+      this.users = null
       this.comments = []
       this.getPhotoInfo()
     } else if (newsMatch) {
@@ -163,6 +135,8 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
     this.cidHistory = this.cidHistory.slice(0, -1)
     this.activeCid = previousCid
     this.isImageLoaded = false
+    this.postInfo = null
+    this.users = null
     this.comments = []
     this.getPhotoInfo()
     return true

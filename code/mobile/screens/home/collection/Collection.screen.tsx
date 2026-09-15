@@ -9,6 +9,7 @@ import { Spacer } from '../../../../core/components/ui/Spacer'
 import { useVM } from '../../../../core/hooks/useVM'
 import { SegmentedControl } from '../../../../core/components/ui/segmentedControl/SegmentedControl'
 import { ConfirmationSheet } from '../../../../core/components/ui/confirmationSheet/ConfirmationSheet'
+import { t } from '../../../../core/i18n'
 
 export interface CollectionItem {
   title: string
@@ -52,12 +53,12 @@ export const CollectionScreen = observer(() => {
           selectedValue={vm.selectedTab}
           onChange={value => vm.setSelectedTab(value as CollectionTab)}
         />
+        <Spacer height={16} />
       </View>
       <FlatList
         data={vm.displayedData}
         keyExtractor={keyExtractor}
         contentContainerStyle={s.padding}
-        ListHeaderComponent={Separator}
         ItemSeparatorComponent={Separator}
         renderItem={renderItem}
         initialNumToRender={10}
@@ -65,11 +66,11 @@ export const CollectionScreen = observer(() => {
         windowSize={5}
         ListEmptyComponent={
           <MenuButton
-            title={vm.selectedTab === 'viewed' ? 'История просмотра' : 'Избранное'}
+            title={vm.selectedTab === 'viewed' ? t('collection.historyTitle') : t('collection.favorites')}
             description={
               vm.selectedTab === 'viewed'
-                ? 'История сохраняет последние 1000 просмотренных фотографий'
-                : 'Здесь будут отображаться ваши избранные фотографии'
+                ? t('collection.historyHint')
+                : t('collection.favoritesHint')
             }
             icon={'history'}
           />

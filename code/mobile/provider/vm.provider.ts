@@ -11,6 +11,7 @@ interface IBaseViewModelProvider<T extends SCREENS> {
 export class BaseViewModelProvider<SCREEN extends SCREENS>
   implements IBaseViewModelProvider<SCREEN>
 {
+  screenName?: SCREEN
   @observable.ref navigator: NavigationContainerRef<ParamListBase> | null = null
 
   constructor() {

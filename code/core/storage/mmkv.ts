@@ -12,8 +12,9 @@ type MMKVStorageType =
   | 'RegionString'
   | 'History'
   | 'Favorites'
-  | 'mapProvider'
   | 'isShowCluster'
+  | 'isFirstLaunch'
+  | 'locale'
 
 type TValue = string | number | object
 

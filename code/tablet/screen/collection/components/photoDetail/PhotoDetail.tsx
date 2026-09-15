@@ -6,6 +6,8 @@ import { s } from './style'
 import { PostInfo } from '../../../map/components/postInfo/PostInfo'
 import { Comment } from '../../../map/components/comment/Comment'
 import { Spacer } from '../../../../../core/components/ui/Spacer'
+import { t } from '../../../../../core/i18n'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 type PhotoDetailProps = {
   comments: IComment[]
@@ -31,10 +33,13 @@ export const PhotoDetail: FC<PhotoDetailProps> = ({
   onLinkPress,
 }) => {
   const { colors } = useTheme()
+  const { bottom } = useSafeAreaInsets()
   const { width } = useWindowDimensions()
   const modalWidth = width * 0.67 - 32
   const renderItem = useCallback(
-    ({ item }) => <Comment comment={item} users={users} onLinkPress={onLinkPress} />,
+    ({ item }: { item: IComment }) => (
+      <Comment comment={item} users={users} onLinkPress={onLinkPress} />
+    ),
     [users, onLinkPress],
   )
   if (!postInfo) {
@@ -43,7 +48,7 @@ export const PhotoDetail: FC<PhotoDetailProps> = ({
         <Spacer height={18} />
         <View style={s.emptyContainer}>
           <Text style={[s.emptyText, { color: colors.textThird }]}>
-            Выберите фото для просмотра
+            {t('collection.selectPhoto')}
           </Text>
         </View>
       </View>
@@ -56,11 +61,12 @@ export const PhotoDetail: FC<PhotoDetailProps> = ({
       {!isImageLoaded && (
         <View style={[s.loaderContainer, { backgroundColor: colors.backgroundApp }]}>
           {showLoader && (
-            <Text style={[s.titleText, { color: colors.textFirst }]}>Загрузка...</Text>
+            <Text style={[s.titleText, { color: colors.textFirst }]}>{t('common.loading')}</Text>
           )}
         </View>
       )}
       <FlatList
+        contentContainerStyle={{ paddingBottom: bottom + 16 }}
         showsVerticalScrollIndicator={false}
         data={comments}
         renderItem={renderItem}

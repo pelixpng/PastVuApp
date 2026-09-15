@@ -10,6 +10,7 @@ import type { CollectionItem } from '../collection/Collection.screen'
 import { PhotoListItem } from '../collection/components/Item'
 import { Spacer } from '../../../../core/components/ui/Spacer'
 import { PostListItem } from './components/PostListItem/PostListItem'
+import { t } from '../../../../core/i18n'
 
 const Separator8 = () => <Spacer height={8} />
 const Separator16 = () => <Spacer height={16} />
@@ -52,12 +53,12 @@ export const NewsScreen = observer(() => {
         selectedValue={vm.selectedTab}
         onChange={value => vm.setSelectedTab(value as NewsTab)}
       />
+      <Spacer height={16} />
       <View style={s.listContainer}>
         {vm.selectedTab === 'posts' ? (
           <FlatList<NewsItems>
             data={vm.news}
             ItemSeparatorComponent={Separator8}
-            ListHeaderComponent={Separator16}
             keyExtractor={postKeyExtractor}
             renderItem={renderPost}
             initialNumToRender={10}
@@ -70,11 +71,15 @@ export const NewsScreen = observer(() => {
                 </View>
               ) : vm.newsError ? (
                 <View style={s.emptyContainer}>
-                  <Text style={{ color: colors.text, marginBottom: 12 }}>Не удалось загрузить новости</Text>
-                  <Text onPress={vm.retry} style={s.retryText}>Обновить</Text>
+                  <Text style={{ color: colors.text, marginBottom: 12 }}>
+                    {t('news.postsError')}
+                  </Text>
+                  <Text onPress={vm.retry} style={s.retryText}>
+                    {t('common.retry')}
+                  </Text>
                 </View>
               ) : (
-                <Text style={{ padding: 16, color: colors.text }}>Нет постов</Text>
+                <Text style={{ padding: 16, color: colors.text }}>{t('news.noPosts')}</Text>
               )
             }
           />
@@ -82,7 +87,6 @@ export const NewsScreen = observer(() => {
           <FlatList<CollectionItem>
             data={vm.historyItems}
             ItemSeparatorComponent={Separator16}
-            ListHeaderComponent={Separator16}
             keyExtractor={photoKeyExtractor}
             renderItem={renderPhoto}
             initialNumToRender={10}
@@ -95,11 +99,15 @@ export const NewsScreen = observer(() => {
                 </View>
               ) : vm.photosError ? (
                 <View style={s.emptyContainer}>
-                  <Text style={{ color: colors.text, marginBottom: 12 }}>Не удалось загрузить фотографии</Text>
-                  <Text onPress={vm.retry} style={s.retryText}>Обновить</Text>
+                  <Text style={{ color: colors.text, marginBottom: 12 }}>
+                    {t('news.photosError')}
+                  </Text>
+                  <Text onPress={vm.retry} style={s.retryText}>
+                    {t('common.retry')}
+                  </Text>
                 </View>
               ) : (
-                <Text style={{ padding: 16, color: colors.text }}>Нет фотографий</Text>
+                <Text style={{ padding: 16, color: colors.text }}>{t('news.noPhotos')}</Text>
               )
             }
           />
