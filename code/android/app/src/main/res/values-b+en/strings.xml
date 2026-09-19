@@ -2,4 +2,5 @@
   <string name="NSLocationWhenInUseUsageDescription">"Location access lets the app show photos taken near you on the map."</string>
   <string name="NSPhotoLibraryAddUsageDescription">"Photo library access lets the app save photos you download, so you can view and use them later."</string>
   <string name="NSPhotoLibraryUsageDescription">"Photo library access lets the app save photos you download, so you can view and use them later."</string>
+  <string name="NSCameraUsageDescription">"Camera access lets you photograph this place today and compare it with the old photo."</string>
 </resources>

@@ -1,0 +1,4 @@
+NSLocationWhenInUseUsageDescription = "A helymeghatározás segítségével a térképen megjelenítjük a közeli érdekes fotókat.";
+NSPhotoLibraryAddUsageDescription = "A hozzáférést azért kérjük, hogy a letöltött fotókat a galériába menthessük későbbi megtekintésre.";
+NSPhotoLibraryUsageDescription = "A hozzáférést azért kérjük, hogy a letöltött fotókat a galériába menthessük későbbi megtekintésre.";
+NSCameraUsageDescription = "A kamera-hozzáférés arra kell, hogy lefotózza ezt a helyet ma, és összehasonlítsa a régi fotóval.";

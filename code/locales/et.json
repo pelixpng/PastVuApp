@@ -1,0 +1,6 @@
+{
+  "NSLocationWhenInUseUsageDescription": "Asukoha luba võimaldab näidata kaardil huvitavaid fotosid teie lähedal.",
+  "NSPhotoLibraryAddUsageDescription": "Küsime luba, et salvestada allalaaditud fotod teie galeriisse hilisemaks vaatamiseks.",
+  "NSPhotoLibraryUsageDescription": "Küsime luba, et salvestada allalaaditud fotod teie galeriisse hilisemaks vaatamiseks.",
+  "NSCameraUsageDescription": "Kaamera luba on vaja, et pildistada seda kohta täna ja võrrelda vana fotoga."
+}

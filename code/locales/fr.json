@@ -1,0 +1,6 @@
+{
+  "NSLocationWhenInUseUsageDescription": "L’accès à la position permet d’afficher sur la carte des photos intéressantes près de vous.",
+  "NSPhotoLibraryAddUsageDescription": "Nous demandons l’accès pour enregistrer les photos téléchargées dans votre galerie afin de les consulter plus tard.",
+  "NSPhotoLibraryUsageDescription": "Nous demandons l’accès pour enregistrer les photos téléchargées dans votre galerie afin de les consulter plus tard.",
+  "NSCameraUsageDescription": "L’accès à l’appareil photo sert à photographier cet endroit aujourd’hui et à le comparer à l’ancienne photo."
+}

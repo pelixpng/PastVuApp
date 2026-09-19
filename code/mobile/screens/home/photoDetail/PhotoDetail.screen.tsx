@@ -31,6 +31,13 @@ export const PhotoDetailScreen = observer(() => {
       headerRight: () => (
         <View style={s.backIcon}>
           <MaterialIcons
+            name="compare"
+            size={24}
+            color={colors.textFirst}
+            onPress={vm.openCompare}
+          />
+          <Spacer width={24} />
+          <MaterialIcons
             name={vm.isFavorite ? 'favorite' : 'favorite-border'}
             size={24}
             color={colors.textFirst}

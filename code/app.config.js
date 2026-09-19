@@ -19,5 +19,9 @@ module.exports = ({ config }) => ({
   extra: {
     ...config.extra,
     placeApiKey: requireKey('PLACE_API_KEY'),
+    // Street View is optional: without it the button still works through the Google Maps link.
+    streetViewApiKey: requireKey('STREET_VIEW_API_KEY', { optional: true }),
+    // Yandex MapKit is optional too: without a key the provider option is not shown.
+    yandexMapsApiKey: requireKey('YANDEX_MAPS_API_KEY', { optional: true }),
   },
 })

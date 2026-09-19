@@ -53,6 +53,13 @@ export const CollectionScreen = observer(() => {
       headerRight: () => (
         <View style={s.header}>
           <MaterialIcons
+            name="compare"
+            size={24}
+            color={colors.textFirst}
+            onPress={vm.openCompare}
+          />
+          <Spacer width={24} />
+          <MaterialIcons
             name={vm.isFavorite ? 'favorite' : 'favorite-border'}
             size={24}
             color={colors.textFirst}
@@ -134,6 +141,11 @@ export const CollectionScreen = observer(() => {
         showLoader={vm.showLoader}
         openFullScreen={vm.openFullScreenImage}
         onLinkPress={vm.openPhotoFromLink}
+        compareMode={vm.compareMode}
+        closeCompare={vm.closeCompare}
+        hasStreetView={vm.hasStreetView}
+        streetView={vm.streetView}
+        comparePhoto={vm.comparePhoto}
       />
       <Modal
         visible={vm.isDeleteModalVisible}

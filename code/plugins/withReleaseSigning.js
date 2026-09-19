@@ -33,9 +33,11 @@ const withReleaseSigning = config =>
       return config
     }
     contents = contents.replace(/(signingConfigs \{\n)/, `$1${RELEASE_CONFIG}`)
+    // Other plugins (the Maps key placeholder, for one) may have inserted lines into the release
+    // build type before this runs, so match the first debug signingConfig anywhere inside it.
     contents = contents.replace(
-      /(release \{\n(?:\s*\/\/[^\n]*\n)*)\s*signingConfig signingConfigs\.debug/,
-      '$1            signingConfig signingConfigs.release',
+      /(buildTypes \{[\s\S]*?\n\s*release \{[\s\S]*?)signingConfig signingConfigs\.debug/,
+      '$1signingConfig signingConfigs.release',
     )
     config.modResults.contents = contents
     return config

@@ -3,7 +3,22 @@ import { getLocales } from 'expo-localization'
 import { MMKVStorage } from '../storage/mmkv'
 import AppLocaleModule from '../../modules/app-locale'
 
-export const SUPPORTED_LOCALES = ['ru', 'en'] as const
+export const SUPPORTED_LOCALES = [
+  'ru',
+  'en',
+  'uk',
+  'be',
+  'pl',
+  'de',
+  'cs',
+  'hu',
+  'fi',
+  'et',
+  'lv',
+  'lt',
+  'sr',
+  'fr',
+] as const
 export type AppLocale = (typeof SUPPORTED_LOCALES)[number]
 
 /** `system` follows the device, or the per-app language iOS offers in its Settings. */

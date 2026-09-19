@@ -1,0 +1,6 @@
+<resources>
+  <string name="NSLocationWhenInUseUsageDescription">"Dostęp do lokalizacji pozwala pokazać na mapie ciekawe zdjęcia w pobliżu."</string>
+  <string name="NSPhotoLibraryAddUsageDescription">"Prosimy o dostęp, aby zapisywać pobrane zdjęcia w galerii do późniejszego przeglądania."</string>
+  <string name="NSPhotoLibraryUsageDescription">"Prosimy o dostęp, aby zapisywać pobrane zdjęcia w galerii do późniejszego przeglądania."</string>
+  <string name="NSCameraUsageDescription">"Dostęp do aparatu pozwala sfotografować to miejsce dziś i porównać je ze starym zdjęciem."</string>
+</resources>

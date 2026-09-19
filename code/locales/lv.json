@@ -1,0 +1,6 @@
+{
+  "NSLocationWhenInUseUsageDescription": "Atrašanās vietas piekļuve ļauj kartē parādīt interesantas fotogrāfijas jūsu tuvumā.",
+  "NSPhotoLibraryAddUsageDescription": "Mēs lūdzam piekļuvi, lai saglabātu lejupielādētās fotogrāfijas jūsu galerijā vēlākai skatīšanai.",
+  "NSPhotoLibraryUsageDescription": "Mēs lūdzam piekļuvi, lai saglabātu lejupielādētās fotogrāfijas jūsu galerijā vēlākai skatīšanai.",
+  "NSCameraUsageDescription": "Kameras piekļuve ir vajadzīga, lai nofotografētu šo vietu šodien un salīdzinātu ar veco fotogrāfiju."
+}

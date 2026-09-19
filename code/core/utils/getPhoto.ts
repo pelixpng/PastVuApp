@@ -9,17 +9,27 @@ export const sharePhoto = (title: string, cid: string) => {
   })
 }
 
+/**
+ * Imports a file that already sits on disk into the gallery and tells the user how it went.
+ *
+ * Write-only, and no granular read permissions: on Android 10+ writing into the shared gallery
+ * through MediaStore needs no permission, and asking for READ_MEDIA_IMAGES would request read
+ * access to the user's whole library that this app never uses.
+ */
+export const saveLocalImage = async (localUri: string): Promise<boolean> => {
+  const { status } = await requestPermissionsAsync(true)
+  if (status !== 'granted') {
+    Alert.alert(t('common.error'), t('photo.noPermission'))
+    return false
+  }
+  await Asset.create(localUri)
+  Alert.alert(t('common.done'), t('photo.saved'))
+  return true
+}
+
 export const savePhoto = async (title: string, file: string) => {
   let localUri: string | undefined
   try {
-    // Write-only, and no granular read permissions: on Android 10+ writing into the shared
-    // gallery through MediaStore needs no permission, and asking for READ_MEDIA_IMAGES would
-    // request read access to the user's whole library that this app never uses.
-    const { status } = await requestPermissionsAsync(true)
-    if (status !== 'granted') {
-      Alert.alert(t('common.error'), t('photo.noPermission'))
-      return
-    }
     // `file` arrives as `a/b/c/name.jpg?s=<signature>` from the photo endpoint. Taking everything
     // after the first dot kept the query in the extension, and the media store rejects a file it
     // cannot type. Drop the query, take the last dot, and keep the name free of path characters.
@@ -37,8 +47,7 @@ export const savePhoto = async (title: string, file: string) => {
       `${FileSystem.documentDirectory}${fileName}`,
     )
     localUri = download.uri
-    await Asset.create(localUri)
-    Alert.alert(t('common.done'), t('photo.saved'))
+    await saveLocalImage(localUri)
   } catch (error) {
     // Surfaced in the log: the alert alone gives no clue why a save failed.
     console.error('savePhoto failed', error)
