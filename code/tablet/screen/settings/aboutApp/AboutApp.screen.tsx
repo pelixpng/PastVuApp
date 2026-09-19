@@ -8,8 +8,8 @@ import { Links } from '../../../../core/constants/links'
 import { formatLongDate, t } from '../../../../core/i18n'
 import { observer } from 'mobx-react'
 
-const APP_VERSION = '2.6.0'
-const RELEASE_DATE = new Date('2026-09-12')
+const APP_VERSION = '2.6.1'
+const RELEASE_DATE = new Date('2026-09-22')
 
 export const AboutAppScreen = observer(() => {
   const { colors } = useTheme()
