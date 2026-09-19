@@ -144,3 +144,24 @@ index 18fedba..56d9b8b 100644
  export * from './Components';
 +export * from './Utils/YamapUtils';
 +export * from './@types';
+diff --git a/node_modules/react-native-yamap-lite/ios/YamapLiteView.mm b/node_modules/react-native-yamap-lite/ios/YamapLiteView.mm
+--- a/node_modules/react-native-yamap-lite/ios/YamapLiteView.mm
++++ b/node_modules/react-native-yamap-lite/ios/YamapLiteView.mm
+@@ -76,7 +76,16 @@
+         [self->_view setShowUserPositionState:newViewProps.showUserPosition];
+         [self->_view updateUserIcon];
+         [self->_view setUserLocationIconWithPath:RCTNSStringFromString(newViewProps.userLocationIcon)];
+-        [self->_view move:newViewProps.initialRegion.lat :newViewProps.initialRegion.lon :newViewProps.initialRegion.zoom :newViewProps.initialRegion.azimuth :newViewProps.initialRegion.tilt];
++        // Only when the region prop itself changed. Fabric calls updateProps for any prop, and
++        // moving the camera back to the initial region on every marker or theme update threw the
++        // map back to where the app started whenever the screen re-rendered (e.g. after a tab switch).
++        if (oldViewProps.initialRegion.lat != newViewProps.initialRegion.lat ||
++            oldViewProps.initialRegion.lon != newViewProps.initialRegion.lon ||
++            oldViewProps.initialRegion.zoom != newViewProps.initialRegion.zoom ||
++            oldViewProps.initialRegion.azimuth != newViewProps.initialRegion.azimuth ||
++            oldViewProps.initialRegion.tilt != newViewProps.initialRegion.tilt) {
++            [self->_view move:newViewProps.initialRegion.lat :newViewProps.initialRegion.lon :newViewProps.initialRegion.zoom :newViewProps.initialRegion.azimuth :newViewProps.initialRegion.tilt];
++        }
+         [self->_view setLogoPositionWithPosition:logoPositionDict];
+         [self->_view setLogoPaddingWithVertical:newViewProps.logoPadding.vertical horizontal:newViewProps.logoPadding.horizontal];
+         self->_view.maxFps = newViewProps.maxFps;

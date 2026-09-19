@@ -1,5 +1,6 @@
 import { Platform, useColorScheme, StyleSheet } from 'react-native'
 import { StatusBar } from 'expo-status-bar'
+import { SystemBars } from 'react-native-edge-to-edge'
 import { createRef, useMemo } from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
 import {
@@ -28,7 +29,15 @@ export default observer(function AppTablet() {
   }, [ThemeStore.selectedTheme, colorScheme])
   return (
     <NavigationContainer ref={NavigationRef} theme={theme}>
-      <StatusBar animated style={'auto'} />
+      {/* Follows the app's theme, not the system one: with a light app on a dark system
+          (or vice versa) `auto` painted the status bar the wrong colour and it vanished.
+          Android runs edge-to-edge, where React Native's StatusBar ignores style changes, so the
+          system bars are driven through react-native-edge-to-edge there. */}
+      {Platform.OS === 'android' ? (
+        <SystemBars style={theme === DarkTheme ? 'light' : 'dark'} />
+      ) : (
+        <StatusBar animated style={theme === DarkTheme ? 'light' : 'dark'} />
+      )}
       <Stack.Navigator
         initialRouteName={SCREENS.BOTTOM_TAB_NAVIGATOR}
         screenOptions={{

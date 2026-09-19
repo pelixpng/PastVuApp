@@ -8,7 +8,7 @@ import { Comment } from '../../../map/components/comment/Comment'
 import { Spacer } from '../../../../../core/components/ui/Spacer'
 import { t } from '../../../../../core/i18n'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { MaterialIcons } from '@expo/vector-icons'
+import { HeaderIconButton } from '../../../../../core/components/ui/buttons/HeaderIconButton'
 import { CompareMode, ComparePhoto, CompareView } from '../../../../../core/components/compare/CompareView'
 import { StreetViewInfo, streetViewTarget } from '../../../../../core/services/streetView'
 
@@ -74,7 +74,7 @@ export const PhotoDetail: FC<PhotoDetailProps> = ({
       <View style={[s.modal, { width: modalWidth }]}>
         <Spacer height={18} />
         <View style={s.header}>
-          <MaterialIcons name="arrow-back" size={24} color={colors.textFirst} onPress={closeCompare} />
+          <HeaderIconButton name="arrow-back" color={colors.textFirst} onPress={closeCompare} />
         </View>
         <CompareView
           photo={comparePhoto}

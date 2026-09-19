@@ -37,6 +37,7 @@
     "react": "19.2.3",
     "react-native": "0.86.3",
     "react-native-device-info": "^15.0.2",
+    "react-native-edge-to-edge": "^1.8.2",
     "react-native-gesture-handler": "~2.32.0",
     "react-native-gradle-plugin": "^0.71.19",
     "react-native-maps": "1.27.2",

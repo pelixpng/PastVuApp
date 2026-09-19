@@ -8,7 +8,7 @@ import { useNavigation, useTheme } from '@react-navigation/native'
 import { PostInfo } from './components/postInfo/PostInfo'
 import { Spacer } from '../../../../core/components/ui/Spacer'
 import { useCallback, useEffect, useLayoutEffect } from 'react'
-import { MaterialIcons } from '@expo/vector-icons'
+import { HeaderIconButton } from '../../../../core/components/ui/buttons/HeaderIconButton'
 import { ImageZoom } from './components/imageView/ImageZoom'
 import { useVM } from '../../../../core/hooks/useVM'
 import { t } from '../../../../core/i18n'
@@ -30,28 +30,17 @@ export const PhotoDetailScreen = observer(() => {
     navigation.setOptions({
       headerRight: () => (
         <View style={s.backIcon}>
-          <MaterialIcons
-            name="compare"
-            size={24}
-            color={colors.textFirst}
-            onPress={vm.openCompare}
-          />
-          <Spacer width={24} />
-          <MaterialIcons
+          <HeaderIconButton name="compare" color={colors.textFirst} onPress={vm.openCompare} />
+          <Spacer width={4} />
+          <HeaderIconButton
             name={vm.isFavorite ? 'favorite' : 'favorite-border'}
-            size={24}
             color={colors.textFirst}
             onPress={vm.toggleFavorite}
           />
-          <Spacer width={24} />
-          <MaterialIcons
-            name="save-alt"
-            size={24}
-            color={colors.textFirst}
-            onPress={vm.saveImage}
-          />
-          <Spacer width={24} />
-          <MaterialIcons name="share" size={24} color={colors.textFirst} onPress={vm.share} />
+          <Spacer width={4} />
+          <HeaderIconButton name="save-alt" color={colors.textFirst} onPress={vm.saveImage} />
+          <Spacer width={4} />
+          <HeaderIconButton name="share" color={colors.textFirst} onPress={vm.share} />
         </View>
       ),
     })
@@ -108,5 +97,5 @@ const s = StyleSheet.create({
     lineHeight: 20,
     fontWeight: '800',
   },
-  backIcon: { flexDirection: 'row', marginRight: 16 },
+  backIcon: { flexDirection: 'row', marginRight: 6 },
 })

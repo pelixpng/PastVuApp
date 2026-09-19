@@ -14,7 +14,7 @@ import Animated, {
 } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useRef, useState } from 'react'
-import { MaterialIcons } from '@expo/vector-icons'
+import { HeaderIconButton } from '../../../../core/components/ui/buttons/HeaderIconButton'
 import { Spacer } from '../../../../core/components/ui/Spacer'
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native'
 import { StackParamList } from '../../../navigation/stackParams.types'
@@ -129,23 +129,16 @@ export const FullScreenImage = () => {
             entering={SlideInUp.duration(600).easing(Easing.out(Easing.quad))}
             exiting={SlideOutUp.duration(600).easing(Easing.in(Easing.quad))}
             style={[s.header, { paddingTop }]}>
-            <MaterialIcons
-              name="arrow-back"
-              size={24}
-              color="white"
-              onPress={() => navigation.goBack()}
-            />
+            <HeaderIconButton name="arrow-back" color="white" onPress={() => navigation.goBack()} />
             <View style={s.actionIcons}>
-              <MaterialIcons
+              <HeaderIconButton
                 name="save-alt"
-                size={24}
                 color="white"
                 onPress={() => savePhoto(params.title, params.file)}
               />
-              <Spacer width={24} />
-              <MaterialIcons
+              <Spacer width={4} />
+              <HeaderIconButton
                 name="share"
-                size={24}
                 color="white"
                 onPress={() => sharePhoto(params.title, params.cid)}
               />

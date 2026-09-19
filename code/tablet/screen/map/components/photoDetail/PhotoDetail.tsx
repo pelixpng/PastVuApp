@@ -2,7 +2,7 @@ import { FC, useCallback } from 'react'
 import { View, Text, FlatList, useWindowDimensions } from 'react-native'
 import Animated, { SlideInRight, SlideOutRight } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { MaterialIcons } from '@expo/vector-icons'
+import { HeaderIconButton } from '../../../../../core/components/ui/buttons/HeaderIconButton'
 import { Spacer } from '../../../../../core/components/ui/Spacer'
 import { useTheme } from '@react-navigation/native'
 import { IComment, Users } from '../../../../../core/types/apiPhotoComment'
@@ -70,7 +70,7 @@ export const PhotoDetail: FC<PhotoDetailProps> = ({
         exiting={SlideOutRight.duration(600)}
         style={[s.modal, { backgroundColor: colors.backgroundApp, width: modalWidth }]}>
         <View style={[s.header, { marginTop: top + 5, marginBottom: 5 }]}>
-          <MaterialIcons name="arrow-back" size={24} color={colors.textFirst} onPress={closeCompare} />
+          <HeaderIconButton name="arrow-back" color={colors.textFirst} onPress={closeCompare} />
         </View>
         <CompareView
           photo={comparePhoto}
@@ -92,25 +92,15 @@ export const PhotoDetail: FC<PhotoDetailProps> = ({
       exiting={SlideOutRight.duration(600)}
       style={[s.modal, { backgroundColor: colors.backgroundApp, width: modalWidth }]}>
       <View style={[s.header, { marginTop: top + 5, marginBottom: 5 }]}>
-        <MaterialIcons name="arrow-back" size={24} color={colors.textFirst} onPress={closePhoto} />
+        <HeaderIconButton name="arrow-back" color={colors.textFirst} onPress={closePhoto} />
         <View style={s.iconContainer}>
-          <MaterialIcons
-            name="compare"
-            size={24}
-            color={colors.textFirst}
-            onPress={openCompare}
-          />
-          <Spacer width={24} />
-          <MaterialIcons
-            name={isFavorite ? 'favorite' : 'favorite-border'}
-            size={24}
-            color={colors.textFirst}
-            onPress={toggleFavorite}
-          />
-          <Spacer width={24} />
-          <MaterialIcons name="save-alt" size={24} color={colors.textFirst} onPress={saveImage} />
-          <Spacer width={24} />
-          <MaterialIcons name="share" size={24} color={colors.textFirst} onPress={share} />
+          <HeaderIconButton name="compare" color={colors.textFirst} onPress={openCompare} />
+          <Spacer width={4} />
+          <HeaderIconButton name={isFavorite ? 'favorite' : 'favorite-border'} color={colors.textFirst} onPress={toggleFavorite} />
+          <Spacer width={4} />
+          <HeaderIconButton name="save-alt" color={colors.textFirst} onPress={saveImage} />
+          <Spacer width={4} />
+          <HeaderIconButton name="share" color={colors.textFirst} onPress={share} />
         </View>
       </View>
       {!isImageLoaded && (

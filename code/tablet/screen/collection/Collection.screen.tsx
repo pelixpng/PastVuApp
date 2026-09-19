@@ -18,7 +18,7 @@ import { Spacer } from '../../../core/components/ui/Spacer'
 import { MenuButton } from '../../../core/components/ui/buttons/menuButton/MenuButton'
 import { PhotoDetail } from './components/photoDetail/PhotoDetail'
 import { Container } from '../../../core/components/ui/Container'
-import { MaterialIcons } from '@expo/vector-icons'
+import { HeaderIconButton } from '../../../core/components/ui/buttons/HeaderIconButton'
 import { SegmentedControl } from '../../../core/components/ui/segmentedControl/SegmentedControl'
 import { t } from '../../../core/i18n'
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
@@ -52,28 +52,13 @@ export const CollectionScreen = observer(() => {
     navigation.setOptions({
       headerRight: () => (
         <View style={s.header}>
-          <MaterialIcons
-            name="compare"
-            size={24}
-            color={colors.textFirst}
-            onPress={vm.openCompare}
-          />
-          <Spacer width={24} />
-          <MaterialIcons
-            name={vm.isFavorite ? 'favorite' : 'favorite-border'}
-            size={24}
-            color={colors.textFirst}
-            onPress={vm.toggleFavorite}
-          />
-          <Spacer width={24} />
-          <MaterialIcons
-            name="save-alt"
-            size={24}
-            color={colors.textFirst}
-            onPress={vm.saveImage}
-          />
-          <Spacer width={24} />
-          <MaterialIcons name="share" size={24} color={colors.textFirst} onPress={vm.share} />
+          <HeaderIconButton name="compare" color={colors.textFirst} onPress={vm.openCompare} />
+          <Spacer width={4} />
+          <HeaderIconButton name={vm.isFavorite ? 'favorite' : 'favorite-border'} color={colors.textFirst} onPress={vm.toggleFavorite} />
+          <Spacer width={4} />
+          <HeaderIconButton name="save-alt" color={colors.textFirst} onPress={vm.saveImage} />
+          <Spacer width={4} />
+          <HeaderIconButton name="share" color={colors.textFirst} onPress={vm.share} />
         </View>
       ),
     })
@@ -181,7 +166,8 @@ export const CollectionScreen = observer(() => {
 
 const s = StyleSheet.create({
   emptyContainer: { paddingHorizontal: 16, paddingTop: 16 },
-  header: { flexDirection: 'row', marginRight: 16 },
+  // 44 pt buttons around 24 pt glyphs: 6 keeps the glyphs 16 from the edge.
+  header: { flexDirection: 'row', marginRight: 6 },
   segmentHeader: { paddingHorizontal: 16 },
   list: { flex: 1 },
   overlay: {

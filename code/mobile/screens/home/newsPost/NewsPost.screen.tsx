@@ -5,6 +5,7 @@ import { useNavigation, useTheme } from '@react-navigation/native'
 import RenderHTML from 'react-native-render-html'
 import { useCallback, useLayoutEffect } from 'react'
 import { MaterialIcons } from '@expo/vector-icons'
+import { HeaderIconButton } from '../../../../core/components/ui/buttons/HeaderIconButton'
 import NewsPostVM from './NewsPost.vm'
 import { Comment } from '../photoDetail/components/comment/Comment'
 import { Container } from '../../../../core/components/ui/Container'
@@ -25,13 +26,9 @@ export const NewsPostScreen = observer(() => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <MaterialIcons
-          name="share"
-          size={24}
-          color={colors.textFirst}
-          onPress={vm.share}
-          style={s.shareIcon}
-        />
+        <View style={s.shareIcon}>
+          <HeaderIconButton name="share" color={colors.textFirst} onPress={vm.share} />
+        </View>
       ),
     })
   }, [colors.textFirst, navigation, vm.share])
@@ -113,8 +110,9 @@ const s = StyleSheet.create({
   list: {
     paddingHorizontal: 16,
   },
+  // 44 pt box around a 24 pt glyph: pull in by 10 so the glyph stays 16 from the edge.
   shareIcon: {
-    marginRight: 16,
+    marginRight: 6,
   },
   headerContainer: {
     paddingTop: 18,

@@ -11,9 +11,10 @@ export const s = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
+    // 44 pt buttons around 24 pt glyphs: 6 keeps the glyphs 16 from the edges.
+    paddingHorizontal: 6,
     width: '100%',
-    height: 40,
+    height: 44,
     alignItems: 'center',
   },
   iconContainer: { flexDirection: 'row' },
