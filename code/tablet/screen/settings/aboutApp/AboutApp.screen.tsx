@@ -8,8 +8,8 @@ import { Links } from '../../../../core/constants/links'
 import { formatLongDate, t } from '../../../../core/i18n'
 import { observer } from 'mobx-react'
 
-const APP_VERSION = '2.5.0'
-const RELEASE_DATE = new Date('2026-09-07')
+const APP_VERSION = '2.6.0'
+const RELEASE_DATE = new Date('2026-09-12')
 
 export const AboutAppScreen = observer(() => {
   const { colors } = useTheme()
@@ -39,7 +39,7 @@ export const AboutAppScreen = observer(() => {
           <MyButton
             fullWidth
             title={t('about.webVersion')}
-            func={() => Linking.openURL(Links.telegramDesigner)}
+            func={() => Linking.openURL(Links.webPastVu)}
           />
           <MyButton
             fullWidth
@@ -65,6 +65,19 @@ export const AboutAppScreen = observer(() => {
             func={() => Linking.openURL(Links.mapsPlatformAPI)}
           />
           <MyButton fullWidth title={'LocationIQ'} func={() => Linking.openURL(Links.locationIq)} />
+        </View>
+        <Spacer height={16} />
+        <View style={s.row}>
+          <MyButton
+            fullWidth
+            title={'Google Street View'}
+            func={() => Linking.openURL(Links.streetView)}
+          />
+          <MyButton
+            fullWidth
+            title={'Yandex Maps'}
+            func={() => Linking.openURL(Links.yandexMaps)}
+          />
         </View>
       </UICard>
       <Spacer height={16} />

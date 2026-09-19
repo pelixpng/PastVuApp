@@ -9,4 +9,6 @@ export const Links = {
   pastVuAPI: 'https://docs.pastvu.com/dev/api',
   mapsPlatformAPI: 'https://developers.google.com/maps?hl=ru',
   locationIq: 'https://locationiq.com',
+  streetView: 'https://developers.google.com/maps/documentation/embed/get-started',
+  yandexMaps: 'https://yandex.ru/maps-api/products/mapkit',
 }

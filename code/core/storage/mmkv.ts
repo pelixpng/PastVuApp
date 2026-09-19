@@ -7,6 +7,7 @@ type MMKVStorageType =
   | 'MaxDistance'
   | 'MaxPhoto'
   | 'mapType'
+  | 'mapProvider'
   | 'markerType'
   | 'RangeYears'
   | 'RegionString'

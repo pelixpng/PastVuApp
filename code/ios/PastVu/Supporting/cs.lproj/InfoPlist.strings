@@ -1,0 +1,4 @@
+NSLocationWhenInUseUsageDescription = "Přístup k poloze umožňuje zobrazit na mapě zajímavé fotografie ve vašem okolí.";
+NSPhotoLibraryAddUsageDescription = "Přístup žádáme, abychom mohli stažené fotografie ukládat do vaší galerie k pozdějšímu prohlížení.";
+NSPhotoLibraryUsageDescription = "Přístup žádáme, abychom mohli stažené fotografie ukládat do vaší galerie k pozdějšímu prohlížení.";
+NSCameraUsageDescription = "Přístup k fotoaparátu umožňuje vyfotit toto místo dnes a porovnat je se starou fotografií.";

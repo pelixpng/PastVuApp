@@ -8,6 +8,9 @@ import { Comment } from '../../../map/components/comment/Comment'
 import { Spacer } from '../../../../../core/components/ui/Spacer'
 import { t } from '../../../../../core/i18n'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { MaterialIcons } from '@expo/vector-icons'
+import { CompareMode, ComparePhoto, CompareView } from '../../../../../core/components/compare/CompareView'
+import { StreetViewInfo, streetViewTarget } from '../../../../../core/services/streetView'
 
 type PhotoDetailProps = {
   comments: IComment[]
@@ -19,6 +22,11 @@ type PhotoDetailProps = {
   onImageLoaded: () => void
   openFullScreen: () => void
   onLinkPress?: (href: string) => void
+  compareMode?: CompareMode | null
+  closeCompare?: () => void
+  hasStreetView?: boolean
+  streetView?: StreetViewInfo | null
+  comparePhoto?: ComparePhoto
 }
 
 export const PhotoDetail: FC<PhotoDetailProps> = ({
@@ -31,6 +39,11 @@ export const PhotoDetail: FC<PhotoDetailProps> = ({
   showLoader,
   openFullScreen,
   onLinkPress,
+  compareMode,
+  closeCompare,
+  hasStreetView,
+  streetView,
+  comparePhoto,
 }) => {
   const { colors } = useTheme()
   const { bottom } = useSafeAreaInsets()
@@ -55,6 +68,28 @@ export const PhotoDetail: FC<PhotoDetailProps> = ({
     )
   }
 
+  if (compareMode && comparePhoto) {
+    // Then-and-now takes over the panel; the arrow brings the post back.
+    return (
+      <View style={[s.modal, { width: modalWidth }]}>
+        <Spacer height={18} />
+        <View style={s.header}>
+          <MaterialIcons name="arrow-back" size={24} color={colors.textFirst} onPress={closeCompare} />
+        </View>
+        <CompareView
+          photo={comparePhoto}
+          initialMode={compareMode}
+          target={
+            hasStreetView && streetViewTarget(postInfo)
+              ? { ...streetViewTarget(postInfo)!, panoId: streetView?.panoId }
+              : null
+          }
+          panoramaYear={streetView?.year}
+          fit="contain"
+        />
+      </View>
+    )
+  }
   return (
     <View style={[s.modal, { width: modalWidth }]}>
       <Spacer height={18} />

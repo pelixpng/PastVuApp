@@ -2,24 +2,40 @@
   "expo": {
     "name": "PastVu",
     "slug": "PastVuApp",
-    "version": "2.5.0",
+    "version": "2.6.0",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "assetBundlePatterns": ["assets/*.png"],
+    "assetBundlePatterns": [
+      "assets/*.png"
+    ],
     "locales": {
       "ru": "./locales/ru.json",
-      "en": "./locales/en.json"
+      "en": "./locales/en.json",
+      "uk": "./locales/uk.json",
+      "be": "./locales/be.json",
+      "pl": "./locales/pl.json",
+      "de": "./locales/de.json",
+      "cs": "./locales/cs.json",
+      "hu": "./locales/hu.json",
+      "fi": "./locales/fi.json",
+      "et": "./locales/et.json",
+      "lv": "./locales/lv.json",
+      "lt": "./locales/lt.json",
+      "sr": "./locales/sr.json",
+      "fr": "./locales/fr.json"
     },
     "ios": {
       "supportsTablet": true,
       "requireFullScreen": true,
       "userInterfaceStyle": "automatic",
       "bundleIdentifier": "com.pelixpng.PastVuApp",
-      "buildNumber": "66",
+      "buildNumber": "68",
       "appleTeamId": "989AHJ2KDZ",
       "entitlements": {
-        "com.apple.security.application-groups": ["group.com.pelixpng.PastVuApp"]
+        "com.apple.security.application-groups": [
+          "group.com.pelixpng.PastVuApp"
+        ]
       },
       "icon": "./assets/PastVu.icon",
       "infoPlist": {
@@ -38,7 +54,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.pelixpng.PastVuApp",
-      "versionCode": 42,
+      "versionCode": 44,
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION"
@@ -50,6 +66,14 @@
       }
     },
     "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "minSdkVersion": 26
+          }
+        }
+      ],
       [
         "expo-splash-screen",
         {
@@ -72,9 +96,19 @@
         }
       ],
       [
+        "expo-camera",
+        {
+          "cameraPermission": "Доступ к камере нужен, чтобы снять это место сегодня и сравнить со старой фотографией.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false,
+          "barcodeScannerEnabled": false
+        }
+      ],
+      [
         "expo-location",
         {
-          "locationWhenInUsePermission": "Доступ к геолокации позволяет нам показать на карте интересны фотографии рядом с вами."
+          "locationWhenInUsePermission": "Доступ к геолокации позволяет нам показать на карте интересные фотографии рядом с вами.",
+          "motionUsagePermission": false
         }
       ],
       "@bacons/apple-targets",
@@ -89,7 +123,19 @@
         {
           "supportedLocales": [
             "ru",
-            "en"
+            "en",
+            "uk",
+            "be",
+            "pl",
+            "de",
+            "cs",
+            "hu",
+            "fi",
+            "et",
+            "lv",
+            "lt",
+            "sr",
+            "fr"
           ],
           "allowDynamicLocaleChangesAndroid": true
         }

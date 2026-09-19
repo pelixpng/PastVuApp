@@ -1,0 +1,6 @@
+<resources>
+  <string name="NSLocationWhenInUseUsageDescription">"Приступ локацији омогућава приказ занимљивих фотографија у вашој близини на мапи."</string>
+  <string name="NSPhotoLibraryAddUsageDescription">"Тражимо приступ да бисмо преузете фотографије сачували у вашој галерији за касније прегледање."</string>
+  <string name="NSPhotoLibraryUsageDescription">"Тражимо приступ да бисмо преузете фотографије сачували у вашој галерији за касније прегледање."</string>
+  <string name="NSCameraUsageDescription">"Приступ камери је потребан да снимите ово место данас и упоредите га са старом фотографијом."</string>
+</resources>

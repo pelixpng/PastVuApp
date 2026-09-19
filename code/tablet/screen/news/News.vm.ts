@@ -12,6 +12,9 @@ import { IComment, Users } from '../../../core/types/apiPhotoComment'
 import { getRegionPath } from '../../../core/utils/getRegionPath'
 import { savePhoto, sharePhoto } from '../../../core/utils/getPhoto'
 import { t } from '../../../core/i18n'
+import * as PhotoPost from '../../../core/services/photoPost'
+import * as StreetView from '../../../core/services/streetView'
+import { CompareMode } from '../../../core/components/compare/CompareView'
 
 export type NewsTab = 'posts' | 'photos'
 
@@ -38,6 +41,9 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
   @observable showLoader = false
   @observable isImageLoaded = false
   @observable isFavorite = false
+  @observable.ref streetView: StreetView.StreetViewInfo | null = null
+  /** The panel shows the then-and-now view in place of the post, in this mode. */
+  @observable compareMode: CompareMode | null = null
 
   private regionsMap: Map<number, any> = new Map()
 
@@ -77,6 +83,24 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
   @computed
   get canGoBack() {
     return this.postHistory.length > 0
+  }
+
+  @computed
+  get streetViewTarget() {
+    return StreetView.streetViewTarget(this.postInfo)
+  }
+
+  /** Google confirmed a panorama, or could not be asked: either way the header offers it. */
+  @computed
+  get hasStreetView() {
+    return this.streetView !== null && this.streetView.available !== false
+  }
+
+  @computed
+  get comparePhoto() {
+    return this.postInfo
+      ? { uri: this.imageLink, year: this.postInfo.y, ...PhotoPost.photoResolution(this.postInfo) }
+      : undefined
   }
 
   @computed
@@ -213,10 +237,38 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
 
   // -------------------------------- Photo detail --------------------------------
 
+  /** Runs after the post is shown: the button appears once Google confirms a panorama. */
+  @action.bound
+  async checkStreetView(cid: string, photo: Photo) {
+    const target = StreetView.streetViewTarget(photo)
+    if (!target) return
+    const info = await StreetView.checkAvailability(target)
+    if (this.selectedPhotoCid !== cid) return
+    runInAction(() => {
+      this.streetView = info
+    })
+  }
+
+  /**
+   * On the tablet the comparison replaces the post inside the same panel, not a new screen. It
+   * always opens on Street View, even without a panorama, so the camera never pops up unasked.
+   */
+  @action.bound
+  openCompare() {
+    this.compareMode = 'streetView'
+  }
+
+  @action.bound
+  closeCompare() {
+    this.compareMode = null
+  }
+
   @action.bound
   closePhoto() {
     this.selectedPhotoCid = null
     this.postInfo = null
+    this.streetView = null
+    this.compareMode = null
     this.photoComments = []
     this.photoUsers = null
     this.isImageLoaded = false
@@ -228,6 +280,8 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
       if (this.postInfo) {
         runInAction(() => {
           this.postInfo = null
+          this.streetView = null
+          this.compareMode = null
           this.photoComments = []
           this.photoUsers = null
           this.isImageLoaded = false
@@ -244,6 +298,7 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
   async getPhotoInfo(cid: string) {
     await ApiService.getPhotoInfo(cid)
       .then(async ({ result }) => {
+        this.checkStreetView(cid, result.photo)
         runInAction(() => {
           this.postInfo = result.photo
           const favorites: CollectionItem[] = MMKVStorage.get('Favorites') ?? []

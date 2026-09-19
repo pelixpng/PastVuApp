@@ -10,6 +10,7 @@ class AppSettingsVM extends BaseViewModelProvider<SCREENS.APP_SETTINGS> {
   photoQualityOptions = SettingsOptions.photoQualityOptions
   mapTypeOptions = SettingsOptions.mapTypeOptions
   markerTypeOptions = SettingsOptions.markerTypeOptions
+  mapProviderOptions = SettingsOptions.mapProviderOptions
 
   constructor() {
     super()

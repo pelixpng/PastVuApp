@@ -1,0 +1,6 @@
+<resources>
+  <string name="NSLocationWhenInUseUsageDescription">"Sijainnin avulla kartalla näytetään kiinnostavia kuvia lähelläsi."</string>
+  <string name="NSPhotoLibraryAddUsageDescription">"Pyydämme käyttöoikeutta, jotta ladatut kuvat voidaan tallentaa galleriaasi myöhempää katselua varten."</string>
+  <string name="NSPhotoLibraryUsageDescription">"Pyydämme käyttöoikeutta, jotta ladatut kuvat voidaan tallentaa galleriaasi myöhempää katselua varten."</string>
+  <string name="NSCameraUsageDescription">"Kameran käyttöoikeus tarvitaan, jotta voit kuvata tämän paikan tänään ja verrata sitä vanhaan kuvaan."</string>
+</resources>

@@ -1,0 +1,4 @@
+NSLocationWhenInUseUsageDescription = "Vietos prieiga leidžia žemėlapyje rodyti įdomias nuotraukas netoli jūsų.";
+NSPhotoLibraryAddUsageDescription = "Prašome prieigos, kad atsisiųstas nuotraukas galėtume išsaugoti jūsų galerijoje vėlesnei peržiūrai.";
+NSPhotoLibraryUsageDescription = "Prašome prieigos, kad atsisiųstas nuotraukas galėtume išsaugoti jūsų galerijoje vėlesnei peržiūrai.";
+NSCameraUsageDescription = "Kameros prieiga reikalinga, kad nufotografuotumėte šią vietą šiandien ir palygintumėte su sena nuotrauka.";

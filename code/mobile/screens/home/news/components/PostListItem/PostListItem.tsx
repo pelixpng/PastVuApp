@@ -1,4 +1,4 @@
-import { FC, memo } from 'react'
+import { FC } from 'react'
 import { TouchableOpacity, View, Text } from 'react-native'
 import { Image } from 'expo-image'
 import { LinearGradient } from 'expo-linear-gradient'
@@ -9,6 +9,7 @@ import StandardAvatar from '../../../../../../assets/avatar.png'
 import { NewsUser } from '../../../../../../core/types/apiNews'
 import { formatDate } from '../../../../../../core/utils/getTime'
 import { t } from '../../../../../../core/i18n'
+import { observer } from 'mobx-react'
 
 export type PostListItemProps = {
   onPress: () => void
@@ -26,7 +27,7 @@ const stripHtml = (html: string) =>
     .replace(/\s+/g, ' ')
     .trim()
 
-export const PostListItem: FC<PostListItemProps> = memo(
+export const PostListItem: FC<PostListItemProps> = observer(
   ({ title, notice, pdate, ccount, user, onPress }) => {
     const { colors } = useTheme()
     const avatarUri = user.avatar ? `https://pastvu.com/_a/h/${user.avatar}` : null

@@ -8,6 +8,8 @@ import { savePhoto, sharePhoto } from '../../../../core/utils/getPhoto'
 import ApiStore from '../../../../core/store/Api.store'
 import * as PhotoPost from '../../../../core/services/photoPost'
 import { t } from '../../../../core/i18n'
+import * as StreetView from '../../../../core/services/streetView'
+import { CompareMode } from '../../../../core/components/compare/CompareView'
 
 class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
   @observable comments: IComment[] = []
@@ -16,6 +18,7 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
   @observable isImageLoaded = false
   @observable isFavorite = false
   @observable activeCid: string | null = null
+  @observable.ref streetView: StreetView.StreetViewInfo | null = null
   @observable.ref cidHistory: string[] = []
 
   constructor() {
@@ -42,6 +45,17 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
   }
 
   @computed
+  get streetViewTarget() {
+    return StreetView.streetViewTarget(this.postInfo)
+  }
+
+  /** Google confirmed a panorama, or could not be asked: either way the header offers it. */
+  @computed
+  get hasStreetView() {
+    return this.streetView !== null && this.streetView.available !== false
+  }
+
+  @computed
   get canGoBack() {
     return this.cidHistory.length > 0
   }
@@ -63,9 +77,41 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
         this.isFavorite = PhotoPost.isFavorite(cid)
       })
       PhotoPost.recordHistory(photo, cid)
+      this.checkStreetView(cid)
     } catch {
       Alert.alert(t('common.error'), t('photo.infoError'))
     }
+  }
+
+  /** Runs after the post is shown: the button appears once Google confirms a panorama. */
+  @action.bound
+  async checkStreetView(cid: string) {
+    const target = this.streetViewTarget
+    if (!target) return
+    const info = await StreetView.checkAvailability(target)
+    if (this.activeCid !== cid) return
+    runInAction(() => {
+      this.streetView = info
+    })
+  }
+
+  /**
+   * Then-and-now screen. Always opens on Street View, even where Google has no panorama (the
+   * screen says so): jumping straight into a live camera would be a surprise.
+   */
+  @action.bound
+  openCompare() {
+    const photo = this.postInfo!
+    const mode: CompareMode = 'streetView'
+    this.navigateTo(SCREENS.COMPARE, {
+      mode,
+      photo: { uri: this.imageLink, year: photo.y, ...this.imageResolution },
+      target:
+        this.hasStreetView && this.streetViewTarget
+          ? { ...this.streetViewTarget, panoId: this.streetView?.panoId }
+          : null,
+      year: this.streetView?.year,
+    })
   }
 
   @action.bound
@@ -107,6 +153,7 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
       this.activeCid = photoMatch[1]
       this.isImageLoaded = false
       this.postInfo = null
+      this.streetView = null
       this.users = null
       this.comments = []
       this.getPhotoInfo()
@@ -136,6 +183,7 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
     this.activeCid = previousCid
     this.isImageLoaded = false
     this.postInfo = null
+    this.streetView = null
     this.users = null
     this.comments = []
     this.getPhotoInfo()

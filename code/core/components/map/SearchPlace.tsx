@@ -1,4 +1,4 @@
-import { FC, memo, useState } from 'react'
+import { FC, useState } from 'react'
 import { View, FlatList, TouchableOpacity, Text, TextInput, StyleSheet } from 'react-native'
 import { MaterialIcons } from '@expo/vector-icons'
 import { useTheme } from '@react-navigation/native'
@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { LocationItem } from '../../types/apiPhotoList'
 import { Spacer } from '../ui/Spacer'
 import { t } from '../../i18n'
+import { observer } from 'mobx-react'
 
 type SearchPlaceProps = {
   places: LocationItem[]
@@ -123,4 +124,6 @@ const s = StyleSheet.create({
   },
 })
 
-export const SearchPlace = memo(LocationSearch)
+// `observer` rather than `memo`: it still skips renders on equal props, and also re-renders when
+// the language changes, which `t()` reads from the locale store.
+export const SearchPlace = observer(LocationSearch)

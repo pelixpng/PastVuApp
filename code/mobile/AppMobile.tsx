@@ -21,6 +21,7 @@ import { AboutAppScreen } from './screens/settings/aboutApp/AboutApp.screen'
 import { AppSettingsScreen } from './screens/settings/appSettings/AppSettings.screen'
 import { SupportContactsScreen } from './screens/settings/supportContacts/SupportContacts.screen'
 import { NewsPostScreen } from './screens/home/newsPost/NewsPost.screen'
+import { CompareScreen } from './screens/home/compare/Compare.screen'
 import { t } from '../core/i18n'
 
 export const Stack = createStackNavigator<StackParamList>()
@@ -84,6 +85,11 @@ export default observer(function AppMobile() {
             cardStyle: { backgroundColor: 'transparent' },
             headerShown: false,
           }}
+        />
+        <Stack.Screen
+          name={SCREENS.COMPARE}
+          component={CompareScreen}
+          options={{ headerTitle: t('streetView.title') }}
         />
         <Stack.Screen
           name={SCREENS.ABOUT_APP}

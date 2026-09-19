@@ -6,6 +6,7 @@ import * as ScreenOrientation from 'expo-screen-orientation'
 import { Alert } from 'react-native'
 import { MMKVStorage } from './core/storage/mmkv'
 import { t } from './core/i18n'
+import { initYandexMaps } from './core/services/yandexMaps'
 
 export default function App() {
   const typeDevice = getDeviceType()
@@ -20,6 +21,10 @@ export default function App() {
     }
     lockOrientation()
   }, [isShowTabletUI])
+
+  useEffect(() => {
+    initYandexMaps()
+  }, [])
 
   useEffect(() => {
     const isFirstLaunch = MMKVStorage.get('isFirstLaunch')

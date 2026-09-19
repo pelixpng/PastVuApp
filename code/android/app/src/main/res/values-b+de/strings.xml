@@ -1,0 +1,6 @@
+<resources>
+  <string name="NSLocationWhenInUseUsageDescription">"Der Standortzugriff zeigt interessante Fotos in Ihrer Nähe auf der Karte."</string>
+  <string name="NSPhotoLibraryAddUsageDescription">"Der Zugriff auf die Fotomediathek dient dazu, geladene Fotos zum späteren Ansehen zu speichern."</string>
+  <string name="NSPhotoLibraryUsageDescription">"Der Zugriff auf die Fotomediathek dient dazu, geladene Fotos zum späteren Ansehen zu speichern."</string>
+  <string name="NSCameraUsageDescription">"Der Kamerazugriff dient dazu, diesen Ort heute zu fotografieren und mit dem alten Foto zu vergleichen."</string>
+</resources>

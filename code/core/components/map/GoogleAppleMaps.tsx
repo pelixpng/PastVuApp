@@ -3,6 +3,7 @@ import { Platform, StyleSheet } from 'react-native'
 import { RefObject } from 'react'
 import { useTheme } from '@react-navigation/native'
 import { MapMarker } from '../../types/apiPhotoList'
+import { markerKey } from '../../services/mapMarkers'
 import { ClusterMarker } from './ClusterMarker'
 
 type Props = {
@@ -54,7 +55,7 @@ export const GoogleAppleMaps = ({
             <Marker
               // Keyed by identity, not by array index: the list mixes photos and clusters, so an
               // index key made React reuse a photo's marker for a cluster and vice versa.
-              key={`photo-${marker.cid}`}
+              key={markerKey(marker)}
               coordinate={marker.location}
               tracksViewChanges={false}
               rotation={marker.dir}
@@ -75,7 +76,7 @@ export const GoogleAppleMaps = ({
         } else {
           return (
             <Marker
-              key={`cluster-${marker.location.latitude},${marker.location.longitude}`}
+              key={markerKey(marker)}
               coordinate={marker.location}
               tracksViewChanges={false}
               image={

@@ -12,6 +12,7 @@ export enum SCREENS {
   //photo
   PHOTO_DETAIL = 'Photo Detail',
   FULL_SCREEN_IMAGE = 'Full Screen Image',
+  COMPARE = 'Compare',
   //news
   NEWS_POST = 'News Post',
 }

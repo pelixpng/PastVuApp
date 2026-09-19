@@ -1,21 +1,35 @@
 import * as Location from 'expo-location'
-import { action, autorun, computed, makeObservable, observable, reaction, runInAction } from 'mobx'
+import {
+	action,
+	autorun,
+	computed,
+	makeObservable,
+	observable,
+	reaction,
+	runInAction
+} from 'mobx'
 import { Alert, Keyboard, Platform } from 'react-native'
 import MapView, { Region } from 'react-native-maps'
 import { createRef } from 'react'
+import type { YaMapRef } from 'react-native-yamap-lite'
 import {
-  getClustersPhotosProps,
-  getPhotoListProps,
-  LocationItem,
-  MapMarker,
-  PhotoMarker,
+	getClustersPhotosProps,
+	getPhotoListProps,
+	LocationItem,
+	MapMarker,
+	PhotoMarker
 } from '../../../core/types/apiPhotoList'
 import { MMKVStorage } from '../../../core/storage/mmkv'
 import { YearsRangeType } from '../../../core/types/components'
 import MapStore from '../../../core/store/Map.store'
 import ApiStore from '../../../core/store/Api.store'
-import { getPolygon, getZoom, zoomLevelToAltitude } from '../../../core/utils/getMapData'
+import {
+	getPolygon,
+	getZoom,
+	zoomLevelToAltitude
+} from '../../../core/utils/getMapData'
 import ApiService from '../../../core/api/apiService'
+import { dedupeMarkers } from '../../../core/services/mapMarkers'
 import * as PhotoPost from '../../../core/services/photoPost'
 import { BaseViewModelProvider } from '../../provider/vm.provider'
 import { SCREENS } from '../../navigation/navigation.types'
@@ -25,344 +39,456 @@ import { Linking } from 'react-native'
 import { savePhoto, sharePhoto } from '../../../core/utils/getPhoto'
 import { t } from '../../../core/i18n'
 import { defaultRegion } from '../../../core/constants/map'
+import * as StreetView from '../../../core/services/streetView'
+import { CompareMode } from '../../../core/components/compare/CompareView'
 
 export const mapRef = createRef<MapView>()
+/** The Yandex map, when that provider is selected; only one of the two refs is mounted. */
+export const yamapRef = createRef<YaMapRef>()
 
 /** Matches `cameraZoomRange.minCenterCoordinateDistance` on the MapView. */
 const MIN_ALTITUDE = 100
 
 class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
-  //map data
-  @observable.ref photoCollection: { markers: MapMarker[] } = { markers: [] }
-  @observable.ref coordinates: Region = MMKVStorage.get('RegionString') ?? defaultRegion()
-  @observable.ref yearsRange: YearsRangeType = MMKVStorage.get('RangeYears') ?? [1840, 2000]
-  @observable queryPlace = ''
-  @observable.ref places: LocationItem[] = []
-  private timeoutId: ReturnType<typeof setTimeout> | null = null
-  private collectionTimeoutId: ReturnType<typeof setTimeout> | null = null
-  //photo detail
-  @observable.ref comments: IComment[] = []
-  @observable.ref users: Users | null = null
-  @observable.ref postInfo: Photo | null = null
-  @observable showPhotoDetail = false
-  @observable isImageLoaded = false
-  @observable activeCid: string | null = null
-  @observable isFavorite = false
+	//map data
+	@observable.ref photoCollection: { markers: MapMarker[] } = { markers: [] }
+	@observable.ref coordinates: Region =
+		MMKVStorage.get('RegionString') ?? defaultRegion()
+	@observable.ref yearsRange: YearsRangeType = MMKVStorage.get(
+		'RangeYears'
+	) ?? [1840, 2000]
+	@observable queryPlace = ''
+	@observable.ref places: LocationItem[] = []
+	private timeoutId: ReturnType<typeof setTimeout> | null = null
+	private collectionTimeoutId: ReturnType<typeof setTimeout> | null = null
+	//photo detail
+	@observable.ref comments: IComment[] = []
+	@observable.ref users: Users | null = null
+	@observable.ref postInfo: Photo | null = null
+	@observable showPhotoDetail = false
+	@observable isImageLoaded = false
+	@observable activeCid: string | null = null
+	@observable isFavorite = false
+	@observable.ref streetView: StreetView.StreetViewInfo | null = null
+	/** The panel shows the then-and-now view in place of the post, in this mode. */
+	@observable compareMode: CompareMode | null = null
 
-  constructor() {
-    super()
-    autorun(() => {
-      if (!this.coordinates) return
-      if (this.collectionTimeoutId) clearTimeout(this.collectionTimeoutId)
-      this.collectionTimeoutId = setTimeout(() => this.getPhotoCollection(), 300)
-    })
-    reaction(
-      () => this.yearsRange,
-      () => {
-        runInAction(() => {
-          this.photoCollection = { markers: [] }
-          this.getPhotoCollection()
-        })
-      },
-    )
-    reaction(
-      () => this.queryPlace,
-      query => {
-        if (query.length > 2) {
-          if (this.timeoutId) clearTimeout(this.timeoutId)
-          this.timeoutId = setTimeout(() => {
-            this.findPlace()
-          }, 500)
-        }
-      },
-    )
-    makeObservable(this)
-  }
+	constructor() {
+		super()
+		autorun(() => {
+			if (!this.coordinates) return
+			if (this.collectionTimeoutId) clearTimeout(this.collectionTimeoutId)
+			this.collectionTimeoutId = setTimeout(
+				() => this.getPhotoCollection(),
+				300
+			)
+		})
+		reaction(
+			() => this.yearsRange,
+			() => {
+				runInAction(() => {
+					this.photoCollection = { markers: [] }
+					this.getPhotoCollection()
+				})
+			}
+		)
+		reaction(
+			() => this.queryPlace,
+			query => {
+				if (query.length > 2) {
+					if (this.timeoutId) clearTimeout(this.timeoutId)
+					this.timeoutId = setTimeout(() => {
+						this.findPlace()
+					}, 500)
+				}
+			}
+		)
+		makeObservable(this)
+	}
 
-  // ------------------------------------------ Computed ------------------------------------------
+	// ------------------------------------------ Computed ------------------------------------------
 
-  // map settings
-  @computed
-  get mapTypeSetting() {
-    return MapStore.mapType
-  }
+	// map settings
+	@computed
+	get mapTypeSetting() {
+		return MapStore.mapType
+	}
 
-  @computed
-  get mapMarkerType() {
-    return MapStore.markerType
-  }
+	@computed
+	get mapMarkerType() {
+		return MapStore.markerType
+	}
 
-  // photo detail
-  @computed
-  get imageLink() {
-    return `https://img.pastvu.com/${ApiStore.photoQualitySettings}/${this.postInfo?.file}`
-  }
+	// photo detail
+	@computed
+	get streetViewTarget() {
+		return StreetView.streetViewTarget(this.postInfo)
+	}
 
-  @computed
-  get imageResolution() {
-    return this.postInfo ? PhotoPost.photoResolution(this.postInfo) : undefined
-  }
+	/** Google confirmed a panorama, or could not be asked: either way the header offers it. */
+	@computed
+	get hasStreetView() {
+		return this.streetView !== null && this.streetView.available !== false
+	}
 
-  // ------------------------------------------ Actions ------------------------------------------
+	@computed
+	get imageLink() {
+		return `https://img.pastvu.com/${ApiStore.photoQualitySettings}/${this.postInfo?.file}`
+	}
 
-  // map data
-  @action.bound
-  setYearsRange(years: [number, number]) {
-    this.yearsRange = years
-    MMKVStorage.set('RangeYears', years)
-  }
+	@computed
+	get imageResolution() {
+		return this.postInfo ? PhotoPost.photoResolution(this.postInfo) : undefined
+	}
 
-  @action.bound
-  setCoordinate(cord: Region) {
-    const prev = this.coordinates
-    // The map re-emits onRegionChangeComplete with an unchanged region when its view is
-    // reattached (e.g. returning to the tab). `coordinates` is an observable.ref, so assigning an
-    // equal-but-new object still counts as a change and makes the autorun refetch the markers,
-    // which visibly redraws the whole map.
-    if (
-      prev &&
-      prev.latitude === cord.latitude &&
-      prev.longitude === cord.longitude &&
-      prev.latitudeDelta === cord.latitudeDelta &&
-      prev.longitudeDelta === cord.longitudeDelta
-    ) {
-      return
-    }
-    this.coordinates = cord
-    MMKVStorage.set('RegionString', this.coordinates)
-  }
+	// ------------------------------------------ Actions ------------------------------------------
 
-  @action.bound
-  goToLocation(latitude: number, longitude: number) {
-    Keyboard.dismiss()
-    this.places = []
-    const zoomLevel = ApiStore.showCluster ? getZoom(this.coordinates.latitudeDelta) + 1.2 : 14
-    const altitude = Platform.OS === 'ios' ? zoomLevelToAltitude(zoomLevel) : undefined
-    const camera = {
-      center: {
-        latitude,
-        longitude,
-      },
-      heading: 0,
-      pitch: 0,
-      ...(Platform.OS === 'ios' ? { altitude } : { zoom: zoomLevel }),
-    }
-    if (mapRef.current) {
-      mapRef.current.animateCamera(camera, { duration: 2000 })
-    }
-  }
+	// map data
+	@action.bound
+	setYearsRange(years: [number, number]) {
+		this.yearsRange = years
+		MMKVStorage.set('RangeYears', years)
+	}
 
-  @action.bound
-  async getCurrentLocation() {
-    let { status } = await Location.requestForegroundPermissionsAsync()
-    if (status === 'granted') {
-      const lastPosition = await Location.getLastKnownPositionAsync()
-      if (lastPosition) {
-        this.goToLocation(lastPosition.coords.latitude, lastPosition.coords.longitude)
-      } else {
-        const { coords } = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.Lowest,
-        })
-        this.goToLocation(coords.latitude, coords.longitude)
-      }
-    }
-  }
+	@action.bound
+	setCoordinate(cord: Region) {
+		const prev = this.coordinates
+		// The map re-emits onRegionChangeComplete with an unchanged region when its view is
+		// reattached (e.g. returning to the tab). `coordinates` is an observable.ref, so assigning an
+		// equal-but-new object still counts as a change and makes the autorun refetch the markers,
+		// which visibly redraws the whole map.
+		if (
+			prev &&
+			prev.latitude === cord.latitude &&
+			prev.longitude === cord.longitude &&
+			prev.latitudeDelta === cord.latitudeDelta &&
+			prev.longitudeDelta === cord.longitudeDelta
+		) {
+			return
+		}
+		this.coordinates = cord
+		MMKVStorage.set('RegionString', this.coordinates)
+	}
 
-  @action.bound
-  async getPhotoCollection() {
-    try {
-      const zoom = getZoom(this.coordinates.latitudeDelta)
-      if (ApiStore.showCluster === 'yes') {
-        const paramsClustersApi: getClustersPhotosProps = {
-          polygon: getPolygon(this.coordinates),
-          latitude: this.coordinates.latitude,
-          longitude: this.coordinates.longitude,
-          yearStart: this.yearsRange[0],
-          yearEnd: this.yearsRange[1],
-          zoom,
-        }
-        const markers = await ApiService.getPhotosClusters(paramsClustersApi)
-        this.photoCollection = { markers } // ← сразу единый массив
-        return
-      }
-      if (this.photoCollection.markers.length > MapStore.maxPhotoOnMap) {
-        this.photoCollection = { markers: [] }
-      }
-      const params: getPhotoListProps = {
-        latitude: this.coordinates.latitude,
-        longitude: this.coordinates.longitude,
-        limit: ApiStore.requestCountPhoto,
-        distance: ApiStore.maxDistance,
-        yearStart: this.yearsRange[0],
-        yearEnd: this.yearsRange[1],
-      }
-      const photoArray = await ApiService.getPhotoList(params)
-      const newPhotos: PhotoMarker[] = photoArray.map(item => ({
-        _type: 'photo',
-        title: item.title,
-        cid: item.cid,
-        location: item.location,
-        year: item.year,
-        dir: item.dir,
-        marker: item.marker,
-        color: item.color,
-      }))
-      const uniquePhotos = newPhotos.filter(
-        p =>
-          !this.photoCollection.markers.some(prev => prev._type === 'photo' && prev.cid === p.cid),
-      )
-      this.photoCollection = {
-        markers: [...this.photoCollection.markers, ...uniquePhotos],
-      }
-    } catch (error) {
-      Alert.alert(t('common.error'), t('map.markersError'))
-    }
-  }
+	@action.bound
+	goToLocation(latitude: number, longitude: number) {
+		Keyboard.dismiss()
+		this.places = []
+		const zoomLevel = ApiStore.showCluster
+			? getZoom(this.coordinates.latitudeDelta) + 1.2
+			: 14
+		const altitude =
+			Platform.OS === 'ios' ? zoomLevelToAltitude(zoomLevel) : undefined
+		const camera = {
+			center: {
+				latitude,
+				longitude
+			},
+			heading: 0,
+			pitch: 0,
+			...(Platform.OS === 'ios' ? { altitude } : { zoom: zoomLevel })
+		}
+		if (MapStore.mapProvider === 'yandex') {
+			yamapRef.current?.setCenter(
+				{ lat: latitude, lon: longitude },
+				16,
+				0,
+				0,
+				2000,
+				'SMOOTH'
+			)
+			return
+		}
+		if (mapRef.current) {
+			mapRef.current.animateCamera(camera, { duration: 2000 })
+		}
+	}
 
-  // find place
+	@action.bound
+	async getCurrentLocation() {
+		let { status } = await Location.requestForegroundPermissionsAsync()
+		if (status === 'granted') {
+			const lastPosition = await Location.getLastKnownPositionAsync()
+			if (lastPosition) {
+				this.goToLocation(
+					lastPosition.coords.latitude,
+					lastPosition.coords.longitude
+				)
+			} else {
+				const { coords } = await Location.getCurrentPositionAsync({
+					accuracy: Location.Accuracy.Lowest
+				})
+				this.goToLocation(coords.latitude, coords.longitude)
+			}
+		}
+	}
 
-  @action.bound
-  setQueryPlace(value: string) {
-    runInAction(() => {
-      if (value.length < 2) {
-        this.places = []
-      }
-      this.queryPlace = value
-    })
-  }
+	@action.bound
+	async getPhotoCollection() {
+		try {
+			const zoom = getZoom(this.coordinates.latitudeDelta)
+			if (ApiStore.showCluster === 'yes') {
+				const paramsClustersApi: getClustersPhotosProps = {
+					polygon: getPolygon(this.coordinates),
+					latitude: this.coordinates.latitude,
+					longitude: this.coordinates.longitude,
+					yearStart: this.yearsRange[0],
+					yearEnd: this.yearsRange[1],
+					zoom
+				}
+				const markers = await ApiService.getPhotosClusters(paramsClustersApi)
+				this.photoCollection = { markers: dedupeMarkers(markers) }
+				return
+			}
+			if (this.photoCollection.markers.length > MapStore.maxPhotoOnMap) {
+				this.photoCollection = { markers: [] }
+			}
+			const params: getPhotoListProps = {
+				latitude: this.coordinates.latitude,
+				longitude: this.coordinates.longitude,
+				limit: ApiStore.requestCountPhoto,
+				distance: ApiStore.maxDistance,
+				yearStart: this.yearsRange[0],
+				yearEnd: this.yearsRange[1]
+			}
+			const photoArray = await ApiService.getPhotoList(params)
+			const newPhotos: PhotoMarker[] = photoArray.map(item => ({
+				_type: 'photo',
+				title: item.title,
+				cid: item.cid,
+				location: item.location,
+				year: item.year,
+				dir: item.dir,
+				marker: item.marker,
+				color: item.color
+			}))
+			const uniquePhotos = newPhotos.filter(
+				p =>
+					!this.photoCollection.markers.some(
+						prev => prev._type === 'photo' && prev.cid === p.cid
+					)
+			)
+			this.photoCollection = {
+				markers: dedupeMarkers([
+					...this.photoCollection.markers,
+					...uniquePhotos
+				])
+			}
+		} catch (error) {
+			Alert.alert(t('common.error'), t('map.markersError'))
+		}
+	}
 
-  @action.bound
-  async findPlace() {
-    try {
-      this.places = await ApiService.searchPlace(this.queryPlace)
-    } catch (error: any) {
-      if (error.message === '429') {
-        Alert.alert(t('common.error'), t('map.searchLimit'))
-      }
-    }
-  }
+	// find place
 
-  // photo detail
+	@action.bound
+	setQueryPlace(value: string) {
+		runInAction(() => {
+			if (value.length < 2) {
+				this.places = []
+			}
+			this.queryPlace = value
+		})
+	}
 
-  @action.bound
-  async zoomToCluster(latitude: number, longitude: number) {
-    const map = mapRef.current
-    if (!map) return
-    // Step from the camera's own zoom rather than from `getZoom(latitudeDelta)`: that helper
-    // buckets the delta for the API's `z` parameter and reads about one level lower than the
-    // camera actually is, so near zoom 17 it kept asking the camera to move where it already was
-    // and tapping a cluster did nothing. Halving the altitude is one zoom level on iOS.
-    const current = await map.getCamera()
-    const step =
-      Platform.OS === 'ios'
-        ? { altitude: Math.max((current.altitude ?? zoomLevelToAltitude(16)) / 2, MIN_ALTITUDE) }
-        : { zoom: (current.zoom ?? getZoom(this.coordinates.latitudeDelta)) + 1 }
-    map.animateCamera(
-      { center: { latitude, longitude }, heading: 0, pitch: 0, ...step },
-      { duration: 500 },
-    )
-  }
+	@action.bound
+	async findPlace() {
+		try {
+			this.places = await ApiService.searchPlace(this.queryPlace)
+		} catch (error: any) {
+			if (error.message === '429') {
+				Alert.alert(t('common.error'), t('map.searchLimit'))
+			}
+		}
+	}
 
-  @action.bound
-  showPhoto(cid: string, _title?: string) {
-    this.showPhotoDetail = true
-    this.activeCid = cid
-    if (this.postInfo) {
-      runInAction(() => {
-        this.postInfo = null
-        this.comments = []
-        this.users = null
-        this.isImageLoaded = false
-      })
-    }
-    this.getPhotoInfo(cid)
-  }
+	// photo detail
 
-  @action.bound
-  closePhoto() {
-    runInAction(() => {
-      this.showPhotoDetail = false
-      this.activeCid = null
-      this.postInfo = null
-      this.comments = []
-      this.users = null
-      this.isImageLoaded = false
-    })
-  }
+	@action.bound
+	async zoomToCluster(latitude: number, longitude: number) {
+		if (MapStore.mapProvider === 'yandex') {
+			const yamap = yamapRef.current
+			if (!yamap) return
+			const { zoom } = await yamap.getCameraPosition()
+			yamap.setCenter(
+				{ lat: latitude, lon: longitude },
+				zoom + 1,
+				0,
+				0,
+				500,
+				'SMOOTH'
+			)
+			return
+		}
+		const map = mapRef.current
+		if (!map) return
+		// Step from the camera's own zoom rather than from `getZoom(latitudeDelta)`: that helper
+		// buckets the delta for the API's `z` parameter and reads about one level lower than the
+		// camera actually is, so near zoom 17 it kept asking the camera to move where it already was
+		// and tapping a cluster did nothing. Halving the altitude is one zoom level on iOS.
+		const current = await map.getCamera()
+		const step =
+			Platform.OS === 'ios'
+				? {
+						altitude: Math.max(
+							(current.altitude ?? zoomLevelToAltitude(16)) / 2,
+							MIN_ALTITUDE
+						)
+					}
+				: {
+						zoom: (current.zoom ?? getZoom(this.coordinates.latitudeDelta)) + 1
+					}
+		map.animateCamera(
+			{ center: { latitude, longitude }, heading: 0, pitch: 0, ...step },
+			{ duration: 500 }
+		)
+	}
 
-  @action.bound
-  openFullScreenImage() {
-    this.navigateTo(SCREENS.FULL_SCREEN_IMAGE, {
-      title: this.postInfo!.title,
-      cid: this.postInfo!.cid.toString(),
-      uri: this.imageLink,
-      file: this.postInfo!.file,
-    })
-  }
+	@action.bound
+	showPhoto(cid: string, _title?: string) {
+		this.showPhotoDetail = true
+		this.activeCid = cid
+		if (this.postInfo) {
+			runInAction(() => {
+				this.postInfo = null
+				this.streetView = null
+				this.compareMode = null
+				this.comments = []
+				this.users = null
+				this.isImageLoaded = false
+			})
+		}
+		this.getPhotoInfo(cid)
+	}
 
-  @action.bound
-  async getPhotoInfo(cid: string) {
-    try {
-      const { photo, users, comments } = await PhotoPost.loadPost(cid)
-      // Another photo may have been opened, or the panel closed, while this request was in
-      // flight; without this the slower, older response would overwrite the newer one.
-      if (this.activeCid !== cid) return
-      runInAction(() => {
-        this.postInfo = photo
-        this.users = users
-        this.comments = comments
-        this.isFavorite = PhotoPost.isFavorite(cid)
-      })
-      PhotoPost.recordHistory(photo, cid)
-    } catch {
-      Alert.alert(t('common.error'), t('photo.infoError'))
-    }
-  }
+	@action.bound
+	closePhoto() {
+		runInAction(() => {
+			this.showPhotoDetail = false
+			this.activeCid = null
+			this.postInfo = null
+			this.streetView = null
+			this.compareMode = null
+			this.comments = []
+			this.users = null
+			this.isImageLoaded = false
+		})
+	}
 
-  @action.bound
-  onImageLoad() {
-    this.isImageLoaded = true
-  }
+	@action.bound
+	openFullScreenImage() {
+		this.navigateTo(SCREENS.FULL_SCREEN_IMAGE, {
+			title: this.postInfo!.title,
+			cid: this.postInfo!.cid.toString(),
+			uri: this.imageLink,
+			file: this.postInfo!.file
+		})
+	}
 
-  @action.bound
-  toggleFavorite() {
-    const cid = this.postInfo!.cid.toString()
-    const favorites: CollectionItem[] = MMKVStorage.get('Favorites') ?? []
-    const title = this.postInfo!.title
-    const description = `${this.postInfo!.y} ${this.postInfo!.regions.map(
-      region => region.title_local,
-    ).join(', ')}`
-    const file = this.postInfo!.file
+	@action.bound
+	async getPhotoInfo(cid: string) {
+		try {
+			const { photo, users, comments } = await PhotoPost.loadPost(cid)
+			// Another photo may have been opened, or the panel closed, while this request was in
+			// flight; without this the slower, older response would overwrite the newer one.
+			if (this.activeCid !== cid) return
+			runInAction(() => {
+				this.postInfo = photo
+				this.users = users
+				this.comments = comments
+				this.isFavorite = PhotoPost.isFavorite(cid)
+			})
+			PhotoPost.recordHistory(photo, cid)
+			this.checkStreetView(cid)
+		} catch {
+			Alert.alert(t('common.error'), t('photo.infoError'))
+		}
+	}
 
-    if (this.isFavorite) {
-      const updatedFavorites = favorites.filter(item => item.cid !== cid)
-      MMKVStorage.set('Favorites', updatedFavorites)
-      this.isFavorite = false
-    } else {
-      MMKVStorage.set('Favorites', [{ title, description, cid, file }, ...favorites])
-      this.isFavorite = true
-    }
-  }
+	/** Runs after the post is shown: the button appears once Google confirms a panorama. */
+	@action.bound
+	async checkStreetView(cid: string) {
+		const target = this.streetViewTarget
+		if (!target) return
+		const info = await StreetView.checkAvailability(target)
+		if (this.activeCid !== cid) return
+		runInAction(() => {
+			this.streetView = info
+		})
+	}
 
-  @action.bound
-  openPhotoFromLink(href: string) {
-    const photoMatch = href.match(/\/p\/(\d+)/)
-    if (photoMatch) {
-      this.showPhoto(photoMatch[1])
-    } else {
-      Linking.openURL(href)
-    }
-  }
+	/**
+	 * On the tablet the comparison replaces the post inside the same panel, not a new screen. It
+	 * always opens on Street View, even without a panorama, so the camera never pops up unasked.
+	 */
+	@action.bound
+	openCompare() {
+		this.compareMode = 'streetView'
+	}
 
-  @action.bound
-  share() {
-    sharePhoto(this.postInfo!.title, this.postInfo!.cid.toString())
-  }
+	@action.bound
+	closeCompare() {
+		this.compareMode = null
+	}
 
-  @action.bound
-  saveImage() {
-    savePhoto(this.postInfo!.title, this.postInfo!.file)
-  }
+	@computed
+	get comparePhoto() {
+		return this.postInfo
+			? {
+					uri: this.imageLink,
+					year: this.postInfo.y,
+					...PhotoPost.photoResolution(this.postInfo)
+				}
+			: undefined
+	}
+
+	@action.bound
+	onImageLoad() {
+		this.isImageLoaded = true
+	}
+
+	@action.bound
+	toggleFavorite() {
+		const cid = this.postInfo!.cid.toString()
+		const favorites: CollectionItem[] = MMKVStorage.get('Favorites') ?? []
+		const title = this.postInfo!.title
+		const description = `${this.postInfo!.y} ${this.postInfo!.regions.map(
+			region => region.title_local
+		).join(', ')}`
+		const file = this.postInfo!.file
+
+		if (this.isFavorite) {
+			const updatedFavorites = favorites.filter(item => item.cid !== cid)
+			MMKVStorage.set('Favorites', updatedFavorites)
+			this.isFavorite = false
+		} else {
+			MMKVStorage.set('Favorites', [
+				{ title, description, cid, file },
+				...favorites
+			])
+			this.isFavorite = true
+		}
+	}
+
+	@action.bound
+	openPhotoFromLink(href: string) {
+		const photoMatch = href.match(/\/p\/(\d+)/)
+		if (photoMatch) {
+			this.showPhoto(photoMatch[1])
+		} else {
+			Linking.openURL(href)
+		}
+	}
+
+	@action.bound
+	share() {
+		sharePhoto(this.postInfo!.title, this.postInfo!.cid.toString())
+	}
+
+	@action.bound
+	saveImage() {
+		savePhoto(this.postInfo!.title, this.postInfo!.file)
+	}
 }
 
 export default MapVM
