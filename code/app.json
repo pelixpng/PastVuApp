@@ -54,7 +54,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.pelixpng.PastVuApp",
-      "versionCode": 45,
+      "versionCode": 46,
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION"
@@ -70,7 +70,9 @@
         "expo-build-properties",
         {
           "android": {
-            "minSdkVersion": 26
+            "minSdkVersion": 28,
+            "enableMinifyInReleaseBuilds": true,
+            "extraProguardRules": "# React Native view managers of the Yandex map fork are looked up by name.\n-keep class com.yamaplite.** { *; }\n# MMKV and the app's own Expo modules are called from native/JSI code.\n-keep class com.margelo.** { *; }\n-keep class expo.modules.applocale.** { *; }\n-keep class expo.modules.screencapture.** { *; }\n# expo-camera is built from source with the barcode scanner disabled: its ML Kit\n# references stay in the bytecode but are never reached.\n-dontwarn com.google.mlkit.**"
           }
         }
       ],

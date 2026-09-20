@@ -12,3 +12,15 @@
 -keep class com.facebook.react.turbomodule.** { *; }
 
 # Add any project specific keep options here:
+
+# @generated begin expo-build-properties - expo prebuild (DO NOT MODIFY)
+# React Native view managers of the Yandex map fork are looked up by name.
+-keep class com.yamaplite.** { *; }
+# MMKV and the app's own Expo modules are called from native/JSI code.
+-keep class com.margelo.** { *; }
+-keep class expo.modules.applocale.** { *; }
+-keep class expo.modules.screencapture.** { *; }
+# expo-camera is built from source with the barcode scanner disabled: its ML Kit
+# references stay in the bytecode but are never reached.
+-dontwarn com.google.mlkit.**
+# @generated end expo-build-properties

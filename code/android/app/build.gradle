@@ -92,8 +92,8 @@ android {
         applicationId 'com.pelixpng.PastVuApp'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 44
-        versionName "2.6.0"
+        versionCode 46
+        versionName "2.6.1"
 
         buildConfigField "String", "REACT_NATIVE_RELEASE_LEVEL", "\"${findProperty('reactNativeReleaseLevel') ?: 'stable'}\""
         resourceConfigurations += ["b+ru", "b+en", "b+uk", "b+be", "b+pl", "b+de", "b+cs", "b+hu", "b+fi", "b+et", "b+lv", "b+lt", "b+sr", "b+fr"]
