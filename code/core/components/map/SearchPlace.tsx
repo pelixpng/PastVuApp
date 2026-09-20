@@ -1,6 +1,6 @@
 import { FC, useState } from 'react'
 import { View, FlatList, TouchableOpacity, Text, TextInput, StyleSheet } from 'react-native'
-import { MaterialIcons } from '@expo/vector-icons'
+import MaterialIcons from '@expo/vector-icons/MaterialIcons'
 import { useTheme } from '@react-navigation/native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { LocationItem } from '../../types/apiPhotoList'

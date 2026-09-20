@@ -1,6 +1,6 @@
 import { createRef, useMemo } from 'react'
 import { Platform, useColorScheme, View, StyleSheet } from 'react-native'
-import { MaterialIcons } from '@expo/vector-icons'
+import MaterialIcons from '@expo/vector-icons/MaterialIcons'
 import { observer } from 'mobx-react'
 import { StatusBar } from 'expo-status-bar'
 import { SystemBars } from 'react-native-edge-to-edge'
