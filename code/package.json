@@ -6,15 +6,15 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package && node scripts/trim-yamap-codegen.js"
   },
   "dependencies": {
     "@bacons/apple-targets": "^3.0.2",
     "@expo/vector-icons": "^15.0.2",
+    "@exterio/react-native-yamap-lite": "^1.0.3",
     "@miblanchard/react-native-slider": "^2.3.1",
     "@react-navigation/bottom-tabs": "^6.5.8",
     "@react-navigation/native": "^6.1.17",
-    "@react-navigation/native-stack": "^6.9.26",
     "@react-navigation/stack": "^6.3.29",
     "babel-preset-expo": "~57.0.0",
     "expo": "^57.0.20",
@@ -49,9 +49,7 @@
     "react-native-view-shot": "5.1.0",
     "react-native-webview": "13.16.1",
     "react-native-worklets": "0.10.1",
-    "react-native-yamap-lite": "github:pelixpng/react-native-yamap-lite-pastvu",
-    "react-native-zoom-toolkit-swipe": "github:pelixpng/react-native-zoom-toolkit-swipe",
-    "socket.io-client": "^4.8.3"
+    "react-native-zoom-toolkit-swipe": "github:pelixpng/react-native-zoom-toolkit-swipe"
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",

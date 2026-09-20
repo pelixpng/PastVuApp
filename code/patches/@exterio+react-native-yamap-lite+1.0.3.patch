@@ -1,0 +1,2546 @@
+diff --git a/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/Components/YamapLiteCircleView.kt b/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/Components/YamapLiteCircleView.kt
+deleted file mode 100644
+index 0c71157..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/Components/YamapLiteCircleView.kt
++++ /dev/null
+@@ -1,145 +0,0 @@
+-package com.yamaplite.components
+-
+-import android.content.Context
+-import android.graphics.Color
+-import android.view.ViewGroup
+-import com.facebook.react.bridge.ReactContext
+-import com.facebook.react.uimanager.UIManagerHelper
+-import com.yamaplite.events.PressEvent
+-import com.yandex.mapkit.geometry.Circle
+-import com.yandex.mapkit.geometry.Point
+-import com.yandex.mapkit.map.CircleMapObject
+-import com.yandex.mapkit.map.MapObject
+-import com.yandex.mapkit.map.MapObjectTapListener
+-import com.yandex.mapkit.mapview.MapView
+-
+-class YamapCircle(context: Context?) : ViewGroup(context), MapObjectTapListener {
+-  var circle: Circle
+-
+-  var rnMapObject: MapObject? = null
+-  private var mapView: MapView? = null
+-  private var handled = true
+-  private var fillColor = Color.BLACK
+-  private var strokeColor = Color.BLACK
+-  private var zInd = 1
+-  private var strokeWidth = 1f
+-  private var center = Point(0.0, 0.0)
+-  private var radius = 0f
+-
+-  init {
+-    circle = Circle(center, radius)
+-  }
+-
+-  override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {}
+-
+-  // PROPS
+-  fun setCenter(point: Point) {
+-    center = point
+-    updateGeometry()
+-    if (rnMapObject == null && mapView != null && radius > 0) {
+-      addToMap(mapView!!)
+-    } else {
+-      updateCircle()
+-    }
+-  }
+-
+-  fun setRadius(_radius: Float) {
+-    radius = _radius
+-    updateGeometry()
+-    if (rnMapObject == null &&
+-                    mapView != null &&
+-                    radius > 0 &&
+-                    (center.latitude != 0.0 || center.longitude != 0.0)
+-    ) {
+-      addToMap(mapView!!)
+-    } else {
+-      updateCircle()
+-    }
+-  }
+-
+-  private fun updateGeometry() {
+-    circle = Circle(center, radius)
+-  }
+-
+-  fun setZInd(_zInd: Int) {
+-    zInd = _zInd
+-    updateCircle()
+-  }
+-
+-  fun setHandled(_handled: Boolean) {
+-    handled = _handled
+-  }
+-
+-  fun setStrokeColor(_color: Int) {
+-    strokeColor = _color
+-    updateCircle()
+-  }
+-
+-  fun setFillColor(_color: Int) {
+-    fillColor = _color
+-    updateCircle()
+-  }
+-
+-  fun setStrokeWidth(width: Float) {
+-    strokeWidth = width
+-    updateCircle()
+-  }
+-
+-  private fun updateCircle() {
+-    if (rnMapObject != null) {
+-      (rnMapObject as CircleMapObject).geometry = circle
+-      (rnMapObject as CircleMapObject).strokeWidth = strokeWidth
+-      (rnMapObject as CircleMapObject).strokeColor = strokeColor
+-      (rnMapObject as CircleMapObject).fillColor = fillColor
+-      (rnMapObject as CircleMapObject).zIndex = zInd.toFloat()
+-    }
+-  }
+-
+-  fun setCircleMapObject(obj: MapObject?) {
+-    rnMapObject = obj as CircleMapObject?
+-    rnMapObject!!.addTapListener(this)
+-    updateCircle()
+-  }
+-
+-  fun addToMap(mapView: MapView) {
+-    this.mapView = mapView
+-    updateGeometry()
+-    if (!isGeometryValid()) {
+-      return
+-    }
+-    val circleObject = mapView.getMapWindow().map.mapObjects.addCircle(circle)
+-    rnMapObject = circleObject
+-    circleObject.addTapListener(this)
+-    updateCircle()
+-  }
+-
+-  private fun isGeometryValid(): Boolean {
+-    return radius > 0f && center.latitude.isFinite() && center.longitude.isFinite()
+-  }
+-
+-  fun removeFromMap(mapView: MapView) {
+-    rnMapObject?.let {
+-      if (it.isValid) {
+-        mapView.getMapWindow().map.mapObjects.remove(it)
+-      }
+-    }
+-    rnMapObject = null
+-  }
+-
+-  override fun onMapObjectTap(mapObject: MapObject, point: Point): Boolean {
+-    val reactContext = context as? ReactContext
+-    if (reactContext == null) {
+-      return false
+-    }
+-
+-    val viewId = getId()
+-    val surfaceId = UIManagerHelper.getSurfaceId(reactContext)
+-    val eventDispatcher = UIManagerHelper.getEventDispatcherForReactTag(reactContext, viewId)
+-
+-    if (eventDispatcher != null) {
+-      val event = PressEvent(surfaceId, viewId, "onCirclePress", point)
+-      eventDispatcher.dispatchEvent(event)
+-    }
+-    return handled
+-  }
+-}
+diff --git a/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/Components/YamapLiteMarkerView.kt b/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/Components/YamapLiteMarkerView.kt
+index c4b1141..3357d15 100644
+--- a/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/Components/YamapLiteMarkerView.kt
++++ b/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/Components/YamapLiteMarkerView.kt
+@@ -33,6 +33,8 @@ class YamapLiteMarkerView(context: Context) : View(context), MapObjectTapListene
+   var anchorX: Double = 0.5
+   var anchorY: Double = 0.5
+   private var _rotated: Boolean = false
++  // PastVu: a fixed heading for direction markers, in degrees; 0 means no explicit rotation.
++  private var _rotation: Float = 0f
+   private var _handled: Boolean = false
+   private var _size: Int = 25
+   private var _childView: View? = null
+@@ -120,6 +122,11 @@ class YamapLiteMarkerView(context: Context) : View(context), MapObjectTapListene
+     applyStyle()
+   }
+ 
++  fun setMarkerRotation(value: Float) {
++    _rotation = value
++    applyStyle()
++  }
++
+   fun setHandled(value: Boolean) {
+     _handled = value
+   }
+@@ -152,11 +159,16 @@ class YamapLiteMarkerView(context: Context) : View(context), MapObjectTapListene
+       (placemark as PlacemarkMapObject).isVisible = false
+       val iconStyle = IconStyle()
+       iconStyle.setScale(markerScale.toFloat())
+-      iconStyle.setRotationType(if (_rotated) RotationType.ROTATE else RotationType.NO_ROTATION)
++      iconStyle.setRotationType(
++              if (_rotation != 0f || _rotated) RotationType.ROTATE else RotationType.NO_ROTATION
++      )
+       iconStyle.setVisible(isVisibleFlag)
+       iconStyle.setAnchor(PointF(anchorX.toFloat(), anchorY.toFloat()))
+       (placemark as PlacemarkMapObject).geometry = Point(latitude, longitude)
+       (placemark as PlacemarkMapObject).zIndex = zInd.toFloat()
++      if (_rotation != 0f) {
++        (placemark as PlacemarkMapObject).direction = _rotation
++      }
+       (placemark as PlacemarkMapObject).setIconStyle(iconStyle)
+ 
+       if (_childView != null && _childView!!.width > 0 && _childView!!.height > 0) {
+diff --git a/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/Components/YamapLitePolygon.kt b/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/Components/YamapLitePolygon.kt
+deleted file mode 100644
+index e290022..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/Components/YamapLitePolygon.kt
++++ /dev/null
+@@ -1,149 +0,0 @@
+-package com.yamaplite.components
+-
+-import android.content.Context
+-import android.graphics.Color
+-import android.view.ViewGroup
+-import com.facebook.react.bridge.ReactContext
+-import com.facebook.react.uimanager.UIManagerHelper
+-import com.yamaplite.events.PressEvent
+-import com.yandex.mapkit.geometry.LinearRing
+-import com.yandex.mapkit.geometry.Point
+-import com.yandex.mapkit.geometry.Polygon
+-import com.yandex.mapkit.map.MapObject
+-import com.yandex.mapkit.map.MapObjectTapListener
+-import com.yandex.mapkit.map.PolygonMapObject
+-import com.yandex.mapkit.mapview.MapView
+-
+-class YamapPolygon(context: Context?) : ViewGroup(context), MapObjectTapListener {
+-    var polygon = Polygon()
+-
+-    var rnMapObject: MapObject? = null
+-
+-    private var mapView: MapView? = null
+-
+-    private var fillColor = Color.BLACK
+-
+-    private var strokeColor = Color.BLACK
+-
+-    private var strokeWidth = 1f
+-
+-    private var zIndex = 1f
+-
+-    private var points: ArrayList<Point> = ArrayList()
+-
+-    private var innerRings: ArrayList<ArrayList<Point>>? = ArrayList()
+-
+-    private var handled = true
+-
+-    init {
+-        polygon = Polygon(LinearRing(points), emptyList())
+-    }
+-
+-    fun setFillColor(_color: Int) {
+-        fillColor = _color
+-        updatePolygon()
+-    }
+-
+-    fun setStrokeColor(_color: Int) {
+-        strokeColor = _color
+-        updatePolygon()
+-    }
+-
+-    fun setStrokeWidth(_width: Float) {
+-        strokeWidth = _width
+-        updatePolygon()
+-    }
+-
+-    fun setZIndex(_zIndex: Float) {
+-        zIndex = _zIndex
+-        updatePolygon()
+-    }
+-
+-    fun setPoints(_points: ArrayList<Point>) {
+-        points = _points
+-        updateGeometry()
+-        if (rnMapObject == null && mapView != null && isGeometryValid()) {
+-            addToMap(mapView!!)
+-        } else {
+-            updatePolygon()
+-        }
+-    }
+-
+-    fun setInnerRings(_innerRings: ArrayList<ArrayList<Point>>) {
+-        innerRings = _innerRings
+-        updateGeometry()
+-        updatePolygon()
+-    }
+-
+-    private fun List<Point>.isValidRing(): Boolean =
+-            size >= 3 && all { it.latitude.isFinite() && it.longitude.isFinite() }
+-
+-    private fun isGeometryValid(): Boolean = points.isValidRing()
+-
+-    fun setHandled(_handled: Boolean) {
+-        handled = _handled
+-    }
+-
+-    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {}
+-
+-    private fun updatePolygon() {
+-        if (rnMapObject != null) {
+-            val polygonMapObject = rnMapObject as PolygonMapObject
+-            polygonMapObject.geometry = polygon
+-            polygonMapObject.zIndex = zIndex
+-            polygonMapObject.fillColor = fillColor
+-            polygonMapObject.strokeColor = strokeColor
+-            polygonMapObject.strokeWidth = strokeWidth
+-        }
+-    }
+-    private fun updateGeometry() {
+-        if (!isGeometryValid()) return
+-        val ring = LinearRing(points)
+-        val unwrappedInnerRings =
+-                (innerRings ?: ArrayList()).filter { it.isValidRing() }.map { LinearRing(it) }
+-        polygon = Polygon(ring, unwrappedInnerRings)
+-    }
+-
+-    override fun onMapObjectTap(mapObject: MapObject, point: Point): Boolean {
+-        val reactContext = context as? ReactContext
+-        if (reactContext == null) {
+-            return false
+-        }
+-        val viewId = getId()
+-        val surfaceId = UIManagerHelper.getSurfaceId(reactContext)
+-        val eventDispatcher = UIManagerHelper.getEventDispatcherForReactTag(reactContext, viewId)
+-        if (eventDispatcher != null) {
+-            val event = PressEvent(surfaceId, viewId, "onPolygonPress", point)
+-            eventDispatcher.dispatchEvent(event)
+-        }
+-        return handled
+-    }
+-
+-    fun setMapObject(obj: MapObject) {
+-        if (obj is PolygonMapObject) {
+-            rnMapObject = obj
+-            rnMapObject!!.addTapListener(this)
+-            updatePolygon()
+-        }
+-    }
+-
+-    fun addToMap(mapView: MapView) {
+-        this.mapView = mapView
+-        if (!isGeometryValid()) {
+-            return
+-        }
+-        val polygonObject = mapView.mapWindow.map.mapObjects.addPolygon(polygon)
+-        rnMapObject = polygonObject
+-        polygonObject.addTapListener(this)
+-        updatePolygon()
+-    }
+-
+-    fun removeFromMap(mapView: MapView) {
+-        rnMapObject?.let {
+-            if (it.isValid) {
+-                mapView.mapWindow.map.mapObjects.remove(it)
+-            }
+-        }
+-        rnMapObject = null
+-    }
+-}
+diff --git a/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/Components/YamapLitePolyline.kt b/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/Components/YamapLitePolyline.kt
+deleted file mode 100644
+index c12b94b..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/Components/YamapLitePolyline.kt
++++ /dev/null
+@@ -1,171 +0,0 @@
+-package com.yamaplite.components
+-
+-import android.content.Context
+-import android.graphics.Color
+-import android.view.ViewGroup
+-import com.facebook.react.bridge.ReactContext
+-import com.facebook.react.uimanager.UIManagerHelper
+-import com.yamaplite.events.PressEvent
+-import com.yandex.mapkit.geometry.Point
+-import com.yandex.mapkit.geometry.Polyline
+-import com.yandex.mapkit.map.MapObject
+-import com.yandex.mapkit.map.MapObjectTapListener
+-import com.yandex.mapkit.map.PolylineMapObject
+-import com.yandex.mapkit.mapview.MapView
+-
+-class YamapPolyline(context: Context?) : ViewGroup(context), MapObjectTapListener {
+-    var polyline: Polyline
+-
+-    var rnMapObject: MapObject? = null
+-
+-    private var mapView: MapView? = null
+-
+-    private var strokeColor = Color.BLACK
+-
+-    private var strokeWidth = 1f
+-
+-    private var outlineColor = Color.BLACK
+-
+-    private var zIndex = 1f
+-
+-    private var dashLength = 1f
+-
+-    private var gapLength = 0f
+-
+-    private var outlineWidth = 0f
+-
+-    private var dashOffset = 0f
+-
+-    private var points: ArrayList<Point> = ArrayList()
+-
+-    private var handled = true
+-
+-    init {
+-        polyline = Polyline(points)
+-    }
+-
+-    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {}
+-
+-    fun setStrokeColor(_color: Int) {
+-        strokeColor = _color
+-        updatePolyline()
+-    }
+-
+-    fun setStrokeWidth(_width: Float) {
+-        strokeWidth = _width
+-        updatePolyline()
+-    }
+-
+-    fun setOutlineColor(_color: Int) {
+-        outlineColor = _color
+-        updatePolyline()
+-    }
+-
+-    fun setZIndex(_zIndex: Float) {
+-        zIndex = _zIndex
+-        updatePolyline()
+-    }
+-
+-    fun setDashLength(_dashLength: Float) {
+-        dashLength = _dashLength
+-        updatePolyline()
+-    }
+-
+-    fun setGapLength(_gapLength: Float) {
+-        gapLength = _gapLength
+-        updatePolyline()
+-    }
+-
+-    fun setOutlineWidth(_outlineWidth: Float) {
+-        outlineWidth = _outlineWidth
+-        updatePolyline()
+-    }
+-
+-    fun setDashOffset(_dashOffset: Float) {
+-        dashOffset = _dashOffset
+-        updatePolyline()
+-    }
+-
+-    fun setPoints(_points: ArrayList<Point>) {
+-        points = _points
+-        updateGeometry()
+-        if (rnMapObject == null && mapView != null && isGeometryValid()) {
+-            addToMap(mapView!!)
+-        } else {
+-            updatePolyline()
+-        }
+-    }
+-
+-    private fun isGeometryValid(): Boolean =
+-            points.size >= 2 && points.all { it.latitude.isFinite() && it.longitude.isFinite() }
+-
+-    fun setHandled(_handled: Boolean) {
+-        handled = _handled
+-    }
+-
+-    private fun updatePolyline() {
+-        if (rnMapObject != null) {
+-            val polylineMapObject = rnMapObject as PolylineMapObject
+-            polylineMapObject.geometry = polyline
+-            polylineMapObject.zIndex = zIndex
+-            polylineMapObject.setStrokeColor(strokeColor)
+-            polylineMapObject.strokeWidth = strokeWidth
+-            polylineMapObject.dashLength = dashLength
+-            polylineMapObject.gapLength = gapLength
+-            polylineMapObject.dashOffset = dashOffset
+-            polylineMapObject.outlineWidth = outlineWidth
+-            if (outlineWidth > 0) {
+-                polylineMapObject.outlineColor = outlineColor
+-            }
+-        }
+-    }
+-
+-    private fun updateGeometry() {
+-        if (isGeometryValid()) {
+-            polyline = Polyline(points)
+-        }
+-    }
+-
+-    fun setMapObject(obj: MapObject) {
+-        if (obj is PolylineMapObject) {
+-            rnMapObject = obj
+-            rnMapObject!!.addTapListener(this)
+-            updatePolyline()
+-        }
+-    }
+-
+-    override fun onMapObjectTap(mapObject: MapObject, point: Point): Boolean {
+-        val reactContext = context as? ReactContext
+-        if (reactContext == null) {
+-            return false
+-        }
+-        val viewId = getId()
+-        val surfaceId = UIManagerHelper.getSurfaceId(reactContext)
+-        val eventDispatcher = UIManagerHelper.getEventDispatcherForReactTag(reactContext, viewId)
+-        if (eventDispatcher != null) {
+-            val event = PressEvent(surfaceId, viewId, "onPolylinePress", point)
+-            eventDispatcher.dispatchEvent(event)
+-        }
+-        return handled
+-    }
+-
+-    fun addToMap(mapView: MapView) {
+-        this.mapView = mapView
+-        if (!isGeometryValid()) {
+-            return
+-        }
+-        val polylineObject = mapView.mapWindow.map.mapObjects.addPolyline(polyline)
+-        rnMapObject = polylineObject
+-        polylineObject.addTapListener(this)
+-        updatePolyline()
+-    }
+-
+-    fun removeFromMap(mapView: MapView) {
+-        rnMapObject?.let {
+-            if (it.isValid) {
+-                mapView.mapWindow.map.mapObjects.remove(it)
+-            }
+-        }
+-        rnMapObject = null
+-    }
+-}
+diff --git a/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/Components/YamapLiteView.kt b/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/Components/YamapLiteView.kt
+index 095543f..7837823 100644
+--- a/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/Components/YamapLiteView.kt
++++ b/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/Components/YamapLiteView.kt
+@@ -6,6 +6,8 @@ import android.graphics.PointF
+ import android.os.Handler
+ import android.os.Looper
+ import android.util.Log
++import com.yamaplite.R
++import android.view.LayoutInflater
+ import android.view.View
+ import android.widget.FrameLayout
+ import com.facebook.react.bridge.Arguments
+@@ -59,7 +61,11 @@ open class YamapLiteView(context: Context) :
+         CameraListener,
+         UserLocationObjectListener,
+         InputListener {
+-  protected val mapView: MapView = MapView(context)
++  // PastVu: inflated from XML so the `movable` attribute applies, which makes MapKit draw into
++  // a TextureView. A SurfaceView punches a hole through the window, so the map showed through
++  // the translucent status bar of screens opened on top of it.
++  protected val mapView: MapView =
++          LayoutInflater.from(context).inflate(R.layout.yamap_texture_map_view, null) as MapView
+   private val reactChildren = mutableListOf<View>()
+   private val coroutineScope = CoroutineScope(Dispatchers.Main)
+ 
+@@ -83,6 +89,8 @@ open class YamapLiteView(context: Context) :
+   private var logoPosition: Map<String, Any>? = null
+   private var logoPadding: Map<String, Any>? = null
+   private var userLocationView: UserLocationView? = null
++  // PastVu: the map snaps back to this zoom when the user pinches out past it.
++  private var _minZoomPreference: Float = 0f
+ 
+   init {
+     setupMap()
+@@ -174,6 +182,10 @@ open class YamapLiteView(context: Context) :
+     mapView.mapWindow.setMaxFps(maxFps)
+   }
+ 
++  fun setMinZoomPreference(minZoom: Float) {
++    _minZoomPreference = minZoom
++  }
++
+   fun setMapType(type: String?) {
+     mapType = type ?: "map"
+     mapView.mapWindow.map.mapType =
+@@ -360,12 +372,6 @@ open class YamapLiteView(context: Context) :
+     addReactChildToList(child, index)
+     if (child is YamapLiteMarkerView) {
+       child.addToMap(mapView)
+-    } else if (child is YamapCircle) {
+-      child.addToMap(mapView)
+-    } else if (child is YamapPolyline) {
+-      child.addToMap(mapView)
+-    } else if (child is YamapPolygon) {
+-      child.addToMap(mapView)
+     }
+   }
+ 
+@@ -373,12 +379,6 @@ open class YamapLiteView(context: Context) :
+     val child = removeReactChildFromListAt(index) ?: return
+     if (child is YamapLiteMarkerView) {
+       child.removeFromMap(mapView)
+-    } else if (child is YamapCircle) {
+-      child.removeFromMap(mapView)
+-    } else if (child is YamapPolyline) {
+-      child.removeFromMap(mapView)
+-    } else if (child is YamapPolygon) {
+-      child.removeFromMap(mapView)
+     }
+   }
+ 
+@@ -443,6 +443,18 @@ open class YamapLiteView(context: Context) :
+           reason: CameraUpdateReason,
+           finished: Boolean
+   ) {
++    if (finished && _minZoomPreference > 0f && cameraPosition.zoom < _minZoomPreference) {
++      val snapped =
++              CameraPosition(
++                      cameraPosition.target,
++                      _minZoomPreference,
++                      cameraPosition.azimuth,
++                      cameraPosition.tilt
++              )
++      map.move(snapped, Animation(Animation.Type.SMOOTH, 0.2f), null)
++      return
++    }
++
+     val reactContext = context as? ReactContext
+     if (reactContext == null) {
+       return
+diff --git a/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/YamapLiteCircleViewManager.kt b/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/YamapLiteCircleViewManager.kt
+deleted file mode 100644
+index 22a0933..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/YamapLiteCircleViewManager.kt
++++ /dev/null
+@@ -1,67 +0,0 @@
+-package com.yamaplite
+-
+-import android.graphics.Color
+-import com.facebook.react.bridge.ReadableMap
+-import com.facebook.react.module.annotations.ReactModule
+-import com.facebook.react.uimanager.SimpleViewManager
+-import com.facebook.react.uimanager.ThemedReactContext
+-import com.facebook.react.uimanager.annotations.ReactProp
+-import com.facebook.react.viewmanagers.YamapLiteCircleViewManagerInterface
+-import com.yamaplite.components.YamapCircle
+-import com.yandex.mapkit.geometry.Point
+-
+-@ReactModule(name = YamapLiteCircleViewManager.NAME)
+-class YamapLiteCircleViewManager :
+-        SimpleViewManager<YamapCircle>(), YamapLiteCircleViewManagerInterface<YamapCircle> {
+-
+-    override fun getName(): String {
+-        return NAME
+-    }
+-
+-    override fun createViewInstance(context: ThemedReactContext): YamapCircle {
+-        return YamapCircle(context)
+-    }
+-
+-    @ReactProp(name = "fillColor")
+-    override fun setFillColor(view: YamapCircle, color: Int?) {
+-        view.setFillColor(color ?: Color.BLACK)
+-    }
+-
+-    @ReactProp(name = "strokeColor")
+-    override fun setStrokeColor(view: YamapCircle, color: Int?) {
+-        view.setStrokeColor(color ?: Color.BLACK)
+-    }
+-
+-    @ReactProp(name = "strokeWidth", defaultFloat = 1f)
+-    override fun setStrokeWidth(view: YamapCircle, width: Float) {
+-        view.setStrokeWidth(width)
+-    }
+-
+-    @ReactProp(name = "zInd", defaultInt = 0)
+-    override fun setZInd(view: YamapCircle, zInd: Int) {
+-        view.setZInd(zInd)
+-    }
+-
+-    @ReactProp(name = "center")
+-    override fun setCenter(view: YamapCircle, center: ReadableMap?) {
+-        if (center != null) {
+-            val lat = if (center.hasKey("lat")) center.getDouble("lat") else 0.0
+-            val lon = if (center.hasKey("lon")) center.getDouble("lon") else 0.0
+-            view.setCenter(Point(lat, lon))
+-        }
+-    }
+-
+-    @ReactProp(name = "radius", defaultFloat = 0f)
+-    override fun setRadius(view: YamapCircle, radius: Float) {
+-        view.setRadius(radius)
+-    }
+-
+-    @ReactProp(name = "handled", defaultBoolean = false)
+-    override fun setHandled(view: YamapCircle, handled: Boolean) {
+-        view.setHandled(handled)
+-    }
+-
+-    companion object {
+-        const val NAME = "YamapLiteCircleView"
+-    }
+-}
+diff --git a/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/YamapLiteMarkerViewManager.kt b/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/YamapLiteMarkerViewManager.kt
+index 7f0fa56..9c022c6 100644
+--- a/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/YamapLiteMarkerViewManager.kt
++++ b/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/YamapLiteMarkerViewManager.kt
+@@ -70,6 +70,11 @@ class YamapLiteMarkerViewManager : SimpleViewManager<YamapLiteMarkerView>(), Yam
+     view.setRotated(value)
+   }
+ 
++  @ReactProp(name = "rotation")
++  override fun setRotation(view: YamapLiteMarkerView, value: Double) {
++    view.setMarkerRotation(value.toFloat())
++  }
++  
+   @ReactProp(name = "handled")
+   override fun setHandled(view: YamapLiteMarkerView, value: Boolean) {
+     view.setHandled(value)
+diff --git a/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/YamapLitePackage.kt b/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/YamapLitePackage.kt
+index 4ebefd2..ce50676 100644
+--- a/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/YamapLitePackage.kt
++++ b/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/YamapLitePackage.kt
+@@ -33,9 +33,6 @@ class YamapLiteViewPackage : BaseReactPackage() {
+           listOf<ViewManager<*, *>>(
+                   YamapLiteViewManager(),
+                   YamapLiteMarkerViewManager(),
+-                  YamapLiteCircleViewManager(),
+-                  YamapLitePolylineViewManager(),
+-                  YamapLitePolygonViewManager(),
+                   ClusteredYamapLiteViewManager()
+           )
+ }
+diff --git a/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/YamapLitePolygonViewManager.kt b/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/YamapLitePolygonViewManager.kt
+deleted file mode 100644
+index a3fafb7..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/YamapLitePolygonViewManager.kt
++++ /dev/null
+@@ -1,61 +0,0 @@
+-package com.yamaplite
+-
+-import android.graphics.Color
+-import com.facebook.react.bridge.ReadableArray
+-import com.facebook.react.uimanager.SimpleViewManager
+-import com.facebook.react.uimanager.ThemedReactContext
+-import com.facebook.react.uimanager.annotations.ReactProp
+-import com.facebook.react.viewmanagers.YamapLitePolygonViewManagerInterface
+-import com.yamaplite.components.YamapPolygon
+-import com.yamaplite.utils.PointParser
+-
+-class YamapLitePolygonViewManager :
+-        SimpleViewManager<YamapPolygon>(), YamapLitePolygonViewManagerInterface<YamapPolygon> {
+-
+-    override fun getName(): String {
+-        return NAME
+-    }
+-
+-    override fun createViewInstance(context: ThemedReactContext): YamapPolygon {
+-        return YamapPolygon(context)
+-    }
+-
+-    @ReactProp(name = "fillColor")
+-    override fun setFillColor(view: YamapPolygon, color: Int?) {
+-        view.setFillColor(color ?: Color.BLACK)
+-    }
+-
+-    @ReactProp(name = "strokeColor")
+-    override fun setStrokeColor(view: YamapPolygon, color: Int?) {
+-        view.setStrokeColor(color ?: Color.BLACK)
+-    }
+-
+-    @ReactProp(name = "strokeWidth")
+-    override fun setStrokeWidth(view: YamapPolygon, width: Float) {
+-        view.setStrokeWidth(width)
+-    }
+-
+-    @ReactProp(name = "zInd")
+-    override fun setZInd(view: YamapPolygon, zIndex: Int) {
+-        view.setZIndex(zIndex.toFloat())
+-    }
+-
+-    @ReactProp(name = "points")
+-    override fun setPoints(view: YamapPolygon, points: ReadableArray?) {
+-        view.setPoints(PointParser.parsePoints(points))
+-    }
+-
+-    @ReactProp(name = "innerRings")
+-    override fun setInnerRings(view: YamapPolygon, innerRings: ReadableArray?) {
+-        view.setInnerRings(PointParser.parseRings(innerRings))
+-    }
+-
+-    @ReactProp(name = "handled")
+-    override fun setHandled(view: YamapPolygon, handled: Boolean) {
+-        view.setHandled(handled)
+-    }
+-
+-    companion object {
+-        const val NAME = "YamapLitePolygonView"
+-    }
+-}
+diff --git a/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/YamapLitePolylineViewManager.kt b/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/YamapLitePolylineViewManager.kt
+deleted file mode 100644
+index 90dc27f..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/YamapLitePolylineViewManager.kt
++++ /dev/null
+@@ -1,75 +0,0 @@
+-package com.yamaplite
+-
+-import android.graphics.Color
+-import com.facebook.react.bridge.ReadableArray
+-import com.facebook.react.uimanager.SimpleViewManager
+-import com.facebook.react.uimanager.ThemedReactContext
+-import com.facebook.react.uimanager.annotations.ReactProp
+-import com.facebook.react.viewmanagers.YamapLitePolylineViewManagerInterface
+-import com.yamaplite.components.YamapPolyline
+-import com.yamaplite.utils.PointParser
+-
+-class YamapLitePolylineViewManager :
+-        SimpleViewManager<YamapPolyline>(), YamapLitePolylineViewManagerInterface<YamapPolyline> {
+-    override fun getName(): String {
+-        return NAME
+-    }
+-
+-    override fun createViewInstance(context: ThemedReactContext): YamapPolyline {
+-        return YamapPolyline(context)
+-    }
+-
+-    @ReactProp(name = "strokeColor")
+-    override fun setStrokeColor(view: YamapPolyline, color: Int?) {
+-        view.setStrokeColor(color ?: Color.BLACK)
+-    }
+-
+-    @ReactProp(name = "strokeWidth")
+-    override fun setStrokeWidth(view: YamapPolyline, width: Float) {
+-        view.setStrokeWidth(width)
+-    }
+-
+-    @ReactProp(name = "outlineColor")
+-    override fun setOutlineColor(view: YamapPolyline, color: Int?) {
+-        view.setOutlineColor(color ?: Color.BLACK)
+-    }
+-
+-    @ReactProp(name = "zInd")
+-    override fun setZInd(view: YamapPolyline, zIndex: Int) {
+-        view.setZIndex(zIndex.toFloat())
+-    }
+-
+-    @ReactProp(name = "dashLength")
+-    override fun setDashLength(view: YamapPolyline, length: Float) {
+-        view.setDashLength(length)
+-    }
+-
+-    @ReactProp(name = "gapLength")
+-    override fun setGapLength(view: YamapPolyline, length: Float) {
+-        view.setGapLength(length)
+-    }
+-
+-    @ReactProp(name = "outlineWidth")
+-    override fun setOutlineWidth(view: YamapPolyline, width: Float) {
+-        view.setOutlineWidth(width)
+-    }
+-
+-    @ReactProp(name = "dashOffset")
+-    override fun setDashOffset(view: YamapPolyline, offset: Float) {
+-        view.setDashOffset(offset)
+-    }
+-
+-    @ReactProp(name = "points")
+-    override fun setPoints(view: YamapPolyline, points: ReadableArray?) {
+-        view.setPoints(PointParser.parsePoints(points))
+-    }
+-
+-    @ReactProp(name = "handled")
+-    override fun setHandled(view: YamapPolyline, handled: Boolean) {
+-        view.setHandled(handled)
+-    }
+-
+-    companion object {
+-        const val NAME = "YamapLitePolylineView"
+-    }
+-}
+diff --git a/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/YamapLiteViewManager.kt b/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/YamapLiteViewManager.kt
+index f9782f2..da47938 100644
+--- a/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/YamapLiteViewManager.kt
++++ b/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/YamapLiteViewManager.kt
+@@ -123,6 +123,11 @@ class YamapLiteViewManager :
+     view.setMaxFps(_value)
+   }
+ 
++  @ReactProp(name = "minZoomPreference")
++  override fun setMinZoomPreference(view: YamapLiteView, value: Float) {
++    view.setMinZoomPreference(value)
++  }
++
+   @ReactProp(name = "mapType")
+   override fun setMapType(view: YamapLiteView, _value: String?) {
+     view.setMapType(_value)
+diff --git a/node_modules/@exterio/react-native-yamap-lite/android/src/main/res/layout/yamap_texture_map_view.xml b/node_modules/@exterio/react-native-yamap-lite/android/src/main/res/layout/yamap_texture_map_view.xml
+new file mode 100644
+index 0000000..0cce7e3
+--- /dev/null
++++ b/node_modules/@exterio/react-native-yamap-lite/android/src/main/res/layout/yamap_texture_map_view.xml
+@@ -0,0 +1,10 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!-- `movable` makes MapKit render into a TextureView instead of a SurfaceView. A SurfaceView
++     punches a hole through the window, so the map kept showing through the translucent status
++     bar of screens opened on top of it (edge-to-edge, transparentModal). A TextureView is part
++     of the normal view hierarchy and is covered like any other view. -->
++<com.yandex.mapkit.mapview.MapView xmlns:android="http://schemas.android.com/apk/res/android"
++    xmlns:app="http://schemas.android.com/apk/res-auto"
++    android:layout_width="match_parent"
++    android:layout_height="match_parent"
++    app:movable="true" />
+diff --git a/node_modules/@exterio/react-native-yamap-lite/ios/ClusteredYamapLiteView.mm b/node_modules/@exterio/react-native-yamap-lite/ios/ClusteredYamapLiteView.mm
+index 328a725..41d309b 100644
+--- a/node_modules/@exterio/react-native-yamap-lite/ios/ClusteredYamapLiteView.mm
++++ b/node_modules/@exterio/react-native-yamap-lite/ios/ClusteredYamapLiteView.mm
+@@ -1,10 +1,7 @@
+ #import "ClusteredYamapLiteView.h"
+ #include <os/log.h>
+ #include "ReactCodegen/react/renderer/components/YamapLiteViewSpec/EventEmitters.h"
+-#include "YamapLiteCircleView.h"
+ #include "YamapLiteMarkerView.h"
+-#include "YamapLitePolygonView.h"
+-#include "YamapLitePolylineView.h"
+ #include <Foundation/Foundation.h>
+ #include <objc/NSObject.h>
+ 
+@@ -281,23 +278,11 @@ - (void)mountChildComponentView:
+   if ([childComponentView isKindOfClass:YamapLiteMarkerView.class]) {
+     [_view insertReactSubview:childComponentView atIndex:index];
+   }
+-  if ([childComponentView isKindOfClass:YamapLiteCircleView.class]) {
+-    [_view insertReactSubview:childComponentView atIndex:index];
+-  }
+-  if ([childComponentView isKindOfClass:YamapLitePolygonView.class]) {
+-    [_view insertReactSubview:childComponentView atIndex:index];
+-  }
+-  if ([childComponentView isKindOfClass:YamapLitePolylineView.class]) {
+-    [_view insertReactSubview:childComponentView atIndex:index];
+-  }
+ }
+ - (void)unmountChildComponentView:
+             (nonnull UIView<RCTComponentViewProtocol> *)childComponentView
+                             index:(NSInteger)index {
+-  if ([childComponentView isKindOfClass:YamapLiteMarkerView.class] ||
+-      [childComponentView isKindOfClass:YamapLiteCircleView.class] ||
+-      [childComponentView isKindOfClass:YamapLitePolygonView.class] ||
+-      [childComponentView isKindOfClass:YamapLitePolylineView.class]) {
++  if ([childComponentView isKindOfClass:YamapLiteMarkerView.class]) {
+     [_view removeReactSubview:childComponentView];
+     [childComponentView removeFromSuperview];
+   }
+diff --git a/node_modules/@exterio/react-native-yamap-lite/ios/Components/Circle.swift b/node_modules/@exterio/react-native-yamap-lite/ios/Components/Circle.swift
+deleted file mode 100644
+index 210f5c0..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/ios/Components/Circle.swift
++++ /dev/null
+@@ -1,108 +0,0 @@
+-import Foundation
+-import React
+-import YandexMapsMobile
+-
+-@objc(YamapLiteCircleComponentDelegate)
+-public protocol YamapLiteCircleComponentDelegate {
+-  func onCirclePress(point: [String: Double])
+-}
+-
+-@objc(YamapLiteCircle)
+-public class YamapLiteCircle: UIView, MapObjectTapHandler {
+-  @objc public weak var delegate: YamapLiteCircleComponentDelegate? = nil
+-  public var mapObject: YMKMapObject?
+-  @objc public var radius: Float = 100 {
+-    didSet {
+-      updateGeometry()
+-      updateCircle()
+-    }
+-  }
+-
+-  @objc public var fillColor: UIColor = .black {
+-    didSet {
+-      updateCircle()
+-    }
+-  }
+-
+-  @objc public var strokeColor: UIColor = .black {
+-    didSet {
+-      updateCircle()
+-    }
+-  }
+-
+-  @objc public var strokeWidth: Float = 1 {
+-    didSet {
+-      updateCircle()
+-    }
+-  }
+-
+-  @objc public var zIndex: Float = 1 {
+-    didSet {
+-      updateCircle()
+-    }
+-  }
+-
+-  @objc public var circleCenter = YMKPoint(latitude: 55.951244, longitude: 38.718423) {
+-    didSet {
+-      updateGeometry()
+-      updateCircle()
+-    }
+-  }
+-
+-  @objc public var handled = true
+-  @objc public var circle: YMKCircle
+-  @objc var listener: MarkerTapListener?
+-  override init(frame: CGRect) {
+-    circleCenter = YMKPoint(latitude: 0, longitude: 0)
+-    radius = 0.0
+-    fillColor = UIColor.black
+-    strokeColor = UIColor.black
+-    zIndex = 1
+-    strokeWidth = 1
+-    handled = true
+-    circle = YMKCircle(center: circleCenter, radius: radius)
+-    super.init(frame: frame)
+-  }
+-
+-  @available(*, unavailable)
+-  required init?(coder _: NSCoder) {
+-    fatalError("init(coder:) is not implemented.")
+-  }
+-
+-  @objc public func updateGeometry() {
+-    guard circleCenter.latitude.isFinite, circleCenter.longitude.isFinite, radius.isFinite
+-    else { return }
+-    circle = YMKCircle(center: circleCenter, radius: radius)
+-  }
+-
+-  public func onMapObjectTap(point _: YMKPoint) {
+-    delegate?.onCirclePress(point: [
+-      "lat": circleCenter.latitude,
+-      "lon": circleCenter.longitude,
+-    ])
+-  }
+-
+-  @objc public func setMapObject(object: YMKMapObject) {
+-    if let polygonObject = object as? YMKCircleMapObject {
+-      mapObject = polygonObject
+-      mapObject?.userData = self
+-      listener = MarkerTapListener()
+-      mapObject?.addTapListener(with: listener!)
+-      updateCircle()
+-    }
+-  }
+-
+-  @objc public func setCircleCenter(latitude: Double, longitude: Double) {
+-    circleCenter = YMKPoint(latitude: latitude, longitude: longitude)
+-  }
+-
+-  @objc public func updateCircle() {
+-    if let circleObject = mapObject as? YMKCircleMapObject, circleObject.isValid {
+-      circleObject.geometry = circle
+-      circleObject.zIndex = zIndex
+-      circleObject.fillColor = fillColor
+-      circleObject.strokeColor = strokeColor
+-      circleObject.strokeWidth = strokeWidth
+-    }
+-  }
+-}
+diff --git a/node_modules/@exterio/react-native-yamap-lite/ios/Components/Marker.swift b/node_modules/@exterio/react-native-yamap-lite/ios/Components/Marker.swift
+index f4713df..98428b8 100644
+--- a/node_modules/@exterio/react-native-yamap-lite/ios/Components/Marker.swift
++++ b/node_modules/@exterio/react-native-yamap-lite/ios/Components/Marker.swift
+@@ -67,6 +67,13 @@ public class YamapLiteMarker: UIView, MapObjectTapHandler {
+         }
+     }
+ 
++    // PastVu: a fixed heading in degrees for direction markers; 0 leaves `rotated` in charge.
++    @objc public var rotation: Float = 0.0 {
++        didSet {
++            updateMarker()
++        }
++    }
++
+     @objc public var size: Int = 25 {
+         didSet {
+             updateMarker()
+@@ -156,10 +163,15 @@ public class YamapLiteMarker: UIView, MapObjectTapHandler {
+             let anchorY = anchor?.y ?? 0.5
+             iconStyle.anchor = NSValue(cgPoint: CGPoint(x: CGFloat(anchorX), y: CGFloat(anchorY)))
+ 
+-            iconStyle.rotationType = NSNumber(
+-                value: rotated != 0
+-                    ? YMKRotationType.rotate.rawValue
+-                    : YMKRotationType.noRotation.rawValue)
++            if rotation != 0.0 {
++                iconStyle.rotationType = NSNumber(value: YMKRotationType.rotate.rawValue)
++                obj.direction = rotation
++            } else {
++                iconStyle.rotationType = NSNumber(
++                    value: rotated != 0
++                        ? YMKRotationType.rotate.rawValue
++                        : YMKRotationType.noRotation.rawValue)
++            }
+ 
+             if let icon = originalIcon {
+                 let resizedIcon = ResolveImageHelper.shared.resizeImage(
+diff --git a/node_modules/@exterio/react-native-yamap-lite/ios/Components/Polygon.swift b/node_modules/@exterio/react-native-yamap-lite/ios/Components/Polygon.swift
+deleted file mode 100644
+index acd8dd4..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/ios/Components/Polygon.swift
++++ /dev/null
+@@ -1,108 +0,0 @@
+-import Foundation
+-import React
+-import YandexMapsMobile
+-
+-@objc(YamapLitePolygonComponentDelegate)
+-public protocol YamapLitePolygonComponentDelegate {
+-  func onPolygonPress(point: [String: Double])
+-}
+-
+-@objc(YamapLitePolygon)
+-public class YamapLitePolygon: UIView, MapObjectTapHandler {
+-  @objc public weak var delegate: YamapLitePolygonComponentDelegate? = nil
+-  public var mapObject: YMKMapObject?
+-  @objc var listener: MarkerTapListener?
+-
+-  override init(frame: CGRect) {
+-    super.init(frame: frame)
+-  }
+-
+-  @available(*, unavailable)
+-  required init?(coder _: NSCoder) {
+-    fatalError("init(coder:) is not implemented.")
+-  }
+-
+-  @objc public var fillColor: UIColor = .black {
+-    didSet {
+-      updatePolygon()
+-    }
+-
+-  }
+-
+-  @objc public var strokeColor: UIColor = .black {
+-    didSet {
+-      updatePolygon()
+-    }
+-  }
+-
+-  @objc public var strokeWidth: Float = 1 {
+-    didSet {
+-      updatePolygon()
+-    }
+-  }
+-
+-  @objc public var zIndex: Float = 1 {
+-    didSet {
+-      updatePolygon()
+-    }
+-  }
+-
+-  @objc public var points: [YMKPoint]? = [] {
+-    didSet {
+-      updateGeometry()
+-      updatePolygon()
+-    }
+-  }
+-
+-  @objc public var innerRings: [[YMKPoint]]? = [] {
+-    didSet {
+-      updateGeometry()
+-      updatePolygon()
+-    }
+-  }
+-
+-  @objc public var handled: Bool = true
+-
+-  @objc public var polygon: YMKPolygon = YMKPolygon(
+-    outerRing: YMKLinearRing(points: []),
+-    innerRings: []
+-  )
+-
+-  @objc public func updatePolygon() {
+-    if let polygonObject = mapObject as? YMKPolygonMapObject, polygonObject.isValid {
+-      polygonObject.geometry = polygon
+-      polygonObject.zIndex = zIndex
+-      polygonObject.fillColor = fillColor
+-      polygonObject.strokeColor = strokeColor
+-      polygonObject.strokeWidth = strokeWidth
+-    }
+-  }
+-
+-  @objc public func updateGeometry() {
+-    let isFinitePoint: (YMKPoint) -> Bool = { $0.latitude.isFinite && $0.longitude.isFinite }
+-    if let points = points, points.count >= 3, points.allSatisfy(isFinitePoint) {
+-      let ring = YMKLinearRing(points: points)
+-      let unwrappedInnerRings = (innerRings ?? [])
+-        .filter { $0.count >= 3 && $0.allSatisfy(isFinitePoint) }
+-        .map { YMKLinearRing(points: $0) }
+-      polygon = YMKPolygon(outerRing: ring, innerRings: unwrappedInnerRings)
+-    }
+-  }
+-
+-  public func onMapObjectTap(point: YMKPoint) {
+-    delegate?.onPolygonPress(point: [
+-      "lat": point.latitude,
+-      "lon": point.longitude,
+-    ])
+-  }
+-
+-  @objc public func setMapObject(object: YMKMapObject) {
+-    if let polygonObject = object as? YMKPolygonMapObject {
+-      mapObject = polygonObject
+-      mapObject?.userData = self
+-      listener = MarkerTapListener()
+-      mapObject?.addTapListener(with: listener!)
+-      updatePolygon()
+-    }
+-  }
+-}
+diff --git a/node_modules/@exterio/react-native-yamap-lite/ios/Components/Polyline.swift b/node_modules/@exterio/react-native-yamap-lite/ios/Components/Polyline.swift
+deleted file mode 100644
+index 5268dac..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/ios/Components/Polyline.swift
++++ /dev/null
+@@ -1,125 +0,0 @@
+-import Foundation
+-import React
+-import YandexMapsMobile
+-
+-@objc(YamapLitePolylineComponentDelegate)
+-public protocol YamapLitePolylineComponentDelegate {
+-    func onPolylinePress(point: [String: Double])
+-}
+-
+-@objc(YamapLitePolyline)
+-public final class YamapLitePolyline: UIView, MapObjectTapHandler {
+-    @objc public weak var delegate: YamapLitePolylineComponentDelegate? = nil
+-    public var mapObject: YMKMapObject?
+-    @objc var listener: MarkerTapListener?
+-
+-    @objc public var strokeColor: UIColor = .black {
+-        didSet {
+-            updatePolyline()
+-        }
+-    }
+-
+-    @objc public var strokeWidth: Float = 1 {
+-        didSet {
+-            updatePolyline()
+-        }
+-    }
+-
+-    @objc public var outlineColor: UIColor = .black {
+-        didSet {
+-            updatePolyline()
+-        }
+-    }
+-
+-    @objc public var zIndex: Float = 1 {
+-        didSet {
+-            updatePolyline()
+-        }
+-    }
+-
+-    @objc public var dashLength: Float = 1 {
+-        didSet {
+-            updatePolyline()
+-        }
+-    }
+-
+-    @objc public var gapLength: Float = 0 {
+-        didSet {
+-            updatePolyline()
+-        }
+-    }
+-
+-    @objc public var outlineWidth: Float = 0 {
+-        didSet {
+-            updatePolyline()
+-        }
+-    }
+-
+-    @objc public var dashOffset: Float = 0 {
+-        didSet {
+-            updatePolyline()
+-        }
+-    }
+-
+-    @objc public var points: [YMKPoint] = [] {
+-        didSet {
+-            updateGeometry()
+-            updatePolyline()
+-        }
+-    }
+-
+-    @objc public var handled = true
+-
+-    @objc public var polyline: YMKPolyline
+-
+-    override init(frame: CGRect) {
+-        polyline = YMKPolyline(points: points)
+-        super.init(frame: frame)
+-    }
+-
+-    @available(*, unavailable)
+-    required init?(coder _: NSCoder) {
+-        fatalError("init(coder:) is not implemented.")
+-    }
+-
+-    @objc public func updatePolyline() {
+-        if let polylineObject = mapObject as? YMKPolylineMapObject, polylineObject.isValid {
+-            polylineObject.geometry = polyline
+-            polylineObject.zIndex = zIndex
+-            polylineObject.setStrokeColorWith(strokeColor)
+-            polylineObject.strokeWidth = strokeWidth
+-            polylineObject.dashLength = dashLength
+-            polylineObject.gapLength = gapLength
+-            polylineObject.dashOffset = dashOffset
+-            polylineObject.outlineWidth = outlineWidth
+-            if outlineWidth > 0 {
+-                polylineObject.outlineColor = outlineColor
+-            }
+-        }
+-    }
+-
+-    @objc public func updateGeometry() {
+-        if points.count >= 2,
+-            points.allSatisfy({ $0.latitude.isFinite && $0.longitude.isFinite })
+-        {
+-            polyline = YMKPolyline(points: points)
+-        }
+-    }
+-
+-    @objc public func setMapObject(object: YMKMapObject) {
+-        if let polylineObject = object as? YMKPolylineMapObject {
+-            mapObject = polylineObject
+-            mapObject?.userData = self
+-            listener = MarkerTapListener()
+-            mapObject?.addTapListener(with: listener!)
+-            updatePolyline()
+-        }
+-    }
+-
+-    public func onMapObjectTap(point: YMKPoint) {
+-        delegate?.onPolylinePress(point: [
+-            "lat": point.latitude,
+-            "lon": point.longitude,
+-        ])
+-    }
+-}
+diff --git a/node_modules/@exterio/react-native-yamap-lite/ios/Components/Yamap.swift b/node_modules/@exterio/react-native-yamap-lite/ios/Components/Yamap.swift
+index cbfaa69..d81ef14 100644
+--- a/node_modules/@exterio/react-native-yamap-lite/ios/Components/Yamap.swift
++++ b/node_modules/@exterio/react-native-yamap-lite/ios/Components/Yamap.swift
+@@ -109,6 +109,9 @@ public class YamapView: UIView {
+     map.isTiltGesturesEnabled = tiltGesturesEnabled
+     map.isRotateGesturesEnabled = rotateGesturesEnabled
+     map.isFastTapEnabled = fastTapEnabled
++    if minZoomPreference > 0 {
++      map.cameraBounds.setMinZoomPreferenceWithZoom(minZoomPreference)
++    }
+ 
+     self.updateUserIcon()
+   }
+@@ -131,6 +134,14 @@ public class YamapView: UIView {
+       userLocationLayer.resetAnchor()
+     }
+   }
++  // PastVu: keeps the camera from zooming out past this level.
++  @objc public var minZoomPreference: Float = 0 {
++    didSet {
++      guard let map = mapView?.mapWindow?.map else { return }
++      map.cameraBounds.setMinZoomPreferenceWithZoom(minZoomPreference)
++    }
++  }
++
+   @objc public var maxFps: Float = 60 {
+     didSet {
+       if maxFps <= 0 || maxFps > 60 {
+diff --git a/node_modules/@exterio/react-native-yamap-lite/ios/YamapLiteCircleView.h b/node_modules/@exterio/react-native-yamap-lite/ios/YamapLiteCircleView.h
+deleted file mode 100644
+index 7ba40e6..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/ios/YamapLiteCircleView.h
++++ /dev/null
+@@ -1,15 +0,0 @@
+-#import <React/RCTViewComponentView.h>
+-#import <React/RCTViewManager.h>
+-#import <UIKit/UIKit.h>
+-
+-#ifndef YamapLiteCircleViewNativeComponent_h
+-#define YamapLiteCircleViewNativeComponent_h
+-
+-NS_ASSUME_NONNULL_BEGIN
+-
+-@interface YamapLiteCircleView : RCTViewComponentView
+-@end
+-
+-NS_ASSUME_NONNULL_END
+-
+-#endif /* YamapLiteViewNativeComponent_h */
+diff --git a/node_modules/@exterio/react-native-yamap-lite/ios/YamapLiteCircleView.mm b/node_modules/@exterio/react-native-yamap-lite/ios/YamapLiteCircleView.mm
+deleted file mode 100644
+index 68990c8..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/ios/YamapLiteCircleView.mm
++++ /dev/null
+@@ -1,106 +0,0 @@
+-#import "YamapLiteCircleView.h"
+-#include "ReactCodegen/react/renderer/components/YamapLiteViewSpec/EventEmitters.h"
+-#include "react/renderer/components/YamapLiteViewSpec/EventEmitters.h"
+-#include <Foundation/Foundation.h>
+-#include <objc/NSObject.h>
+-
+-#import <RCTTypeSafety/RCTConvertHelpers.h>
+-#import <React/RCTConversions.h>
+-#import <react/renderer/components/YamapLiteViewSpec/ComponentDescriptors.h>
+-#import <react/renderer/components/YamapLiteViewSpec/EventEmitters.h>
+-#import <react/renderer/components/YamapLiteViewSpec/Props.h>
+-#import <react/renderer/components/YamapLiteViewSpec/RCTComponentViewHelpers.h>
+-#import <react/renderer/graphics/Color.h>
+-
+-#import "RCTFabricComponentsPlugins.h"
+-#if __has_include("YamapLite/YamapLite-Swift.h")
+-#import "YamapLite/YamapLite-Swift.h"
+-#else
+-#import "YamapLite-Swift.h"
+-#endif
+-
+-using namespace facebook::react;
+-
+-@interface YamapLiteCircleView () <RCTYamapLiteCircleViewViewProtocol,
+-                                   YamapLiteCircleComponentDelegate>
+-
+-@end
+-
+-@implementation YamapLiteCircleView {
+-  YamapLiteCircle *_view;
+-}
+-
+-+ (ComponentDescriptorProvider)componentDescriptorProvider {
+-  return concreteComponentDescriptorProvider<
+-      YamapLiteCircleViewComponentDescriptor>();
+-}
+-
+-- (instancetype)initWithFrame:(CGRect)frame {
+-  if (self = [super initWithFrame:frame]) {
+-    static const auto defaultProps =
+-        std::make_shared<const YamapLiteCircleViewProps>();
+-    _props = defaultProps;
+-    _view = [[YamapLiteCircle alloc] init];
+-    _view.delegate = self;
+-    self.contentView = _view;
+-  }
+-  return self;
+-}
+-
+-- (void)updateProps:(Props::Shared const &)props
+-           oldProps:(Props::Shared const &)oldProps {
+-  const auto &oldViewProps =
+-      *std::static_pointer_cast<YamapLiteCircleViewProps const>(_props);
+-  const auto &newViewProps =
+-      *std::static_pointer_cast<YamapLiteCircleViewProps const>(props);
+-
+-  if (oldViewProps.radius != newViewProps.radius) {
+-    _view.radius = newViewProps.radius;
+-  }
+-  if (oldViewProps.fillColor != newViewProps.fillColor) {
+-    UIColor *uiColor = RCTUIColorFromSharedColor(newViewProps.fillColor);
+-    if (uiColor) {
+-      _view.fillColor = uiColor;
+-    }
+-  }
+-  if (oldViewProps.strokeColor != newViewProps.strokeColor) {
+-    UIColor *uiColor = RCTUIColorFromSharedColor(newViewProps.strokeColor);
+-    if (uiColor) {
+-      _view.strokeColor = uiColor;
+-    }
+-  }
+-  if (oldViewProps.strokeWidth != newViewProps.strokeWidth) {
+-    _view.strokeWidth = newViewProps.strokeWidth;
+-  }
+-  if (oldViewProps.zIndex != newViewProps.zIndex) {
+-    _view.zIndex = newViewProps.zInd;
+-  }
+-  if (oldViewProps.center.lat != newViewProps.center.lat ||
+-      oldViewProps.center.lon != newViewProps.center.lon) {
+-    [_view setCircleCenterWithLatitude:newViewProps.center.lat
+-                             longitude:newViewProps.center.lon];
+-  }
+-  if (oldViewProps.handled != newViewProps.handled) {
+-    _view.handled = newViewProps.handled;
+-  }
+-
+-  [super updateProps:props oldProps:oldProps];
+-}
+-
+-- (void)onCirclePressWithPoint:
+-    (NSDictionary<NSString *, NSNumber *> *_Nonnull)point {
+-  if (_eventEmitter != nil) {
+-    YamapLiteCircleViewEventEmitter::OnCirclePress event = {};
+-    event.lat = [[point objectForKey:@"lat"] doubleValue];
+-    event.lon = [[point objectForKey:@"lon"] doubleValue];
+-    std::dynamic_pointer_cast<const YamapLiteCircleViewEventEmitter>(
+-        _eventEmitter)
+-        ->onCirclePress(event);
+-  }
+-}
+-
+-Class<RCTComponentViewProtocol> YamapLiteCircleViewCls(void) {
+-  return YamapLiteCircleView.class;
+-}
+-
+-@end
+diff --git a/node_modules/@exterio/react-native-yamap-lite/ios/YamapLiteMarkerView.mm b/node_modules/@exterio/react-native-yamap-lite/ios/YamapLiteMarkerView.mm
+index dd8275f..22a2d87 100644
+--- a/node_modules/@exterio/react-native-yamap-lite/ios/YamapLiteMarkerView.mm
++++ b/node_modules/@exterio/react-native-yamap-lite/ios/YamapLiteMarkerView.mm
+@@ -79,6 +79,9 @@ - (void)updateProps:(Props::Shared const &)props
+   if (oldViewProps.rotated != newViewProps.rotated) {
+     _view.rotated = newViewProps.rotated;
+   }
++  if (oldViewProps.rotation != newViewProps.rotation) {
++    _view.rotation = (float)newViewProps.rotation;
++  }
+   if (oldViewProps.size != newViewProps.size) {
+     _view.size = newViewProps.size;
+   }
+diff --git a/node_modules/@exterio/react-native-yamap-lite/ios/YamapLitePolygonView.h b/node_modules/@exterio/react-native-yamap-lite/ios/YamapLitePolygonView.h
+deleted file mode 100644
+index c47e44d..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/ios/YamapLitePolygonView.h
++++ /dev/null
+@@ -1,15 +0,0 @@
+-#import <React/RCTViewComponentView.h>
+-#import <React/RCTViewManager.h>
+-#import <UIKit/UIKit.h>
+-
+-#ifndef YamapLitePolygonViewNativeComponent_h
+-#define YamapLitePolygonViewNativeComponent_h
+-
+-NS_ASSUME_NONNULL_BEGIN
+-
+-@interface YamapLitePolygonView : RCTViewComponentView
+-@end
+-
+-NS_ASSUME_NONNULL_END
+-
+-#endif /* YamapLiteViewNativeComponent_h */
+diff --git a/node_modules/@exterio/react-native-yamap-lite/ios/YamapLitePolygonView.mm b/node_modules/@exterio/react-native-yamap-lite/ios/YamapLitePolygonView.mm
+deleted file mode 100644
+index 528c1bd..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/ios/YamapLitePolygonView.mm
++++ /dev/null
+@@ -1,124 +0,0 @@
+-#import "YamapLitePolygonView.h"
+-#include "ReactCodegen/react/renderer/components/YamapLiteViewSpec/EventEmitters.h"
+-#include "react/renderer/components/YamapLiteViewSpec/EventEmitters.h"
+-#include <Foundation/Foundation.h>
+-#include <objc/NSObject.h>
+-
+-#import <RCTTypeSafety/RCTConvertHelpers.h>
+-#import <React/RCTConversions.h>
+-#import <react/renderer/components/YamapLiteViewSpec/ComponentDescriptors.h>
+-#import <react/renderer/components/YamapLiteViewSpec/EventEmitters.h>
+-#import <react/renderer/components/YamapLiteViewSpec/Props.h>
+-#import <react/renderer/components/YamapLiteViewSpec/RCTComponentViewHelpers.h>
+-#import <react/renderer/graphics/Color.h>
+-
+-#import "RCTFabricComponentsPlugins.h"
+-#import "Utils/PointsEqual.h"
+-#if __has_include("YamapLite/YamapLite-Swift.h")
+-#import "YamapLite/YamapLite-Swift.h"
+-#else
+-#import "YamapLite-Swift.h"
+-#endif
+-#import <YandexMapsMobile/YMKMapKitFactory.h>
+-
+-using namespace facebook::react;
+-
+-@interface YamapLitePolygonView () <RCTYamapLitePolygonViewViewProtocol,
+-                                    YamapLitePolygonComponentDelegate>
+-
+-@end
+-
+-@implementation YamapLitePolygonView {
+-  YamapLitePolygon *_view;
+-}
+-
+-+ (ComponentDescriptorProvider)componentDescriptorProvider {
+-  return concreteComponentDescriptorProvider<
+-      YamapLitePolygonViewComponentDescriptor>();
+-}
+-
+-- (instancetype)initWithFrame:(CGRect)frame {
+-  if (self = [super initWithFrame:frame]) {
+-    static const auto defaultProps =
+-        std::make_shared<const YamapLitePolygonViewProps>();
+-    _props = defaultProps;
+-    _view = [[YamapLitePolygon alloc] init];
+-    _view.delegate = self;
+-    self.contentView = _view;
+-  }
+-  return self;
+-}
+-
+-- (void)updateProps:(Props::Shared const &)props
+-           oldProps:(Props::Shared const &)oldProps {
+-  const auto &oldViewProps =
+-      *std::static_pointer_cast<YamapLitePolygonViewProps const>(_props);
+-  const auto &newViewProps =
+-      *std::static_pointer_cast<YamapLitePolygonViewProps const>(props);
+-  if (oldViewProps.fillColor != newViewProps.fillColor) {
+-    UIColor *uiColor = RCTUIColorFromSharedColor(newViewProps.fillColor);
+-    if (uiColor) {
+-      _view.fillColor = uiColor;
+-    }
+-  }
+-  if (oldViewProps.strokeColor != newViewProps.strokeColor) {
+-    UIColor *uiColor = RCTUIColorFromSharedColor(newViewProps.strokeColor);
+-    if (uiColor) {
+-      _view.strokeColor = uiColor;
+-    }
+-  }
+-  if (oldViewProps.strokeWidth != newViewProps.strokeWidth) {
+-    _view.strokeWidth = newViewProps.strokeWidth;
+-  }
+-  if (oldViewProps.zInd != newViewProps.zInd) {
+-    _view.zIndex = newViewProps.zInd;
+-  }
+-
+-  if (!yamaplite::pointsEqual(oldViewProps.points, newViewProps.points)) {
+-    NSMutableArray<YMKPoint *> *pointsArr =
+-        [NSMutableArray arrayWithCapacity:newViewProps.points.size()];
+-    for (const auto &p : newViewProps.points) {
+-      [pointsArr addObject:[YMKPoint pointWithLatitude:p.lat longitude:p.lon]];
+-    }
+-    _view.points = pointsArr;
+-  }
+-
+-  if (!yamaplite::ringsEqual(oldViewProps.innerRings,
+-                             newViewProps.innerRings)) {
+-    NSMutableArray<NSArray<YMKPoint *> *> *innerRingsArr =
+-        [NSMutableArray arrayWithCapacity:newViewProps.innerRings.size()];
+-    for (const auto &ring : newViewProps.innerRings) {
+-      NSMutableArray<YMKPoint *> *ringArr =
+-          [NSMutableArray arrayWithCapacity:ring.size()];
+-      for (const auto &p : ring) {
+-        [ringArr addObject:[YMKPoint pointWithLatitude:p.lat longitude:p.lon]];
+-      }
+-      [innerRingsArr addObject:ringArr];
+-    }
+-    _view.innerRings = innerRingsArr;
+-  }
+-
+-  if (oldViewProps.handled != newViewProps.handled) {
+-    _view.handled = newViewProps.handled;
+-  }
+-
+-  [super updateProps:props oldProps:oldProps];
+-}
+-
+-- (void)onPolygonPressWithPoint:
+-    (NSDictionary<NSString *, NSNumber *> *_Nonnull)point {
+-  if (_eventEmitter != nil) {
+-    YamapLitePolygonViewEventEmitter::OnPolygonPress event = {};
+-    event.lat = [[point objectForKey:@"lat"] doubleValue];
+-    event.lon = [[point objectForKey:@"lon"] doubleValue];
+-    std::dynamic_pointer_cast<const YamapLitePolygonViewEventEmitter>(
+-        _eventEmitter)
+-        ->onPolygonPress(event);
+-  }
+-}
+-
+-Class<RCTComponentViewProtocol> YamapLitePolygonViewCls(void) {
+-  return YamapLitePolygonView.class;
+-}
+-
+-@end
+diff --git a/node_modules/@exterio/react-native-yamap-lite/ios/YamapLitePolylineView.h b/node_modules/@exterio/react-native-yamap-lite/ios/YamapLitePolylineView.h
+deleted file mode 100644
+index 9ec632a..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/ios/YamapLitePolylineView.h
++++ /dev/null
+@@ -1,15 +0,0 @@
+-#import <React/RCTViewComponentView.h>
+-#import <React/RCTViewManager.h>
+-#import <UIKit/UIKit.h>
+-
+-#ifndef YamapLitePolylineViewNativeComponent_h
+-#define YamapLitePolylineViewNativeComponent_h
+-
+-NS_ASSUME_NONNULL_BEGIN
+-
+-@interface YamapLitePolylineView : RCTViewComponentView
+-@end
+-
+-NS_ASSUME_NONNULL_END
+-
+-#endif /* YamapLitePolylineViewNativeComponent_h */
+diff --git a/node_modules/@exterio/react-native-yamap-lite/ios/YamapLitePolylineView.mm b/node_modules/@exterio/react-native-yamap-lite/ios/YamapLitePolylineView.mm
+deleted file mode 100644
+index 54faf7b..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/ios/YamapLitePolylineView.mm
++++ /dev/null
+@@ -1,119 +0,0 @@
+-#import "YamapLitePolylineView.h"
+-#include "ReactCodegen/react/renderer/components/YamapLiteViewSpec/EventEmitters.h"
+-#include "react/renderer/components/YamapLiteViewSpec/EventEmitters.h"
+-#include <Foundation/Foundation.h>
+-#include <objc/NSObject.h>
+-
+-#import <RCTTypeSafety/RCTConvertHelpers.h>
+-#import <React/RCTConversions.h>
+-#import <react/renderer/components/YamapLiteViewSpec/ComponentDescriptors.h>
+-#import <react/renderer/components/YamapLiteViewSpec/EventEmitters.h>
+-#import <react/renderer/components/YamapLiteViewSpec/Props.h>
+-#import <react/renderer/components/YamapLiteViewSpec/RCTComponentViewHelpers.h>
+-#import <react/renderer/graphics/Color.h>
+-
+-#import "RCTFabricComponentsPlugins.h"
+-#import "Utils/PointsEqual.h"
+-#if __has_include("YamapLite/YamapLite-Swift.h")
+-#import "YamapLite/YamapLite-Swift.h"
+-#else
+-#import "YamapLite-Swift.h"
+-#endif
+-#import <YandexMapsMobile/YMKMapKitFactory.h>
+-
+-using namespace facebook::react;
+-
+-@interface YamapLitePolylineView () <RCTYamapLitePolylineViewViewProtocol,
+-                                     YamapLitePolylineComponentDelegate>
+-
+-@end
+-
+-@implementation YamapLitePolylineView {
+-  YamapLitePolyline *_view;
+-}
+-
+-+ (ComponentDescriptorProvider)componentDescriptorProvider {
+-  return concreteComponentDescriptorProvider<
+-      YamapLitePolylineViewComponentDescriptor>();
+-}
+-
+-- (instancetype)initWithFrame:(CGRect)frame {
+-  if (self = [super initWithFrame:frame]) {
+-    static const auto defaultProps =
+-        std::make_shared<const YamapLitePolylineViewProps>();
+-    _props = defaultProps;
+-    _view = [[YamapLitePolyline alloc] init];
+-    _view.delegate = self;
+-    self.contentView = _view;
+-  }
+-  return self;
+-}
+-
+-- (void)updateProps:(Props::Shared const &)props
+-           oldProps:(Props::Shared const &)oldProps {
+-  const auto &oldViewProps =
+-      *std::static_pointer_cast<YamapLitePolylineViewProps const>(_props);
+-  const auto &newViewProps =
+-      *std::static_pointer_cast<YamapLitePolylineViewProps const>(props);
+-  if (oldViewProps.strokeColor != newViewProps.strokeColor) {
+-    UIColor *uiColor = RCTUIColorFromSharedColor(newViewProps.strokeColor);
+-    if (uiColor) {
+-      _view.strokeColor = uiColor;
+-    }
+-  }
+-  if (oldViewProps.strokeWidth != newViewProps.strokeWidth) {
+-    _view.strokeWidth = newViewProps.strokeWidth;
+-  }
+-  if (oldViewProps.outlineColor != newViewProps.outlineColor) {
+-    UIColor *uiColor = RCTUIColorFromSharedColor(newViewProps.outlineColor);
+-    if (uiColor) {
+-      _view.outlineColor = uiColor;
+-    }
+-  }
+-  if (oldViewProps.dashLength != newViewProps.dashLength) {
+-    _view.dashLength = newViewProps.dashLength;
+-  }
+-  if (oldViewProps.gapLength != newViewProps.gapLength) {
+-    _view.gapLength = newViewProps.gapLength;
+-  }
+-  if (oldViewProps.outlineWidth != newViewProps.outlineWidth) {
+-    _view.outlineWidth = newViewProps.outlineWidth;
+-  }
+-  if (oldViewProps.dashOffset != newViewProps.dashOffset) {
+-    _view.dashOffset = newViewProps.dashOffset;
+-  }
+-  if (oldViewProps.zInd != newViewProps.zInd) {
+-    _view.zIndex = newViewProps.zInd;
+-  }
+-  if (!yamaplite::pointsEqual(oldViewProps.points, newViewProps.points)) {
+-    NSMutableArray<YMKPoint *> *pointsArr =
+-        [NSMutableArray arrayWithCapacity:newViewProps.points.size()];
+-    for (const auto &p : newViewProps.points) {
+-      [pointsArr addObject:[YMKPoint pointWithLatitude:p.lat longitude:p.lon]];
+-    }
+-    _view.points = pointsArr;
+-  }
+-  if (oldViewProps.handled != newViewProps.handled) {
+-    _view.handled = newViewProps.handled;
+-  }
+-
+-  [super updateProps:props oldProps:oldProps];
+-}
+-
+-- (void)onPolylinePressWithPoint:
+-    (NSDictionary<NSString *, NSNumber *> *_Nonnull)point {
+-  if (_eventEmitter != nil) {
+-    YamapLitePolylineViewEventEmitter::OnPolylinePress event = {};
+-    event.lat = [[point objectForKey:@"lat"] doubleValue];
+-    event.lon = [[point objectForKey:@"lon"] doubleValue];
+-    std::dynamic_pointer_cast<const YamapLitePolylineViewEventEmitter>(
+-        _eventEmitter)
+-        ->onPolylinePress(event);
+-  }
+-}
+-
+-Class<RCTComponentViewProtocol> YamapLitePolylineViewCls(void) {
+-  return YamapLitePolylineView.class;
+-}
+-
+-@end
+diff --git a/node_modules/@exterio/react-native-yamap-lite/ios/YamapLiteView.mm b/node_modules/@exterio/react-native-yamap-lite/ios/YamapLiteView.mm
+index eaa60cf..c022899 100644
+--- a/node_modules/@exterio/react-native-yamap-lite/ios/YamapLiteView.mm
++++ b/node_modules/@exterio/react-native-yamap-lite/ios/YamapLiteView.mm
+@@ -1,9 +1,6 @@
+ #import "YamapLiteView.h"
+ #include "ReactCodegen/react/renderer/components/YamapLiteViewSpec/EventEmitters.h"
+-#include "YamapLiteCircleView.h"
+ #include "YamapLiteMarkerView.h"
+-#import "YamapLitePolygonView.h"
+-#import "YamapLitePolylineView.h"
+ #include <os/log.h>
+ 
+ #include <Foundation/Foundation.h>
+@@ -146,6 +143,9 @@ - (void)updateProps:(Props::Shared const &)props
+   if (oldViewProps.maxFps != newViewProps.maxFps) {
+     self->_view.maxFps = newViewProps.maxFps;
+   }
++  if (oldViewProps.minZoomPreference != newViewProps.minZoomPreference) {
++    self->_view.minZoomPreference = newViewProps.minZoomPreference;
++  }
+   [self->_view applyProperties];
+ 
+   [super updateProps:props oldProps:oldProps];
+@@ -304,24 +304,12 @@ - (void)mountChildComponentView:
+   if ([childComponentView isKindOfClass:YamapLiteMarkerView.class]) {
+     [_view insertReactSubview:childComponentView atIndex:index];
+   }
+-  if ([childComponentView isKindOfClass:YamapLiteCircleView.class]) {
+-    [_view insertReactSubview:childComponentView atIndex:index];
+-  }
+-  if ([childComponentView isKindOfClass:YamapLitePolylineView.class]) {
+-    [_view insertReactSubview:childComponentView atIndex:index];
+-  }
+-  if ([childComponentView isKindOfClass:YamapLitePolygonView.class]) {
+-    [_view insertReactSubview:childComponentView atIndex:index];
+-  }
+ }
+ 
+ - (void)unmountChildComponentView:
+             (nonnull UIView<RCTComponentViewProtocol> *)childComponentView
+                             index:(NSInteger)index {
+-  if ([childComponentView isKindOfClass:YamapLiteMarkerView.class] ||
+-      [childComponentView isKindOfClass:YamapLiteCircleView.class] ||
+-      [childComponentView isKindOfClass:YamapLitePolylineView.class] ||
+-      [childComponentView isKindOfClass:YamapLitePolygonView.class]) {
++  if ([childComponentView isKindOfClass:YamapLiteMarkerView.class]) {
+     [_view removeReactSubview:childComponentView];
+     [childComponentView removeFromSuperview];
+   }
+diff --git a/node_modules/@exterio/react-native-yamap-lite/lib/module/Components/Circle.js b/node_modules/@exterio/react-native-yamap-lite/lib/module/Components/Circle.js
+deleted file mode 100644
+index c09b8f9..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/lib/module/Components/Circle.js
++++ /dev/null
+@@ -1,20 +0,0 @@
+-"use strict";
+-
+-import React from 'react';
+-import YamapLiteCircleView from '../YamapCircleViewNativeComponent';
+-import { jsx as _jsx } from "react/jsx-runtime";
+-export const Circle = ({
+-  onPress,
+-  zIndex,
+-  ...props
+-}) => {
+-  const handleCirclePress = event => {
+-    onPress?.(event.nativeEvent);
+-  };
+-  return /*#__PURE__*/_jsx(YamapLiteCircleView, {
+-    ...props,
+-    zInd: zIndex,
+-    onCirclePress: handleCirclePress
+-  });
+-};
+-//# sourceMappingURL=Circle.js.map
+\ No newline at end of file
+diff --git a/node_modules/@exterio/react-native-yamap-lite/lib/module/Components/Circle.js.map b/node_modules/@exterio/react-native-yamap-lite/lib/module/Components/Circle.js.map
+deleted file mode 100644
+index 83e7336..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/lib/module/Components/Circle.js.map
++++ /dev/null
+@@ -1 +0,0 @@
+-{"version":3,"names":["React","YamapLiteCircleView","jsx","_jsx","Circle","onPress","zIndex","props","handleCirclePress","event","nativeEvent","zInd","onCirclePress"],"sourceRoot":"../../../src","sources":["Components/Circle.tsx"],"mappings":";;AAAA,OAAOA,KAAK,MAAM,OAAO;AAGzB,OAAOC,mBAAmB,MAAM,mCAAmC;AAAC,SAAAC,GAAA,IAAAC,IAAA;AAEpE,OAAO,MAAMC,MAA6B,GAAGA,CAAC;EAC5CC,OAAO;EACPC,MAAM;EACN,GAAGC;AACL,CAAC,KAAK;EACJ,MAAMC,iBAAiB,GAAIC,KAAkC,IAAK;IAChEJ,OAAO,GAAGI,KAAK,CAACC,WAAW,CAAC;EAC9B,CAAC;EAED,oBACEP,IAAA,CAACF,mBAAmB;IAAA,GACdM,KAAK;IACTI,IAAI,EAAEL,MAAO;IACbM,aAAa,EAAEJ;EAAkB,CAClC,CAAC;AAEN,CAAC","ignoreList":[]}
+diff --git a/node_modules/@exterio/react-native-yamap-lite/lib/module/Components/Polygon.js b/node_modules/@exterio/react-native-yamap-lite/lib/module/Components/Polygon.js
+deleted file mode 100644
+index 8666c97..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/lib/module/Components/Polygon.js
++++ /dev/null
+@@ -1,25 +0,0 @@
+-"use strict";
+-
+-import React from 'react';
+-import YamapLitePolygonView from '../YamapPolygonViewNativeComponent';
+-import { jsx as _jsx } from "react/jsx-runtime";
+-export const Polygon = ({
+-  onPress,
+-  zIndex,
+-  ...props
+-}) => {
+-  const handlePolygonPress = event => {
+-    if (onPress) {
+-      onPress({
+-        lat: event.nativeEvent.lat,
+-        lon: event.nativeEvent.lon
+-      });
+-    }
+-  };
+-  return /*#__PURE__*/_jsx(YamapLitePolygonView, {
+-    ...props,
+-    onPolygonPress: handlePolygonPress,
+-    zInd: zIndex
+-  });
+-};
+-//# sourceMappingURL=Polygon.js.map
+\ No newline at end of file
+diff --git a/node_modules/@exterio/react-native-yamap-lite/lib/module/Components/Polygon.js.map b/node_modules/@exterio/react-native-yamap-lite/lib/module/Components/Polygon.js.map
+deleted file mode 100644
+index 493e472..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/lib/module/Components/Polygon.js.map
++++ /dev/null
+@@ -1 +0,0 @@
+-{"version":3,"names":["React","YamapLitePolygonView","jsx","_jsx","Polygon","onPress","zIndex","props","handlePolygonPress","event","lat","nativeEvent","lon","onPolygonPress","zInd"],"sourceRoot":"../../../src","sources":["Components/Polygon.tsx"],"mappings":";;AAAA,OAAOA,KAAK,MAAM,OAAO;AAGzB,OAAOC,oBAAoB,MAAM,oCAAoC;AAAC,SAAAC,GAAA,IAAAC,IAAA;AAEtE,OAAO,MAAMC,OAA+B,GAAGA,CAAC;EAC9CC,OAAO;EACPC,MAAM;EACN,GAAGC;AACL,CAAC,KAAK;EACJ,MAAMC,kBAAkB,GAAIC,KAAkC,IAAK;IACjE,IAAIJ,OAAO,EAAE;MACXA,OAAO,CAAC;QACNK,GAAG,EAAED,KAAK,CAACE,WAAW,CAACD,GAAG;QAC1BE,GAAG,EAAEH,KAAK,CAACE,WAAW,CAACC;MACzB,CAAC,CAAC;IACJ;EACF,CAAC;EAED,oBACET,IAAA,CAACF,oBAAoB;IAAA,GACfM,KAAK;IACTM,cAAc,EAAEL,kBAAmB;IACnCM,IAAI,EAAER;EAAO,CACd,CAAC;AAEN,CAAC","ignoreList":[]}
+diff --git a/node_modules/@exterio/react-native-yamap-lite/lib/module/Components/Polyline.js b/node_modules/@exterio/react-native-yamap-lite/lib/module/Components/Polyline.js
+deleted file mode 100644
+index 7e479e1..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/lib/module/Components/Polyline.js
++++ /dev/null
+@@ -1,25 +0,0 @@
+-"use strict";
+-
+-import React from 'react';
+-import YamapLitePolylineView from '../YamapPolylineViewNativeComponent';
+-import { jsx as _jsx } from "react/jsx-runtime";
+-export const Polyline = ({
+-  onPress,
+-  zIndex,
+-  ...props
+-}) => {
+-  const handlePolylinePress = event => {
+-    if (onPress) {
+-      onPress({
+-        lat: event.nativeEvent.lat,
+-        lon: event.nativeEvent.lon
+-      });
+-    }
+-  };
+-  return /*#__PURE__*/_jsx(YamapLitePolylineView, {
+-    ...props,
+-    onPolylinePress: handlePolylinePress,
+-    zInd: zIndex
+-  });
+-};
+-//# sourceMappingURL=Polyline.js.map
+\ No newline at end of file
+diff --git a/node_modules/@exterio/react-native-yamap-lite/lib/module/Components/Polyline.js.map b/node_modules/@exterio/react-native-yamap-lite/lib/module/Components/Polyline.js.map
+deleted file mode 100644
+index 311272a..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/lib/module/Components/Polyline.js.map
++++ /dev/null
+@@ -1 +0,0 @@
+-{"version":3,"names":["React","YamapLitePolylineView","jsx","_jsx","Polyline","onPress","zIndex","props","handlePolylinePress","event","lat","nativeEvent","lon","onPolylinePress","zInd"],"sourceRoot":"../../../src","sources":["Components/Polyline.tsx"],"mappings":";;AAAA,OAAOA,KAAK,MAAM,OAAO;AAGzB,OAAOC,qBAAqB,MAAM,qCAAqC;AAAC,SAAAC,GAAA,IAAAC,IAAA;AAExE,OAAO,MAAMC,QAAiC,GAAGA,CAAC;EAChDC,OAAO;EACPC,MAAM;EACN,GAAGC;AACL,CAAC,KAAK;EACJ,MAAMC,mBAAmB,GAAIC,KAAkC,IAAK;IAClE,IAAIJ,OAAO,EAAE;MACXA,OAAO,CAAC;QACNK,GAAG,EAAED,KAAK,CAACE,WAAW,CAACD,GAAG;QAC1BE,GAAG,EAAEH,KAAK,CAACE,WAAW,CAACC;MACzB,CAAC,CAAC;IACJ;EACF,CAAC;EAED,oBACET,IAAA,CAACF,qBAAqB;IAAA,GAChBM,KAAK;IACTM,eAAe,EAAEL,mBAAoB;IACrCM,IAAI,EAAER;EAAO,CACd,CAAC;AAEN,CAAC","ignoreList":[]}
+diff --git a/node_modules/@exterio/react-native-yamap-lite/lib/module/Components/index.js b/node_modules/@exterio/react-native-yamap-lite/lib/module/Components/index.js
+index d2ff6a6..9255929 100644
+--- a/node_modules/@exterio/react-native-yamap-lite/lib/module/Components/index.js
++++ b/node_modules/@exterio/react-native-yamap-lite/lib/module/Components/index.js
+@@ -1,9 +1,6 @@
+ "use strict";
+ 
+ export * from "./Marker.js";
+-export * from "./Circle.js";
+-export * from "./Polygon.js";
+-export * from "./Polyline.js";
+ export * from "./Yamap.js";
+ export * from "./ClusteredYamap.js";
+ //# sourceMappingURL=index.js.map
+\ No newline at end of file
+diff --git a/node_modules/@exterio/react-native-yamap-lite/lib/module/YamapCircleViewNativeComponent.ts b/node_modules/@exterio/react-native-yamap-lite/lib/module/YamapCircleViewNativeComponent.ts
+deleted file mode 100644
+index d73651b..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/lib/module/YamapCircleViewNativeComponent.ts
++++ /dev/null
+@@ -1,28 +0,0 @@
+-import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNativeComponent';
+-import type { HostComponent, ViewProps, ColorValue } from 'react-native';
+-import type {
+-  DirectEventHandler,
+-  Double,
+-  Float,
+-  Int32,
+-} from 'react-native/Libraries/Types/CodegenTypes';
+-
+-interface Point {
+-  lat: Double;
+-  lon: Double;
+-}
+-
+-export interface NativeProps extends ViewProps {
+-  fillColor?: ColorValue;
+-  strokeColor?: ColorValue;
+-  strokeWidth?: Float;
+-  zInd?: Int32;
+-  onCirclePress?: DirectEventHandler<Readonly<Point>>;
+-  center: Point;
+-  radius: Float;
+-  handled?: boolean;
+-}
+-
+-export type YamapLiteCircleViewComponent = HostComponent<NativeProps>;
+-
+-export default codegenNativeComponent<NativeProps>('YamapLiteCircleView');
+diff --git a/node_modules/@exterio/react-native-yamap-lite/lib/module/YamapPolygonViewNativeComponent.ts b/node_modules/@exterio/react-native-yamap-lite/lib/module/YamapPolygonViewNativeComponent.ts
+deleted file mode 100644
+index f448d34..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/lib/module/YamapPolygonViewNativeComponent.ts
++++ /dev/null
+@@ -1,28 +0,0 @@
+-import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNativeComponent';
+-import type { HostComponent, ViewProps, ColorValue } from 'react-native';
+-import type {
+-  DirectEventHandler,
+-  Double,
+-  Float,
+-  Int32,
+-} from 'react-native/Libraries/Types/CodegenTypes';
+-
+-interface Point {
+-  lat: Double;
+-  lon: Double;
+-}
+-
+-export interface NativeProps extends ViewProps {
+-  fillColor?: ColorValue;
+-  strokeColor?: ColorValue;
+-  strokeWidth?: Float;
+-  zInd?: Int32;
+-  onPolygonPress?: DirectEventHandler<Readonly<Point>>;
+-  points: Point[];
+-  innerRings?: Point[][];
+-  handled?: boolean;
+-}
+-
+-export type YamapLitePolygonViewComponent = HostComponent<NativeProps>;
+-
+-export default codegenNativeComponent<NativeProps>('YamapLitePolygonView');
+diff --git a/node_modules/@exterio/react-native-yamap-lite/lib/module/YamapPolylineViewNativeComponent.ts b/node_modules/@exterio/react-native-yamap-lite/lib/module/YamapPolylineViewNativeComponent.ts
+deleted file mode 100644
+index d5f20d3..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/lib/module/YamapPolylineViewNativeComponent.ts
++++ /dev/null
+@@ -1,31 +0,0 @@
+-import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNativeComponent';
+-import type { HostComponent, ViewProps, ColorValue } from 'react-native';
+-import type {
+-  DirectEventHandler,
+-  Double,
+-  Float,
+-  Int32,
+-} from 'react-native/Libraries/Types/CodegenTypes';
+-
+-interface Point {
+-  lat: Double;
+-  lon: Double;
+-}
+-
+-export interface NativeProps extends ViewProps {
+-  strokeColor?: ColorValue;
+-  strokeWidth?: Float;
+-  outlineColor?: ColorValue;
+-  zInd?: Int32;
+-  dashLength?: Float;
+-  gapLength?: Float;
+-  outlineWidth?: Float;
+-  dashOffset?: Float;
+-  onPolylinePress?: DirectEventHandler<Readonly<Point>>;
+-  points: Point[];
+-  handled?: boolean;
+-}
+-
+-export type YamapLitePolylineViewComponent = HostComponent<NativeProps>;
+-
+-export default codegenNativeComponent<NativeProps>('YamapLitePolylineView');
+diff --git a/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/@types/index.d.ts b/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/@types/index.d.ts
+index 9bf359a..ab4c0af 100644
+--- a/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/@types/index.d.ts
++++ b/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/@types/index.d.ts
+@@ -38,6 +38,7 @@ export interface MarkerProps extends ViewProps {
+     zIndex?: number;
+     scale?: number;
+     rotated?: boolean;
++    rotation?: number;
+     onPress?: (event: Point) => void;
+     source?: ImageSourcePropType;
+     anchor?: {
+@@ -109,6 +110,7 @@ export interface YaMapProps extends ViewProps {
+     tiltGesturesEnabled?: boolean;
+     /** @default true */
+     rotateGesturesEnabled?: boolean;
++    minZoomPreference?: number;
+     /** @default true */
+     fastTapEnabled?: boolean;
+     initialRegion?: InitialRegion;
+diff --git a/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/Components/Circle.d.ts b/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/Components/Circle.d.ts
+deleted file mode 100644
+index 934f11c..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/Components/Circle.d.ts
++++ /dev/null
+@@ -1,4 +0,0 @@
+-import React from 'react';
+-import type { CircleProps } from '../@types';
+-export declare const Circle: React.FC<CircleProps>;
+-//# sourceMappingURL=Circle.d.ts.map
+\ No newline at end of file
+diff --git a/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/Components/Circle.d.ts.map b/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/Components/Circle.d.ts.map
+deleted file mode 100644
+index c437e7e..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/Components/Circle.d.ts.map
++++ /dev/null
+@@ -1 +0,0 @@
+-{"version":3,"file":"Circle.d.ts","sourceRoot":"","sources":["../../../../src/Components/Circle.tsx"],"names":[],"mappings":"AAAA,OAAO,KAAK,MAAM,OAAO,CAAC;AAC1B,OAAO,KAAK,EAAE,WAAW,EAAS,MAAM,WAAW,CAAC;AAIpD,eAAO,MAAM,MAAM,EAAE,KAAK,CAAC,EAAE,CAAC,WAAW,CAgBxC,CAAC"}
+\ No newline at end of file
+diff --git a/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/Components/Polygon.d.ts b/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/Components/Polygon.d.ts
+deleted file mode 100644
+index 115a96b..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/Components/Polygon.d.ts
++++ /dev/null
+@@ -1,4 +0,0 @@
+-import React from 'react';
+-import type { PolygonProps } from '../@types';
+-export declare const Polygon: React.FC<PolygonProps>;
+-//# sourceMappingURL=Polygon.d.ts.map
+\ No newline at end of file
+diff --git a/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/Components/Polygon.d.ts.map b/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/Components/Polygon.d.ts.map
+deleted file mode 100644
+index f745e41..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/Components/Polygon.d.ts.map
++++ /dev/null
+@@ -1 +0,0 @@
+-{"version":3,"file":"Polygon.d.ts","sourceRoot":"","sources":["../../../../src/Components/Polygon.tsx"],"names":[],"mappings":"AAAA,OAAO,KAAK,MAAM,OAAO,CAAC;AAC1B,OAAO,KAAK,EAAS,YAAY,EAAE,MAAM,WAAW,CAAC;AAIrD,eAAO,MAAM,OAAO,EAAE,KAAK,CAAC,EAAE,CAAC,YAAY,CAqB1C,CAAC"}
+\ No newline at end of file
+diff --git a/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/Components/Polyline.d.ts b/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/Components/Polyline.d.ts
+deleted file mode 100644
+index 1b18883..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/Components/Polyline.d.ts
++++ /dev/null
+@@ -1,4 +0,0 @@
+-import React from 'react';
+-import type { PolylineProps } from '../@types';
+-export declare const Polyline: React.FC<PolylineProps>;
+-//# sourceMappingURL=Polyline.d.ts.map
+\ No newline at end of file
+diff --git a/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/Components/Polyline.d.ts.map b/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/Components/Polyline.d.ts.map
+deleted file mode 100644
+index bf874f8..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/Components/Polyline.d.ts.map
++++ /dev/null
+@@ -1 +0,0 @@
+-{"version":3,"file":"Polyline.d.ts","sourceRoot":"","sources":["../../../../src/Components/Polyline.tsx"],"names":[],"mappings":"AAAA,OAAO,KAAK,MAAM,OAAO,CAAC;AAC1B,OAAO,KAAK,EAAS,aAAa,EAAE,MAAM,WAAW,CAAC;AAItD,eAAO,MAAM,QAAQ,EAAE,KAAK,CAAC,EAAE,CAAC,aAAa,CAqB5C,CAAC"}
+\ No newline at end of file
+diff --git a/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/Components/index.d.ts b/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/Components/index.d.ts
+index 3a6c2ac..1d9b096 100644
+--- a/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/Components/index.d.ts
++++ b/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/Components/index.d.ts
+@@ -1,7 +1,4 @@
+ export * from './Marker';
+-export * from './Circle';
+-export * from './Polygon';
+-export * from './Polyline';
+ export * from './Yamap';
+ export * from './ClusteredYamap';
+ //# sourceMappingURL=index.d.ts.map
+\ No newline at end of file
+diff --git a/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/YamapCircleViewNativeComponent.d.ts b/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/YamapCircleViewNativeComponent.d.ts
+deleted file mode 100644
+index 8a62de9..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/YamapCircleViewNativeComponent.d.ts
++++ /dev/null
+@@ -1,20 +0,0 @@
+-import type { HostComponent, ViewProps, ColorValue } from 'react-native';
+-import type { DirectEventHandler, Double, Float, Int32 } from 'react-native/Libraries/Types/CodegenTypes';
+-interface Point {
+-    lat: Double;
+-    lon: Double;
+-}
+-export interface NativeProps extends ViewProps {
+-    fillColor?: ColorValue;
+-    strokeColor?: ColorValue;
+-    strokeWidth?: Float;
+-    zInd?: Int32;
+-    onCirclePress?: DirectEventHandler<Readonly<Point>>;
+-    center: Point;
+-    radius: Float;
+-    handled?: boolean;
+-}
+-export type YamapLiteCircleViewComponent = HostComponent<NativeProps>;
+-declare const _default: import("react-native/Libraries/Utilities/codegenNativeComponent").NativeComponentType<NativeProps>;
+-export default _default;
+-//# sourceMappingURL=YamapCircleViewNativeComponent.d.ts.map
+\ No newline at end of file
+diff --git a/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/YamapCircleViewNativeComponent.d.ts.map b/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/YamapCircleViewNativeComponent.d.ts.map
+deleted file mode 100644
+index 218e8d2..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/YamapCircleViewNativeComponent.d.ts.map
++++ /dev/null
+@@ -1 +0,0 @@
+-{"version":3,"file":"YamapCircleViewNativeComponent.d.ts","sourceRoot":"","sources":["../../../src/YamapCircleViewNativeComponent.ts"],"names":[],"mappings":"AACA,OAAO,KAAK,EAAE,aAAa,EAAE,SAAS,EAAE,UAAU,EAAE,MAAM,cAAc,CAAC;AACzE,OAAO,KAAK,EACV,kBAAkB,EAClB,MAAM,EACN,KAAK,EACL,KAAK,EACN,MAAM,2CAA2C,CAAC;AAEnD,UAAU,KAAK;IACb,GAAG,EAAE,MAAM,CAAC;IACZ,GAAG,EAAE,MAAM,CAAC;CACb;AAED,MAAM,WAAW,WAAY,SAAQ,SAAS;IAC5C,SAAS,CAAC,EAAE,UAAU,CAAC;IACvB,WAAW,CAAC,EAAE,UAAU,CAAC;IACzB,WAAW,CAAC,EAAE,KAAK,CAAC;IACpB,IAAI,CAAC,EAAE,KAAK,CAAC;IACb,aAAa,CAAC,EAAE,kBAAkB,CAAC,QAAQ,CAAC,KAAK,CAAC,CAAC,CAAC;IACpD,MAAM,EAAE,KAAK,CAAC;IACd,MAAM,EAAE,KAAK,CAAC;IACd,OAAO,CAAC,EAAE,OAAO,CAAC;CACnB;AAED,MAAM,MAAM,4BAA4B,GAAG,aAAa,CAAC,WAAW,CAAC,CAAC;;AAEtE,wBAA0E"}
+\ No newline at end of file
+diff --git a/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/YamapPolygonViewNativeComponent.d.ts b/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/YamapPolygonViewNativeComponent.d.ts
+deleted file mode 100644
+index 923ff90..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/YamapPolygonViewNativeComponent.d.ts
++++ /dev/null
+@@ -1,20 +0,0 @@
+-import type { HostComponent, ViewProps, ColorValue } from 'react-native';
+-import type { DirectEventHandler, Double, Float, Int32 } from 'react-native/Libraries/Types/CodegenTypes';
+-interface Point {
+-    lat: Double;
+-    lon: Double;
+-}
+-export interface NativeProps extends ViewProps {
+-    fillColor?: ColorValue;
+-    strokeColor?: ColorValue;
+-    strokeWidth?: Float;
+-    zInd?: Int32;
+-    onPolygonPress?: DirectEventHandler<Readonly<Point>>;
+-    points: Point[];
+-    innerRings?: Point[][];
+-    handled?: boolean;
+-}
+-export type YamapLitePolygonViewComponent = HostComponent<NativeProps>;
+-declare const _default: import("react-native/Libraries/Utilities/codegenNativeComponent").NativeComponentType<NativeProps>;
+-export default _default;
+-//# sourceMappingURL=YamapPolygonViewNativeComponent.d.ts.map
+\ No newline at end of file
+diff --git a/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/YamapPolygonViewNativeComponent.d.ts.map b/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/YamapPolygonViewNativeComponent.d.ts.map
+deleted file mode 100644
+index 2f22458..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/YamapPolygonViewNativeComponent.d.ts.map
++++ /dev/null
+@@ -1 +0,0 @@
+-{"version":3,"file":"YamapPolygonViewNativeComponent.d.ts","sourceRoot":"","sources":["../../../src/YamapPolygonViewNativeComponent.ts"],"names":[],"mappings":"AACA,OAAO,KAAK,EAAE,aAAa,EAAE,SAAS,EAAE,UAAU,EAAE,MAAM,cAAc,CAAC;AACzE,OAAO,KAAK,EACV,kBAAkB,EAClB,MAAM,EACN,KAAK,EACL,KAAK,EACN,MAAM,2CAA2C,CAAC;AAEnD,UAAU,KAAK;IACb,GAAG,EAAE,MAAM,CAAC;IACZ,GAAG,EAAE,MAAM,CAAC;CACb;AAED,MAAM,WAAW,WAAY,SAAQ,SAAS;IAC5C,SAAS,CAAC,EAAE,UAAU,CAAC;IACvB,WAAW,CAAC,EAAE,UAAU,CAAC;IACzB,WAAW,CAAC,EAAE,KAAK,CAAC;IACpB,IAAI,CAAC,EAAE,KAAK,CAAC;IACb,cAAc,CAAC,EAAE,kBAAkB,CAAC,QAAQ,CAAC,KAAK,CAAC,CAAC,CAAC;IACrD,MAAM,EAAE,KAAK,EAAE,CAAC;IAChB,UAAU,CAAC,EAAE,KAAK,EAAE,EAAE,CAAC;IACvB,OAAO,CAAC,EAAE,OAAO,CAAC;CACnB;AAED,MAAM,MAAM,6BAA6B,GAAG,aAAa,CAAC,WAAW,CAAC,CAAC;;AAEvE,wBAA2E"}
+\ No newline at end of file
+diff --git a/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/YamapPolylineViewNativeComponent.d.ts b/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/YamapPolylineViewNativeComponent.d.ts
+deleted file mode 100644
+index 391f960..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/YamapPolylineViewNativeComponent.d.ts
++++ /dev/null
+@@ -1,23 +0,0 @@
+-import type { HostComponent, ViewProps, ColorValue } from 'react-native';
+-import type { DirectEventHandler, Double, Float, Int32 } from 'react-native/Libraries/Types/CodegenTypes';
+-interface Point {
+-    lat: Double;
+-    lon: Double;
+-}
+-export interface NativeProps extends ViewProps {
+-    strokeColor?: ColorValue;
+-    strokeWidth?: Float;
+-    outlineColor?: ColorValue;
+-    zInd?: Int32;
+-    dashLength?: Float;
+-    gapLength?: Float;
+-    outlineWidth?: Float;
+-    dashOffset?: Float;
+-    onPolylinePress?: DirectEventHandler<Readonly<Point>>;
+-    points: Point[];
+-    handled?: boolean;
+-}
+-export type YamapLitePolylineViewComponent = HostComponent<NativeProps>;
+-declare const _default: import("react-native/Libraries/Utilities/codegenNativeComponent").NativeComponentType<NativeProps>;
+-export default _default;
+-//# sourceMappingURL=YamapPolylineViewNativeComponent.d.ts.map
+\ No newline at end of file
+diff --git a/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/YamapPolylineViewNativeComponent.d.ts.map b/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/YamapPolylineViewNativeComponent.d.ts.map
+deleted file mode 100644
+index c024e00..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/lib/typescript/src/YamapPolylineViewNativeComponent.d.ts.map
++++ /dev/null
+@@ -1 +0,0 @@
+-{"version":3,"file":"YamapPolylineViewNativeComponent.d.ts","sourceRoot":"","sources":["../../../src/YamapPolylineViewNativeComponent.ts"],"names":[],"mappings":"AACA,OAAO,KAAK,EAAE,aAAa,EAAE,SAAS,EAAE,UAAU,EAAE,MAAM,cAAc,CAAC;AACzE,OAAO,KAAK,EACV,kBAAkB,EAClB,MAAM,EACN,KAAK,EACL,KAAK,EACN,MAAM,2CAA2C,CAAC;AAEnD,UAAU,KAAK;IACb,GAAG,EAAE,MAAM,CAAC;IACZ,GAAG,EAAE,MAAM,CAAC;CACb;AAED,MAAM,WAAW,WAAY,SAAQ,SAAS;IAC5C,WAAW,CAAC,EAAE,UAAU,CAAC;IACzB,WAAW,CAAC,EAAE,KAAK,CAAC;IACpB,YAAY,CAAC,EAAE,UAAU,CAAC;IAC1B,IAAI,CAAC,EAAE,KAAK,CAAC;IACb,UAAU,CAAC,EAAE,KAAK,CAAC;IACnB,SAAS,CAAC,EAAE,KAAK,CAAC;IAClB,YAAY,CAAC,EAAE,KAAK,CAAC;IACrB,UAAU,CAAC,EAAE,KAAK,CAAC;IACnB,eAAe,CAAC,EAAE,kBAAkB,CAAC,QAAQ,CAAC,KAAK,CAAC,CAAC,CAAC;IACtD,MAAM,EAAE,KAAK,EAAE,CAAC;IAChB,OAAO,CAAC,EAAE,OAAO,CAAC;CACnB;AAED,MAAM,MAAM,8BAA8B,GAAG,aAAa,CAAC,WAAW,CAAC,CAAC;;AAExE,wBAA4E"}
+\ No newline at end of file
+diff --git a/node_modules/@exterio/react-native-yamap-lite/src/@types/index.ts b/node_modules/@exterio/react-native-yamap-lite/src/@types/index.ts
+index 4d7886c..2fc18bc 100644
+--- a/node_modules/@exterio/react-native-yamap-lite/src/@types/index.ts
++++ b/node_modules/@exterio/react-native-yamap-lite/src/@types/index.ts
+@@ -50,6 +50,8 @@ export interface MarkerProps extends ViewProps {
+   zIndex?: number;
+   scale?: number;
+   rotated?: boolean;
++  /** PastVu: turns the icon by a fixed angle, for photo direction markers. */
++  rotation?: number;
+   onPress?: (event: Point) => void;
+   source?: ImageSourcePropType;
+   anchor?: {
+@@ -141,6 +143,8 @@ export interface YaMapProps extends ViewProps {
+ 
+   /** @default true */
+   rotateGesturesEnabled?: boolean;
++  /** PastVu: keeps the camera from zooming out past this level. */
++  minZoomPreference?: number;
+ 
+   /** @default true */
+   fastTapEnabled?: boolean;
+diff --git a/node_modules/@exterio/react-native-yamap-lite/src/Components/Circle.tsx b/node_modules/@exterio/react-native-yamap-lite/src/Components/Circle.tsx
+deleted file mode 100644
+index bb597e6..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/src/Components/Circle.tsx
++++ /dev/null
+@@ -1,22 +0,0 @@
+-import React from 'react';
+-import type { CircleProps, Point } from '../@types';
+-import { type NativeSyntheticEvent } from 'react-native';
+-import YamapLiteCircleView from '../YamapCircleViewNativeComponent';
+-
+-export const Circle: React.FC<CircleProps> = ({
+-  onPress,
+-  zIndex,
+-  ...props
+-}) => {
+-  const handleCirclePress = (event: NativeSyntheticEvent<Point>) => {
+-    onPress?.(event.nativeEvent);
+-  };
+-
+-  return (
+-    <YamapLiteCircleView
+-      {...props}
+-      zInd={zIndex}
+-      onCirclePress={handleCirclePress}
+-    />
+-  );
+-};
+diff --git a/node_modules/@exterio/react-native-yamap-lite/src/Components/Polygon.tsx b/node_modules/@exterio/react-native-yamap-lite/src/Components/Polygon.tsx
+deleted file mode 100644
+index 5b30e35..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/src/Components/Polygon.tsx
++++ /dev/null
+@@ -1,27 +0,0 @@
+-import React from 'react';
+-import type { Point, PolygonProps } from '../@types';
+-import { type NativeSyntheticEvent } from 'react-native';
+-import YamapLitePolygonView from '../YamapPolygonViewNativeComponent';
+-
+-export const Polygon: React.FC<PolygonProps> = ({
+-  onPress,
+-  zIndex,
+-  ...props
+-}) => {
+-  const handlePolygonPress = (event: NativeSyntheticEvent<Point>) => {
+-    if (onPress) {
+-      onPress({
+-        lat: event.nativeEvent.lat,
+-        lon: event.nativeEvent.lon,
+-      });
+-    }
+-  };
+-
+-  return (
+-    <YamapLitePolygonView
+-      {...props}
+-      onPolygonPress={handlePolygonPress}
+-      zInd={zIndex}
+-    />
+-  );
+-};
+diff --git a/node_modules/@exterio/react-native-yamap-lite/src/Components/Polyline.tsx b/node_modules/@exterio/react-native-yamap-lite/src/Components/Polyline.tsx
+deleted file mode 100644
+index 6a433d7..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/src/Components/Polyline.tsx
++++ /dev/null
+@@ -1,27 +0,0 @@
+-import React from 'react';
+-import type { Point, PolylineProps } from '../@types';
+-import { type NativeSyntheticEvent } from 'react-native';
+-import YamapLitePolylineView from '../YamapPolylineViewNativeComponent';
+-
+-export const Polyline: React.FC<PolylineProps> = ({
+-  onPress,
+-  zIndex,
+-  ...props
+-}) => {
+-  const handlePolylinePress = (event: NativeSyntheticEvent<Point>) => {
+-    if (onPress) {
+-      onPress({
+-        lat: event.nativeEvent.lat,
+-        lon: event.nativeEvent.lon,
+-      });
+-    }
+-  };
+-
+-  return (
+-    <YamapLitePolylineView
+-      {...props}
+-      onPolylinePress={handlePolylinePress}
+-      zInd={zIndex}
+-    />
+-  );
+-};
+diff --git a/node_modules/@exterio/react-native-yamap-lite/src/Components/index.ts b/node_modules/@exterio/react-native-yamap-lite/src/Components/index.ts
+index 7c967d2..c7476ab 100644
+--- a/node_modules/@exterio/react-native-yamap-lite/src/Components/index.ts
++++ b/node_modules/@exterio/react-native-yamap-lite/src/Components/index.ts
+@@ -1,6 +1,3 @@
+ export * from './Marker';
+-export * from './Circle';
+-export * from './Polygon';
+-export * from './Polyline';
+ export * from './Yamap';
+ export * from './ClusteredYamap';
+diff --git a/node_modules/@exterio/react-native-yamap-lite/src/YamapCircleViewNativeComponent.ts b/node_modules/@exterio/react-native-yamap-lite/src/YamapCircleViewNativeComponent.ts
+deleted file mode 100644
+index d73651b..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/src/YamapCircleViewNativeComponent.ts
++++ /dev/null
+@@ -1,28 +0,0 @@
+-import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNativeComponent';
+-import type { HostComponent, ViewProps, ColorValue } from 'react-native';
+-import type {
+-  DirectEventHandler,
+-  Double,
+-  Float,
+-  Int32,
+-} from 'react-native/Libraries/Types/CodegenTypes';
+-
+-interface Point {
+-  lat: Double;
+-  lon: Double;
+-}
+-
+-export interface NativeProps extends ViewProps {
+-  fillColor?: ColorValue;
+-  strokeColor?: ColorValue;
+-  strokeWidth?: Float;
+-  zInd?: Int32;
+-  onCirclePress?: DirectEventHandler<Readonly<Point>>;
+-  center: Point;
+-  radius: Float;
+-  handled?: boolean;
+-}
+-
+-export type YamapLiteCircleViewComponent = HostComponent<NativeProps>;
+-
+-export default codegenNativeComponent<NativeProps>('YamapLiteCircleView');
+diff --git a/node_modules/@exterio/react-native-yamap-lite/src/YamapLiteViewNativeComponent.ts b/node_modules/@exterio/react-native-yamap-lite/src/YamapLiteViewNativeComponent.ts
+index 6c347a4..045f465 100644
+--- a/node_modules/@exterio/react-native-yamap-lite/src/YamapLiteViewNativeComponent.ts
++++ b/node_modules/@exterio/react-native-yamap-lite/src/YamapLiteViewNativeComponent.ts
+@@ -78,6 +78,7 @@ export interface NativeProps extends ViewProps {
+   zoomGesturesEnabled?: WithDefault<boolean, true>;
+   tiltGesturesEnabled?: WithDefault<boolean, true>;
+   rotateGesturesEnabled?: WithDefault<boolean, true>;
++  minZoomPreference?: Float;
+   fastTapEnabled?: WithDefault<boolean, true>;
+   initialRegion?: InitialRegion;
+   maxFps?: Float;
+diff --git a/node_modules/@exterio/react-native-yamap-lite/src/YamapMarkerViewNativeComponent.ts b/node_modules/@exterio/react-native-yamap-lite/src/YamapMarkerViewNativeComponent.ts
+index f0eddef..51f48d2 100644
+--- a/node_modules/@exterio/react-native-yamap-lite/src/YamapMarkerViewNativeComponent.ts
++++ b/node_modules/@exterio/react-native-yamap-lite/src/YamapMarkerViewNativeComponent.ts
+@@ -16,6 +16,7 @@ export interface NativeProps extends ViewProps {
+   zInd?: Int32;
+   scale?: Double;
+   rotated?: boolean;
++  rotation?: Double;
+   onMarkerPress?: DirectEventHandler<Readonly<Point>>;
+   source?: string;
+   anchor?: {
+diff --git a/node_modules/@exterio/react-native-yamap-lite/src/YamapPolygonViewNativeComponent.ts b/node_modules/@exterio/react-native-yamap-lite/src/YamapPolygonViewNativeComponent.ts
+deleted file mode 100644
+index f448d34..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/src/YamapPolygonViewNativeComponent.ts
++++ /dev/null
+@@ -1,28 +0,0 @@
+-import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNativeComponent';
+-import type { HostComponent, ViewProps, ColorValue } from 'react-native';
+-import type {
+-  DirectEventHandler,
+-  Double,
+-  Float,
+-  Int32,
+-} from 'react-native/Libraries/Types/CodegenTypes';
+-
+-interface Point {
+-  lat: Double;
+-  lon: Double;
+-}
+-
+-export interface NativeProps extends ViewProps {
+-  fillColor?: ColorValue;
+-  strokeColor?: ColorValue;
+-  strokeWidth?: Float;
+-  zInd?: Int32;
+-  onPolygonPress?: DirectEventHandler<Readonly<Point>>;
+-  points: Point[];
+-  innerRings?: Point[][];
+-  handled?: boolean;
+-}
+-
+-export type YamapLitePolygonViewComponent = HostComponent<NativeProps>;
+-
+-export default codegenNativeComponent<NativeProps>('YamapLitePolygonView');
+diff --git a/node_modules/@exterio/react-native-yamap-lite/src/YamapPolylineViewNativeComponent.ts b/node_modules/@exterio/react-native-yamap-lite/src/YamapPolylineViewNativeComponent.ts
+deleted file mode 100644
+index d5f20d3..0000000
+--- a/node_modules/@exterio/react-native-yamap-lite/src/YamapPolylineViewNativeComponent.ts
++++ /dev/null
+@@ -1,31 +0,0 @@
+-import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNativeComponent';
+-import type { HostComponent, ViewProps, ColorValue } from 'react-native';
+-import type {
+-  DirectEventHandler,
+-  Double,
+-  Float,
+-  Int32,
+-} from 'react-native/Libraries/Types/CodegenTypes';
+-
+-interface Point {
+-  lat: Double;
+-  lon: Double;
+-}
+-
+-export interface NativeProps extends ViewProps {
+-  strokeColor?: ColorValue;
+-  strokeWidth?: Float;
+-  outlineColor?: ColorValue;
+-  zInd?: Int32;
+-  dashLength?: Float;
+-  gapLength?: Float;
+-  outlineWidth?: Float;
+-  dashOffset?: Float;
+-  onPolylinePress?: DirectEventHandler<Readonly<Point>>;
+-  points: Point[];
+-  handled?: boolean;
+-}
+-
+-export type YamapLitePolylineViewComponent = HostComponent<NativeProps>;
+-
+-export default codegenNativeComponent<NativeProps>('YamapLitePolylineView');

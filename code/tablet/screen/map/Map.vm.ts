@@ -11,7 +11,7 @@ import {
 import { Alert, Keyboard, Platform } from 'react-native'
 import MapView, { Region } from 'react-native-maps'
 import { createRef } from 'react'
-import type { YaMapRef } from 'react-native-yamap-lite'
+import type { YaMapRef } from '@exterio/react-native-yamap-lite'
 import {
 	getClustersPhotosProps,
 	getPhotoListProps,

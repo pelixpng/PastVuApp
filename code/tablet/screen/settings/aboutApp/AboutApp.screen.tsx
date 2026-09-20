@@ -17,7 +17,7 @@ export const AboutAppScreen = observer(() => {
     <Container isScroll style={s.container}>
       <Spacer height={18} />
       <View style={s.block}>
-        <Image style={s.image} source={require('../../../../assets/icon.png')} />
+        <Image style={s.image} source={require('../../../../assets/iconAbout.png')} />
         <Spacer height={16} />
         <Text selectable style={[s.descriptionText, { color: colors.textSecond }]}>
           {t('about.version', { version: APP_VERSION, date: formatLongDate(RELEASE_DATE) })}

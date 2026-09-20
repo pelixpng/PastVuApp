@@ -1,4 +1,4 @@
-import { YaMap, Marker, YaMapRef } from 'react-native-yamap-lite'
+import { YaMap, Marker, YaMapRef } from '@exterio/react-native-yamap-lite'
 import {
 	LayoutChangeEvent,
 	PixelRatio,

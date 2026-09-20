@@ -10,11 +10,30 @@ import { getColor } from '../utils/getColor'
 import { getAngle } from '../utils/getDirection'
 import { getMarkerName, getMarkerClusterName } from '../utils/getMarker'
 import Constants from 'expo-constants'
-import { socketEmit } from './socketService'
 
 const BASE_URL = 'https://api.pastvu.com/api2'
 const PLACE_API_URL = 'https://us1.locationiq.com/v1'
 const PLACE_API_KEY = Constants.expoConfig?.extra?.placeApiKey ?? ''
+
+/**
+ * Calls a method of the PastVu HTTP API.
+ *
+ * News, the front-page feed, the region list and news comments used to go over a socket.io
+ * connection, because the site itself talks to the server that way and these methods had no HTTP
+ * counterpart. They answer over `api2` now, so the whole socket client is gone.
+ *
+ * The endpoint replies with HTTP 200 even for a method it does not know, describing the failure in
+ * the body, so the result is what has to be checked rather than the status.
+ */
+const apiGet = async (method: string, params?: object) => {
+  const query = params ? `&params=${encodeURIComponent(JSON.stringify(params))}` : ''
+  const response = await fetch(`${BASE_URL}?method=${method}${query}`)
+  const json = await response.json()
+  if (!json?.result) {
+    throw new Error(`${method} failed: ${json?.code ?? response.status}`)
+  }
+  return json.result
+}
 
 export default class ApiService {
   static async getPhotoList(params: getPhotoListProps) {
@@ -103,12 +122,12 @@ export default class ApiService {
   }
 
   static async getNews() {
-    const result = await socketEmit('index.giveAllNews', undefined)
+    const result = await apiGet('index.giveAllNews')
     return result.news
   }
 
   static async getNewsComments(cid: number) {
-    const result = await socketEmit('comment.giveForObj', { cid, type: 'news' })
+    const result = await apiGet('comment.giveForObj', { cid, type: 'news' })
     let convertComments: IComment[] = []
     function getConvertComments(comments: IComment[]) {
       for (let comment of comments) {
@@ -124,12 +143,12 @@ export default class ApiService {
   }
 
   static async getRecentPhotos() {
-    const result = await socketEmit('photo.givePublicIndex', undefined)
+    const result = await apiGet('photo.givePublicIndex')
     return result.photos
   }
 
   static async getRegions(): Promise<Map<number, any>> {
-    const result = await socketEmit('region.giveListPublic', undefined)
+    const result = await apiGet('region.giveListPublic')
     const regionsMap = new Map<number, any>()
     result.regions.forEach((region: any) => {
       regionsMap.set(region.cid, region)

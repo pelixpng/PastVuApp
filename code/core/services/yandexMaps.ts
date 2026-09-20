@@ -1,5 +1,5 @@
 import Constants from 'expo-constants'
-import { YamapUtils } from 'react-native-yamap-lite'
+import { YamapUtils } from '@exterio/react-native-yamap-lite'
 
 /**
  * Yandex MapKit needs its key before the first map mounts, and the SDK is loaded lazily by the
