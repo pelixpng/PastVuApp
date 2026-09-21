@@ -58,6 +58,13 @@ index 89dfd9a..c4a6d29 100644
      __weak __typeof(self) weakSelf = self;
  
      _reloadImageCancellationBlock = [[[RCTBridge currentBridge] moduleForName:@"ImageLoader"] loadImageWithURLRequest:[RCTConvert NSURLRequest:_imageSrc]
+diff --git a/node_modules/react-native-maps/ios/AirMaps/RNMapsDefines.h b/node_modules/react-native-maps/ios/AirMaps/RNMapsDefines.h
+index e4fc048..91b6de5 100644
+--- a/node_modules/react-native-maps/ios/AirMaps/RNMapsDefines.h
++++ b/node_modules/react-native-maps/ios/AirMaps/RNMapsDefines.h
+@@ -1 +1 @@
+-#define HAVE_GOOGLE_MAPS 1
++#define HAVE_GOOGLE_MAPS 0
 diff --git a/node_modules/react-native-maps/ios/AirMaps/RNMapsMapView.mm b/node_modules/react-native-maps/ios/AirMaps/RNMapsMapView.mm
 index 447520d..59b6753 100644
 --- a/node_modules/react-native-maps/ios/AirMaps/RNMapsMapView.mm
@@ -179,3 +186,105 @@ index be7e91d..9811695 100644
  
  @end
  
+diff --git a/node_modules/react-native-maps/src/MapView.tsx b/node_modules/react-native-maps/src/MapView.tsx
+index 6fd5565..fc95d30 100644
+--- a/node_modules/react-native-maps/src/MapView.tsx
++++ b/node_modules/react-native-maps/src/MapView.tsx
+@@ -71,7 +71,7 @@ var FabricGoogleMap: any = null;
+ if (Platform.OS === 'ios') {
+   FabricGoogleMap = createFabricMap(GoogleMapView, GoogleCommands);
+ }
+-import AnimatedRegion from './AnimatedRegion';
++import type AnimatedRegion from './AnimatedRegion';
+ 
+ export const MAP_TYPES: MapTypes = {
+   STANDARD: 'standard',
+diff --git a/node_modules/react-native-maps/src/decorateMapComponent.ts b/node_modules/react-native-maps/src/decorateMapComponent.ts
+index 3b52d77..fe4d7a1 100644
+--- a/node_modules/react-native-maps/src/decorateMapComponent.ts
++++ b/node_modules/react-native-maps/src/decorateMapComponent.ts
+@@ -8,17 +8,17 @@ import {
+ } from 'react-native';
+ import {PROVIDER_DEFAULT, PROVIDER_GOOGLE} from './ProviderConstants';
+ import type {Provider} from './sharedTypes';
+-import {MapCallout} from './MapCallout';
+-import {MapOverlay} from './MapOverlay';
+-import {MapCalloutSubview} from './MapCalloutSubview';
+-import {MapCircle} from './MapCircle';
+-import {MapHeatmap} from './MapHeatmap';
+-import {MapLocalTile} from './MapLocalTile';
++import type {MapCallout} from './MapCallout';
++import type {MapOverlay} from './MapOverlay';
++import type {MapCalloutSubview} from './MapCalloutSubview';
++import type {MapCircle} from './MapCircle';
++import type {MapHeatmap} from './MapHeatmap';
++import type {MapLocalTile} from './MapLocalTile';
+ import {MapMarker} from './MapMarker';
+-import {MapPolygon} from './MapPolygon';
+-import {MapPolyline} from './MapPolyline';
+-import {MapUrlTile} from './MapUrlTile';
+-import {MapWMSTile} from './MapWMSTile';
++import type {MapPolygon} from './MapPolygon';
++import type {MapPolyline} from './MapPolyline';
++import type {MapUrlTile} from './MapUrlTile';
++import type {MapWMSTile} from './MapWMSTile';
+ import {Commands} from './MapViewNativeComponent';
+ import GooglePolygon from './specs/NativeComponentGooglePolygon';
+ import FabricMarker from './specs/NativeComponentMarker';
+diff --git a/node_modules/react-native-maps/src/index.ts b/node_modules/react-native-maps/src/index.ts
+index 11851ca..c689e72 100644
+--- a/node_modules/react-native-maps/src/index.ts
++++ b/node_modules/react-native-maps/src/index.ts
+@@ -1,3 +1,6 @@
++// PastVu: the app renders only MapView and Marker. The other wrappers were re-exported here
++// as values, which pulled their whole module graph into the bundle; Metro has no tree
++// shaking. Their type exports stay, since types are erased and cost nothing.
+ import MapView, {
+   AnimatedMapView as Animated,
+   MAP_TYPES,
+@@ -8,36 +11,19 @@ import Marker from './MapMarker';
+ export {MapMarker} from './MapMarker';
+ export type {MapMarkerProps} from './MapMarker';
+ 
+-import Overlay from './MapOverlay';
+-export {MapOverlay} from './MapOverlay';
+ export type {MapOverlayProps} from './MapOverlay';
+ 
+-export {default as Polyline, MapPolyline} from './MapPolyline';
+ export type {MapPolylineProps} from './MapPolyline';
+-export {default as Heatmap, MapHeatmap} from './MapHeatmap';
+ export type {MapHeatmapProps} from './MapHeatmap';
+-export {default as Polygon, MapPolygon} from './MapPolygon';
+ export type {MapPolygonProps} from './MapPolygon';
+-export {default as Circle, MapCircle} from './MapCircle';
+ export type {MapCircleProps} from './MapCircle';
+-export {default as UrlTile, MapUrlTile} from './MapUrlTile';
+ export type {MapUrlTileProps} from './MapUrlTile';
+-export {default as WMSTile, MapWMSTile} from './MapWMSTile';
+ export type {MapWMSTileProps} from './MapWMSTile';
+-export {default as LocalTile, MapLocalTile} from './MapLocalTile';
+ export type {MapLocalTileProps} from './MapLocalTile';
+-export {default as Callout, MapCallout} from './MapCallout';
+ export type {MapCalloutProps} from './MapCallout';
+-export {
+-  default as CalloutSubview,
+-  MapCalloutSubview,
+-} from './MapCalloutSubview';
+ export type {MapCalloutSubviewProps} from './MapCalloutSubview';
+-export {default as AnimatedRegion} from './AnimatedRegion';
+-export {default as Geojson} from './Geojson';
+ export type {GeojsonProps} from './Geojson';
+ 
+-export {Marker, Overlay};
+ export type {MapViewProps};
+ export {Animated, MAP_TYPES};
+ 
+@@ -46,7 +32,7 @@ export * from './MapView.types';
+ export * from './MapPolygon.types';
+ export * from './sharedTypes';
+ 
++export {Marker};
+ export const MarkerAnimated = Marker.Animated;
+-export const OverlayAnimated = Overlay.Animated;
+ 
+ export default MapView;

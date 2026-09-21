@@ -9,7 +9,7 @@ import { CollectionScreen } from '../screen/collection/Collection.screen'
 import { NewsScreen } from '../screen/news/News.screen'
 import { SettingsMenuScreen } from '../screen/settings/settingsMenu/SettingsMenu.screen'
 import { t } from '../../core/i18n'
-import { observer } from 'mobx-react'
+import { observer } from 'mobx-react-lite'
 
 const Tab = createBottomTabNavigator<StackParamList>()
 

@@ -1,0 +1,67 @@
+diff --git a/node_modules/react-native-gesture-handler/src/index.ts b/node_modules/react-native-gesture-handler/src/index.ts
+index dcf7998..62c152f 100644
+--- a/node_modules/react-native-gesture-handler/src/index.ts
++++ b/node_modules/react-native-gesture-handler/src/index.ts
+@@ -1,3 +1,7 @@
++// PastVu: the app and its libraries use only the gesture API (Gesture, GestureDetector,
++// PanGestureHandler) and GestureHandlerRootView. The component wrappers re-exported here
++// (buttons, touchables, ScrollView and friends, Swipeable, Pressable, DrawerLayout, Text) are
++// never imported, and Metro has no tree shaking, so they only added weight to the bundle.
+ import { initialize } from './init';
+ 
+ export { Directions } from './Directions';
+@@ -76,33 +80,11 @@ export type {
+   RectButtonProps,
+   BorderlessButtonProps,
+ } from './components/GestureButtonsProps';
+-export {
+-  RawButton,
+-  BaseButton,
+-  RectButton,
+-  BorderlessButton,
+-  PureNativeButton,
+-} from './components/GestureButtons';
+ export type {
+   TouchableHighlightProps,
+   TouchableOpacityProps,
+   TouchableWithoutFeedbackProps,
+ } from './components/touchables';
+-export {
+-  TouchableHighlight,
+-  TouchableNativeFeedback,
+-  TouchableOpacity,
+-  TouchableWithoutFeedback,
+-} from './components/touchables';
+-export {
+-  ScrollView,
+-  Switch,
+-  TextInput,
+-  DrawerLayoutAndroid,
+-  FlatList,
+-  RefreshControl,
+-} from './components/GestureComponents';
+-export { Text } from './components/Text';
+ export { HoverEffect } from './handlers/gestures/hoverGesture';
+ export type {
+   // Events
+@@ -144,12 +126,10 @@ export type {
+ } from './handlers/gestureHandlerTypesCompat';
+ 
+ export type { SwipeableProps } from './components/Swipeable';
+-export { default as Swipeable } from './components/Swipeable';
+ export type {
+   PressableProps,
+   PressableStateCallbackType,
+ } from './components/Pressable';
+-export { default as Pressable } from './components/Pressable';
+ 
+ export type {
+   DrawerLayoutProps,
+@@ -159,7 +139,6 @@ export type {
+   DrawerLockMode,
+   DrawerKeyboardDismissMode,
+ } from './components/DrawerLayout';
+-export { default as DrawerLayout } from './components/DrawerLayout';
+ 
+ export {
+   enableExperimentalWebImplementation,

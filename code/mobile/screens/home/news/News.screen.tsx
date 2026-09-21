@@ -1,6 +1,6 @@
 import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native'
 import { useTheme } from '@react-navigation/native'
-import { observer } from 'mobx-react'
+import { observer } from 'mobx-react-lite'
 import { useCallback } from 'react'
 import NewsVM, { NewsTab } from './News.vm'
 import { useVM } from '../../../../core/hooks/useVM'

@@ -1,4 +1,4 @@
-import { useLocalObservable } from 'mobx-react'
+import { useLocalObservable } from 'mobx-react-lite'
 
 interface IViewModel<T> {
   new (): T

@@ -9,7 +9,7 @@ import { NewsUser } from '../../../../../core/types/apiNews'
 import { formatDate } from '../../../../../core/utils/getTime'
 import StandardAvatar from '../../../../../assets/avatar.png'
 import { t } from '../../../../../core/i18n'
-import { observer } from 'mobx-react'
+import { observer } from 'mobx-react-lite'
 
 export type PostListItemProps = {
   onPress: () => void

@@ -16,9 +16,7 @@
     "@react-navigation/bottom-tabs": "^6.5.8",
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/stack": "^6.3.29",
-    "babel-preset-expo": "~57.0.0",
     "expo": "^57.0.20",
-    "expo-build-properties": "~57.0.17",
     "expo-camera": "~57.0.5",
     "expo-constants": "~57.0.17",
     "expo-dev-client": "~57.0.18",
@@ -30,16 +28,14 @@
     "expo-media-library": "~57.0.4",
     "expo-screen-orientation": "~57.0.2",
     "expo-splash-screen": "~57.0.8",
-    "expo-status-bar": "~57.0.1",
     "i18n-js": "^4.5.3",
     "mobx": "^6.16.1",
-    "mobx-react": "^9.2.2",
+    "mobx-react-lite": "^4.1.1",
     "react": "19.2.3",
     "react-native": "0.86.3",
     "react-native-device-info": "^15.0.2",
     "react-native-edge-to-edge": "^1.8.2",
     "react-native-gesture-handler": "~2.32.0",
-    "react-native-gradle-plugin": "^0.71.19",
     "react-native-maps": "1.27.2",
     "react-native-mmkv": "^3.3.3",
     "react-native-reanimated": "4.5.1",
@@ -56,8 +52,10 @@
     "@types/react": "~19.2.0",
     "@typescript-eslint/eslint-plugin": "^6.2.1",
     "@typescript-eslint/parser": "^6.2.1",
+    "babel-preset-expo": "~57.0.10",
     "eslint": "^8.46.0",
     "eslint-plugin-react": "^7.33.1",
+    "expo-build-properties": "~57.0.17",
     "patch-package": "^8.0.1",
     "typescript": "~6.0.3"
   },
@@ -67,6 +65,9 @@
       "android": {
         "buildFromSource": [
           "expo-camera"
+        ],
+        "exclude": [
+          "react-native-view-shot"
         ]
       }
     }

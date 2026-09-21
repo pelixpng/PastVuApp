@@ -1,5 +1,5 @@
 import { FlatList, StyleSheet, Text, View } from 'react-native'
-import { observer } from 'mobx-react'
+import { observer } from 'mobx-react-lite'
 import { Image } from 'expo-image'
 import { useNavigation, useTheme } from '@react-navigation/native'
 import RenderHTML from 'react-native-render-html'

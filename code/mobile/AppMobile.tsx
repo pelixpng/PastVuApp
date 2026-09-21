@@ -1,8 +1,7 @@
-import { createRef, useMemo } from 'react'
-import { Platform, useColorScheme, View, StyleSheet } from 'react-native'
+import { createRef, useEffect, useMemo } from 'react'
+import { AppState, Platform, StatusBar, useColorScheme, View, StyleSheet } from 'react-native'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
-import { observer } from 'mobx-react'
-import { StatusBar } from 'expo-status-bar'
+import { observer } from 'mobx-react-lite'
 import { SystemBars } from 'react-native-edge-to-edge'
 import { createStackNavigator } from '@react-navigation/stack'
 import {
@@ -37,16 +36,31 @@ export default observer(function AppMobile() {
       ThemeStore.selectedTheme === 'light' || (isSystemTheme && colorScheme === 'light')
     return isLightTheme ? LightTheme : DarkTheme
   }, [ThemeStore.selectedTheme, colorScheme])
+  useEffect(() => {
+    if (Platform.OS !== 'android') return
+    const apply = () =>
+      StatusBar.setBarStyle(theme === DarkTheme ? 'light-content' : 'dark-content', true)
+    apply()
+    // Re-applied on return to the foreground: that is when the system is most likely to have
+    // rewritten the appearance from the device theme.
+    const subscription = AppState.addEventListener('change', state => {
+      if (state === 'active') apply()
+    })
+    return () => subscription.remove()
+  }, [theme, colorScheme])
   return (
     <NavigationContainer ref={NavigationRef} theme={theme}>
       {/* Follows the app's theme, not the system one: with a light app on a dark system
           (or vice versa) `auto` painted the status bar the wrong colour and it vanished.
-          Android runs edge-to-edge, where React Native's StatusBar ignores style changes, so the
-          system bars are driven through react-native-edge-to-edge there. */}
+          On Android the navigation bar goes through react-native-edge-to-edge, while the status
+          bar is written twice: SystemBars sets the legacy window flags and the effect below sets
+          the WindowInsetsController appearance. Once anything touches the new appearance API the
+          system ignores the legacy flags, and on a TECNO that left the status bar following the
+          device theme instead of the app's, invisible on light screens. */}
       {Platform.OS === 'android' ? (
         <SystemBars style={theme === DarkTheme ? 'light' : 'dark'} />
       ) : (
-        <StatusBar animated style={theme === DarkTheme ? 'light' : 'dark'} />
+        <StatusBar animated barStyle={theme === DarkTheme ? 'light-content' : 'dark-content'} />
       )}
       <Stack.Navigator
         initialRouteName={SCREENS.BOTTOM_TAB_NAVIGATOR}

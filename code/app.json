@@ -54,7 +54,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.pelixpng.PastVuApp",
-      "versionCode": 47,
+      "versionCode": 49,
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION"

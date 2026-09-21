@@ -9,7 +9,7 @@ import { NewsScreen } from '../screens/home/news/News.screen'
 import { SettingsMenuScreen } from '../screens/settings/settingsMenu/SettingsMenu.screen'
 import { useTheme } from '@react-navigation/native'
 import { t } from '../../core/i18n'
-import { observer } from 'mobx-react'
+import { observer } from 'mobx-react-lite'
 
 const Tab = createBottomTabNavigator<StackParamList>()
 

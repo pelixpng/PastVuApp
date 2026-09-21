@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { LocationItem } from '../../types/apiPhotoList'
 import { Spacer } from '../ui/Spacer'
 import { t } from '../../i18n'
-import { observer } from 'mobx-react'
+import { observer } from 'mobx-react-lite'
 
 type SearchPlaceProps = {
   places: LocationItem[]

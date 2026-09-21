@@ -6,7 +6,7 @@ import { Spacer } from '../../../../core/components/ui/Spacer'
 import { Links } from '../../../../core/constants/links'
 import { Container } from '../../../../core/components/ui/Container'
 import { t } from '../../../../core/i18n'
-import { observer } from 'mobx-react'
+import { observer } from 'mobx-react-lite'
 
 export const SupportContactsScreen = observer(() => {
   const { colors } = useTheme()

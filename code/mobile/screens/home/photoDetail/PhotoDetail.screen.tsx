@@ -1,5 +1,5 @@
 import { FlatList, StyleSheet, Text, View } from 'react-native'
-import { observer } from 'mobx-react'
+import { observer } from 'mobx-react-lite'
 import { Comment } from './components/comment/Comment'
 import PhotoDetailVM from './PhotoDetail.vm'
 import { IComment } from '../../../../core/types/apiPhotoComment'

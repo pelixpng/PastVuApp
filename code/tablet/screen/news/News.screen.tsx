@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native'
 import { useNavigation, useTheme } from '@react-navigation/native'
-import { observer } from 'mobx-react'
+import { observer } from 'mobx-react-lite'
 import { HeaderIconButton } from '../../../core/components/ui/buttons/HeaderIconButton'
 import NewsVM, { NewsTab } from './News.vm'
 import { useVM } from '../../../core/hooks/useVM'

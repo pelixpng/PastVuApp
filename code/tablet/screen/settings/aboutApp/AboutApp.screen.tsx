@@ -6,7 +6,7 @@ import { UICard } from '../../../../core/components/ui/UICards'
 import { Spacer } from '../../../../core/components/ui/Spacer'
 import { Links } from '../../../../core/constants/links'
 import { formatLongDate, t } from '../../../../core/i18n'
-import { observer } from 'mobx-react'
+import { observer } from 'mobx-react-lite'
 
 const APP_VERSION = '2.6.1'
 const RELEASE_DATE = new Date('2026-09-22')

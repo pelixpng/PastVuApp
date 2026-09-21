@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import { FlatList, StyleSheet, View } from 'react-native'
 import { useFocusEffect, useTheme } from '@react-navigation/native'
-import { observer } from 'mobx-react'
+import { observer } from 'mobx-react-lite'
 import CollectionVM, { CollectionTab } from './Collection.vm'
 import { PhotoListItem } from './components/Item'
 import { MenuButton } from '../../../../core/components/ui/buttons/menuButton/MenuButton'
