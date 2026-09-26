@@ -22,8 +22,8 @@ import { useTheme } from '@react-navigation/native'
 // Required lazily: its native spec is resolved at import time and would throw where it is absent.
 const captureRef: typeof import('react-native-view-shot').captureRef | null =
   Platform.OS === 'ios' ? require('react-native-view-shot').captureRef : null
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5'
-import MaterialIcons from '@expo/vector-icons/MaterialIcons'
+import { FontAwesome5 } from '../ui/icons'
+import { MaterialIcons } from '../ui/icons'
 import { StreetViewPanorama } from '../streetView/StreetViewPanorama'
 import { StreetViewTarget } from '../../services/streetView'
 import { MyButton } from '../ui/buttons/MyButton'

@@ -1,4 +1,6 @@
 PODS:
+  - AppKeys (1.0.0):
+    - ExpoModulesCore
   - AppLocale (1.0.0):
     - ExpoModulesCore
   - CameraLenses (1.0.0):
@@ -186,16 +188,16 @@ PODS:
     - ExpoModulesCore
   - ExpoCamera (57.0.5):
     - ExpoModulesCore
-  - ExpoDomWebView (57.0.1):
-    - ExpoModulesCore
   - ExpoFileSystem (57.0.6):
     - ExpoModulesCore
   - ExpoFont (57.0.1):
     - ExpoModulesCore
   - ExpoImage (57.0.4):
     - ExpoModulesCore
-  - ExpoKeepAwake (57.0.1):
-    - ExpoModulesCore
+    - SDWebImage (~> 5.21.0)
+    - SDWebImageAVIFCoder (~> 0.11.0)
+    - SDWebImageSVGCoder (~> 1.7.0)
+    - SDWebImageWebPCoder (~> 0.14.6)
   - ExpoLinearGradient (57.0.1):
     - ExpoModulesCore
   - ExpoLocalization (57.0.1):
@@ -275,6 +277,19 @@ PODS:
   - hermes-engine (250829098.0.17):
     - hermes-engine/Pre-built (= 250829098.0.17)
   - hermes-engine/Pre-built (250829098.0.17)
+  - libavif/core (1.0.0)
+  - libwebp (1.6.0):
+    - libwebp/demux (= 1.6.0)
+    - libwebp/mux (= 1.6.0)
+    - libwebp/sharpyuv (= 1.6.0)
+    - libwebp/webp (= 1.6.0)
+  - libwebp/demux (1.6.0):
+    - libwebp/webp
+  - libwebp/mux (1.6.0):
+    - libwebp/demux
+  - libwebp/sharpyuv (1.6.0)
+  - libwebp/webp (1.6.0):
+    - libwebp/sharpyuv
   - RCTDeprecation (0.86.3)
   - RCTRequired (0.86.3)
   - RCTSwiftUI (0.86.3)
@@ -2520,7 +2535,18 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - YamapLite (1.0.1):
+  - SDWebImage (5.21.7):
+    - SDWebImage/Core (= 5.21.7)
+  - SDWebImage/Core (5.21.7)
+  - SDWebImageAVIFCoder (0.11.1):
+    - libavif/core (>= 0.11.0)
+    - SDWebImage (~> 5.10)
+  - SDWebImageSVGCoder (1.7.0):
+    - SDWebImage/Core (~> 5.6)
+  - SDWebImageWebPCoder (0.14.6):
+    - libwebp (~> 1.0)
+    - SDWebImage/Core (~> 5.17)
+  - YamapLite (1.0.3):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2547,6 +2573,7 @@ PODS:
   - Yoga (0.0.0)
 
 DEPENDENCIES:
+  - AppKeys (from `../modules/app-keys/ios`)
   - AppLocale (from `../modules/app-locale/ios`)
   - CameraLenses (from `../modules/camera-lenses/ios`)
   - EXConstants (from `../node_modules/expo-constants/ios`)
@@ -2559,11 +2586,9 @@ DEPENDENCIES:
   - expo-dev-menu-interface (from `../node_modules/expo-dev-menu-interface/ios`)
   - ExpoAsset (from `../node_modules/expo/node_modules/expo-asset/ios`)
   - ExpoCamera (from `../node_modules/expo-camera/ios/ExpoCamera.podspec`)
-  - "ExpoDomWebView (from `../node_modules/expo/node_modules/@expo/dom-webview/ios`)"
   - ExpoFileSystem (from `../node_modules/expo-file-system/ios/ExpoFileSystem.podspec`)
   - ExpoFont (from `../node_modules/expo-font/ios/ExpoFont.podspec`)
-  - ExpoImage (from `../node_modules/expo-image/ios/ExpoImage.podspec`)
-  - ExpoKeepAwake (from `../node_modules/expo/node_modules/expo-keep-awake/ios`)
+  - ExpoImage (from `../node_modules/expo-image/ios`)
   - ExpoLinearGradient (from `../node_modules/expo-linear-gradient/ios`)
   - ExpoLocalization (from `../node_modules/expo-localization/ios`)
   - ExpoLocation (from `../node_modules/expo-location/ios/ExpoLocation.podspec`)
@@ -2663,14 +2688,22 @@ DEPENDENCIES:
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNWorklets (from `../node_modules/react-native-worklets`)
-  - YamapLite (from `../node_modules/react-native-yamap-lite`)
+  - "YamapLite (from `../node_modules/@exterio/react-native-yamap-lite`)"
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
   trunk:
+    - libavif
+    - libwebp
+    - SDWebImage
+    - SDWebImageAVIFCoder
+    - SDWebImageSVGCoder
+    - SDWebImageWebPCoder
     - YandexMapsMobile
 
 EXTERNAL SOURCES:
+  AppKeys:
+    :path: "../modules/app-keys/ios"
   AppLocale:
     :path: "../modules/app-locale/ios"
   CameraLenses:
@@ -2695,16 +2728,12 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo/node_modules/expo-asset/ios"
   ExpoCamera:
     :podspec: "../node_modules/expo-camera/ios/ExpoCamera.podspec"
-  ExpoDomWebView:
-    :path: "../node_modules/expo/node_modules/@expo/dom-webview/ios"
   ExpoFileSystem:
     :podspec: "../node_modules/expo-file-system/ios/ExpoFileSystem.podspec"
   ExpoFont:
     :podspec: "../node_modules/expo-font/ios/ExpoFont.podspec"
   ExpoImage:
-    :podspec: "../node_modules/expo-image/ios/ExpoImage.podspec"
-  ExpoKeepAwake:
-    :path: "../node_modules/expo/node_modules/expo-keep-awake/ios"
+    :path: "../node_modules/expo-image/ios"
   ExpoLinearGradient:
     :path: "../node_modules/expo-linear-gradient/ios"
   ExpoLocalization:
@@ -2903,11 +2932,12 @@ EXTERNAL SOURCES:
   RNWorklets:
     :path: "../node_modules/react-native-worklets"
   YamapLite:
-    :path: "../node_modules/react-native-yamap-lite"
+    :path: "../node_modules/@exterio/react-native-yamap-lite"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
+  AppKeys: 62c8099c03790dc266e01897196104750d1f23f2
   AppLocale: 536b847ca422287f904a4f2a922ce6e7b0d21306
   CameraLenses: 72847b432da6fdf9bdcf738d663f31be94aa9000
   EXConstants: 60ffbdb43032130f0465ae75675897285fc25647
@@ -2920,11 +2950,9 @@ SPEC CHECKSUMS:
   expo-dev-menu-interface: 7a59e803916fbfd1b96c75ff91ea8dddac7e722f
   ExpoAsset: f827e444c147cc06bb1a552708f3551efd1c6b29
   ExpoCamera: ab39a517d753767d3dcd2385850490e62b30f1dd
-  ExpoDomWebView: fa9c72fe29dd4649197a7ecb07ddd870d55c4eda
   ExpoFileSystem: 19bcf4cd8ecbaae0313ac74ceb8fde3125a8e2e8
   ExpoFont: 17668fb7b4e06edf35e015183eb7bc09d83be637
-  ExpoImage: 749bc498f78d35b535cb746594b07f6ec6b732bd
-  ExpoKeepAwake: 20a87dafdd9d84d68673e8eaf1a1c7eed8f92659
+  ExpoImage: 2e5cfec6bbbddfb37710cf95a92a3955994352fc
   ExpoLinearGradient: 93e951fa19ee7b4bb1a8e2c97227bcfc4bacfa9a
   ExpoLocalization: 17c950d2a25996f2f8e07acdfed5e3c1e258c17e
   ExpoLocation: 1428b1f5b1cdd37612e538b3afcc99b4f2374b00
@@ -2940,6 +2968,8 @@ SPEC CHECKSUMS:
   EXUpdatesInterface: 38eacf4b5c0d686727ccbfebaf4f76eab3766a63
   FBLazyVector: 2138c6c2ab66c31bf5754dc18097fbc498a49c7f
   hermes-engine: 63c5db7d529c36335fada6582fd293ae2a105d77
+  libavif: 5f8e715bea24debec477006f21ef9e95432e254d
+  libwebp: af5937a13536ef73f3784d69cc342b98961acf33
   RCTDeprecation: 96f68ebf33f8762466b01d57d6e873c4f30efb07
   RCTRequired: 166eed8ad6d8440e73e56d09a9090366609823d2
   RCTSwiftUI: e818198d11928a78c2b2afe281d072171dab617f
@@ -3023,10 +3053,14 @@ SPEC CHECKSUMS:
   RNReanimated: 516d842d105966ae05a6a1ad7ad2a0dc1e968d6b
   RNScreens: dcd5c85a822d9cbb21fc321bbbbcf918f3d48c23
   RNWorklets: ca7e0a49681a74e09f09e389aefd9e453fa0079b
-  YamapLite: 98849c9df1440b683727c1023cb772c4da8dbbc8
+  SDWebImage: e9fc87c1aab89a8ab1bbd74eba378c6f53be8abf
+  SDWebImageAVIFCoder: afe194a084e851f70228e4be35ef651df0fc5c57
+  SDWebImageSVGCoder: 15a300a97ec1c8ac958f009c02220ac0402e936c
+  SDWebImageWebPCoder: e38c0a70396191361d60c092933e22c20d5b1380
+  YamapLite: 7c6251e1eb6abf1e8102045f3f81fa13f9e1de7d
   YandexMapsMobile: e6443bf72724581ec9f884abdbae254273bc2912
   Yoga: 18b74b3ade30bebc1904004dfaceae1dd02a330a
 
-PODFILE CHECKSUM: 31df5276ed4ddfd626d24cc6e91947eda889d668
+PODFILE CHECKSUM: 3c703a996b0fcbe5565c77daf618b453e96d9339
 
 COCOAPODS: 1.16.2

@@ -525,7 +525,7 @@ index c12b94b..0000000
 -    }
 -}
 diff --git a/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/Components/YamapLiteView.kt b/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/Components/YamapLiteView.kt
-index 095543f..7837823 100644
+index 095543f..3ced73b 100644
 --- a/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/Components/YamapLiteView.kt
 +++ b/node_modules/@exterio/react-native-yamap-lite/android/src/main/java/com/yamaplite/Components/YamapLiteView.kt
 @@ -6,6 +6,8 @@ import android.graphics.PointF
@@ -559,18 +559,22 @@ index 095543f..7837823 100644
  
    init {
      setupMap()
-@@ -174,6 +182,10 @@ open class YamapLiteView(context: Context) :
+@@ -174,6 +182,14 @@ open class YamapLiteView(context: Context) :
      mapView.mapWindow.setMaxFps(maxFps)
    }
  
 +  fun setMinZoomPreference(minZoom: Float) {
 +    _minZoomPreference = minZoom
++    // Hard limit for gestures; the camera listener below is a fallback in case MapKit treats it as a hint.
++    if (minZoom > 0f) {
++      mapView.mapWindow.map.cameraBounds.setMinZoomPreference(minZoom)
++    }
 +  }
 +
    fun setMapType(type: String?) {
      mapType = type ?: "map"
      mapView.mapWindow.map.mapType =
-@@ -360,12 +372,6 @@ open class YamapLiteView(context: Context) :
+@@ -360,12 +376,6 @@ open class YamapLiteView(context: Context) :
      addReactChildToList(child, index)
      if (child is YamapLiteMarkerView) {
        child.addToMap(mapView)
@@ -583,7 +587,7 @@ index 095543f..7837823 100644
      }
    }
  
-@@ -373,12 +379,6 @@ open class YamapLiteView(context: Context) :
+@@ -373,12 +383,6 @@ open class YamapLiteView(context: Context) :
      val child = removeReactChildFromListAt(index) ?: return
      if (child is YamapLiteMarkerView) {
        child.removeFromMap(mapView)
@@ -596,7 +600,7 @@ index 095543f..7837823 100644
      }
    }
  
-@@ -443,6 +443,18 @@ open class YamapLiteView(context: Context) :
+@@ -443,6 +447,18 @@ open class YamapLiteView(context: Context) :
            reason: CameraUpdateReason,
            finished: Boolean
    ) {
@@ -1052,6 +1056,31 @@ index 210f5c0..0000000
 -    }
 -  }
 -}
+diff --git a/node_modules/@exterio/react-native-yamap-lite/ios/Components/ClusteredYamap.swift b/node_modules/@exterio/react-native-yamap-lite/ios/Components/ClusteredYamap.swift
+index 502a04a..359162d 100644
+--- a/node_modules/@exterio/react-native-yamap-lite/ios/Components/ClusteredYamap.swift
++++ b/node_modules/@exterio/react-native-yamap-lite/ios/Components/ClusteredYamap.swift
+@@ -49,10 +49,6 @@ public class ClusteredYamapView: YamapView {
+       !(subview is YMKMapView) && subview.responds(to: Selector(("contentView")))
+       && (subview.value(forKey: "contentView") as? YamapLiteMarker) != nil
+ 
+-    let isCircle =
+-      !(subview is YMKMapView) && subview.responds(to: Selector(("contentView")))
+-      && (subview.value(forKey: "contentView") as? YamapLiteCircle) != nil
+-
+     if isMarker {
+       let safeIndex = min(atIndex, subviews.count)
+       insertSubview(subview, at: safeIndex)
+@@ -62,9 +58,6 @@ public class ClusteredYamapView: YamapView {
+           markerView.setClusterMapObject(placemarks[atIndex])
+         }
+       }
+-    } else if isCircle {
+-      let safeIndex = min(atIndex, subviews.count)
+-      super.insertReactSubview(subview, at: safeIndex)
+     } else {
+       let safeIndex = min(atIndex, subviews.count)
+       super.insertReactSubview(subview, at: safeIndex)
 diff --git a/node_modules/@exterio/react-native-yamap-lite/ios/Components/Marker.swift b/node_modules/@exterio/react-native-yamap-lite/ios/Components/Marker.swift
 index f4713df..98428b8 100644
 --- a/node_modules/@exterio/react-native-yamap-lite/ios/Components/Marker.swift
@@ -1336,26 +1365,28 @@ index 5268dac..0000000
 -    }
 -}
 diff --git a/node_modules/@exterio/react-native-yamap-lite/ios/Components/Yamap.swift b/node_modules/@exterio/react-native-yamap-lite/ios/Components/Yamap.swift
-index cbfaa69..d81ef14 100644
+index cbfaa69..bdd4929 100644
 --- a/node_modules/@exterio/react-native-yamap-lite/ios/Components/Yamap.swift
 +++ b/node_modules/@exterio/react-native-yamap-lite/ios/Components/Yamap.swift
-@@ -109,6 +109,9 @@ public class YamapView: UIView {
+@@ -109,6 +109,10 @@ public class YamapView: UIView {
      map.isTiltGesturesEnabled = tiltGesturesEnabled
      map.isRotateGesturesEnabled = rotateGesturesEnabled
      map.isFastTapEnabled = fastTapEnabled
 +    if minZoomPreference > 0 {
 +      map.cameraBounds.setMinZoomPreferenceWithZoom(minZoomPreference)
++      cameraListener?.minZoomPreference = minZoomPreference
 +    }
  
      self.updateUserIcon()
    }
-@@ -131,6 +134,14 @@ public class YamapView: UIView {
+@@ -131,6 +135,15 @@ public class YamapView: UIView {
        userLocationLayer.resetAnchor()
      }
    }
 +  // PastVu: keeps the camera from zooming out past this level.
 +  @objc public var minZoomPreference: Float = 0 {
 +    didSet {
++      cameraListener?.minZoomPreference = minZoomPreference
 +      guard let map = mapView?.mapWindow?.map else { return }
 +      map.cameraBounds.setMinZoomPreferenceWithZoom(minZoomPreference)
 +    }
@@ -1364,6 +1395,115 @@ index cbfaa69..d81ef14 100644
    @objc public var maxFps: Float = 60 {
      didSet {
        if maxFps <= 0 || maxFps > 60 {
+@@ -174,6 +187,7 @@ public class YamapView: UIView {
+ 
+     if cameraListener == nil {
+       let cameraDelegate = CameraListener(callback: nil, delegate: delegate)
++      cameraDelegate.minZoomPreference = minZoomPreference
+       cameraListener = cameraDelegate
+       map.addCameraListener(with: cameraDelegate)
+     }
+@@ -508,30 +522,6 @@ public class YamapView: UIView {
+       }
+     }
+ 
+-    else if let circleContainer = subview as? UIView,
+-      let circleView = circleContainer.value(forKey: "contentView") as? YamapLiteCircle
+-    {
+-      if circleView.radius > 0,
+-        circleView.circleCenter.latitude.isFinite,
+-        circleView.circleCenter.longitude.isFinite
+-      {
+-        let nativeMapObjects = mapView.mapWindow.map.mapObjects
+-        let circleObject = nativeMapObjects.addCircle(with: circleView.circle)
+-        circleView.setMapObject(object: circleObject)
+-      }
+-    } else if let polygonContainer = subview as? UIView,
+-      let polygonView = polygonContainer.value(forKey: "contentView") as? YamapLitePolygon
+-    {
+-      let nativeMapObjects = mapView.mapWindow.map.mapObjects
+-      let polygonObject = nativeMapObjects.addPolygon(with: polygonView.polygon)
+-      polygonView.setMapObject(object: polygonObject)
+-    } else if let polylineContainer = subview as? UIView,
+-      let polylineView = polylineContainer.value(forKey: "contentView") as? YamapLitePolyline
+-    {
+-      let nativeMapObjects = mapView.mapWindow.map.mapObjects
+-      let polylineObject = nativeMapObjects.addPolyline(with: polylineView.polyline)
+-      polylineView.setMapObject(object: polylineObject)
+-    }
+   }
+ 
+   @objc override public func removeReactSubview(_ subview: UIView!) {
+@@ -547,18 +537,6 @@ public class YamapView: UIView {
+         nativeMapObjects.remove(with: obj)
+       }
+       mapObjects.removeAll { $0 === markerView }
+-    } else if let circleView = contentView as? YamapLiteCircle {
+-      if let obj = circleView.mapObject, obj.isValid {
+-        nativeMapObjects.remove(with: obj)
+-      }
+-    } else if let polygonView = contentView as? YamapLitePolygon {
+-      if let obj = polygonView.mapObject, obj.isValid {
+-        nativeMapObjects.remove(with: obj)
+-      }
+-    } else if let polylineView = contentView as? YamapLitePolyline {
+-      if let obj = polylineView.mapObject, obj.isValid {
+-        nativeMapObjects.remove(with: obj)
+-      }
+     }
+   }
+ 
+diff --git a/node_modules/@exterio/react-native-yamap-lite/ios/Listeners/CameraListener.swift b/node_modules/@exterio/react-native-yamap-lite/ios/Listeners/CameraListener.swift
+index 4a40856..b96f981 100644
+--- a/node_modules/@exterio/react-native-yamap-lite/ios/Listeners/CameraListener.swift
++++ b/node_modules/@exterio/react-native-yamap-lite/ios/Listeners/CameraListener.swift
+@@ -5,6 +5,8 @@ import YandexMapsMobile
+ class CameraListener: NSObject, YMKMapCameraListener {
+     private let callback: RCTDirectEventBlock?
+     private weak var delegate: YamapViewComponentDelegate?
++    // PastVu: fallback in case MapKit treats the min zoom preference as a hint only.
++    var minZoomPreference: Float = 0
+ 
+     init(callback: RCTDirectEventBlock?, delegate: YamapViewComponentDelegate?) {
+         self.callback = callback
+@@ -12,11 +14,19 @@ class CameraListener: NSObject, YMKMapCameraListener {
+         super.init()
+     }
+ 
+-    func onCameraPositionChanged(with _: YMKMap,
++    func onCameraPositionChanged(with map: YMKMap,
+                                  cameraPosition: YMKCameraPosition,
+                                  cameraUpdateReason : YMKCameraUpdateReason,
+                                  finished: Bool)
+     {
++        if finished && minZoomPreference > 0 && cameraPosition.zoom < minZoomPreference {
++            let snapped = YMKCameraPosition(target: cameraPosition.target,
++                                            zoom: minZoomPreference,
++                                            azimuth: cameraPosition.azimuth,
++                                            tilt: cameraPosition.tilt)
++            map.move(with: snapped, animation: YMKAnimation(type: .smooth, duration: 0.2))
++            return
++        }
+         let target = cameraPosition.target
+         let reasonString: String
+         switch cameraUpdateReason {
+diff --git a/node_modules/@exterio/react-native-yamap-lite/ios/Utils/ResolveImageHelper.swift b/node_modules/@exterio/react-native-yamap-lite/ios/Utils/ResolveImageHelper.swift
+index f2a9327..3593313 100644
+--- a/node_modules/@exterio/react-native-yamap-lite/ios/Utils/ResolveImageHelper.swift
++++ b/node_modules/@exterio/react-native-yamap-lite/ios/Utils/ResolveImageHelper.swift
+@@ -31,6 +31,12 @@ public class ResolveImageHelper {
+       return nil
+     }
+ 
++    // Native Xcode assets (Images.xcassets): the app passes marker names, not URLs.
++    if let namedImage = UIImage(named: uri as String) {
++      completion?(namedImage)
++      return namedImage
++    }
++
+     if uri.hasPrefix("file://") || uri.hasPrefix("/") {
+       var url = URL(string: uri as String)
+       if url == nil {
 diff --git a/node_modules/@exterio/react-native-yamap-lite/ios/YamapLiteCircleView.h b/node_modules/@exterio/react-native-yamap-lite/ios/YamapLiteCircleView.h
 deleted file mode 100644
 index 7ba40e6..0000000
@@ -1809,7 +1949,7 @@ index 54faf7b..0000000
 -
 -@end
 diff --git a/node_modules/@exterio/react-native-yamap-lite/ios/YamapLiteView.mm b/node_modules/@exterio/react-native-yamap-lite/ios/YamapLiteView.mm
-index eaa60cf..c022899 100644
+index eaa60cf..a5af430 100644
 --- a/node_modules/@exterio/react-native-yamap-lite/ios/YamapLiteView.mm
 +++ b/node_modules/@exterio/react-native-yamap-lite/ios/YamapLiteView.mm
 @@ -1,9 +1,6 @@
@@ -1822,7 +1962,33 @@ index eaa60cf..c022899 100644
  #include <os/log.h>
  
  #include <Foundation/Foundation.h>
-@@ -146,6 +143,9 @@ - (void)updateProps:(Props::Shared const &)props
+@@ -125,17 +122,14 @@ - (void)updateProps:(Props::Shared const &)props
+   if (oldViewProps.followUser != newViewProps.followUser) {
+     self->_view.followUser = newViewProps.followUser;
+   }
+-  if (oldViewProps.logoPosition.horizontal !=
+-          newViewProps.logoPosition.horizontal ||
+-      oldViewProps.logoPosition.vertical !=
+-          newViewProps.logoPosition.vertical) {
+-    [self->_view setLogoPositionWithPosition:@{
+-      @"horizontal" :
+-          RCTNSStringFromString(toString(newViewProps.logoPosition.horizontal)),
+-      @"vertical" :
+-          RCTNSStringFromString(toString(newViewProps.logoPosition.vertical))
+-    }];
+-  }
++  // PastVu: always apply. The spec defaults to left/bottom while MapKit defaults to right/bottom,
++  // so a prop equal to the spec default never differed from oldProps and was silently skipped.
++  [self->_view setLogoPositionWithPosition:@{
++    @"horizontal" :
++        RCTNSStringFromString(toString(newViewProps.logoPosition.horizontal)),
++    @"vertical" :
++        RCTNSStringFromString(toString(newViewProps.logoPosition.vertical))
++  }];
+   if (oldViewProps.logoPadding.vertical != newViewProps.logoPadding.vertical ||
+       oldViewProps.logoPadding.horizontal !=
+           newViewProps.logoPadding.horizontal) {
+@@ -146,6 +140,9 @@ - (void)updateProps:(Props::Shared const &)props
    if (oldViewProps.maxFps != newViewProps.maxFps) {
      self->_view.maxFps = newViewProps.maxFps;
    }
@@ -1832,7 +1998,7 @@ index eaa60cf..c022899 100644
    [self->_view applyProperties];
  
    [super updateProps:props oldProps:oldProps];
-@@ -304,24 +304,12 @@ - (void)mountChildComponentView:
+@@ -304,24 +301,12 @@ - (void)mountChildComponentView:
    if ([childComponentView isKindOfClass:YamapLiteMarkerView.class]) {
      [_view insertReactSubview:childComponentView atIndex:index];
    }
@@ -2019,6 +2185,30 @@ index d73651b..0000000
 -export type YamapLiteCircleViewComponent = HostComponent<NativeProps>;
 -
 -export default codegenNativeComponent<NativeProps>('YamapLiteCircleView');
+diff --git a/node_modules/@exterio/react-native-yamap-lite/lib/module/YamapLiteViewNativeComponent.ts b/node_modules/@exterio/react-native-yamap-lite/lib/module/YamapLiteViewNativeComponent.ts
+index 6c347a4..045f465 100644
+--- a/node_modules/@exterio/react-native-yamap-lite/lib/module/YamapLiteViewNativeComponent.ts
++++ b/node_modules/@exterio/react-native-yamap-lite/lib/module/YamapLiteViewNativeComponent.ts
+@@ -78,6 +78,7 @@ export interface NativeProps extends ViewProps {
+   zoomGesturesEnabled?: WithDefault<boolean, true>;
+   tiltGesturesEnabled?: WithDefault<boolean, true>;
+   rotateGesturesEnabled?: WithDefault<boolean, true>;
++  minZoomPreference?: Float;
+   fastTapEnabled?: WithDefault<boolean, true>;
+   initialRegion?: InitialRegion;
+   maxFps?: Float;
+diff --git a/node_modules/@exterio/react-native-yamap-lite/lib/module/YamapMarkerViewNativeComponent.ts b/node_modules/@exterio/react-native-yamap-lite/lib/module/YamapMarkerViewNativeComponent.ts
+index f0eddef..51f48d2 100644
+--- a/node_modules/@exterio/react-native-yamap-lite/lib/module/YamapMarkerViewNativeComponent.ts
++++ b/node_modules/@exterio/react-native-yamap-lite/lib/module/YamapMarkerViewNativeComponent.ts
+@@ -16,6 +16,7 @@ export interface NativeProps extends ViewProps {
+   zInd?: Int32;
+   scale?: Double;
+   rotated?: boolean;
++  rotation?: Double;
+   onMarkerPress?: DirectEventHandler<Readonly<Point>>;
+   source?: string;
+   anchor?: {
 diff --git a/node_modules/@exterio/react-native-yamap-lite/lib/module/YamapPolygonViewNativeComponent.ts b/node_modules/@exterio/react-native-yamap-lite/lib/module/YamapPolygonViewNativeComponent.ts
 deleted file mode 100644
 index f448d34..0000000

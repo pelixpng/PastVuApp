@@ -69,6 +69,15 @@
         "exclude": [
           "react-native-view-shot"
         ]
+      },
+      "apple": {
+        "buildFromSource": [
+          "expo-image"
+        ],
+        "exclude": [
+          "@expo/dom-webview",
+          "expo-keep-awake"
+        ]
       }
     }
   }

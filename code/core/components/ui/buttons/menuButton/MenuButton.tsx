@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import MaterialIcons from '@expo/vector-icons/MaterialIcons'
+import { MaterialIcons } from '../../icons'
 import { View, Text } from 'react-native'
 import { useTheme } from '@react-navigation/native'
 import { UICard } from '../../UICards'

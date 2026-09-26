@@ -2,7 +2,7 @@ import { FC, useState } from 'react'
 import { ActivityIndicator, Linking, StyleSheet, Text, View } from 'react-native'
 import { WebView } from 'react-native-webview'
 import { useTheme } from '@react-navigation/native'
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5'
+import { FontAwesome5 } from '../ui/icons'
 import { t } from '../../i18n'
 import {
   googleMapsUrl,

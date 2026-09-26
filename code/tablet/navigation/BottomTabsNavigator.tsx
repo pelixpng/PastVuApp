@@ -1,5 +1,5 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import MaterialIcons from '@expo/vector-icons/MaterialIcons'
+import { MaterialIcons } from '../../core/components/ui/icons'
 import { StyleSheet } from 'react-native'
 import { StackParamList } from './stackParams.types'
 import { SCREENS } from './navigation.types'

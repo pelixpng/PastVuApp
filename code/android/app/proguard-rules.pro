@@ -19,7 +19,9 @@
 # MMKV and the app's own Expo modules are called from native/JSI code.
 -keep class com.margelo.** { *; }
 -keep class expo.modules.applocale.** { *; }
+-keep class expo.modules.appkeys.** { *; }
 -keep class expo.modules.screencapture.** { *; }
+-keep class expo.modules.windowregion.** { *; }
 # expo-camera is built from source with the barcode scanner disabled: its ML Kit
 # references stay in the bytecode but are never reached.
 -dontwarn com.google.mlkit.**

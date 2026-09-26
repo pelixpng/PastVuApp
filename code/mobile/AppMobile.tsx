@@ -1,6 +1,6 @@
 import { createRef, useEffect, useMemo } from 'react'
 import { AppState, Platform, StatusBar, useColorScheme, View, StyleSheet } from 'react-native'
-import MaterialIcons from '@expo/vector-icons/MaterialIcons'
+import { MaterialIcons } from '../core/components/ui/icons'
 import { observer } from 'mobx-react-lite'
 import { SystemBars } from 'react-native-edge-to-edge'
 import { createStackNavigator } from '@react-navigation/stack'

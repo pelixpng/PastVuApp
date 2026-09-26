@@ -90,9 +90,22 @@ android {
     namespace 'com.pelixpng.PastVuApp'
     defaultConfig {
         applicationId 'com.pelixpng.PastVuApp'
+        // PastVu: API keys come from the project's .env at build time and land in the manifest as
+        // <meta-data>, read by modules/app-keys. See plugins/withApiKeys.js.
+        def pastvuEnv = new Properties()
+        def pastvuEnvFile = rootProject.file('../.env')
+        if (pastvuEnvFile.exists()) { pastvuEnvFile.withReader('UTF-8') { pastvuEnv.load(it) } }
+        def pastvuKey = { String name ->
+            (pastvuEnv.getProperty(name) ?: System.getenv(name) ?: '').trim().replaceAll(/^["']|["']$/, '')
+        }
+        manifestPlaceholders += [
+            PLACE_API_KEY: pastvuKey('PLACE_API_KEY'),
+            STREET_VIEW_API_KEY: pastvuKey('STREET_VIEW_API_KEY'),
+            YANDEX_MAPS_API_KEY: pastvuKey('YANDEX_MAPS_API_KEY'),
+        ]
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 49
+        versionCode 54
         versionName "2.6.1"
 
         buildConfigField "String", "REACT_NATIVE_RELEASE_LEVEL", "\"${findProperty('reactNativeReleaseLevel') ?: 'stable'}\""

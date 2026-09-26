@@ -1,0 +1,9 @@
+{
+  "_comment": "Glyphs kept in the trimmed icon fonts. Add a name here and run scripts/subset-icon-fonts.py; the icon components are typed from the generated glyph maps, so a name missing here is a compile error.",
+  "MaterialIcons": [
+    "arrow-back", "article", "close", "compare", "favorite", "favorite-border", "history", "info",
+    "mail", "map", "no-photography", "photo-camera", "replay", "save-alt", "search", "settings", "share"
+  ],
+  "FontAwesome5": ["location-arrow", "street-view"],
+  "Feather": ["more-horizontal"]
+}

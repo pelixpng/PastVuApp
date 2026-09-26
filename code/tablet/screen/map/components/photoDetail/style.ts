@@ -8,6 +8,12 @@ export const s = StyleSheet.create({
     zIndex: 50,
     right: 0,
   },
+  // Clips the slide to the panel's final area, so the post appears to come in from the screen edge.
+  slideFrame: { overflow: 'hidden' },
+  // A background makes Android count this view as covering the map when it gathers the window's
+  // transparent region. 1/255 black is invisible over the map and under the panel.
+  regionAnchor: { backgroundColor: '#00000001' },
+  panel: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',

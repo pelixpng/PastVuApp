@@ -1,11 +1,11 @@
-import Constants from 'expo-constants'
+import { getApiKey } from '../../modules/app-keys'
 import { YamapUtils } from '@exterio/react-native-yamap-lite'
 
 /**
  * Yandex MapKit needs its key before the first map mounts, and the SDK is loaded lazily by the
  * native module, so this runs once at app start. Without a key the option is not offered at all.
  */
-const API_KEY: string = Constants.expoConfig?.extra?.yandexMapsApiKey ?? ''
+const API_KEY: string = getApiKey('YANDEX_MAPS_API_KEY')
 
 export const isYandexConfigured = () => API_KEY.length > 0
 
