@@ -13,10 +13,17 @@ import {
   View,
 } from 'react-native'
 import { CameraView, useCameraPermissions } from 'expo-camera'
-import { captureRef } from 'react-native-view-shot'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTheme } from '@react-navigation/native'
-import { FontAwesome5, MaterialIcons } from '@expo/vector-icons'
+
+// react-native-view-shot is linked on iOS only. On Android the panorama's WebView draws on the
+// GPU and a view snapshot leaves it black, so the PixelCopy module below is used there and the
+// library is excluded from the Android build (package.json, expo.autolinking.android.exclude).
+// Required lazily: its native spec is resolved at import time and would throw where it is absent.
+const captureRef: typeof import('react-native-view-shot').captureRef | null =
+  Platform.OS === 'ios' ? require('react-native-view-shot').captureRef : null
+import { FontAwesome5 } from '../ui/icons'
+import { MaterialIcons } from '../ui/icons'
 import { StreetViewPanorama } from '../streetView/StreetViewPanorama'
 import { StreetViewTarget } from '../../services/streetView'
 import { MyButton } from '../ui/buttons/MyButton'
@@ -168,10 +175,14 @@ export const CompareView: FC<Props> = ({
       // sees, badges included. On Android the panorama's WebView draws on the GPU and a plain
       // view snapshot leaves it black, hence the PixelCopy module.
       const tag = ScreenCapture ? findNodeHandle(collage.current) : null
-      const uri =
-        ScreenCapture && tag
-          ? await ScreenCapture.captureView(tag)
-          : await captureRef(collage, { format: 'jpg', quality: 0.92 })
+      let uri: string
+      if (ScreenCapture && tag) {
+        uri = await ScreenCapture.captureView(tag)
+      } else if (captureRef) {
+        uri = await captureRef(collage, { format: 'jpg', quality: 0.92 })
+      } else {
+        throw new Error('No snapshot module on this platform')
+      }
       await saveLocalImage(uri)
     } catch (error) {
       console.error('saveCollage failed', error)

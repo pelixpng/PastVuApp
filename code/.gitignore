@@ -24,6 +24,7 @@ web-build/
 .env
 .env.local
 android/keystore.properties
+ios/Keys.xcconfig
 
 # Артефакты сборки локальных Expo-модулей
 modules/**/build/

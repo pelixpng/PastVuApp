@@ -2,7 +2,7 @@
   "expo": {
     "name": "PastVu",
     "slug": "PastVuApp",
-    "version": "2.6.0",
+    "version": "2.6.1",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -30,7 +30,7 @@
       "requireFullScreen": true,
       "userInterfaceStyle": "automatic",
       "bundleIdentifier": "com.pelixpng.PastVuApp",
-      "buildNumber": "68",
+      "buildNumber": "70",
       "appleTeamId": "989AHJ2KDZ",
       "entitlements": {
         "com.apple.security.application-groups": [
@@ -39,7 +39,10 @@
       },
       "icon": "./assets/PastVu.icon",
       "infoPlist": {
-        "EXDefaultScreenOrientationMask": "UIInterfaceOrientationMaskAll"
+        "EXDefaultScreenOrientationMask": "UIInterfaceOrientationMaskAll",
+        "PLACE_API_KEY": "$(PLACE_API_KEY)",
+        "STREET_VIEW_API_KEY": "$(STREET_VIEW_API_KEY)",
+        "YANDEX_MAPS_API_KEY": "$(YANDEX_MAPS_API_KEY)"
       }
     },
     "android": {
@@ -54,10 +57,14 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.pelixpng.PastVuApp",
-      "versionCode": 44,
+      "versionCode": 54,
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION"
+      ],
+      "blockedPermissions": [
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.VIBRATE"
       ]
     },
     "extra": {
@@ -70,7 +77,9 @@
         "expo-build-properties",
         {
           "android": {
-            "minSdkVersion": 26
+            "minSdkVersion": 28,
+            "enableMinifyInReleaseBuilds": true,
+            "extraProguardRules": "# React Native view managers of the Yandex map fork are looked up by name.\n-keep class com.yamaplite.** { *; }\n# MMKV and the app's own Expo modules are called from native/JSI code.\n-keep class com.margelo.** { *; }\n-keep class expo.modules.applocale.** { *; }\n-keep class expo.modules.appkeys.** { *; }\n-keep class expo.modules.screencapture.** { *; }\n-keep class expo.modules.windowregion.** { *; }\n# expo-camera is built from source with the barcode scanner disabled: its ML Kit\n# references stay in the bytecode but are never reached.\n-dontwarn com.google.mlkit.**"
           }
         }
       ],
@@ -107,8 +116,7 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "Доступ к геолокации позволяет нам показать на карте интересные фотографии рядом с вами.",
-          "motionUsagePermission": false
+          "locationWhenInUsePermission": "Доступ к геолокации позволяет нам показать на карте интересные фотографии рядом с вами."
         }
       ],
       "@bacons/apple-targets",
@@ -116,7 +124,12 @@
       "./plugins/withReleaseSigning",
       "./plugins/withLintConfig",
       "./plugins/withMapsKeyPlaceholder",
-      "expo-image",
+      [
+        "expo-image",
+        {
+          "disableLibdav1d": true
+        }
+      ],
       "expo-localization",
       [
         "expo-localization",
@@ -139,7 +152,8 @@
           ],
           "allowDynamicLocaleChangesAndroid": true
         }
-      ]
+      ],
+      "./plugins/withApiKeys"
     ]
   }
 }

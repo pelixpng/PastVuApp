@@ -24,6 +24,21 @@ platform :ios, podfile_properties['ios.deploymentTarget'] || '16.4'
 
 prepare_react_native_project!
 
+# PastVu: Info.plist holds $(NAME) references for the API keys; the values come from ../.env
+# through this generated, git-ignored xcconfig. See plugins/withApiKeys.js.
+pre_install do |installer|
+  env_file = File.expand_path('../.env', __dir__)
+  values = {}
+  if File.exist?(env_file)
+    File.foreach(env_file) do |line|
+      next unless line =~ /\A\s*([A-Z0-9_]+)\s*=\s*(.*?)\s*\z/
+      values[$1] = $2.gsub(/\A["']|["']\z/, '')
+    end
+  end
+  keys = %w[PLACE_API_KEY STREET_VIEW_API_KEY YANDEX_MAPS_API_KEY]
+  File.write(File.join(__dir__, 'Keys.xcconfig'), keys.map { |k| "#{k} = #{values[k] || ''}" }.join("\n") + "\n")
+end
+
 target 'PastVu' do
   use_expo_modules!
 
@@ -63,6 +78,12 @@ target 'PastVu' do
       :mac_catalyst_enabled => false,
       :ccache_enabled => ccache_enabled?(podfile_properties),
     )
+    # PastVu: make the app target's xcconfig pull in the generated Keys.xcconfig.
+    Dir.glob(File.join(__dir__, 'Pods', 'Target Support Files', 'Pods-PastVu', '*.xcconfig')).each do |xcconfig|
+      include_line = '#include? "../../../Keys.xcconfig"'
+      content = File.read(xcconfig)
+      File.write(xcconfig, content + "\n" + include_line + "\n") unless content.include?(include_line)
+    end
   end
 end
 

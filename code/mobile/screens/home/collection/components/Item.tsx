@@ -1,7 +1,7 @@
 import { FC } from 'react'
 import { Image } from 'expo-image'
 import { Alert, TouchableOpacity, View, Text } from 'react-native'
-import { MaterialIcons, Feather } from '@expo/vector-icons'
+import { Feather } from '../../../../../core/components/ui/icons'
 import { s } from './style'
 import { useTheme } from '@react-navigation/native'
 import { Spacer } from '../../../../../core/components/ui/Spacer'

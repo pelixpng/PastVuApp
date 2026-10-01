@@ -1,13 +1,13 @@
-import { Platform, useColorScheme, StyleSheet } from 'react-native'
-import { StatusBar } from 'expo-status-bar'
-import { createRef, useMemo } from 'react'
+import { AppState, Platform, StatusBar, useColorScheme, StyleSheet } from 'react-native'
+import { SystemBars } from 'react-native-edge-to-edge'
+import { createRef, useEffect, useMemo } from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
 import {
   NavigationContainer,
   NavigationContainerRef,
   ParamListBase,
 } from '@react-navigation/native'
-import { observer } from 'mobx-react'
+import { observer } from 'mobx-react-lite'
 import { DarkTheme, LightTheme } from '../core/components/theme/Theme'
 import ThemeStore from '../core/store/Theme.store'
 import { StackParamList } from './navigation/stackParams.types'
@@ -26,9 +26,29 @@ export default observer(function AppTablet() {
       ThemeStore.selectedTheme === 'light' || (isSystemTheme && colorScheme === 'light')
     return isLightTheme ? LightTheme : DarkTheme
   }, [ThemeStore.selectedTheme, colorScheme])
+  useEffect(() => {
+    if (Platform.OS !== 'android') return
+    // See AppMobile: the status bar is written through the WindowInsetsController appearance
+    // as well, since the legacy flags SystemBars sets get ignored once that API has been touched.
+    const apply = () =>
+      StatusBar.setBarStyle(theme === DarkTheme ? 'light-content' : 'dark-content', true)
+    apply()
+    const subscription = AppState.addEventListener('change', state => {
+      if (state === 'active') apply()
+    })
+    return () => subscription.remove()
+  }, [theme, colorScheme])
   return (
     <NavigationContainer ref={NavigationRef} theme={theme}>
-      <StatusBar animated style={'auto'} />
+      {/* Follows the app's theme, not the system one: with a light app on a dark system
+          (or vice versa) `auto` painted the status bar the wrong colour and it vanished.
+          Android runs edge-to-edge, where React Native's StatusBar ignores style changes, so the
+          system bars are driven through react-native-edge-to-edge there. */}
+      {Platform.OS === 'android' ? (
+        <SystemBars style={theme === DarkTheme ? 'light' : 'dark'} />
+      ) : (
+        <StatusBar animated barStyle={theme === DarkTheme ? 'light-content' : 'dark-content'} />
+      )}
       <Stack.Navigator
         initialRouteName={SCREENS.BOTTOM_TAB_NAVIGATOR}
         screenOptions={{

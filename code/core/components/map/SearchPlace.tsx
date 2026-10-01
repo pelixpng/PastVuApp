@@ -1,12 +1,12 @@
 import { FC, useState } from 'react'
 import { View, FlatList, TouchableOpacity, Text, TextInput, StyleSheet } from 'react-native'
-import { MaterialIcons } from '@expo/vector-icons'
+import { MaterialIcons } from '../ui/icons'
 import { useTheme } from '@react-navigation/native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { LocationItem } from '../../types/apiPhotoList'
 import { Spacer } from '../ui/Spacer'
 import { t } from '../../i18n'
-import { observer } from 'mobx-react'
+import { observer } from 'mobx-react-lite'
 
 type SearchPlaceProps = {
   places: LocationItem[]
@@ -62,7 +62,7 @@ const LocationSearch: FC<SearchPlaceProps> = ({
           data={places}
           scrollEnabled={false}
           keyboardShouldPersistTaps={'always'}
-          keyExtractor={(item, index) => index.toString()}
+          keyExtractor={(_, index) => index.toString()}
           contentContainerStyle={[s.list, { backgroundColor: colors.backgroundApp }]}
           ItemSeparatorComponent={() => <Spacer height={8} />}
           renderItem={({ item }) => (

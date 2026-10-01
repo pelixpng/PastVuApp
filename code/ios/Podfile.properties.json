@@ -3,7 +3,7 @@
   "EX_DEV_CLIENT_NETWORK_INSPECTOR": "true",
   "expo.inlineModules.watchedDirectories": "[]",
   "expo.inlineModules.xcodeProjectTargets": "{\"mainTarget\":\"PastVu\",\"targets\":[]}",
-  "expo-image.disable-libdav1d": "false",
+  "expo-image.disable-libdav1d": "true",
   "expo.camera.barcode-scanner-enabled": "false",
   "ios.forceStaticLinking": "[]",
   "apple.privacyManifestAggregationEnabled": "true",

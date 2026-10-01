@@ -1,0 +1,14 @@
+diff --git a/node_modules/react-native-render-html/src/context/ListStyleSpecsProvider.tsx b/node_modules/react-native-render-html/src/context/ListStyleSpecsProvider.tsx
+index 822a4b7..2720207 100644
+--- a/node_modules/react-native-render-html/src/context/ListStyleSpecsProvider.tsx
++++ b/node_modules/react-native-render-html/src/context/ListStyleSpecsProvider.tsx
+@@ -1,6 +1,8 @@
+ /* eslint-disable react-native/no-inline-styles */
+ import { MarkerBoxProps } from '@jsamr/react-native-li';
+-import { mapObjIndexed } from 'ramda';
++// PastVu: the only ramda function used from the sources Metro bundles; importing it from the
++// package index dragged the whole library (330 files) into the bundle.
++import mapObjIndexed from 'ramda/src/mapObjIndexed';
+ import React, {
+   createContext,
+   PropsWithChildren,

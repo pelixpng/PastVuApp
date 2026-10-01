@@ -1,5 +1,5 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import { MaterialIcons } from '@expo/vector-icons'
+import { MaterialIcons } from '../../core/components/ui/icons'
 import { StyleSheet } from 'react-native'
 import { StackParamList } from './stackParams.types'
 import { SCREENS } from './navigation.types'
@@ -9,7 +9,7 @@ import { CollectionScreen } from '../screen/collection/Collection.screen'
 import { NewsScreen } from '../screen/news/News.screen'
 import { SettingsMenuScreen } from '../screen/settings/settingsMenu/SettingsMenu.screen'
 import { t } from '../../core/i18n'
-import { observer } from 'mobx-react'
+import { observer } from 'mobx-react-lite'
 
 const Tab = createBottomTabNavigator<StackParamList>()
 

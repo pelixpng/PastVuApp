@@ -1,4 +1,4 @@
-import Constants from 'expo-constants'
+import { getApiKey } from '../../modules/app-keys'
 
 /**
  * Street View for "how does this place look today".
@@ -26,7 +26,7 @@ export type StreetViewInfo = {
   panoId?: string
 }
 
-const API_KEY: string = Constants.expoConfig?.extra?.streetViewApiKey ?? ''
+const API_KEY: string = getApiKey('STREET_VIEW_API_KEY')
 
 /**
  * Origin the key is locked to. Both the WebView (as `baseUrl`) and the metadata request (as

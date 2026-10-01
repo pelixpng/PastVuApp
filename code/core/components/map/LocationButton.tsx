@@ -1,5 +1,5 @@
 import { FC, memo } from 'react'
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5'
+import { FontAwesome5 } from '../ui/icons'
 import { StyleSheet, TouchableOpacity } from 'react-native'
 import { useTheme } from '@react-navigation/native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'

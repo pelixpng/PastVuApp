@@ -1,0 +1,31 @@
+diff --git a/node_modules/react-native-zoom-toolkit-swipe/src/index.ts b/node_modules/react-native-zoom-toolkit-swipe/src/index.ts
+index dbea962..b84483a 100644
+--- a/node_modules/react-native-zoom-toolkit-swipe/src/index.ts
++++ b/node_modules/react-native-zoom-toolkit-swipe/src/index.ts
+@@ -1,15 +1,12 @@
++// PastVu: the app uses only SnapbackZoom, ResumableZoom, useImageResolution and fitContainer.
++// Metro has no tree shaking, so re-exporting Gallery, CropZoom, useTransformationState and
++// stackTransition from here pulled their whole module graph into the bundle for nothing.
+ export { default as SnapbackZoom } from './components/snapback/SnapbackZoom';
+ export type * from './components/snapback/types';
+ 
+ export { default as ResumableZoom } from './components/resumable/ResumableZoom';
+ export type * from './components/resumable/types';
+ 
+-export { default as CropZoom } from './components/crop/CropZoom';
+-export * from './components/crop/types';
+-
+-export { default as Gallery } from './components/gallery/GalleryProvider';
+-export * from './components/gallery/types';
+-
+ export type {
+   PanMode,
+   ScaleMode,
+@@ -35,7 +32,4 @@ export {
+   type Source,
+ } from './hooks/useImageResolution';
+ 
+-export { useTransformationState } from './hooks/useTransformationState';
+-
+ export { fitContainer } from './utils/fitContainer';
+-export { stackTransition } from './commons/misc/stacktransition';

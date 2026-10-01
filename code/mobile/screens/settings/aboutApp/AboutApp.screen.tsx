@@ -6,10 +6,10 @@ import { UICard } from '../../../../core/components/ui/UICards'
 import { Spacer } from '../../../../core/components/ui/Spacer'
 import { Links } from '../../../../core/constants/links'
 import { formatLongDate, t } from '../../../../core/i18n'
-import { observer } from 'mobx-react'
+import { observer } from 'mobx-react-lite'
 
-const APP_VERSION = '2.6.0'
-const RELEASE_DATE = new Date('2026-09-12')
+const APP_VERSION = '2.6.1'
+const RELEASE_DATE = new Date('2026-09-22')
 
 export const AboutAppScreen = observer(() => {
   const { colors } = useTheme()
@@ -17,7 +17,7 @@ export const AboutAppScreen = observer(() => {
     <Container isScroll pdHorizontal={16}>
       <Spacer height={18} />
       <View style={s.block}>
-        <Image style={s.image} source={require('../../../../assets/icon.png')} />
+        <Image style={s.image} source={require('../../../../assets/iconAbout.png')} />
         <Spacer height={16} />
         <Text selectable style={[s.descriptionText, { color: colors.textSecond }]}>
           {t('about.version', { version: APP_VERSION, date: formatLongDate(RELEASE_DATE) })}

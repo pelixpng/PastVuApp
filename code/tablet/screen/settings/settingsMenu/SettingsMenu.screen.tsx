@@ -1,4 +1,4 @@
-import { observer } from 'mobx-react'
+import { observer } from 'mobx-react-lite'
 import SettingsVM from './SettingsMenu.vm'
 import { Container } from '../../../../core/components/ui/Container'
 import { MenuButton } from '../../../../core/components/ui/buttons/menuButton/MenuButton'

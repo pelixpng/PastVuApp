@@ -1,7 +1,7 @@
 import { SliderComponent } from './components/settingsSlider/SliderSettings'
 import { Platform } from 'react-native'
 import { RadioButtons } from '../../../../core/components/ui/buttons/radioButton/RadioButtons'
-import { observer } from 'mobx-react'
+import { observer } from 'mobx-react-lite'
 import AppSettingsVM from './AppSettings.vm'
 import { Container } from '../../../../core/components/ui/Container'
 import { UICard } from '../../../../core/components/ui/UICards'
