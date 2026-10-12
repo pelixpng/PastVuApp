@@ -41,6 +41,7 @@ export const MapScreen = observer(() => {
 					onRegionChangeComplete={vm.setCoordinate}
 					onShowPhoto={vm.showPhoto}
 					onGoToLocation={vm.zoomToCluster}
+					isTablet
 				/>
 			)}
 			{vm.showPhotoDetail && (
@@ -51,6 +52,7 @@ export const MapScreen = observer(() => {
 					closePhoto={vm.closePhoto}
 					onImageLoaded={vm.onImageLoad}
 					openFullScreen={vm.openFullScreenImage}
+					colorize={vm.colorize}
 					saveImage={vm.saveImage}
 					share={vm.share}
 					imageLink={vm.imageLink}

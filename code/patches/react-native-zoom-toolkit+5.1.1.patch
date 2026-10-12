@@ -1,0 +1,55 @@
+diff --git a/node_modules/react-native-zoom-toolkit/lib/module/index.js b/node_modules/react-native-zoom-toolkit/lib/module/index.js
+index 6609002..82e88f4 100644
+--- a/node_modules/react-native-zoom-toolkit/lib/module/index.js
++++ b/node_modules/react-native-zoom-toolkit/lib/module/index.js
+@@ -1,14 +1,10 @@
+ "use strict";
+ 
++// PastVu: the app uses only SnapbackZoom, ResumableZoom, useImageResolution and fitContainer.
++// Metro has no tree shaking, so re-exporting Gallery, CropZoom, useZoomCallbacks,
++// useTransformationState and stackTransition pulled their whole module graph into the bundle.
+ export { default as SnapbackZoom } from "./components/snapback/SnapbackZoom.js";
+ export { default as ResumableZoom } from "./components/resumable/ResumableZoom.js";
+-export { default as CropZoom } from "./components/crop/CropZoom.js";
+-export * from "./components/crop/types.js";
+-export { default as Gallery } from "./components/gallery/GalleryProvider.js";
+-export * from "./components/gallery/types.js";
+ export { default as useImageResolution } from "./hooks/useImageResolution.js";
+-export { default as useZoomCallbacks } from "./hooks/useZoomCallbacks.js";
+-export { useTransformationState } from "./hooks/useTransformationState.js";
+ export { fitContainer } from "./utils/fitContainer.js";
+-export { stackTransition } from "./commons/misc/stacktransition.js";
+ //# sourceMappingURL=index.js.map
+\ No newline at end of file
+diff --git a/node_modules/react-native-zoom-toolkit/src/index.ts b/node_modules/react-native-zoom-toolkit/src/index.ts
+index fce4cd4..9d92657 100644
+--- a/node_modules/react-native-zoom-toolkit/src/index.ts
++++ b/node_modules/react-native-zoom-toolkit/src/index.ts
+@@ -1,15 +1,12 @@
++// PastVu: the app uses only SnapbackZoom, ResumableZoom, useImageResolution and fitContainer.
++// Metro has no tree shaking, so re-exporting Gallery, CropZoom, useZoomCallbacks,
++// useTransformationState and stackTransition pulled their whole module graph into the bundle.
+ export { default as SnapbackZoom } from './components/snapback/SnapbackZoom';
+ export type * from './components/snapback/types';
+ 
+ export { default as ResumableZoom } from './components/resumable/ResumableZoom';
+ export type * from './components/resumable/types';
+ 
+-export { default as CropZoom } from './components/crop/CropZoom';
+-export * from './components/crop/types';
+-
+-export { default as Gallery } from './components/gallery/GalleryProvider';
+-export * from './components/gallery/types';
+-
+ export type {
+   PanMode,
+   ScaleMode,
+@@ -35,8 +32,5 @@ export {
+   type Source,
+ } from './hooks/useImageResolution';
+ 
+-export { default as useZoomCallbacks } from './hooks/useZoomCallbacks';
+-export { useTransformationState } from './hooks/useTransformationState';
+ 
+ export { fitContainer } from './utils/fitContainer';
+-export { stackTransition } from './commons/misc/stacktransition';

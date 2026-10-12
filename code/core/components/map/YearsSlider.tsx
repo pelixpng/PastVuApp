@@ -11,6 +11,9 @@ type YearsSliderProps = {
   isTablet?: boolean
 }
 
+/** How far the slider reaches up from its bottom edge, in points: padding, two lines and the track. */
+export const YEARS_SLIDER_HEIGHT = 12 + 20 + 25 + 20 + 8
+
 const YearsSliderComponent: FC<YearsSliderProps> = ({ value, setValue, isTablet }) => {
   const { colors } = useTheme()
   const tabBarHeight = useBottomTabBarHeight()

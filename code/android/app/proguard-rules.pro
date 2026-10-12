@@ -22,6 +22,9 @@
 -keep class expo.modules.appkeys.** { *; }
 -keep class expo.modules.screencapture.** { *; }
 -keep class expo.modules.windowregion.** { *; }
+-keep class expo.modules.colorizer.** { *; }
+# ONNX Runtime's Java classes are created and read from its native library.
+-keep class ai.onnxruntime.** { *; }
 # expo-camera is built from source with the barcode scanner disabled: its ML Kit
 # references stay in the bytecode but are never reached.
 -dontwarn com.google.mlkit.**

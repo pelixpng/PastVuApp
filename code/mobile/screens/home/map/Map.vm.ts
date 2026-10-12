@@ -26,7 +26,7 @@ import { YearsRangeType } from '../../../../core/types/components'
 import MapStore from '../../../../core/store/Map.store'
 import ApiStore from '../../../../core/store/Api.store'
 import {
-	getPolygon,
+	getPolygons,
 	getZoom,
 	zoomLevelToAltitude
 } from '../../../../core/utils/getMapData'
@@ -238,7 +238,7 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
 			const zoom = getZoom(this.coordinates.latitudeDelta)
 			if (ApiStore.showCluster === 'yes') {
 				const paramsClustersApi: getClustersPhotosProps = {
-					polygon: getPolygon(this.coordinates),
+					polygons: getPolygons(this.coordinates),
 					latitude: this.coordinates.latitude,
 					longitude: this.coordinates.longitude,
 					yearStart: this.yearsRange[0],

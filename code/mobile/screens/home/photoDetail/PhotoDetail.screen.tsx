@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native'
 import { observer } from 'mobx-react-lite'
 import { Comment } from './components/comment/Comment'
 import PhotoDetailVM from './PhotoDetail.vm'
@@ -7,17 +7,21 @@ import { Container } from '../../../../core/components/ui/Container'
 import { useNavigation, useTheme } from '@react-navigation/native'
 import { PostInfo } from './components/postInfo/PostInfo'
 import { Spacer } from '../../../../core/components/ui/Spacer'
-import { useCallback, useEffect, useLayoutEffect } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react'
 import { HeaderIconButton } from '../../../../core/components/ui/buttons/HeaderIconButton'
-import { ImageZoom } from './components/imageView/ImageZoom'
+import { ImageZoom } from '../../../../core/components/photo/ImageZoom'
+import { ColourReveal } from '../../../../core/components/colorize/ColourReveal'
 import { useVM } from '../../../../core/hooks/useVM'
 import { t } from '../../../../core/i18n'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import Animated, { Easing, ZoomIn, ZoomOut } from 'react-native-reanimated'
 
 export const PhotoDetailScreen = observer(() => {
   const vm = useVM(PhotoDetailVM)
   const { colors } = useTheme()
   const insets = useSafeAreaInsets()
+  // The colour photo above the original is being zoomed and has to cover it.
+  const [colourRaised, setColourRaised] = useState(false)
   const renderItem = useCallback(
     ({ item }: { item: IComment }) => (
       <Comment comment={item} users={vm.users} onLinkPress={vm.openPhotoFromLink} />
@@ -30,6 +34,35 @@ export const PhotoDetailScreen = observer(() => {
     navigation.setOptions({
       headerRight: () => (
         <View style={s.backIcon}>
+          {/* Once coloured: the colour version above the black-and-white original. Grows in, so
+              a button turning up in the header does not go unnoticed. */}
+          {vm.isColorized && !vm.isColorizing && (
+            <Animated.View style={s.compareButton} entering={BUTTON_IN} exiting={BUTTON_OUT}>
+              <HeaderIconButton
+                name="view-agenda"
+                color={vm.isComparingOriginal ? colors.basePrimary : colors.textFirst}
+                onPress={vm.toggleCompareOriginal}
+                accessibilityLabel={
+                  vm.isComparingOriginal ? t('colorize.compareHide') : t('colorize.compare')
+                }
+              />
+            </Animated.View>
+          )}
+          {/* Colours the photo everywhere it shows, and back to the original on a second press.
+              Only on black-and-white photos. */}
+          {vm.isColorizing ? (
+            <View style={s.headerSpinner}>
+              <ActivityIndicator color={colors.textFirst} />
+            </View>
+          ) : vm.canColorize ? (
+            <HeaderIconButton
+              name="palette"
+              color={vm.isColorized ? colors.basePrimary : colors.textFirst}
+              onPress={vm.toggleColorize}
+              accessibilityLabel={vm.isColorized ? t('colorize.original') : t('colorize.start')}
+            />
+          ) : null}
+          {(vm.isColorizing || vm.canColorize) && <Spacer width={4} />}
           <HeaderIconButton name="compare" color={colors.textFirst} onPress={vm.openCompare} />
           <Spacer width={4} />
           <HeaderIconButton
@@ -44,7 +77,16 @@ export const PhotoDetailScreen = observer(() => {
         </View>
       ),
     })
-  }, [vm.postInfo, vm.isFavorite, colors.textFirst, navigation])
+  }, [
+    vm.postInfo,
+    vm.isFavorite,
+    vm.isColorizing,
+    vm.isColorized,
+    vm.canColorize,
+    vm.isComparingOriginal,
+    colors,
+    navigation,
+  ])
 
   useEffect(() => {
     return navigation.addListener('beforeRemove', e => {
@@ -64,10 +106,29 @@ export const PhotoDetailScreen = observer(() => {
   }
   return (
     <Container>
+      {vm.isColorized && (
+        <ColourReveal open={vm.isComparingOriginal} raised={colourRaised}>
+          <ImageZoom
+            uri={vm.displayLink}
+            resolution={vm.imageResolution}
+            openFullScreenImage={vm.openFullScreenImage}
+            onImageLoaded={noop}
+            onZoomStart={() => setColourRaised(true)}
+            onZoomEnd={() => setColourRaised(false)}
+          />
+        </ColourReveal>
+      )}
+      {/* The original, with the colour version laid over it once coloured. While compared the
+          colour layer fades out here, as the colour photo now sits above. */}
       <ImageZoom
         uri={vm.imageLink}
+        overlayUri={vm.isColorized ? vm.displayLink : undefined}
+        overlayHidden={vm.isComparingOriginal}
+        colorizing={vm.isColorizing}
         resolution={vm.imageResolution}
-        openFullScreenImage={vm.openFullScreenImage}
+        openFullScreenImage={
+          vm.isComparingOriginal ? vm.openOriginalFullScreen : vm.openFullScreenImage
+        }
         onImageLoaded={vm.onImageLoad}
       />
       <Spacer height={16} />
@@ -90,6 +151,11 @@ export const PhotoDetailScreen = observer(() => {
   )
 })
 
+const noop = () => {}
+
+const BUTTON_IN = ZoomIn.duration(220).easing(Easing.out(Easing.cubic))
+const BUTTON_OUT = ZoomOut.duration(160)
+
 const s = StyleSheet.create({
   listStyle: { marginHorizontal: 16 },
   titleText: {
@@ -98,4 +164,8 @@ const s = StyleSheet.create({
     fontWeight: '800',
   },
   backIcon: { flexDirection: 'row', marginRight: 6 },
+  // The 4 pt gap to the palette, as between the other header buttons.
+  compareButton: { marginRight: 4 },
+  // The 44 pt box of a header button, so the row does not shift while the photo is being coloured.
+  headerSpinner: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center' },
 })

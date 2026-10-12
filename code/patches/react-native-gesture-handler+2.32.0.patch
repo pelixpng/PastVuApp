@@ -1,3 +1,20 @@
+diff --git a/node_modules/react-native-gesture-handler/apple/Handlers/RNTapHandler.m b/node_modules/react-native-gesture-handler/apple/Handlers/RNTapHandler.m
+index eafe719..2dc1f06 100644
+--- a/node_modules/react-native-gesture-handler/apple/Handlers/RNTapHandler.m
++++ b/node_modules/react-native-gesture-handler/apple/Handlers/RNTapHandler.m
+@@ -132,6 +132,12 @@ - (void)interactionsEnded:(NSSet *)touches withEvent:(UIEvent *)event
+ {
+   [_gestureHandler.pointerTracker touchesEnded:touches withEvent:event];
+ 
++  // PastVu: backport of the 2.33.0 fix. maxDuration limits how long the finger stays down, so
++  // its timer goes once the finger lifts. Left running, it disabled a tap that had already
++  // ended but was still waiting for a double tap to fail (Gesture.Exclusive(doubleTap, tap)),
++  // so any tap held longer than about 50 ms was lost.
++  [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(cancel) object:nil];
++
+   if (_numberOfTaps == _tapsSoFar && _maxNumberOfTouches >= _minPointers) {
+     self.state = UIGestureRecognizerStateEnded;
+   } else {
 diff --git a/node_modules/react-native-gesture-handler/src/index.ts b/node_modules/react-native-gesture-handler/src/index.ts
 index dcf7998..62c152f 100644
 --- a/node_modules/react-native-gesture-handler/src/index.ts

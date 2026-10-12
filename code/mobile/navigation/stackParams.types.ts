@@ -10,14 +10,25 @@ export type StackParamList = {
   [SCREENS.NEWS]: undefined
   [SCREENS.SETTINGS_MENU]: undefined
   [SCREENS.PHOTO_DETAIL]: { cid: string; title: string }
-  [SCREENS.FULL_SCREEN_IMAGE]: { uri: string; title: string; cid: string; file: string }
+  [SCREENS.FULL_SCREEN_IMAGE]: {
+    uri: string
+    title: string
+    cid: string
+    file: string
+    /** The colour version on disk, saved in place of the original while it is shown. */
+    localFile?: string
+  }
   [SCREENS.COMPARE]: {
+    /** Ties the palette button here to the post's colour version. */
+    cid: string
+    /** The original; the colour version, when it is on, comes from ColorizeStore. */
     photo: ComparePhoto
     mode: CompareMode
     target?: StreetViewTarget | null
     year?: number
   }
   [SCREENS.NEWS_POST]: NewsItems
+  [SCREENS.PROFILE]: { login: string }
   [SCREENS.ABOUT_APP]: undefined
   [SCREENS.SUPPORT_CONTACTS]: undefined
   [SCREENS.APP_SETTINGS]: undefined

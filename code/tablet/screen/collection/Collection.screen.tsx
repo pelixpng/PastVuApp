@@ -19,6 +19,7 @@ import { MenuButton } from '../../../core/components/ui/buttons/menuButton/MenuB
 import { PhotoDetail } from './components/photoDetail/PhotoDetail'
 import { Container } from '../../../core/components/ui/Container'
 import { HeaderIconButton } from '../../../core/components/ui/buttons/HeaderIconButton'
+import { ColorizeButtons } from '../../../core/components/colorize/ColorizeButtons'
 import { SegmentedControl } from '../../../core/components/ui/segmentedControl/SegmentedControl'
 import { t } from '../../../core/i18n'
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
@@ -52,6 +53,8 @@ export const CollectionScreen = observer(() => {
     navigation.setOptions({
       headerRight: () => (
         <View style={s.header}>
+          {/* Palette and the comparison with the original; the latter not over the then-and-now view. */}
+          <ColorizeButtons colorize={vm.colorize} showCompareOriginal={!vm.compareMode} />
           <HeaderIconButton name="compare" color={colors.textFirst} onPress={vm.openCompare} />
           <Spacer width={4} />
           <HeaderIconButton name={vm.isFavorite ? 'favorite' : 'favorite-border'} color={colors.textFirst} onPress={vm.toggleFavorite} />
@@ -62,7 +65,7 @@ export const CollectionScreen = observer(() => {
         </View>
       ),
     })
-  }, [vm.postInfo, vm.isFavorite, colors.textFirst, navigation])
+  }, [vm.postInfo, vm.isFavorite, vm.compareMode, colors.textFirst, navigation])
 
   const renderItem = useCallback(
     ({ item }: { item: CollectionItem }) => (
@@ -124,7 +127,9 @@ export const CollectionScreen = observer(() => {
         imageLink={vm.imageLink}
         isImageLoaded={vm.isImageLoaded}
         showLoader={vm.showLoader}
+        photoSelected={vm.selectedItem !== null}
         openFullScreen={vm.openFullScreenImage}
+        colorize={vm.colorize}
         onLinkPress={vm.openPhotoFromLink}
         compareMode={vm.compareMode}
         closeCompare={vm.closeCompare}

@@ -14,6 +14,11 @@ class MapStore {
 	@observable maxPhotoOnMap = MMKVStorage.get('MaxPhoto') ?? 150
 	@observable mapProvider: MapProvider =
 		MMKVStorage.get('mapProvider') ?? defaultMapProvider
+	/**
+	 * The user agreed to what Yandex collects (its terms, 8.1: IP address, device ID, location),
+	 * asked once, when Yandex Maps is first chosen in the settings.
+	 */
+	@observable yandexConsent: boolean = MMKVStorage.get('yandexConsent') === 'yes'
 
 	constructor() {
 		makeObservable(this)
@@ -29,6 +34,13 @@ class MapStore {
 	setMapProvider = (value: string) => {
 		this.mapProvider = value as MapProvider
 		MMKVStorage.set('mapProvider', value)
+	}
+
+	@action.bound
+	acceptYandex = () => {
+		this.yandexConsent = true
+		MMKVStorage.set('yandexConsent', 'yes')
+		this.setMapProvider('yandex')
 	}
 
 	@action.bound

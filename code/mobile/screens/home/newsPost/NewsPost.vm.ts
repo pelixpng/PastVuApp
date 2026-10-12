@@ -5,6 +5,7 @@ import { BaseViewModelProvider } from '../../../provider/vm.provider'
 import { IComment, Users } from '../../../../core/types/apiPhotoComment'
 import { NewsItems } from '../../../../core/types/apiNews'
 import ApiService from '../../../../core/api/apiService'
+import { userLoginFromLink } from '../../../../core/utils/userLink'
 
 class NewsPostVM extends BaseViewModelProvider<SCREENS.NEWS_POST> {
   @observable comments: IComment[] = []
@@ -73,8 +74,18 @@ class NewsPostVM extends BaseViewModelProvider<SCREENS.NEWS_POST> {
         Linking.openURL(`https://pastvu.com/news/${newsMatch[1]}`)
       }
     } else {
-      Linking.openURL(href)
+      const login = userLoginFromLink(href)
+      if (login) {
+        this.pushTo(SCREENS.PROFILE, { login })
+      } else {
+        Linking.openURL(href)
+      }
     }
+  }
+
+  @action.bound
+  openProfile(login: string) {
+    this.pushTo(SCREENS.PROFILE, { login })
   }
 
   @action.bound

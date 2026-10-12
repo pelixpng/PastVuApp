@@ -1,11 +1,14 @@
-import { FC } from 'react'
+import { FC, useState } from 'react'
 import { View, Text } from 'react-native'
+import { observer } from 'mobx-react-lite'
 import { s } from './style'
 import { useTheme } from '@react-navigation/native'
 import RenderHTML from 'react-native-render-html'
 import { formatDate } from '../../../../../core/utils/getTime'
 import { Spacer } from '../../../../../core/components/ui/Spacer'
-import { ImageZoom } from '../imageView/ImageZoom'
+import { ImageZoom } from '../../../../../core/components/photo/ImageZoom'
+import { ColourReveal } from '../../../../../core/components/colorize/ColourReveal'
+import { PostColorize } from '../../../../../core/store/PostColorize'
 import { photoResolution } from '../../../../../core/services/photoPost'
 import { t } from '../../../../../core/i18n'
 
@@ -13,18 +16,25 @@ type PostInfoProps = {
   postInfo: Photo
   imageLink: string
   onImageLoaded: () => void
-  openFullScreen: () => void
+  /** `original`: the black-and-white photo under the colour one while they are compared. */
+  openFullScreen: (original?: boolean) => void
   onLinkPress?: (href: string) => void
+  colorize?: PostColorize
 }
 
-export const PostInfo: FC<PostInfoProps> = ({
+// An observer: the colour version comes and goes without the panel re-rendering.
+export const PostInfo: FC<PostInfoProps> = observer(({
   postInfo,
   imageLink,
   onImageLoaded,
   openFullScreen,
   onLinkPress,
+  colorize,
 }) => {
   const { colors } = useTheme()
+  // The colour photo above the original is being zoomed and has to cover it.
+  const [colourRaised, setColourRaised] = useState(false)
+  const comparing = colorize?.isComparingOriginal ?? false
   const commentTotal = postInfo?.ccount || 0
   const titlesRegion = postInfo?.regions?.map(region => region.title_local).join(', ')
   const locationText = postInfo?.y + ', ' + titlesRegion
@@ -38,10 +48,27 @@ export const PostInfo: FC<PostInfoProps> = ({
   const lastEditFormat = formatDate(postInfo?.cdate)
   return (
     <View>
+      {colorize?.isColorized && (
+        <ColourReveal open={comparing} raised={colourRaised}>
+          <ImageZoom
+            uri={colorize.displayLink}
+            resolution={photoResolution(postInfo)}
+            openFullScreenImage={() => openFullScreen()}
+            onImageLoaded={noop}
+            onZoomStart={() => setColourRaised(true)}
+            onZoomEnd={() => setColourRaised(false)}
+          />
+        </ColourReveal>
+      )}
+      {/* The original, with the colour version laid over it once coloured. While compared the
+          colour layer fades out here, as the colour photo now sits above. */}
       <ImageZoom
         uri={imageLink}
+        overlayUri={colorize?.isColorized ? colorize.displayLink : undefined}
+        overlayHidden={comparing}
+        colorizing={colorize?.isColorizing}
         resolution={photoResolution(postInfo)}
-        openFullScreenImage={openFullScreen}
+        openFullScreenImage={() => openFullScreen(comparing)}
         onImageLoaded={onImageLoaded}
       />
       <Spacer height={12} />
@@ -138,4 +165,6 @@ export const PostInfo: FC<PostInfoProps> = ({
       </View>
     </View>
   )
-}
+})
+
+const noop = () => {}

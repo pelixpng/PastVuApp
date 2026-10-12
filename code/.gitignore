@@ -28,3 +28,10 @@ ios/Keys.xcconfig
 
 # Артефакты сборки локальных Expo-модулей
 modules/**/build/
+
+# Модель раскраски DDColor-L (224 МБ): локальный результат scripts/colorizer/convert_ddcolor.py. В сборку не входит —
+# приложение скачивает её при первой раскраске с huggingface.co/pelixpng/pastvu-colorizer
+modules/colorizer/ios/Colorizer.mlmodelc/
+
+# Кэш Python от скриптов в scripts/
+__pycache__/

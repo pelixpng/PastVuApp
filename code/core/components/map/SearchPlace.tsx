@@ -64,7 +64,6 @@ const LocationSearch: FC<SearchPlaceProps> = ({
           keyboardShouldPersistTaps={'always'}
           keyExtractor={(_, index) => index.toString()}
           contentContainerStyle={[s.list, { backgroundColor: colors.backgroundApp }]}
-          ItemSeparatorComponent={() => <Spacer height={8} />}
           renderItem={({ item }) => (
             <TouchableOpacity
               style={s.rowContainer}
@@ -87,11 +86,9 @@ const s = StyleSheet.create({
     position: 'absolute',
     zIndex: 9,
   },
+  // The rows fill the list edge to edge, so a tap anywhere on it lands on a place.
   list: {
-    paddingTop: 12,
-    paddingBottom: 12,
-    paddingLeft: 20,
-    paddingRight: 8,
+    paddingVertical: 8,
     borderRadius: 12,
   },
   input: {
@@ -107,9 +104,13 @@ const s = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 12,
   },
+  // 34 pt rows with no gaps, so all of the list is tappable.
   rowContainer: {
-    height: 20,
+    height: 34,
+    paddingLeft: 20,
+    paddingRight: 8,
     flexDirection: 'row',
+    alignItems: 'center',
     overflow: 'hidden',
   },
   ball: {
@@ -118,7 +119,9 @@ const s = StyleSheet.create({
     borderRadius: 50,
     alignSelf: 'center',
   },
+  // Shrinks to the row, so numberOfLines cuts a long name with an ellipsis instead of clipping it.
   resultText: {
+    flex: 1,
     fontSize: 14,
     fontWeight: 'medium',
   },

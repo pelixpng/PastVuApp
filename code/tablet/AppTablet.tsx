@@ -1,7 +1,11 @@
-import { AppState, Platform, StatusBar, useColorScheme, StyleSheet } from 'react-native'
+import { AppState, Platform, StatusBar, useColorScheme, StyleSheet, View } from 'react-native'
 import { SystemBars } from 'react-native-edge-to-edge'
 import { createRef, useEffect, useMemo } from 'react'
-import { createStackNavigator } from '@react-navigation/stack'
+import {
+  CardStyleInterpolators,
+  HeaderStyleInterpolators,
+  createStackNavigator,
+} from '@react-navigation/stack'
 import {
   NavigationContainer,
   NavigationContainerRef,
@@ -14,6 +18,10 @@ import { StackParamList } from './navigation/stackParams.types'
 import { SCREENS } from './navigation/navigation.types'
 import { BottomTabsNavigator } from './navigation/BottomTabsNavigator'
 import { FullScreenImage } from './screen/fullScreenImage/FullScreenImage'
+import { ProfileScreen } from './screen/profile/Profile.screen'
+import { HeaderIconButton } from '../core/components/ui/buttons/HeaderIconButton'
+import { t } from '../core/i18n'
+import { ModelDownloadSheet } from '../core/components/colorize/ModelDownloadSheet'
 
 const Stack = createStackNavigator<StackParamList>()
 export let NavigationRef = createRef<NavigationContainerRef<ParamListBase>>()
@@ -75,7 +83,35 @@ export default observer(function AppTablet() {
             cardStyle: { backgroundColor: 'transparent' },
           }}
         />
+        <Stack.Screen
+          name={SCREENS.PROFILE}
+          component={ProfileScreen}
+          options={{
+            headerShown: true,
+            headerTitle: t('profile.title'),
+            headerLeft: ({ tintColor, onPress }) =>
+              onPress ? (
+                <View style={s.profileBack}>
+                  <HeaderIconButton
+                    name="arrow-back"
+                    color={tintColor ?? theme.colors.textFirst}
+                    onPress={onPress}
+                  />
+                </View>
+              ) : null,
+            // Stays attached underneath, like every other screen here: detaching the tabs would
+            // tear the native map out and rebuild it on return.
+            presentation: 'transparentModal',
+            // A fade, not a slide: the profile covers the map from its first frame and never
+            // moves, so the map cannot show through it on Android (see ProfileScreen).
+            cardStyleInterpolator: CardStyleInterpolators.forFadeFromCenter,
+            headerStyleInterpolator: HeaderStyleInterpolators.forFade,
+            gestureEnabled: false,
+          }}
+        />
       </Stack.Navigator>
+      {/* The colorization model's one-time download, opened by the palette. */}
+      <ModelDownloadSheet />
     </NavigationContainer>
   )
 })
@@ -84,4 +120,6 @@ const s = StyleSheet.create({
   back: { marginLeft: Platform.OS === 'android' ? 5 : 16 },
   icons: { flexDirection: 'row', marginRight: 16 },
   settingsTitle: { fontSize: 17, lineHeight: 28, fontWeight: 'bold' },
+  // 44 pt button around a 24 pt glyph: 6 keeps the glyph 16 from the edge.
+  profileBack: { marginLeft: 6 },
 })

@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, Text, View } from 'react-native'
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
 import { observer } from 'mobx-react-lite'
 import { Image } from 'expo-image'
 import { useNavigation, useTheme } from '@react-navigation/native'
@@ -44,7 +44,11 @@ export const NewsPostScreen = observer(() => {
 
   const ListHeader = () => (
     <View style={s.headerContainer}>
-      <View style={s.userRow}>
+      <Pressable
+        style={s.userRow}
+        disabled={!vm.post?.user?.login}
+        onPress={() => vm.post?.user?.login && vm.openProfile(vm.post.user.login)}
+        accessibilityRole="link">
         <Image
           source={avatarUri ? { uri: avatarUri } : StandardAvatar}
           style={s.avatar}
@@ -57,7 +61,7 @@ export const NewsPostScreen = observer(() => {
           </Text>
           <Text style={[s.date, { color: colors.textThird }]}>{formattedDate}</Text>
         </View>
-      </View>
+      </Pressable>
       <Spacer height={12} />
       <Text style={[s.title, { color: colors.textFirst }]}>{vm.post?.title}</Text>
       <Spacer height={12} />

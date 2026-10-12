@@ -14,6 +14,7 @@ export const s = StyleSheet.create({
   // transparent region. 1/255 black is invisible over the map and under the panel.
   regionAnchor: { backgroundColor: '#00000001' },
   panel: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 },
+  layer: { flex: 1 },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',

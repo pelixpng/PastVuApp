@@ -1,10 +1,13 @@
 import { StyleSheet } from 'react-native'
 
 export const s = StyleSheet.create({
+  // Holds the post and, over it, then-and-now; no padding, so the cover lines up with the post.
+  frame: { height: '100%' },
   modal: {
     height: '100%',
     paddingHorizontal: 16,
   },
+  cover: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',

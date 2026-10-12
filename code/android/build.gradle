@@ -14,6 +14,17 @@ buildscript {
 
 allprojects {
   repositories {
+    // PastVu: our own size-reduced ONNX Runtime 1.30.0 (modules/colorizer/android/ort-maven, built
+    // with only the colorizer model's ops and without Microsoft telemetry). exclusiveContent makes
+    // it the ONLY source of this artifact: the coordinates match Maven Central's, so otherwise
+    // Gradle could quietly ship the stock 33 MB library with telemetry. Keep it after prebuild.
+    // -PpastvuStockOrt builds with the stock library instead, only to compare the two.
+    if (!rootProject.hasProperty('pastvuStockOrt')) {
+      exclusiveContent {
+        forRepository { maven { url = uri("${rootDir}/../modules/colorizer/android/ort-maven") } }
+        filter { includeModule('com.microsoft.onnxruntime', 'onnxruntime-android') }
+      }
+    }
     google()
     mavenCentral()
     maven { url 'https://www.jitpack.io' }

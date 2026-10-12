@@ -1,6 +1,7 @@
 import { FC, useEffect } from 'react'
-import { Modal, Text, TouchableOpacity, StyleSheet, Pressable } from 'react-native'
+import { Linking, Modal, Text, TouchableOpacity, StyleSheet, Pressable } from 'react-native'
 import { useTheme } from '@react-navigation/native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -17,6 +18,8 @@ export interface ConfirmationSheetProps {
   cancelText?: string
   onConfirm: () => void
   onCancel: () => void
+  /** A link under the text, e.g. to the terms the user is agreeing to. */
+  link?: { title: string; url: string }
 }
 
 export const ConfirmationSheet: FC<ConfirmationSheetProps> = ({
@@ -26,8 +29,11 @@ export const ConfirmationSheet: FC<ConfirmationSheetProps> = ({
   cancelText = t('common.cancel'),
   onConfirm,
   onCancel,
+  link,
 }) => {
   const { colors } = useTheme()
+  // The app runs edge to edge: without this the system navigation buttons cover Cancel.
+  const { bottom } = useSafeAreaInsets()
   const translateY = useSharedValue(300)
   const opacity = useSharedValue(0)
 
@@ -61,12 +67,31 @@ export const ConfirmationSheet: FC<ConfirmationSheetProps> = ({
   }))
 
   return (
-    <Modal visible={visible} transparent animationType="none" onRequestClose={handleClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="none"
+      // A modal is portrait-only by default on iOS, which would turn the landscape iPad app around.
+      supportedOrientations={['portrait', 'portrait-upside-down', 'landscape-left', 'landscape-right']}
+      onRequestClose={handleClose}>
       <Animated.View style={[s.overlay, overlayStyle]}>
         <Pressable style={s.overlayPressable} onPress={handleClose} />
         <Animated.View
-          style={[s.container, { backgroundColor: colors.baseSecond }, containerStyle]}>
+          style={[
+            s.container,
+            { backgroundColor: colors.baseSecond, paddingBottom: bottom + 16 },
+            containerStyle,
+          ]}>
           <Text style={[s.title, { color: colors.textThird }]}>{title}</Text>
+          {link && (
+            <TouchableOpacity
+              style={s.link}
+              onPress={() => Linking.openURL(link.url)}
+              accessibilityRole="link"
+              activeOpacity={0.7}>
+              <Text style={[s.linkText, { color: colors.basePrimary }]}>{link.title}</Text>
+            </TouchableOpacity>
+          )}
           <Spacer height={17} />
           <TouchableOpacity
             style={[s.button, { backgroundColor: colors.baseFourth }]}
@@ -85,6 +110,8 @@ export const ConfirmationSheet: FC<ConfirmationSheetProps> = ({
 }
 
 const s = StyleSheet.create({
+  link: { alignSelf: 'center', paddingTop: 10, paddingBottom: 2 },
+  linkText: { fontSize: 13, fontWeight: '600', textAlign: 'center' },
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -93,10 +120,13 @@ const s = StyleSheet.create({
   overlayPressable: {
     flex: 1,
   },
+  // Full width on a phone; on the iPad a column of phone width, centred.
   container: {
+    width: '100%',
+    maxWidth: 520,
+    alignSelf: 'center',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    paddingBottom: 16,
     paddingTop: 29,
     paddingHorizontal: 24,
   },

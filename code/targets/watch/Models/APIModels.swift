@@ -20,7 +20,9 @@ struct Photo: Identifiable, Decodable {
     let ccount: Int?
   
     var id: Int { cid }
-    var imageURL: URL? {
-        URL(string: "https://img.pastvu.com/h/\(file)")
+    /// The standard size, up to 1050 px: the thumbnail ("h", 246 px wide) blurs across a card as
+    /// wide as the screen. ImageLoader scales it down to the card on decode.
+    var imageURL: URL {
+        URL(string: "https://img.pastvu.com/d/\(file)") ?? URL(string: "https://img.pastvu.com/")!
     }
 }

@@ -46,10 +46,10 @@ about the project [here](https://docs.pastvu.com/en/about). Platform source
 
 # System Requirements
 
-- **Android:** 7.0 and up
-- **iOS:** 15.1 and up
+- **Android:** 9.0 and up (ARM devices)
+- **iOS:** 16.4 and up
 - **watchOS:** 9.4 and up
-- **macOS:** 12.0 and up
+- **macOS:** Mac with Apple silicon
 - **visionOS:** 1.0 and up
 
 # Resources Used

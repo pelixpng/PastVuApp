@@ -98,16 +98,21 @@ android {
         def pastvuKey = { String name ->
             (pastvuEnv.getProperty(name) ?: System.getenv(name) ?: '').trim().replaceAll(/^["']|["']$/, '')
         }
+        // NAME_ANDROID, when set, overrides NAME for this platform (e.g. a separate search key).
         manifestPlaceholders += [
-            PLACE_API_KEY: pastvuKey('PLACE_API_KEY'),
-            STREET_VIEW_API_KEY: pastvuKey('STREET_VIEW_API_KEY'),
-            YANDEX_MAPS_API_KEY: pastvuKey('YANDEX_MAPS_API_KEY'),
+            PLACE_API_KEY: pastvuKey('PLACE_API_KEY_ANDROID') ?: pastvuKey('PLACE_API_KEY'),
+            STREET_VIEW_API_KEY: pastvuKey('STREET_VIEW_API_KEY_ANDROID') ?: pastvuKey('STREET_VIEW_API_KEY'),
+            YANDEX_MAPS_API_KEY: pastvuKey('YANDEX_MAPS_API_KEY_ANDROID') ?: pastvuKey('YANDEX_MAPS_API_KEY'),
         ]
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 54
-        versionName "2.6.1"
+        versionCode 57
+        versionName "2.7.0"
 
+        // PastVu: phones only (arm64 and 32-bit arm), for every native library, not just React
+        // Native's: reactNativeArchitectures in gradle.properties only governs the libraries built
+        // from source, while prebuilt ones (ONNX Runtime, Yandex MapKit) would still bring x86.
+        ndk { abiFilters(*((findProperty('reactNativeArchitectures') ?: 'armeabi-v7a,arm64-v8a').split(','))) }
         buildConfigField "String", "REACT_NATIVE_RELEASE_LEVEL", "\"${findProperty('reactNativeReleaseLevel') ?: 'stable'}\""
         resourceConfigurations += ["b+ru", "b+en", "b+uk", "b+be", "b+pl", "b+de", "b+cs", "b+hu", "b+fi", "b+et", "b+lv", "b+lt", "b+sr", "b+fr"]
     }
@@ -154,6 +159,16 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             def enablePngCrunchInRelease = findProperty('android.enablePngCrunchInReleaseBuilds') ?: 'true'
             crunchPngs enablePngCrunchInRelease.toBoolean()
+        }
+        // PastVu: an APK to hand to testers (./gradlew assemblePreview). A release build under its own
+        // package and name ("PastVu Beta", src/preview/res), so it installs next to the Google Play app:
+        // with the same package Android refuses it, as Play re-signs its copy with another key.
+        preview {
+            initWith release
+            applicationIdSuffix '.preview'
+            versionNameSuffix '-preview'
+            // Libraries have no preview build type; they are built as for release.
+            matchingFallbacks = ['release']
         }
     }
     packagingOptions {

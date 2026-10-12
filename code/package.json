@@ -1,6 +1,6 @@
 {
   "name": "pastvuapp",
-  "version": "2.6.1",
+  "version": "2.7.0",
   "scripts": {
     "start": "expo start --dev-client",
     "android": "expo run:android",
@@ -45,7 +45,7 @@
     "react-native-view-shot": "5.1.0",
     "react-native-webview": "13.16.1",
     "react-native-worklets": "0.10.1",
-    "react-native-zoom-toolkit-swipe": "github:pelixpng/react-native-zoom-toolkit-swipe"
+    "react-native-zoom-toolkit": "5.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",

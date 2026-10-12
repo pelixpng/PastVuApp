@@ -4,7 +4,9 @@ import { Alert, Linking } from 'react-native'
 import { BaseViewModelProvider } from '../../../provider/vm.provider'
 import { IComment, Users } from '../../../../core/types/apiPhotoComment'
 import ApiService from '../../../../core/api/apiService'
-import { savePhoto, sharePhoto } from '../../../../core/utils/getPhoto'
+import { userLoginFromLink } from '../../../../core/utils/userLink'
+import { saveLocalImage, savePhoto, sharePhoto } from '../../../../core/utils/getPhoto'
+import ColorizeStore from '../../../../core/store/Colorize.store'
 import ApiStore from '../../../../core/store/Api.store'
 import * as PhotoPost from '../../../../core/services/photoPost'
 import { t } from '../../../../core/i18n'
@@ -20,6 +22,8 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
   @observable activeCid: string | null = null
   @observable.ref streetView: StreetView.StreetViewInfo | null = null
   @observable.ref cidHistory: string[] = []
+  /** The photo whose colour version is shown above its original; see `isComparingOriginal`. */
+  @observable comparingCid: string | null = null
 
   constructor() {
     super()
@@ -37,6 +41,39 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
   @computed
   get imageLink() {
     return `https://img.pastvu.com/${ApiStore.photoQualitySettings}/${this.postInfo?.file}`
+  }
+
+  @computed
+  get isColorized() {
+    return ColorizeStore.isColorized(this.activeCid)
+  }
+
+  @computed
+  get canColorize() {
+    return ColorizeStore.canColorize(this.activeCid)
+  }
+
+  @computed
+  get isColorizing() {
+    return ColorizeStore.isColorizing(this.activeCid)
+  }
+
+  /**
+   * What every view of the photo shows: the post, full screen and the compare screen. The colour
+   * version while it is switched on, the original otherwise.
+   */
+  @computed
+  get displayLink() {
+    return ColorizeStore.uriFor(this.activeCid, this.imageLink)
+  }
+
+  /**
+   * The colour version stacked above the black-and-white original. Tied to the photo, so it ends by
+   * itself when another post opens or the colour is switched off.
+   */
+  @computed
+  get isComparingOriginal() {
+    return this.comparingCid !== null && this.comparingCid === this.activeCid && this.isColorized
   }
 
   @computed
@@ -77,6 +114,7 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
         this.isFavorite = PhotoPost.isFavorite(cid)
       })
       PhotoPost.recordHistory(photo, cid)
+      ColorizeStore.checkMonochrome(cid, `https://img.pastvu.com/h/${photo.file}`)
       this.checkStreetView(cid)
     } catch {
       Alert.alert(t('common.error'), t('photo.infoError'))
@@ -105,6 +143,7 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
     const mode: CompareMode = 'streetView'
     this.navigateTo(SCREENS.COMPARE, {
       mode,
+      cid: this.activeCid!,
       photo: { uri: this.imageLink, year: photo.y, ...this.imageResolution },
       target:
         this.hasStreetView && this.streetViewTarget
@@ -114,8 +153,32 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
     })
   }
 
+  /** The palette button: colours the photo on device, or goes back to the original. */
+  @action.bound
+  toggleColorize() {
+    if (this.activeCid && this.postInfo) ColorizeStore.toggle(this.activeCid, this.imageLink)
+  }
+
+  /** The button next to the palette: the colour version above the original, or back to one photo. */
+  @action.bound
+  toggleCompareOriginal() {
+    this.comparingCid = this.isComparingOriginal ? null : this.activeCid
+  }
+
   @action.bound
   openFullScreenImage() {
+    this.navigateTo(SCREENS.FULL_SCREEN_IMAGE, {
+      title: this.postInfo!.title,
+      cid: this.activeCid!,
+      uri: this.displayLink,
+      file: this.postInfo!.file,
+      localFile: this.isColorized ? this.displayLink : undefined,
+    })
+  }
+
+  /** The black-and-white photo under the colour one while they are compared. */
+  @action.bound
+  openOriginalFullScreen() {
     this.navigateTo(SCREENS.FULL_SCREEN_IMAGE, {
       title: this.postInfo!.title,
       cid: this.activeCid!,
@@ -131,7 +194,9 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
 
   @action.bound
   saveImage() {
-    savePhoto(this.postInfo!.title, this.postInfo!.file)
+    // The colour version when it is on: saving gives what the screen shows.
+    if (this.isColorized) saveLocalImage(this.displayLink)
+    else savePhoto(this.postInfo!.title, this.postInfo!.file)
   }
 
   @action.bound
@@ -171,7 +236,12 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
         Linking.openURL(`https://pastvu.com/news/${newsMatch[1]}`)
       }
     } else {
-      Linking.openURL(href)
+      const login = userLoginFromLink(href)
+      if (login) {
+        this.pushTo(SCREENS.PROFILE, { login })
+      } else {
+        Linking.openURL(href)
+      }
     }
   }
 

@@ -1,29 +1,19 @@
 import { View, Image, Platform, useWindowDimensions } from 'react-native'
-import { fitContainer, ResumableZoom, useImageResolution } from 'react-native-zoom-toolkit-swipe'
-import Animated, {
-  Extrapolate,
-  interpolate,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-  useAnimatedReaction,
-  runOnJS,
-  SlideInUp,
-  Easing,
-  SlideOutUp,
-} from 'react-native-reanimated'
+import { fitContainer, ResumableZoom, useImageResolution } from 'react-native-zoom-toolkit'
+import Animated, { SlideInUp, Easing, SlideOutUp } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { HeaderIconButton } from '../../../core/components/ui/buttons/HeaderIconButton'
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native'
 import { s } from './style'
 import { StackParamList } from '../../navigation/stackParams.types'
 import { SCREENS } from '../../navigation/navigation.types'
 import { Spacer } from '../../../core/components/ui/Spacer'
-import { savePhoto, sharePhoto } from '../../../core/utils/getPhoto'
+import { saveLocalImage, savePhoto, sharePhoto } from '../../../core/utils/getPhoto'
+import { useSwipeToClose } from '../../../core/hooks/useSwipeToClose'
+import { useLightStatusBar } from '../../../core/hooks/useLightStatusBar'
 
 export const FullScreenImage = () => {
-  const SWIPE_CLOSE_THRESHOLD = 125
   const [visibleHeader, setVisibleHeader] = useState(true)
   const navigation = useNavigation()
   const { params } = useRoute<RouteProp<StackParamList, typeof SCREENS.FULL_SCREEN_IMAGE>>()
@@ -34,82 +24,14 @@ export const FullScreenImage = () => {
     uri: params.uri,
   })
 
-  const translateY = useSharedValue(0)
-  const isClosing = useSharedValue(false)
-  const swipeTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // The photo sits on black, so the status bar goes white whatever the theme.
+  useLightStatusBar()
 
-  useAnimatedReaction(
-    () => isClosing.value,
-    closing => {
-      if (closing) {
-        runOnJS(navigation.goBack)()
-      }
-    },
-    [navigation],
+  // Telegram-style: at base zoom the photo follows a vertical swipe and closes past a threshold.
+  const { contentStyle, backgroundStyle, zoomCallbacks } = useSwipeToClose(
+    height,
+    navigation.goBack,
   )
-
-  const animatedContent = useAnimatedStyle(() => {
-    const opacity = interpolate(
-      Math.abs(translateY.value),
-      [0, SWIPE_CLOSE_THRESHOLD],
-      [1, 0],
-      Extrapolate.CLAMP,
-    )
-    return {
-      transform: [{ translateY: translateY.value }],
-      opacity,
-    }
-  })
-
-  const animatedBackground = useAnimatedStyle(() => {
-    const opacity = interpolate(
-      Math.abs(translateY.value),
-      [0, SWIPE_CLOSE_THRESHOLD],
-      [1, 0],
-      Extrapolate.CLAMP,
-    )
-    return {
-      opacity,
-    }
-  })
-
-  const handleSwipe = ({ y }: { y: number }) => {
-    if (isClosing.value) return
-
-    translateY.value = y
-
-    if (y < -SWIPE_CLOSE_THRESHOLD) {
-      clearSwipeTimeout()
-      isClosing.value = true
-      translateY.value = withTiming(-height, { duration: 150 })
-      return
-    }
-
-    if (y > SWIPE_CLOSE_THRESHOLD) {
-      clearSwipeTimeout()
-      isClosing.value = true
-      translateY.value = withTiming(height, { duration: 150 })
-      return
-    }
-
-    resetSwipeTimeout()
-  }
-
-  const clearSwipeTimeout = () => {
-    if (swipeTimeout.current) {
-      clearTimeout(swipeTimeout.current)
-      swipeTimeout.current = null
-    }
-  }
-
-  const resetSwipeTimeout = () => {
-    clearSwipeTimeout()
-    swipeTimeout.current = setTimeout(() => {
-      if (!isClosing.value) {
-        translateY.value = withTiming(0, { duration: 200 })
-      }
-    }, 120)
-  }
 
   if (isFetching || resolution === undefined) {
     return <View />
@@ -122,8 +44,8 @@ export const FullScreenImage = () => {
 
   return (
     <View>
-      <Animated.View style={[s.background, animatedBackground]} />
-      <Animated.View style={[{ height }, animatedContent]}>
+      <Animated.View style={[s.background, backgroundStyle]} />
+      <Animated.View style={[{ height }, contentStyle]}>
         {visibleHeader && (
           <Animated.View
             entering={SlideInUp.duration(600).easing(Easing.out(Easing.quad))}
@@ -134,7 +56,11 @@ export const FullScreenImage = () => {
               <HeaderIconButton
                 name="save-alt"
                 color="white"
-                onPress={() => savePhoto(params.title, params.file)}
+                onPress={() =>
+                  params.localFile
+                    ? saveLocalImage(params.localFile)
+                    : savePhoto(params.title, params.file)
+                }
               />
               <Spacer width={4} />
               <HeaderIconButton
@@ -148,7 +74,7 @@ export const FullScreenImage = () => {
         <ResumableZoom
           onTap={() => setVisibleHeader(!visibleHeader)}
           maxScale={5}
-          onSwipeAtBaseZoom={handleSwipe}
+          {...zoomCallbacks}
           style={{
             alignSelf: 'center',
             marginTop: height / 2 - containerFit.height / 2,
