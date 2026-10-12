@@ -15,4 +15,6 @@ export enum SCREENS {
   COMPARE = 'Compare',
   //news
   NEWS_POST = 'News Post',
+  //user
+  PROFILE = 'Profile',
 }

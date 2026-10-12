@@ -1,55 +1,80 @@
 import SwiftUI
+import ImageIO
+import WatchKit
 
-class ImageLoader: ObservableObject {
-    @Published var image: UIImage?
-    
-    private var url: URL?
-    private var operation: BlockOperation?
-    
-    private static let sharedQueue: OperationQueue = {
-        let queue = OperationQueue()
-        queue.maxConcurrentOperationCount = 2
-        return queue
+/// Loads a photo for the list, scaled down on decode to what the screen can show.
+///
+/// A standard-size PastVu photo (up to 1050 px) decoded at full size takes several megabytes,
+/// and thirty of them do not fit in a watch's memory. Decoding straight to the size of a card
+/// keeps each one well under a megabyte.
+final class ImageLoader: ObservableObject {
+    enum State {
+        case loading
+        case loaded(UIImage)
+        /// The file is gone (PastVu keeps removed photos' records) or the download failed.
+        case failed
+    }
+
+    @Published private(set) var state: State = .loading
+
+    private let url: URL
+    private var task: URLSessionDataTask?
+
+    private static let cache: NSCache<NSURL, UIImage> = {
+        let cache = NSCache<NSURL, UIImage>()
+        cache.countLimit = 40
+        return cache
     }()
-    
-    private static let imageCache = NSCache<NSString, UIImage>()
-    
+
+    /// The card the photo fills, in pixels: the full screen width at 4:3.
+    private static let cardPixels: CGSize = {
+        let device = WKInterfaceDevice.current()
+        let width = device.screenBounds.width * device.screenScale
+        return CGSize(width: width, height: width * 3 / 4)
+    }()
+
     init(url: URL) {
         self.url = url
-        loadImage()
-    }
-    
-    private func loadImage() {
-        guard let url = url else { return }
-        
-        if let cachedImage = ImageLoader.imageCache.object(forKey: url.absoluteString as NSString) {
-            DispatchQueue.main.async {
-                self.image = cachedImage
-            }
+        if let cached = Self.cache.object(forKey: url as NSURL) {
+            state = .loaded(cached)
             return
         }
-        
-        let op = BlockOperation {
-            let semaphore = DispatchSemaphore(value: 0)
-            let request = URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad, timeoutInterval: 30)
-            let task = URLSession.shared.dataTask(with: request) { data, response, error in
-                if let data = data, let uiImage = UIImage(data: data) {
-                    ImageLoader.imageCache.setObject(uiImage, forKey: url.absoluteString as NSString)
-                    DispatchQueue.main.async {
-                        self.image = uiImage
-                    }
-                }
-                semaphore.signal()
+        let request = URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad, timeoutInterval: 30)
+        task = URLSession.shared.dataTask(with: request) { [weak self] data, _, _ in
+            let image = data.flatMap(Self.downsample)
+            if let image {
+                Self.cache.setObject(image, forKey: url as NSURL)
             }
-            task.resume()
-            semaphore.wait()
+            DispatchQueue.main.async {
+                self?.state = image.map { .loaded($0) } ?? .failed
+            }
         }
-        self.operation = op
-        ImageLoader.sharedQueue.addOperation(op)
+        task?.resume()
     }
-    
+
     deinit {
-        operation?.cancel()
+        task?.cancel()
+    }
+
+    /// Decodes just enough pixels for the photo to cover a card, whatever its shape.
+    private static func downsample(_ data: Data) -> UIImage? {
+        let sourceOptions = [kCGImageSourceShouldCache: false] as CFDictionary
+        guard let source = CGImageSourceCreateWithData(data as CFData, sourceOptions),
+              let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any],
+              let width = properties[kCGImagePropertyPixelWidth] as? CGFloat,
+              let height = properties[kCGImagePropertyPixelHeight] as? CGFloat,
+              width > 0, height > 0
+        else { return nil }
+
+        // Covering the card: the photo is scaled until both sides reach it, then cropped.
+        let scale = min(1, max(cardPixels.width / width, cardPixels.height / height))
+        let options = [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceShouldCacheImmediately: true,
+            kCGImageSourceThumbnailMaxPixelSize: max(width, height) * scale,
+        ] as CFDictionary
+        guard let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, options) else { return nil }
+        return UIImage(cgImage: cgImage)
     }
 }
-

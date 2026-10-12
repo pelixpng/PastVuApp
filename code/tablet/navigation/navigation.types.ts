@@ -7,4 +7,6 @@ export enum SCREENS {
   SETTINGS_MENU = 'Settings Menu',
   //photo
   FULL_SCREEN_IMAGE = 'Full Screen Image',
+  //user
+  PROFILE = 'Profile',
 }

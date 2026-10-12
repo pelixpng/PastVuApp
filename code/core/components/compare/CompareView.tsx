@@ -15,6 +15,7 @@ import {
 import { CameraView, useCameraPermissions } from 'expo-camera'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTheme } from '@react-navigation/native'
+import { fitContainer, SnapbackZoom } from 'react-native-zoom-toolkit'
 
 // react-native-view-shot is linked on iOS only. On Android the panorama's WebView draws on the
 // GPU and a view snapshot leaves it black, so the PixelCopy module below is used there and the
@@ -27,6 +28,7 @@ import { MaterialIcons } from '../ui/icons'
 import { StreetViewPanorama } from '../streetView/StreetViewPanorama'
 import { StreetViewTarget } from '../../services/streetView'
 import { MyButton } from '../ui/buttons/MyButton'
+import { ColorizingOverlay } from '../colorize/ColorizingOverlay'
 import { Spacer } from '../ui/Spacer'
 import { saveLocalImage } from '../../utils/getPhoto'
 import { t } from '../../i18n'
@@ -105,6 +107,8 @@ type Props = {
    * pair sits centred on the app background.
    */
   fit?: 'cover' | 'contain'
+  /** The old photo's colour version is being made: it dims under a spinner until it is ready. */
+  colorizing?: boolean
 }
 
 /**
@@ -118,6 +122,7 @@ export const CompareView: FC<Props> = ({
   target,
   panoramaYear,
   fit = 'cover',
+  colorizing = false,
 }) => {
   const { bottom } = useSafeAreaInsets()
   const { colors } = useTheme()
@@ -197,10 +202,33 @@ export const CompareView: FC<Props> = ({
     setShot(null)
   }
 
+  // The box both halves share, derived from the photo's aspect ratio.
+  const ratio = photo.width && photo.height ? photo.width / photo.height : 4 / 3
+  const halfHeight = area.height / 2
+  const box =
+    fit === 'cover'
+      ? { width: area.width, height: Math.min(area.width / ratio, halfHeight) }
+      : area.width / ratio <= halfHeight
+        ? { width: area.width, height: area.width / ratio }
+        : { width: halfHeight * ratio, height: halfHeight }
+
+  // Pinch-to-zoom as on the post: the photo grows over the other half and snaps back on release.
+  // Sized to the photo itself rather than the box, so the pinch works on the picture and the
+  // black margins around a tall one do not grow over the other half with it.
   const oldPhoto = (
     <>
-      {/* Always whole: the old photo is the point of the comparison, so it is never cropped. */}
-      <Image source={{ uri: photo.uri }} style={s.fill} resizeMode="contain" />
+      <SnapbackZoom>
+        {/* Always whole: the old photo is the point of the comparison, so it is never cropped. */}
+        <View style={fitContainer(ratio, box)}>
+          <Image
+            source={{ uri: photo.uri }}
+            style={StyleSheet.absoluteFill}
+            resizeMode="contain"
+            resizeMethod="scale"
+          />
+          {colorizing && <ColorizingOverlay />}
+        </View>
+      </SnapbackZoom>
       <Badge text={photo.year} />
     </>
   )
@@ -260,16 +288,6 @@ export const CompareView: FC<Props> = ({
     )
   }
 
-  // The box both halves share, derived from the photo's aspect ratio.
-  const ratio = photo.width && photo.height ? photo.width / photo.height : 4 / 3
-  const halfHeight = area.height / 2
-  const box =
-    fit === 'cover'
-      ? { width: area.width, height: Math.min(area.width / ratio, halfHeight) }
-      : area.width / ratio <= halfHeight
-        ? { width: area.width, height: area.width / ratio }
-        : { width: halfHeight * ratio, height: halfHeight }
-
   const canSave = (mode === 'streetView' && target !== null && target !== undefined) || shot !== null
   const showShutter = mode === 'camera' && !shot
 
@@ -278,7 +296,7 @@ export const CompareView: FC<Props> = ({
       <View style={s.area} onLayout={onLayout}>
         {area.height > 0 && (
           <View ref={collage} collapsable={false}>
-            <View style={[box, s.box]}>{oldPhoto}</View>
+            <View style={[box, s.box, s.zoomBox]}>{oldPhoto}</View>
             <View style={[box, s.box]}>{today}</View>
           </View>
         )}
@@ -387,6 +405,8 @@ const s = StyleSheet.create({
   container: { flex: 1 },
   area: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   box: { backgroundColor: 'black', overflow: 'hidden' },
+  // Above the other half and unclipped, so the zoomed photo can spread over it.
+  zoomBox: { overflow: 'visible', zIndex: 1, justifyContent: 'center', alignItems: 'center' },
   fill: { width: '100%', height: '100%' },
   denied: {
     flex: 1,

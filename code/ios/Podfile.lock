@@ -5,6 +5,8 @@ PODS:
     - ExpoModulesCore
   - CameraLenses (1.0.0):
     - ExpoModulesCore
+  - Colorizer (1.0.0):
+    - ExpoModulesCore
   - EXConstants (57.0.17):
     - ExpoModulesCore
   - EXJSONUtils (57.0.1)
@@ -2576,6 +2578,7 @@ DEPENDENCIES:
   - AppKeys (from `../modules/app-keys/ios`)
   - AppLocale (from `../modules/app-locale/ios`)
   - CameraLenses (from `../modules/camera-lenses/ios`)
+  - Colorizer (from `../modules/colorizer/ios`)
   - EXConstants (from `../node_modules/expo-constants/ios`)
   - EXJSONUtils (from `../node_modules/expo-json-utils/ios`)
   - EXManifests (from `../node_modules/expo-manifests/ios`)
@@ -2708,6 +2711,8 @@ EXTERNAL SOURCES:
     :path: "../modules/app-locale/ios"
   CameraLenses:
     :path: "../modules/camera-lenses/ios"
+  Colorizer:
+    :path: "../modules/colorizer/ios"
   EXConstants:
     :path: "../node_modules/expo-constants/ios"
   EXJSONUtils:
@@ -2940,6 +2945,7 @@ SPEC CHECKSUMS:
   AppKeys: 62c8099c03790dc266e01897196104750d1f23f2
   AppLocale: 536b847ca422287f904a4f2a922ce6e7b0d21306
   CameraLenses: 72847b432da6fdf9bdcf738d663f31be94aa9000
+  Colorizer: 9b5a5f35394b3a62180d41346133f04973425c49
   EXConstants: 60ffbdb43032130f0465ae75675897285fc25647
   EXJSONUtils: 7a1683cfa2cbe6d11fca97097d51a496755b0287
   EXManifests: b9129302cc7af43d45c2f473fadb88e77f837273

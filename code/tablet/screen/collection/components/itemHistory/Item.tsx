@@ -1,7 +1,7 @@
-import { FC, useMemo } from 'react'
+import { FC, useMemo, useState } from 'react'
 import { Image } from 'expo-image'
 import { TouchableOpacity, View, Text } from 'react-native'
-import { Feather } from '../../../../../core/components/ui/icons'
+import { Feather, MaterialIcons } from '../../../../../core/components/ui/icons'
 import { s } from './style'
 import { useTheme } from '@react-navigation/native'
 import { Spacer } from '../../../../../core/components/ui/Spacer'
@@ -13,6 +13,8 @@ type ItemHistoryProps = {
   description: string
   file: string
   onRemove?: () => void
+  /** An icon in place of the thumbnail, for rows with no picture (a news post). */
+  icon?: keyof typeof MaterialIcons.glyphMap
 }
 
 export const ItemHistory: FC<ItemHistoryProps> = ({
@@ -22,8 +24,10 @@ export const ItemHistory: FC<ItemHistoryProps> = ({
   onPress,
   isSelected,
   onRemove,
+  icon,
 }) => {
   const { colors } = useTheme()
+  const [imageFailed, setImageFailed] = useState(false)
   const backgroundColor = useMemo(
     () => (isSelected ? colors.baseThird : null),
     [isSelected, colors],
@@ -33,11 +37,19 @@ export const ItemHistory: FC<ItemHistoryProps> = ({
       style={[s.mainContainer, { backgroundColor }]}
       onPress={onPress}
       onLongPress={onRemove}>
-      <Image
-        source={{ uri: `https://img.pastvu.com/h/${file}` }}
-        style={s.image}
-        cachePolicy="disk"
-      />
+      {icon || imageFailed ? (
+        // Removed photos keep their title but lose their files.
+        <View style={[s.image, s.placeholder, { backgroundColor: colors.baseFifth }]}>
+          <MaterialIcons name={icon ?? 'no-photography'} size={28} color={colors.textThird} />
+        </View>
+      ) : (
+        <Image
+          source={{ uri: `https://img.pastvu.com/h/${file}` }}
+          style={s.image}
+          onError={() => setImageFailed(true)}
+          cachePolicy="disk"
+        />
+      )}
       <Spacer width={12} />
       <View style={s.infoContainer}>
         <Text numberOfLines={1} style={[s.titleText, { color: colors.textFirst }]}>

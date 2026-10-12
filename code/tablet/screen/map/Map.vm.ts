@@ -24,11 +24,12 @@ import { YearsRangeType } from '../../../core/types/components'
 import MapStore from '../../../core/store/Map.store'
 import ApiStore from '../../../core/store/Api.store'
 import {
-	getPolygon,
+	getPolygons,
 	getZoom,
 	zoomLevelToAltitude
 } from '../../../core/utils/getMapData'
 import ApiService from '../../../core/api/apiService'
+import { userLoginFromLink } from '../../../core/utils/userLink'
 import { dedupeMarkers } from '../../../core/services/mapMarkers'
 import * as PhotoPost from '../../../core/services/photoPost'
 import { BaseViewModelProvider } from '../../provider/vm.provider'
@@ -36,7 +37,8 @@ import { SCREENS } from '../../navigation/navigation.types'
 import { IComment, Users } from '../../../core/types/apiPhotoComment'
 import { CollectionItem } from '../collection/Collection.screen'
 import { Linking } from 'react-native'
-import { savePhoto, sharePhoto } from '../../../core/utils/getPhoto'
+import { saveLocalImage, savePhoto, sharePhoto } from '../../../core/utils/getPhoto'
+import { PostColorize } from '../../../core/store/PostColorize'
 import { t } from '../../../core/i18n'
 import { defaultRegion } from '../../../core/constants/map'
 import * as StreetView from '../../../core/services/streetView'
@@ -73,6 +75,9 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
 	/** The panel shows the then-and-now view in place of the post, in this mode. */
 	@observable compareMode: CompareMode | null = null
 
+	/** The open photo's colour version: palette, colour photo, comparison with the original. */
+	readonly colorize: PostColorize
+
 	constructor() {
 		super()
 		autorun(() => {
@@ -104,6 +109,12 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
 			}
 		)
 		makeObservable(this)
+		// After makeObservable, so it tracks the post.
+		this.colorize = new PostColorize(
+			() => (this.postInfo ? this.postInfo.cid.toString() : null),
+			() => this.imageLink,
+			() => this.postInfo?.file
+		)
 	}
 
 	// ------------------------------------------ Computed ------------------------------------------
@@ -229,7 +240,7 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
 			const zoom = getZoom(this.coordinates.latitudeDelta)
 			if (ApiStore.showCluster === 'yes') {
 				const paramsClustersApi: getClustersPhotosProps = {
-					polygon: getPolygon(this.coordinates),
+					polygons: getPolygons(this.coordinates),
 					latitude: this.coordinates.latitude,
 					longitude: this.coordinates.longitude,
 					yearStart: this.yearsRange[0],
@@ -375,13 +386,16 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
 		})
 	}
 
+	/** The colour version while it is on; `original` for the black-and-white photo under it. */
 	@action.bound
-	openFullScreenImage() {
+	openFullScreenImage(original = false) {
+		const colour = original ? undefined : this.colorize.localFile
 		this.navigateTo(SCREENS.FULL_SCREEN_IMAGE, {
 			title: this.postInfo!.title,
 			cid: this.postInfo!.cid.toString(),
-			uri: this.imageLink,
-			file: this.postInfo!.file
+			uri: colour ?? this.imageLink,
+			file: this.postInfo!.file,
+			localFile: colour
 		})
 	}
 
@@ -435,7 +449,7 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
 	get comparePhoto() {
 		return this.postInfo
 			? {
-					uri: this.imageLink,
+					uri: this.colorize.displayLink,
 					year: this.postInfo.y,
 					...PhotoPost.photoResolution(this.postInfo)
 				}
@@ -476,7 +490,12 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
 		if (photoMatch) {
 			this.showPhoto(photoMatch[1])
 		} else {
-			Linking.openURL(href)
+			const login = userLoginFromLink(href)
+			if (login) {
+				this.pushTo(SCREENS.PROFILE, { login })
+			} else {
+				Linking.openURL(href)
+			}
 		}
 	}
 
@@ -487,7 +506,10 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
 
 	@action.bound
 	saveImage() {
-		savePhoto(this.postInfo!.title, this.postInfo!.file)
+		// The colour version when it is on: saving gives what the panel shows.
+		const local = this.colorize.localFile
+		if (local) saveLocalImage(local)
+		else savePhoto(this.postInfo!.title, this.postInfo!.file)
 	}
 }
 

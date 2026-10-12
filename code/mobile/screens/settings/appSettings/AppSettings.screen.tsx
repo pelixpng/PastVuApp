@@ -16,6 +16,8 @@ import { t } from '../../../../core/i18n'
 import LocaleStore from '../../../../core/store/Locale.store'
 import { SettingsOptions } from '../../../../core/constants/settings'
 import { isYandexConfigured } from '../../../../core/services/yandexMaps'
+import { MapProviderRadio } from '../../../../core/components/settings/MapProviderRadio'
+import { ColorizerModelCard } from '../../../../core/components/colorize/ColorizerModelCard'
 
 export const AppSettingsScreen = observer(() => {
 	const vm = useVM(AppSettingsVM)
@@ -115,11 +117,8 @@ export const AppSettingsScreen = observer(() => {
 							{t('appSettings.mapProviderHint')}
 						</Text>
 						<Spacer height={12} />
-						<RadioButtons
-							options={vm.mapProviderOptions()}
-							selectedValue={MapStore.mapProvider}
-							setValue={MapStore.setMapProvider}
-						/>
+						{/* Asks for consent the first time Yandex Maps is chosen. */}
+						<MapProviderRadio options={vm.mapProviderOptions()} />
 					</UICard>
 					<Spacer height={16} />
 				</>
@@ -181,6 +180,8 @@ export const AppSettingsScreen = observer(() => {
 				/>
 			</UICard>
 			<Spacer height={16} />
+			{/* Only while the colorization model is downloaded: its size and a way to delete it. */}
+			<ColorizerModelCard />
 		</Container>
 	)
 })

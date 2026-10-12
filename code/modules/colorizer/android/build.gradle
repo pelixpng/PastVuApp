@@ -1,0 +1,24 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+group = 'expo.modules.colorizer'
+version = '1.0.0'
+
+android {
+  namespace 'expo.modules.colorizer'
+  compileSdk rootProject.ext.compileSdkVersion
+
+  defaultConfig {
+    minSdk rootProject.ext.minSdkVersion
+  }
+
+  kotlinOptions {
+    jvmTarget = '17'
+  }
+}
+
+dependencies {
+  implementation project(':expo-modules-core')
+  // Runs DDColor-L on the CPU. The model itself is downloaded on first use (ModelStore.kt).
+  implementation 'com.microsoft.onnxruntime:onnxruntime-android:1.30.0'
+}

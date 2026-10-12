@@ -8,8 +8,8 @@ import { Links } from '../../../../core/constants/links'
 import { formatLongDate, t } from '../../../../core/i18n'
 import { observer } from 'mobx-react-lite'
 
-const APP_VERSION = '2.6.1'
-const RELEASE_DATE = new Date('2026-09-22')
+const APP_VERSION = '2.7.0'
+const RELEASE_DATE = new Date('2026-10-04')
 
 export const AboutAppScreen = observer(() => {
   const { colors } = useTheme()
@@ -38,6 +38,8 @@ export const AboutAppScreen = observer(() => {
         <MyButton title={t('about.webVersion')} func={() => Linking.openURL(Links.webPastVu)} />
         <Spacer height={16} />
         <MyButton title={t('about.github')} func={() => Linking.openURL(Links.sourceCode)} />
+        <Spacer height={16} />
+        <MyButton title={t('about.privacyPolicy')} func={() => Linking.openURL(Links.privacyPolicy)} />
       </UICard>
       <Spacer height={16} />
       <UICard>
@@ -56,6 +58,10 @@ export const AboutAppScreen = observer(() => {
         <MyButton title={'Google Street View'} func={() => Linking.openURL(Links.streetView)} />
         <Spacer height={16} />
         <MyButton title={'Yandex Maps'} func={() => Linking.openURL(Links.yandexMaps)} />
+        <Spacer height={16} />
+        <MyButton title={t('about.yandexTerms')} func={() => Linking.openURL(Links.yandexTerms)} />
+        <Spacer height={16} />
+        <MyButton title={'DDColor'} func={() => Linking.openURL(Links.ddcolor)} />
       </UICard>
       <Spacer height={16} />
       <UICard>

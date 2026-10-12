@@ -36,7 +36,7 @@
 	<key>CFBundlePackageType</key>
 	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.6.1</string>
+	<string>2.7.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -55,7 +55,9 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>70</string>
+	<string>72</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSMinimumSystemVersion</key>
 	<string>12.0</string>
 	<key>LSRequiresIPhoneOS</key>
@@ -76,17 +78,17 @@
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Expo Dev Launcher uses the local network to discover and connect to development servers running on your computer.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Allow $(PRODUCT_NAME) to access your location</string>
+	<string>Геопозиция нужна, чтобы показать на карте старые фотографии рядом с вами. Приложение использует её, только пока открыто.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Allow $(PRODUCT_NAME) to access your location</string>
+	<string>Геопозиция нужна, чтобы показать на карте старые фотографии рядом с вами. Приложение использует её, только пока открыто.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Доступ к геолокации позволяет нам показать на карте интересные фотографии рядом с вами.</string>
+	<string>Геопозиция нужна, чтобы показать на карте старые фотографии, снятые рядом с вами.</string>
 	<key>NSMotionUsageDescription</key>
-	<string>Allow $(PRODUCT_NAME) to detect your current motion activity</string>
+	<string>Приложение не использует данные о движении: фотографии рядом с вами подбираются только по геопозиции.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Мы запрашиваем доступ для сохранения изображений в вашу фотогалерею, чтобы вы могли добавлять загруженные фотографии для дальнейшего просмотра и использования.</string>
+	<string>Нужно, чтобы сохранить в галерею старую фотографию, её раскрашенную версию или сравнение «тогда и сейчас».</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Allow $(PRODUCT_NAME) to access your photos</string>
+	<string>Доступ к фотогалерее нужен только для сохранения фотографий, которые вы сами решили сохранить. Приложение не просматривает вашу галерею.</string>
 	<key>PLACE_API_KEY</key>
 	<string>$(PLACE_API_KEY)</string>
 	<key>RCTMetroPort</key>

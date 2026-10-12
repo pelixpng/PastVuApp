@@ -2,9 +2,19 @@ import MapView, { Marker, MapType, Region } from 'react-native-maps'
 import { Platform, StyleSheet } from 'react-native'
 import { RefObject } from 'react'
 import { useTheme } from '@react-navigation/native'
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { MapMarker } from '../../types/apiPhotoList'
 import { markerKey } from '../../services/mapMarkers'
 import { ClusterMarker } from './ClusterMarker'
+import { YEARS_SLIDER_HEIGHT } from './YearsSlider'
+
+// MapKit draws the logo about 10 pt inside the margin; this puts it 16 pt from the edge, like the
+// Yandex logo.
+const APPLE_LOGO_LEFT = 6
+// On tablets the logo sits over the slider panel's rounded corner. In line with the panel's
+// straight edge the apple looked like it stuck out past the corner, so it goes a little further in.
+const TABLET_LOGO_INSET = 4
 
 type Props = {
   mapRef: RefObject<MapView | null>
@@ -15,6 +25,7 @@ type Props = {
   onRegionChangeComplete: (region: Region) => void
   onShowPhoto: (cid: string, title: string) => void
   onGoToLocation: (lat: number, lng: number) => void
+  isTablet?: boolean
 }
 
 export const GoogleAppleMaps = ({
@@ -26,13 +37,33 @@ export const GoogleAppleMaps = ({
   onRegionChangeComplete,
   onShowPhoto,
   onGoToLocation,
+  isTablet,
 }: Props) => {
   const { colors, names } = useTheme()
+  const tabBarHeight = useBottomTabBarHeight()
+  const { bottom: safeBottom } = useSafeAreaInsets()
+  // Apple's terms require the Apple Maps logo and its legal link to stay visible. MapKit draws
+  // them in the bottom-left corner, inside the map's layout margins, which is where the years
+  // slider covers them; on tablets, the slider and the tab bar under it. The margins lift them
+  // just above the slider, where the Yandex logo sits too. On tablets the map runs under the tab
+  // bar down to the home indicator, whose safe area MapKit already keeps clear on its own.
+  const attributionPadding =
+    Platform.OS === 'ios'
+      ? {
+          top: 0,
+          right: 0,
+          left: isTablet ? APPLE_LOGO_LEFT + TABLET_LOGO_INSET : APPLE_LOGO_LEFT,
+          bottom: isTablet
+            ? tabBarHeight - safeBottom + YEARS_SLIDER_HEIGHT
+            : YEARS_SLIDER_HEIGHT,
+        }
+      : undefined
 
   return (
     <MapView
       ref={mapRef}
       style={s.flexOne}
+      mapPadding={attributionPadding}
       userInterfaceStyle={names.themeName}
       customMapStyle={colors.MapTheme}
       onRegionChangeComplete={onRegionChangeComplete}

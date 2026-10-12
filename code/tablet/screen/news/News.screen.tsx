@@ -10,6 +10,7 @@ import {
 import { useNavigation, useTheme } from '@react-navigation/native'
 import { observer } from 'mobx-react-lite'
 import { HeaderIconButton } from '../../../core/components/ui/buttons/HeaderIconButton'
+import { ColorizeButtons } from '../../../core/components/colorize/ColorizeButtons'
 import NewsVM, { NewsTab } from './News.vm'
 import { useVM } from '../../../core/hooks/useVM'
 import { Spacer } from '../../../core/components/ui/Spacer'
@@ -50,6 +51,8 @@ export const NewsScreen = observer(() => {
           : undefined,
         headerRight: () => (
           <View style={s.header}>
+            {/* Palette and the comparison with the original; the latter not over the then-and-now view. */}
+            <ColorizeButtons colorize={vm.colorize} showCompareOriginal={!vm.compareMode} />
             <HeaderIconButton name="compare" color={colors.textFirst} onPress={vm.openCompare} />
             <Spacer width={4} />
             <HeaderIconButton name={vm.isFavorite ? 'favorite' : 'favorite-border'} color={colors.textFirst} onPress={vm.toggleFavorite} />
@@ -78,7 +81,7 @@ export const NewsScreen = observer(() => {
     } else {
       navigation.setOptions({ headerLeft: undefined, headerRight: undefined })
     }
-  }, [vm.selectedPhotoCid, vm.selectedTab, vm.activePost, vm.postInfo, vm.isFavorite, vm.canGoBack, colors.textFirst, navigation])
+  }, [vm.selectedPhotoCid, vm.selectedTab, vm.activePost, vm.postInfo, vm.isFavorite, vm.compareMode, vm.canGoBack, colors.textFirst, navigation])
 
   const renderPost = useCallback(
     ({ item }: { item: NewsItems }) => (
@@ -187,7 +190,9 @@ export const NewsScreen = observer(() => {
           imageLink={vm.imageLink}
           isImageLoaded={vm.isImageLoaded}
           showLoader={vm.showLoader}
+          photoSelected={!!vm.selectedPhotoCid}
           openFullScreen={vm.openFullScreenImage}
+          colorize={vm.colorize}
           onLinkPress={vm.openPhotoFromLink}
           compareMode={vm.compareMode}
           closeCompare={vm.closeCompare}

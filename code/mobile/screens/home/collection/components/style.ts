@@ -7,6 +7,7 @@ export const s = StyleSheet.create({
     borderRadius: 16,
   },
   mainContainer: { flexDirection: 'row', alignItems: 'center' },
+  placeholder: { justifyContent: 'center', alignItems: 'center' },
   infoContainer: { flex: 1 },
   removeButton: {
     padding: 6,

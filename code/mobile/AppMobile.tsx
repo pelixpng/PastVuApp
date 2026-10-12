@@ -23,7 +23,9 @@ import { AppSettingsScreen } from './screens/settings/appSettings/AppSettings.sc
 import { SupportContactsScreen } from './screens/settings/supportContacts/SupportContacts.screen'
 import { NewsPostScreen } from './screens/home/newsPost/NewsPost.screen'
 import { CompareScreen } from './screens/home/compare/Compare.screen'
+import { ProfileScreen } from './screens/profile/Profile.screen'
 import { t } from '../core/i18n'
+import { ModelDownloadSheet } from '../core/components/colorize/ModelDownloadSheet'
 
 export const Stack = createStackNavigator<StackParamList>()
 export let NavigationRef = createRef<NavigationContainerRef<ParamListBase>>()
@@ -146,7 +148,14 @@ export default observer(function AppMobile() {
           }}
         />
         <Stack.Screen name={SCREENS.NEWS_POST} component={NewsPostScreen} />
+        <Stack.Screen
+          name={SCREENS.PROFILE}
+          component={ProfileScreen}
+          options={{ headerTitle: t('profile.title') }}
+        />
       </Stack.Navigator>
+      {/* The colorization model's one-time download, opened by the palette. */}
+      <ModelDownloadSheet />
     </NavigationContainer>
   )
 })

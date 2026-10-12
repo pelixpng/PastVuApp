@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The preview build (build.gradle, buildTypes.preview) sits next to the Google Play app, so it
+     gets its own name on the home screen. -->
+<resources>
+  <string name="app_name">PastVu Beta</string>
+</resources>

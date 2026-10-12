@@ -1,7 +1,7 @@
 import { FC, useCallback } from 'react'
-import { View, Text, FlatList, StyleSheet, useWindowDimensions } from 'react-native'
+import { View, Text, FlatList, Pressable, StyleSheet, useWindowDimensions } from 'react-native'
 import { Image } from 'expo-image'
-import { useTheme } from '@react-navigation/native'
+import { StackActions, useNavigation, useTheme } from '@react-navigation/native'
 import RenderHTML from 'react-native-render-html'
 import { NewsItems } from '../../../../../core/types/apiNews'
 import { IComment, Users } from '../../../../../core/types/apiPhotoComment'
@@ -11,6 +11,8 @@ import { formatDate } from '../../../../../core/utils/getTime'
 import StandardAvatar from '../../../../../assets/avatar.png'
 import { t } from '../../../../../core/i18n'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { StackParamList } from '../../../../navigation/stackParams.types'
+import { SCREENS } from '../../../../navigation/navigation.types'
 
 type NewsDetailProps = {
   post: NewsItems | null
@@ -21,6 +23,7 @@ type NewsDetailProps = {
 
 export const NewsDetail: FC<NewsDetailProps> = ({ post, comments, users, onLinkPress }) => {
   const { colors } = useTheme()
+  const navigation = useNavigation()
   const { bottom } = useSafeAreaInsets()
   const { width } = useWindowDimensions()
   const detailWidth = width * 0.67 - 32
@@ -50,7 +53,15 @@ export const NewsDetail: FC<NewsDetailProps> = ({ post, comments, users, onLinkP
 
   const ListHeader = () => (
     <View style={s.headerContainer}>
-      <View style={s.userRow}>
+      <Pressable
+        style={s.userRow}
+        disabled={!post.user?.login}
+        onPress={() => {
+          if (!post.user?.login) return
+          const params: StackParamList[SCREENS.PROFILE] = { login: post.user.login }
+          navigation.dispatch(StackActions.push(SCREENS.PROFILE, params))
+        }}
+        accessibilityRole="link">
         <Image
           source={avatarUri ? { uri: avatarUri } : StandardAvatar}
           style={s.avatar}
@@ -63,7 +74,7 @@ export const NewsDetail: FC<NewsDetailProps> = ({ post, comments, users, onLinkP
           </Text>
           <Text style={[s.date, { color: colors.textThird }]}>{formattedDate}</Text>
         </View>
-      </View>
+      </Pressable>
       <Spacer height={16} />
       <Text style={[s.title, { color: colors.textFirst }]}>{post.title}</Text>
       <Spacer height={16} />

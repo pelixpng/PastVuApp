@@ -12,6 +12,7 @@ export const s = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
   },
+  placeholder: { justifyContent: 'center', alignItems: 'center' },
   infoContainer: { flex: 1 },
   titleText: {
     fontSize: 13,

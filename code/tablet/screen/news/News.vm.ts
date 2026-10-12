@@ -4,13 +4,15 @@ import { BaseViewModelProvider } from '../../provider/vm.provider'
 import { SCREENS } from '../../navigation/navigation.types'
 import { SegmentedControlOption } from '../../../core/components/ui/segmentedControl/SegmentedControl'
 import ApiService from '../../../core/api/apiService'
+import { userLoginFromLink } from '../../../core/utils/userLink'
 import ApiStore from '../../../core/store/Api.store'
 import { MMKVStorage } from '../../../core/storage/mmkv'
 import { NewsItems } from '../../../core/types/apiNews'
 import { CollectionItem } from '../collection/Collection.screen'
 import { IComment, Users } from '../../../core/types/apiPhotoComment'
 import { getRegionPath } from '../../../core/utils/getRegionPath'
-import { savePhoto, sharePhoto } from '../../../core/utils/getPhoto'
+import { saveLocalImage, savePhoto, sharePhoto } from '../../../core/utils/getPhoto'
+import { PostColorize } from '../../../core/store/PostColorize'
 import { t } from '../../../core/i18n'
 import * as PhotoPost from '../../../core/services/photoPost'
 import * as StreetView from '../../../core/services/streetView'
@@ -57,9 +59,18 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
     ]
   }
 
+  /** The open photo's colour version: palette, colour photo, comparison with the original. */
+  readonly colorize: PostColorize
+
   constructor() {
     super()
     makeObservable(this)
+    // After makeObservable, so it tracks the post.
+    this.colorize = new PostColorize(
+      () => (this.postInfo ? this.postInfo.cid.toString() : null),
+      () => this.imageLink,
+      () => this.postInfo?.file,
+    )
     this.loadAll()
   }
 
@@ -99,7 +110,7 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
   @computed
   get comparePhoto() {
     return this.postInfo
-      ? { uri: this.imageLink, year: this.postInfo.y, ...PhotoPost.photoResolution(this.postInfo) }
+      ? { uri: this.colorize.displayLink, year: this.postInfo.y, ...PhotoPost.photoResolution(this.postInfo) }
       : undefined
   }
 
@@ -219,7 +230,12 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
         Linking.openURL(`https://pastvu.com/news/${newsMatch[1]}`)
       }
     } else {
-      Linking.openURL(href)
+      const login = userLoginFromLink(href)
+      if (login) {
+        this.pushTo(SCREENS.PROFILE, { login })
+      } else {
+        Linking.openURL(href)
+      }
     }
   }
 
@@ -337,13 +353,16 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
     this.isImageLoaded = true
   }
 
+  /** The colour version while it is on; `original` for the black-and-white photo under it. */
   @action.bound
-  openFullScreenImage() {
+  openFullScreenImage(original = false) {
+    const colour = original ? undefined : this.colorize.localFile
     this.navigateTo(SCREENS.FULL_SCREEN_IMAGE, {
       title: this.postInfo!.title,
       cid: this.postInfo!.cid.toString(),
-      uri: this.imageLink,
+      uri: colour ?? this.imageLink,
       file: this.postInfo!.file,
+      localFile: colour,
     })
   }
 
@@ -374,7 +393,10 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
 
   @action.bound
   saveImage() {
-    savePhoto(this.postInfo!.title, this.postInfo!.file)
+    // The colour version when it is on: saving gives what the panel shows.
+    const local = this.colorize.localFile
+    if (local) saveLocalImage(local)
+    else savePhoto(this.postInfo!.title, this.postInfo!.file)
   }
 }
 

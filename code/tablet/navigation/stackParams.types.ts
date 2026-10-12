@@ -6,5 +6,13 @@ export type StackParamList = {
   [SCREENS.PHOTO_HISTORY]: undefined
   [SCREENS.NEWS]: undefined
   [SCREENS.SETTINGS_MENU]: undefined
-  [SCREENS.FULL_SCREEN_IMAGE]: { uri: string; title: string; cid: string; file: string }
+  [SCREENS.FULL_SCREEN_IMAGE]: {
+    uri: string
+    title: string
+    cid: string
+    file: string
+    /** The colour version's local file, saved as is instead of downloading the photo. */
+    localFile?: string
+  }
+  [SCREENS.PROFILE]: { login: string }
 } & Record<SCREENS, object | undefined>

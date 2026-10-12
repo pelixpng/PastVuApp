@@ -30,8 +30,9 @@ const gradleBlock = `        // PastVu: API keys come from the project's .env at
         def pastvuKey = { String name ->
             (pastvuEnv.getProperty(name) ?: System.getenv(name) ?: '').trim().replaceAll(/^["']|["']$/, '')
         }
+        // NAME_ANDROID, when set, overrides NAME for this platform (e.g. a separate search key).
         manifestPlaceholders += [
-${KEYS.map(k => `            ${k}: pastvuKey('${k}'),`).join('\n')}
+${KEYS.map(k => `            ${k}: pastvuKey('${k}_ANDROID') ?: pastvuKey('${k}'),`).join('\n')}
         ]
 `
 

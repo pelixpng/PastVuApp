@@ -3,9 +3,11 @@ import { CollectionItem } from './Collection.screen'
 import { MMKVStorage } from '../../../core/storage/mmkv'
 import { BaseViewModelProvider } from '../../provider/vm.provider'
 import { SCREENS } from '../../navigation/navigation.types'
+import { userLoginFromLink } from '../../../core/utils/userLink'
 import { IComment, Users } from '../../../core/types/apiPhotoComment'
 import ApiStore from '../../../core/store/Api.store'
-import { savePhoto, sharePhoto } from '../../../core/utils/getPhoto'
+import { saveLocalImage, savePhoto, sharePhoto } from '../../../core/utils/getPhoto'
+import { PostColorize } from '../../../core/store/PostColorize'
 import * as PhotoPost from '../../../core/services/photoPost'
 import { Alert, Linking } from 'react-native'
 import { SegmentedControlOption } from '../../../core/components/ui/segmentedControl/SegmentedControl'
@@ -15,7 +17,8 @@ import { CompareMode } from '../../../core/components/compare/CompareView'
 
 export type CollectionTab = 'favorites' | 'viewed'
 
-class CollectionVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
+// Generic over the screen so a subclass on another screen (the profile) gets its own route params.
+class CollectionVM<SCREEN extends SCREENS = SCREENS.PHOTO_HISTORY> extends BaseViewModelProvider<SCREEN> {
   @observable.ref photos: CollectionItem[] = []
   @observable.ref favorites: CollectionItem[] = []
   @observable selectedTab: CollectionTab = 'favorites'
@@ -44,9 +47,18 @@ class CollectionVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
     ]
   }
 
+  /** The open photo's colour version: palette, colour photo, comparison with the original. */
+  readonly colorize: PostColorize
+
   constructor() {
     super()
     makeObservable(this)
+    // After makeObservable, so it tracks the post.
+    this.colorize = new PostColorize(
+      () => (this.postInfo ? this.postInfo.cid.toString() : null),
+      () => this.imageLink,
+      () => this.postInfo?.file,
+    )
   }
   // ------------------------------------------ Computed -----------------------------------------
   @computed
@@ -193,17 +205,20 @@ class CollectionVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
   @computed
   get comparePhoto() {
     return this.postInfo
-      ? { uri: this.imageLink, year: this.postInfo.y, ...PhotoPost.photoResolution(this.postInfo) }
+      ? { uri: this.colorize.displayLink, year: this.postInfo.y, ...PhotoPost.photoResolution(this.postInfo) }
       : undefined
   }
 
+  /** The colour version while it is on; `original` for the black-and-white photo under it. */
   @action.bound
-  openFullScreenImage() {
+  openFullScreenImage(original = false) {
+    const colour = original ? undefined : this.colorize.localFile
     this.navigateTo(SCREENS.FULL_SCREEN_IMAGE, {
       title: this.postInfo!.title,
       cid: this.postInfo!.cid.toString(),
-      uri: this.imageLink,
+      uri: colour ?? this.imageLink,
       file: this.postInfo!.file,
+      localFile: colour,
     })
   }
 
@@ -241,7 +256,12 @@ class CollectionVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
     if (photoMatch) {
       this.showPhoto(photoMatch[1])
     } else {
-      Linking.openURL(href)
+      const login = userLoginFromLink(href)
+      if (login) {
+        this.pushTo(SCREENS.PROFILE, { login })
+      } else {
+        Linking.openURL(href)
+      }
     }
   }
 
@@ -252,7 +272,10 @@ class CollectionVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
 
   @action.bound
   saveImage() {
-    savePhoto(this.postInfo!.title, this.postInfo!.file)
+    // The colour version when it is on: saving gives what the panel shows.
+    const local = this.colorize.localFile
+    if (local) saveLocalImage(local)
+    else savePhoto(this.postInfo!.title, this.postInfo!.file)
   }
 }
 

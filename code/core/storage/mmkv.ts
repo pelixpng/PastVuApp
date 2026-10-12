@@ -16,6 +16,7 @@ type MMKVStorageType =
   | 'isShowCluster'
   | 'isFirstLaunch'
   | 'locale'
+  | 'yandexConsent'
 
 type TValue = string | number | object
 

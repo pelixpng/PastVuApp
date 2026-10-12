@@ -8,8 +8,8 @@ import { Links } from '../../../../core/constants/links'
 import { formatLongDate, t } from '../../../../core/i18n'
 import { observer } from 'mobx-react-lite'
 
-const APP_VERSION = '2.6.1'
-const RELEASE_DATE = new Date('2026-09-22')
+const APP_VERSION = '2.7.0'
+const RELEASE_DATE = new Date('2026-10-04')
 
 export const AboutAppScreen = observer(() => {
   const { colors } = useTheme()
@@ -47,6 +47,8 @@ export const AboutAppScreen = observer(() => {
             func={() => Linking.openURL(Links.sourceCode)}
           />
         </View>
+        <Spacer height={16} />
+        <MyButton title={t('about.privacyPolicy')} func={() => Linking.openURL(Links.privacyPolicy)} />
       </UICard>
       <Spacer height={16} />
       <UICard>
@@ -79,6 +81,10 @@ export const AboutAppScreen = observer(() => {
             func={() => Linking.openURL(Links.yandexMaps)}
           />
         </View>
+        <Spacer height={16} />
+        <MyButton title={t('about.yandexTerms')} func={() => Linking.openURL(Links.yandexTerms)} />
+        <Spacer height={16} />
+        <MyButton title={'DDColor'} func={() => Linking.openURL(Links.ddcolor)} />
       </UICard>
       <Spacer height={16} />
       <UICard>
