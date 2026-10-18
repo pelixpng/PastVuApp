@@ -20,7 +20,10 @@ const mapTypeOptions = (): OptionsRadioButton[] => [
 	{ label: t('options.mapStandard'), value: 'standard' },
 	{ label: t('options.mapSatellite'), value: 'satellite' },
 	{ label: t('options.mapHybrid'), value: 'hybrid' },
-	{ label: t('options.mapTerrain'), value: 'terrain' }
+	// Apple Maps has no terrain type: react-native-maps draws the standard map for it.
+	...(Platform.OS === 'ios'
+		? []
+		: [{ label: t('options.mapTerrain'), value: 'terrain' }])
 ]
 const markerTypeOptions = (): OptionsRadioButton[] => [
 	{ label: t('options.markerNew'), value: 'new' },

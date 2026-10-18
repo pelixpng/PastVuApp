@@ -1,4 +1,4 @@
-NSLocationWhenInUseUsageDescription = "Dostęp do lokalizacji pozwala pokazać na mapie ciekawe zdjęcia w pobliżu.";
-NSPhotoLibraryAddUsageDescription = "Prosimy o dostęp, aby zapisywać pobrane zdjęcia w galerii do późniejszego przeglądania.";
-NSPhotoLibraryUsageDescription = "Prosimy o dostęp, aby zapisywać pobrane zdjęcia w galerii do późniejszego przeglądania.";
+NSLocationWhenInUseUsageDescription = "Lokalizacja jest potrzebna, aby pokazać na mapie stare zdjęcia zrobione w pobliżu.";
+NSPhotoLibraryAddUsageDescription = "Potrzebne, aby zapisać w galerii stare zdjęcie, jego pokolorowaną wersję lub porównanie „wtedy i teraz”.";
+NSPhotoLibraryUsageDescription = "Dostęp do galerii jest potrzebny tylko do zapisywania zdjęć, które zdecydujesz się zapisać. Aplikacja nie przegląda Twojej galerii.";
 NSCameraUsageDescription = "Dostęp do aparatu pozwala sfotografować to miejsce dziś i porównać je ze starym zdjęciem.";

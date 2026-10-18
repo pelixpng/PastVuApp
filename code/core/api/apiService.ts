@@ -1,6 +1,7 @@
 import { IComment, IComments } from '../types/apiPhotoComment'
 import {
   LocationItem,
+  NearbyPhoto,
   PhotoList,
   clusterResponse,
   getClustersPhotosProps,
@@ -22,16 +23,6 @@ const BASE_URL = 'https://api.pastvu.com/api2'
 const PLACE_API_URL = 'https://us1.locationiq.com/v1'
 const PLACE_API_KEY = getApiKey('PLACE_API_KEY')
 
-/**
- * Calls a method of the PastVu HTTP API.
- *
- * News, the front-page feed, the region list and news comments used to go over a socket.io
- * connection, because the site itself talks to the server that way and these methods had no HTTP
- * counterpart. They answer over `api2` now, so the whole socket client is gone.
- *
- * The endpoint replies with HTTP 200 even for a method it does not know, describing the failure in
- * the body, so the result is what has to be checked rather than the status.
- */
 /** A failed API call; `code` is the server's error code (`NO_SUCH_USER`) or the HTTP status. */
 export class ApiError extends Error {
   constructor(
@@ -42,6 +33,16 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * Calls a method of the PastVu HTTP API.
+ *
+ * News, the front-page feed, the region list and news comments used to go over a socket.io
+ * connection, because the site itself talks to the server that way and these methods had no HTTP
+ * counterpart. They answer over `api2` now, so the whole socket client is gone.
+ *
+ * The endpoint replies with HTTP 200 even for a method it does not know, describing the failure in
+ * the body, so the result is what has to be checked rather than the status.
+ */
 const apiGet = async (method: string, params?: object) => {
   const query = params ? `&params=${encodeURIComponent(JSON.stringify(params))}` : ''
   const response = await fetch(`${BASE_URL}?method=${method}${query}`)
@@ -75,6 +76,76 @@ export default class ApiService {
       marker: getMarkerName(photo.year, photo.dir),
       color: getColor(photo.year),
     }))
+  }
+
+  /**
+   * The photos closest to a point, nearest first. The strip under a photo leaves the photo itself
+   * out with `exceptCid` and asks for every period; the map's nearby sheet passes the years on the
+   * slider.
+   */
+  static async getNearbyPhotos(
+    latitude: number,
+    longitude: number,
+    exceptCid?: string,
+    limit = 16,
+    years?: [number, number],
+  ): Promise<NearbyPhoto[]> {
+    const { photos } = (await apiGet('photo.giveNearestPhotos', {
+      geo: [latitude, wrapLongitude(longitude)],
+      limit,
+      ...(exceptCid ? { except: Number(exceptCid) } : {}),
+      ...(years ? { year: years[0], year2: years[1] } : {}),
+    })) as PhotoList['result']
+    return (photos ?? []).map(photo => ({
+      cid: photo.cid.toString(),
+      title: photo.title,
+      year: photo.year,
+      file: photo.file,
+      location: { latitude: photo.geo[0], longitude: photo.geo[1] },
+    }))
+  }
+
+  /**
+   * The end years of the photos' date ranges, which photo.giveNearestPhotos leaves out:
+   * photo.getByBounds over the small box around them returns `year2`, in one request. Photos it
+   * misses keep their single year. Keyed by cid; only ranges, not single years.
+   */
+  static async getYearRanges(
+    photos: Pick<NearbyPhoto, 'cid' | 'location'>[],
+    years: [number, number] = [1826, 2000],
+  ): Promise<Map<string, number>> {
+    const ranges = new Map<string, number>()
+    if (!photos.length) return ranges
+    const latitudes = photos.map(photo => photo.location.latitude)
+    const longitudes = photos.map(photo => wrapLongitude(photo.location.longitude))
+    // A little room around the outermost photos, which sit right on the box's edge otherwise.
+    const pad = 0.0005
+    const south = Math.max(Math.min(...latitudes) - pad, -90)
+    const north = Math.min(Math.max(...latitudes) + pad, 90)
+    const west = Math.min(...longitudes) - pad
+    const east = Math.max(...longitudes) + pad
+    // The server turns down longitudes past ±180, and a box across that meridian would span the
+    // world the other way round: such photos keep their single year.
+    if (west < -180 || east > 180 || east - west > 180) return ranges
+    const ring = [
+      [west, south],
+      [east, south],
+      [east, north],
+      [west, north],
+      [west, south],
+    ]
+    const { photos: found } = (await apiGet('photo.getByBounds', {
+      // From zoom 17 the server sends the photos themselves rather than clusters.
+      z: 17,
+      localWork: true,
+      year: years[0],
+      year2: years[1],
+      geometry: { type: 'Polygon', coordinates: [ring] },
+    })) as { photos?: { cid: number; year?: number; year2?: number }[] }
+    for (const photo of found ?? []) {
+      if (photo.year2 && photo.year2 !== photo.year) ranges.set(photo.cid.toString(), photo.year2)
+    }
+    return ranges
   }
 
   static async getPhotosClusters(params: getClustersPhotosProps) {

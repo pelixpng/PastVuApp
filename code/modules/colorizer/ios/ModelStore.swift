@@ -5,11 +5,10 @@ import Foundation
 
 /// Where the colorization model lives once downloaded, and how a download becomes that model.
 ///
-/// The model (224 MB) is not in the app: the app downloads it on first use as a zipped
-/// Colorizer.mlpackage (see core/services/colorizerModel.ts), and this checks the zip against its
-/// SHA-256, unpacks it and compiles it for this device. Compiling here rather than shipping a
-/// compiled model keeps the download valid for every iOS version the app supports.
-@available(iOS 16.0, macOS 13.0, *)
+/// The model (about 235 MB installed) is not in the app: the app downloads it on first use as a
+/// zipped Colorizer.mlpackage (see core/store/ColorizerModel.store.ts), and this checks the zip
+/// against its SHA-256, unpacks it and compiles it for this device. Compiling here rather than
+/// shipping a compiled model keeps the download valid for every iOS version the app supports.
 enum ModelStore {
   /// Application Support: kept until the app is removed, unlike caches, which iOS empties when it
   /// runs short of space. Left out of backups, as it can always be downloaded again.

@@ -64,6 +64,7 @@ export const NewsScreen = observer(() => {
             initialNumToRender={10}
             maxToRenderPerBatch={5}
             windowSize={5}
+            showsVerticalScrollIndicator={false}
             ListEmptyComponent={
               vm.loading ? (
                 <View style={s.emptyContainer}>
@@ -92,6 +93,7 @@ export const NewsScreen = observer(() => {
             initialNumToRender={10}
             maxToRenderPerBatch={5}
             windowSize={5}
+            showsVerticalScrollIndicator={false}
             ListEmptyComponent={
               vm.loading ? (
                 <View style={s.emptyContainer}>

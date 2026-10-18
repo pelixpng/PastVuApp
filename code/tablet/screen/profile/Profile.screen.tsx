@@ -1,8 +1,8 @@
 import { useCallback, useLayoutEffect } from 'react'
-import { FlatList, Pressable, StyleSheet, View, useWindowDimensions } from 'react-native'
+import { FlatList, Pressable, StyleSheet, View } from 'react-native'
 import { useNavigation, useTheme } from '@react-navigation/native'
 import { observer } from 'mobx-react-lite'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { HeaderIconButton } from '../../../core/components/ui/buttons/HeaderIconButton'
 import { ColorizeButtons } from '../../../core/components/colorize/ColorizeButtons'
 import { Spacer } from '../../../core/components/ui/Spacer'
@@ -42,7 +42,8 @@ const CONTENT_TOP = 16
  */
 export const ProfileScreen = observer(() => {
   const navigation = useNavigation()
-  const { width } = useWindowDimensions()
+  // The root view's width, not Dimensions: see core/hooks/useRootSize.
+  const { width } = useSafeAreaFrame()
   const { bottom } = useSafeAreaInsets()
   const { colors } = useTheme()
   const vm = useVM(ProfileVM)
@@ -214,6 +215,7 @@ export const ProfileScreen = observer(() => {
           openFullScreen={vm.openFullScreenImage}
           colorize={vm.colorize}
           onLinkPress={vm.openPanelLink}
+          onOpenPhoto={vm.openPhoto}
           compareMode={vm.compareMode}
           closeCompare={vm.closeCompare}
           hasStreetView={vm.hasStreetView}

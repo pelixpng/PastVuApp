@@ -45,13 +45,16 @@ export class PostColorize {
     return ColorizeStore.isColorizing(this.cid())
   }
 
-  /** What the photo shows: the colour version while it is switched on, the original otherwise. */
+  /**
+   * What the photo shows: the colour version while it is switched on, with the "AI" mark while that
+   * is on in settings, the original otherwise. Full screen and then-and-now take it too.
+   */
   @computed
   get displayLink() {
-    return ColorizeStore.uriFor(this.cid(), this.original())
+    return ColorizeStore.displayUriFor(this.cid(), this.original())
   }
 
-  /** The colour version's file, which saving takes instead of downloading from PastVu. */
+  /** The colour version's file as shown, which saving takes instead of downloading from PastVu. */
   @computed
   get localFile() {
     return this.isColorized ? this.displayLink : undefined

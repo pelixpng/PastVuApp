@@ -26,7 +26,10 @@ export const ItemHistory: FC<ItemHistoryProps> = ({
   onRemove,
   icon,
 }) => {
-  const { colors } = useTheme()
+  const { colors, names } = useTheme()
+  // The light grey is too faint on the selected row's dark grey.
+  const descriptionColor =
+    isSelected && names.themeName === 'dark' ? colors.textSecond : colors.textThird
   const [imageFailed, setImageFailed] = useState(false)
   const backgroundColor = useMemo(
     () => (isSelected ? colors.baseThird : null),
@@ -56,7 +59,7 @@ export const ItemHistory: FC<ItemHistoryProps> = ({
           {title}
         </Text>
         <Spacer height={2} />
-        <Text numberOfLines={2} style={[s.descriptionText, { color: colors.textThird }]}>
+        <Text numberOfLines={2} style={[s.descriptionText, { color: descriptionColor }]}>
           {description}
         </Text>
       </View>

@@ -1,4 +1,4 @@
-NSLocationWhenInUseUsageDescription = "Vietos prieiga leidžia žemėlapyje rodyti įdomias nuotraukas netoli jūsų.";
-NSPhotoLibraryAddUsageDescription = "Prašome prieigos, kad atsisiųstas nuotraukas galėtume išsaugoti jūsų galerijoje vėlesnei peržiūrai.";
-NSPhotoLibraryUsageDescription = "Prašome prieigos, kad atsisiųstas nuotraukas galėtume išsaugoti jūsų galerijoje vėlesnei peržiūrai.";
+NSLocationWhenInUseUsageDescription = "Buvimo vieta reikalinga, kad žemėlapyje būtų rodomos netoli jūsų darytos senos nuotraukos.";
+NSPhotoLibraryAddUsageDescription = "Reikalinga, kad galėtumėte išsaugoti galerijoje seną nuotrauką, jos nuspalvintą versiją arba palyginimą „tada ir dabar“.";
+NSPhotoLibraryUsageDescription = "Prieiga prie nuotraukų galerijos reikalinga tik toms nuotraukoms išsaugoti, kurias patys nusprendėte išsaugoti. Programėlė jūsų galerijos neperžiūri.";
 NSCameraUsageDescription = "Kameros prieiga reikalinga, kad nufotografuotumėte šią vietą šiandien ir palygintumėte su sena nuotrauka.";

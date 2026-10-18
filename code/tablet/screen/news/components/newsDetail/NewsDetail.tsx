@@ -1,5 +1,5 @@
 import { FC, useCallback } from 'react'
-import { View, Text, FlatList, Pressable, StyleSheet, useWindowDimensions } from 'react-native'
+import { View, Text, FlatList, Pressable, StyleSheet } from 'react-native'
 import { Image } from 'expo-image'
 import { StackActions, useNavigation, useTheme } from '@react-navigation/native'
 import RenderHTML from 'react-native-render-html'
@@ -10,7 +10,7 @@ import { Spacer } from '../../../../../core/components/ui/Spacer'
 import { formatDate } from '../../../../../core/utils/getTime'
 import StandardAvatar from '../../../../../assets/avatar.png'
 import { t } from '../../../../../core/i18n'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { StackParamList } from '../../../../navigation/stackParams.types'
 import { SCREENS } from '../../../../navigation/navigation.types'
 
@@ -25,7 +25,8 @@ export const NewsDetail: FC<NewsDetailProps> = ({ post, comments, users, onLinkP
   const { colors } = useTheme()
   const navigation = useNavigation()
   const { bottom } = useSafeAreaInsets()
-  const { width } = useWindowDimensions()
+  // The root view's width, not Dimensions: see core/hooks/useRootSize.
+  const { width } = useSafeAreaFrame()
   const detailWidth = width * 0.67 - 32
 
   const renderItem = useCallback(

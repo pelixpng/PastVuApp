@@ -19,8 +19,11 @@ conversion takes about 6 GB of memory:
       https://huggingface.co/piddnad/DDColor-models/resolve/main/ddcolor_modelscope.pth
     venv/bin/python convert_ddcolor.py --repo <DDColor checkout> --weights ddcolor_modelscope.pth
 
-Writes Colorizer.mlpackage (8-bit weights, iOS 16+, about 225 MB); `xcrun coremlcompiler compile`
-turns it into the .mlmodelc the app bundles (modules/colorizer/ios).
+Writes Colorizer.mlpackage (8-bit weights, iOS 16+, about 225 MB). The app does not bundle it: it is
+zipped, the package at the archive's root, as Colorizer.mlpackage.zip and uploaded to
+huggingface.co/pelixpng/pastvu-colorizer. The app downloads it on first use (pinned commit and
+SHA-256 in core/store/ColorizerModel.store.ts) and compiles it on device
+(modules/colorizer/ios/ModelStore.swift).
 """
 import argparse
 import os

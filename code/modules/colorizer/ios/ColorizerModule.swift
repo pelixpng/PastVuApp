@@ -10,23 +10,19 @@ public class ColorizerModule: Module {
 
     // Expo runs async functions off the main thread, which the model and the pixel work need.
     AsyncFunction("colorize") { (path: String) throws -> String in
-      guard #available(iOS 16.0, *) else { throw UnsupportedSystemException() }
       return try PhotoColorizer.shared.colorize(fileAt: ColorizerModule.fileURL(path)).absoluteString
     }
 
     // The model is downloaded on first use; see ModelStore.
     Function("isModelInstalled") { () -> Bool in
-      guard #available(iOS 16.0, *) else { return false }
       return ModelStore.isInstalled
     }
 
     AsyncFunction("installModel") { (zipPath: String, sha256: String) async throws in
-      guard #available(iOS 16.0, *) else { throw UnsupportedSystemException() }
       try await ModelStore.install(zip: ColorizerModule.fileURL(zipPath), sha256: sha256)
     }
 
     AsyncFunction("removeModel") { () throws in
-      guard #available(iOS 16.0, *) else { return }
       try ModelStore.remove()
     }
 
@@ -35,6 +31,11 @@ public class ColorizerModule: Module {
         throw UnreadablePhotoException(path)
       }
       return monochrome
+    }
+
+    // Off the main thread like colorize: a full-size photo is decoded, drawn on and encoded again.
+    AsyncFunction("addWatermark") { (path: String) throws -> String in
+      return try Watermark.add(toFileAt: ColorizerModule.fileURL(path)).absoluteString
     }
   }
 
@@ -45,10 +46,6 @@ public class ColorizerModule: Module {
     }
     return URL(fileURLWithPath: path)
   }
-}
-
-final class UnsupportedSystemException: Exception {
-  override var reason: String { "Colorizing needs iOS 16 or later" }
 }
 
 final class ModelUnavailableException: Exception {
@@ -63,6 +60,10 @@ final class UnreadablePhotoException: GenericException<String> {
   override var reason: String { "Could not read the photo at \(param)" }
 }
 
+final class UnwritablePhotoException: GenericException<String> {
+  override var reason: String { "Could not write the photo to \(param)" }
+}
+
 final class ColorizationFailedException: GenericException<String> {
   override var reason: String { "Colorizing failed: \(param)" }
 }
@@ -70,7 +71,6 @@ final class ColorizationFailedException: GenericException<String> {
 /// DDColor-L (Kang et al., ICCV 2023; Apache-2.0): the photo's lightness goes in as a neutral grey at
 /// 512×512, its colour (a, b of CIE Lab) comes out at the same size. The colour is then stretched
 /// over the lightness of the original at full size, which is where the result's detail comes from.
-@available(iOS 16.0, *)
 final class PhotoColorizer {
   static let shared = PhotoColorizer()
 
@@ -254,8 +254,9 @@ final class PhotoColorizer {
   }
 
   /// Rows of PastVu's caption bar at the bottom: one flat grey across most of the row, the caption's
-  /// text aside, with no colour in it. At most a tenth of the photo.
-  private func captionRows(_ rgba: [UInt8], width: Int, height: Int) -> Int {
+  /// text aside, with no colour in it. At most a tenth of the photo. Watermark runs it on the
+  /// coloured result, where the bar stays grey, to put the AI mark above the bar.
+  func captionRows(_ rgba: [UInt8], width: Int, height: Int) -> Int {
     func grey(_ i: Int) -> Int { (Int(rgba[i * 4]) + Int(rgba[i * 4 + 1]) + Int(rgba[i * 4 + 2])) / 3 }
     var histogram = [Int](repeating: 0, count: 256)
     for x in 0..<width { histogram[grey((height - 1) * width + x)] += 1 }
@@ -279,7 +280,7 @@ final class PhotoColorizer {
   // MARK: - Model
 
   private func loadModel() throws -> MLModel {
-    // Downloaded on first use, not shipped with the app (224 MB); see ModelStore.
+    // Downloaded on first use, not shipped with the app (about 235 MB installed); see ModelStore.
     guard ModelStore.isInstalled else { throw ModelUnavailableException() }
     let url = ModelStore.modelURL
     let configuration = MLModelConfiguration()

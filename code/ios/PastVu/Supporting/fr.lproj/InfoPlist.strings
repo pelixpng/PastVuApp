@@ -1,4 +1,4 @@
-NSLocationWhenInUseUsageDescription = "L’accès à la position permet d’afficher sur la carte des photos intéressantes près de vous.";
-NSPhotoLibraryAddUsageDescription = "Nous demandons l’accès pour enregistrer les photos téléchargées dans votre galerie afin de les consulter plus tard.";
-NSPhotoLibraryUsageDescription = "Nous demandons l’accès pour enregistrer les photos téléchargées dans votre galerie afin de les consulter plus tard.";
+NSLocationWhenInUseUsageDescription = "La position est nécessaire pour afficher sur la carte d’anciennes photos prises près de vous.";
+NSPhotoLibraryAddUsageDescription = "Nécessaire pour enregistrer dans la galerie une ancienne photo, sa version colorisée ou une comparaison entre hier et aujourd’hui.";
+NSPhotoLibraryUsageDescription = "L’accès à la galerie n’est nécessaire que pour enregistrer les photos que vous avez décidé d’enregistrer. L’application ne parcourt pas votre galerie.";
 NSCameraUsageDescription = "L’accès à l’appareil photo sert à photographier cet endroit aujourd’hui et à le comparer à l’ancienne photo.";

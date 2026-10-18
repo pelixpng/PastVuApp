@@ -17,6 +17,7 @@ type MMKVStorageType =
   | 'isFirstLaunch'
   | 'locale'
   | 'yandexConsent'
+  | 'aiWatermark'
 
 type TValue = string | number | object
 

@@ -29,9 +29,19 @@ ios/Keys.xcconfig
 # Артефакты сборки локальных Expo-модулей
 modules/**/build/
 
-# Модель раскраски DDColor-L (224 МБ): локальный результат scripts/colorizer/convert_ddcolor.py. В сборку не входит —
-# приложение скачивает её при первой раскраске с huggingface.co/pelixpng/pastvu-colorizer
-modules/colorizer/ios/Colorizer.mlmodelc/
+# Модель раскраски DDColor-L: веса, промежуточные и готовые модели из scripts/colorizer (сотни МБ,
+# ddcolor-tiled-fp32.onnx — 912 МБ). В сборку не входят — приложение скачивает модель при первой
+# раскраске с huggingface.co/pelixpng/pastvu-colorizer
+*.mlpackage/
+*.mlpackage.zip
+*.mlmodelc/
+*.onnx
+*.pth
+# Пробные раскраски convert_ddcolor.py --test
+scripts/colorizer/**/*-ddcolor-*.jpg
+# Исходники и сборка ONNX Runtime по modules/colorizer/android/ort-maven/build-inputs/README.md
+modules/colorizer/android/ort-maven/build-inputs/src/
+modules/colorizer/android/ort-maven/build-inputs/build-aar/
 
 # Кэш Python от скриптов в scripts/
 __pycache__/

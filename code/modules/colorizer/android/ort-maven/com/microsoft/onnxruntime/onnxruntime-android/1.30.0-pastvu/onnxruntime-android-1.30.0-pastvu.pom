@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.microsoft.onnxruntime</groupId>
   <artifactId>onnxruntime-android</artifactId>
-  <version>1.30.0</version>
+  <version>1.30.0-pastvu</version>
   <packaging>aar</packaging>
   <name>onnx-runtime</name>
   <description>ONNX Runtime is a performance-focused inference engine for ONNX (Open Neural Network Exchange) models. This package contains the Android (aar) build of ONNX Runtime. It includes support for all types and operators, for ONNX format models. All standard ONNX models can be executed with this package.</description>

@@ -1,7 +1,7 @@
-import { View, Image, Platform, useWindowDimensions } from 'react-native'
+import { View, Image, Platform } from 'react-native'
 import { fitContainer, ResumableZoom, useImageResolution } from 'react-native-zoom-toolkit'
 import Animated, { SlideInUp, Easing, SlideOutUp } from 'react-native-reanimated'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useState } from 'react'
 import { HeaderIconButton } from '../../../core/components/ui/buttons/HeaderIconButton'
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native'
@@ -18,7 +18,8 @@ export const FullScreenImage = () => {
   const navigation = useNavigation()
   const { params } = useRoute<RouteProp<StackParamList, typeof SCREENS.FULL_SCREEN_IMAGE>>()
   const { top } = useSafeAreaInsets()
-  const { width, height } = useWindowDimensions()
+  // The root view's size, not Dimensions: see core/hooks/useRootSize.
+  const { width, height } = useSafeAreaFrame()
   const paddingTop = top + (Platform.OS === 'android' ? 15 : 10)
   const { isFetching, resolution } = useImageResolution({
     uri: params.uri,

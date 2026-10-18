@@ -124,7 +124,7 @@ class CollectionVM<SCREEN extends SCREENS = SCREENS.PHOTO_HISTORY> extends BaseV
     if (!this.pendingDeleteCid) return
     if (this.selectedTab === 'viewed') {
       this.photos = this.photos.filter(photo => photo.cid !== this.pendingDeleteCid)
-      MMKVStorage.set('History', this.photos)
+      PhotoPost.saveHistory(this.photos)
     } else {
       this.favorites = this.favorites.filter(photo => photo.cid !== this.pendingDeleteCid)
       MMKVStorage.set('Favorites', this.favorites)
@@ -212,6 +212,7 @@ class CollectionVM<SCREEN extends SCREENS = SCREENS.PHOTO_HISTORY> extends BaseV
   /** The colour version while it is on; `original` for the black-and-white photo under it. */
   @action.bound
   openFullScreenImage(original = false) {
+    if (!this.postInfo) return
     const colour = original ? undefined : this.colorize.localFile
     this.navigateTo(SCREENS.FULL_SCREEN_IMAGE, {
       title: this.postInfo!.title,
@@ -229,6 +230,7 @@ class CollectionVM<SCREEN extends SCREENS = SCREENS.PHOTO_HISTORY> extends BaseV
 
   @action.bound
   toggleFavorite() {
+    if (!this.postInfo) return
     const cid = this.postInfo!.cid.toString()
     const favorites: CollectionItem[] = MMKVStorage.get('Favorites') ?? []
     const title = this.postInfo!.title
@@ -267,11 +269,13 @@ class CollectionVM<SCREEN extends SCREENS = SCREENS.PHOTO_HISTORY> extends BaseV
 
   @action.bound
   share() {
+    if (!this.postInfo) return
     sharePhoto(this.postInfo!.title, this.postInfo!.cid.toString())
   }
 
   @action.bound
   saveImage() {
+    if (!this.postInfo) return
     // The colour version when it is on: saving gives what the panel shows.
     const local = this.colorize.localFile
     if (local) saveLocalImage(local)

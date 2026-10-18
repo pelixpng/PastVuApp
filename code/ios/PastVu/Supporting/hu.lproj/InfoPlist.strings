@@ -1,4 +1,4 @@
-NSLocationWhenInUseUsageDescription = "A helymeghatározás segítségével a térképen megjelenítjük a közeli érdekes fotókat.";
-NSPhotoLibraryAddUsageDescription = "A hozzáférést azért kérjük, hogy a letöltött fotókat a galériába menthessük későbbi megtekintésre.";
-NSPhotoLibraryUsageDescription = "A hozzáférést azért kérjük, hogy a letöltött fotókat a galériába menthessük későbbi megtekintésre.";
+NSLocationWhenInUseUsageDescription = "A helyadatokra azért van szükség, hogy a térképen megjelenítsük az Ön közelében készült régi fotókat.";
+NSPhotoLibraryAddUsageDescription = "Ahhoz szükséges, hogy a galériába menthesse a régi fotót, annak színezett változatát vagy az „akkor és most” összehasonlítást.";
+NSPhotoLibraryUsageDescription = "A fotógalériához való hozzáférés csak azoknak a fotóknak a mentéséhez szükséges, amelyeket Ön maga szeretne elmenteni. Az alkalmazás nem böngészi a galériáját.";
 NSCameraUsageDescription = "A kamera-hozzáférés arra kell, hogy lefotózza ezt a helyet ma, és összehasonlítsa a régi fotóval.";

@@ -26,11 +26,6 @@ export const s = StyleSheet.create({
   },
   iconContainer: { flexDirection: 'row' },
   postInfoContainer: { paddingHorizontal: 16 },
-  titleText: {
-    fontSize: 13,
-    fontWeight: '500',
-    lineHeight: 20,
-  },
   loaderContainer: {
     width: '100%',
     height: '100%',

@@ -20,5 +20,8 @@ android {
 dependencies {
   implementation project(':expo-modules-core')
   // Runs DDColor-L on the CPU. The model itself is downloaded on first use (ModelStore.kt).
-  implementation 'com.microsoft.onnxruntime:onnxruntime-android:1.30.0'
+  // Our reduced build without telemetry from ort-maven (see the root build.gradle). The version is
+  // ours alone, so a missing ort-maven repository fails the build instead of resolving the stock
+  // library from Maven Central.
+  implementation 'com.microsoft.onnxruntime:onnxruntime-android:1.30.0-pastvu'
 }

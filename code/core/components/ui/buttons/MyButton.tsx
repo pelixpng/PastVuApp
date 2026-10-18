@@ -5,16 +5,11 @@ type ButtonProps = {
   title: string
   func: () => void
   fullWidth?: boolean
-  /** Dimmed and ignoring taps, e.g. while the action it starts is still running. */
-  disabled?: boolean
 }
 
-export const MyButton: FC<ButtonProps> = ({ title, func, fullWidth, disabled }) => {
+export const MyButton: FC<ButtonProps> = ({ title, func, fullWidth }) => {
   return (
-    <TouchableOpacity
-      style={[s.block, fullWidth && s.flex, disabled && s.disabled]}
-      onPress={func}
-      disabled={disabled}>
+    <TouchableOpacity style={[s.block, fullWidth && s.flex]} onPress={func}>
       {/* One line, shrunk a little when a label is longer than the button (some are required word
           for word, like the link to Yandex Maps' terms), instead of running past its edges. */}
       <Text style={s.text} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
@@ -42,5 +37,4 @@ const s = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#428BF9',
   },
-  disabled: { opacity: 0.5 },
 })

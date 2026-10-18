@@ -1,6 +1,9 @@
 import { SliderComponent } from './components/settingsSlider/SliderSettings'
 import { Platform } from 'react-native'
-import { RadioButtons } from '../../../../core/components/ui/buttons/radioButton/RadioButtons'
+import {
+	OptionsRadioButton,
+	RadioButtons
+} from '../../../../core/components/ui/buttons/radioButton/RadioButtons'
 import { observer } from 'mobx-react-lite'
 import AppSettingsVM from './AppSettings.vm'
 import { Container } from '../../../../core/components/ui/Container'
@@ -18,6 +21,12 @@ import { SettingsOptions } from '../../../../core/constants/settings'
 import { isYandexConfigured } from '../../../../core/services/yandexMaps'
 import { MapProviderRadio } from '../../../../core/components/settings/MapProviderRadio'
 import { ColorizerModelCard } from '../../../../core/components/colorize/ColorizerModelCard'
+import ColorizeStore from '../../../../core/store/Colorize.store'
+
+const watermarkOptions = (): OptionsRadioButton[] => [
+	{ label: t('common.yes'), value: 'yes' },
+	{ label: t('common.no'), value: 'no' }
+]
 
 export const AppSettingsScreen = observer(() => {
 	const vm = useVM(AppSettingsVM)
@@ -177,6 +186,22 @@ export const AppSettingsScreen = observer(() => {
 					options={SettingsOptions.languageOptions()}
 					selectedValue={LocaleStore.preference}
 					setValue={LocaleStore.setLocale}
+				/>
+			</UICard>
+			<Spacer height={16} />
+			<UICard>
+				<Text style={[s.titleText, { color: colors.textFirst }]}>
+					{t('appSettings.aiWatermark')}
+				</Text>
+				<Spacer height={4} />
+				<Text style={[s.descriptionText, { color: colors.textSecond }]}>
+					{t('appSettings.aiWatermarkHint')}
+				</Text>
+				<Spacer height={12} />
+				<RadioButtons
+					options={watermarkOptions()}
+					selectedValue={ColorizeStore.watermark ? 'yes' : 'no'}
+					setValue={value => ColorizeStore.setWatermark(value === 'yes')}
 				/>
 			</UICard>
 			<Spacer height={16} />

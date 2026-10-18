@@ -64,6 +64,7 @@ export const CollectionScreen = observer(() => {
         initialNumToRender={10}
         maxToRenderPerBatch={5}
         windowSize={5}
+        showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <MenuButton
             title={vm.selectedTab === 'viewed' ? t('collection.historyTitle') : t('collection.favorites')}

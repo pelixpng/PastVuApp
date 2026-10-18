@@ -8,6 +8,7 @@ import { formatDate } from '../../../../../core/utils/getTime'
 import { Spacer } from '../../../../../core/components/ui/Spacer'
 import { ImageZoom } from '../../../../../core/components/photo/ImageZoom'
 import { ColourReveal } from '../../../../../core/components/colorize/ColourReveal'
+import { NearbyPhotos } from '../../../../../core/components/photo/NearbyPhotos'
 import { PostColorize } from '../../../../../core/store/PostColorize'
 import { photoResolution } from '../../../../../core/services/photoPost'
 import { t } from '../../../../../core/i18n'
@@ -20,6 +21,8 @@ type PostInfoProps = {
   openFullScreen: (original?: boolean) => void
   onLinkPress?: (href: string) => void
   colorize?: PostColorize
+  /** Opens another photo in this panel; without it the nearby photos are left out. */
+  onOpenPhoto?: (cid: string) => void
 }
 
 // An observer: the colour version comes and goes without the panel re-rendering.
@@ -30,6 +33,7 @@ export const PostInfo: FC<PostInfoProps> = observer(({
   openFullScreen,
   onLinkPress,
   colorize,
+  onOpenPhoto,
 }) => {
   const { colors } = useTheme()
   // The colour photo above the original is being zoomed and has to cover it.
@@ -157,6 +161,10 @@ export const PostInfo: FC<PostInfoProps> = observer(({
           </Text>
         )}
         <Spacer height={12} />
+        {onOpenPhoto && (
+          // 16: the panels' side padding, so the row scrolls out to the panel's edges.
+          <NearbyPhotos cid={String(postInfo.cid)} geo={postInfo.geo} onOpen={onOpenPhoto} inset={16} />
+        )}
         <View style={s.row}>
           <Text style={[s.commentHeaderText, { color: colors.textFirst }]}>{t('photo.comments')} </Text>
           <Text style={[s.commentHeaderText, { color: colors.textThird }]}>{commentTotal}</Text>

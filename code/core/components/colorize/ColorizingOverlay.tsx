@@ -37,7 +37,7 @@ const s = StyleSheet.create({
     right: 0,
     bottom: 0,
     left: 0,
-    // The photo at about a third of its brightness, as on the old colorize screen.
+    // The photo at about a third of its brightness.
     backgroundColor: 'rgba(0, 0, 0, 0.65)',
     justifyContent: 'center',
     alignItems: 'center',

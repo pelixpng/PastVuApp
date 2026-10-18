@@ -29,6 +29,11 @@ export const lv = {
     markersError: 'Neizdevās ielādēt kartes atzīmes',
     searchLimit:
       'Kopējais meklēšanas limits ir izsmelts. Mēģiniet pēc dažām minūtēm vai rīt 🪫',
+    nearbyButton: 'Fotogrāfijas kartes centra tuvumā',
+    nearbyEmpty: 'Tuvumā nav fotogrāfiju no izvēlētajiem gadiem',
+    nearbyError: 'Neizdevās ielādēt fotogrāfijas tuvumā',
+    distanceM: '%{distance} m',
+    distanceKm: '%{distance} km',
   },
   photo: {
     infoError: 'Neizdevās ielādēt informāciju par fotogrāfiju',
@@ -39,6 +44,7 @@ export const lv = {
     source: 'Avots',
     sourceMissing: 'Nav norādīts',
     lastModified: 'Pēdējās izmaiņas',
+    nearby: 'Fotogrāfijas tuvumā',
     comments: 'Komentāri',
     commentsCount: {
       zero: '%{count} komentāru',
@@ -84,6 +90,8 @@ export const lv = {
     settingsDescription: 'Lejupielādēts ierīcē un aizņem apmēram %{size} MB. Ja to izdzēsīsiet, nākamajā krāsošanas reizē tas tiks lejupielādēts vēlreiz.',
     remove: 'Dzēst neironu tīklu',
     removeConfirm: 'Dzēst krāsošanas neironu tīklu? Atbrīvosies apmēram %{size} MB.',
+    disclaimerTitle: 'Tikai izklaidei',
+    disclaimer: 'Neironu tīkls pats izvēlas iespējamās krāsas, un tās var neatbilst īstenībai, tāpēc rezultātu nevajadzētu uzskatīt par patiesu īsto krāsu attēlojumu. Uzticami krāsot fotoattēlus var tikai profesionāli vēsturnieki.',
   },
   streetView: {
     title: 'Šodien',
@@ -145,6 +153,8 @@ export const lv = {
     yandexConsentConfirm: 'Izvēlēties Yandex Maps',
     languageSection: 'Valoda',
     languageHint: 'Lietotnes saskarnes valoda.',
+    aiWatermark: 'Ūdenszīme „AI“',
+    aiWatermarkHint: 'Pievienot atzīmi „AI COLORIZATION“ krāsoto fotoattēlu stūrī, arī galerijā saglabātajos?',
   },
   options: {
     themeDark: 'Tumšs',

@@ -29,7 +29,7 @@ export const INSTALLED_BYTES = Platform.OS === 'android' ? MODEL_DOWNLOAD.bytes 
  * iOS: the zip, its unpacked package and the compiled model briefly exist side by side.
  * Android: the download and its copy, when the cache and the model's folder are on two volumes.
  */
-const SPACE_NEEDED =
+export const SPACE_NEEDED =
   Platform.OS === 'android' ? 2 * MODEL_DOWNLOAD.bytes : MODEL_DOWNLOAD.bytes + 2 * 235_000_000
 
 export type ModelPhase = 'missing' | 'downloading' | 'installing' | 'ready' | 'failed'
@@ -51,8 +51,8 @@ class ColorizerModelStore {
 
   constructor() {
     makeObservable(this)
-    // Where there is no native colorizer the placeholder needs no model.
-    this.phase = !Colorizer || Colorizer.isModelInstalled() ? 'ready' : 'missing'
+    // Without the native module (Expo Go, web) there is nothing to colour with: it stays missing.
+    this.phase = Colorizer?.isModelInstalled() ? 'ready' : 'missing'
   }
 
   @computed
@@ -99,6 +99,8 @@ class ColorizerModelStore {
 
   @action.bound
   async start() {
+    // No native module: the model could not be installed, so it is not downloaded either.
+    if (!Colorizer) return
     if (this.phase === 'downloading' || this.phase === 'installing' || this.phase === 'ready') return
     const run = ++this.run
     this.phase = 'downloading'

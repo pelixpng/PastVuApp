@@ -29,6 +29,11 @@ export const cs = {
     markersError: 'Nepodařilo se načíst značky na mapě',
     searchLimit:
       'Sdílený limit vyhledávání byl vyčerpán. Zkuste to za pár minut nebo zítra 🪫',
+    nearbyButton: 'Fotografie v okolí středu mapy',
+    nearbyEmpty: 'V okolí nejsou fotografie z vybraných let',
+    nearbyError: 'Fotografie v okolí se nepodařilo načíst',
+    distanceM: '%{distance} m',
+    distanceKm: '%{distance} km',
   },
   photo: {
     infoError: 'Nepodařilo se načíst informace o fotografii',
@@ -39,6 +44,7 @@ export const cs = {
     source: 'Zdroj',
     sourceMissing: 'Neuveden',
     lastModified: 'Poslední změna',
+    nearby: 'Fotografie v okolí',
     comments: 'Komentáře',
     commentsCount: {
       one: '%{count} komentář',
@@ -84,6 +90,8 @@ export const cs = {
     settingsDescription: 'Je stažená v zařízení a zabírá asi %{size} MB. Pokud ji smažete, při dalším kolorování se stáhne znovu.',
     remove: 'Smazat neuronovou síť',
     removeConfirm: 'Smazat neuronovou síť pro kolorování? Uvolní se asi %{size} MB.',
+    disclaimerTitle: 'Pouze pro zábavu',
+    disclaimer: 'Neuronová síť sama volí pravděpodobné barvy, které nemusí odpovídat realitě, a proto by výsledek neměl být považován za věrné zobrazení skutečných barev. Věrohodnou kolorizaci mohou provést pouze profesionální historici.',
   },
   streetView: {
     title: 'Dnes',
@@ -145,6 +153,8 @@ export const cs = {
     yandexConsentConfirm: 'Vybrat Yandex Maps',
     languageSection: 'Jazyk',
     languageHint: 'Jazyk rozhraní aplikace.',
+    aiWatermark: 'Vodoznak AI',
+    aiWatermarkHint: 'Přidávat značku „AI COLORIZATION“ do rohu kolorovaných fotografií, včetně těch uložených do galerie?',
   },
   options: {
     themeDark: 'Tmavý',

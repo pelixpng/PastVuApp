@@ -42,7 +42,8 @@ export const CompareScreen = observer(() => {
   return (
     <View style={s.container}>
       <CompareView
-        photo={{ ...params.photo, uri: ColorizeStore.uriFor(params.cid, params.photo.uri) }}
+        // The phone's view of the colour version, marked as in the post, so the collage is too.
+        photo={{ ...params.photo, uri: ColorizeStore.displayUriFor(params.cid, params.photo.uri) }}
         initialMode={params.mode}
         target={params.target}
         panoramaYear={params.year}

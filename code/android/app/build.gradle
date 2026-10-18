@@ -106,8 +106,8 @@ android {
         ]
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 57
-        versionName "2.7.0"
+        versionCode 59
+        versionName "2.8.0"
 
         // PastVu: phones only (arm64 and 32-bit arm), for every native library, not just React
         // Native's: reactNativeArchitectures in gradle.properties only governs the libraries built

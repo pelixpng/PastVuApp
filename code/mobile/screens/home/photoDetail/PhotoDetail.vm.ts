@@ -59,12 +59,13 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
   }
 
   /**
-   * What every view of the photo shows: the post, full screen and the compare screen. The colour
-   * version while it is switched on, the original otherwise.
+   * What every view of the photo shows and saving takes: the post, full screen and the compare
+   * screen. The colour version while it is switched on, with the "AI" mark unless that is off in
+   * settings; the original otherwise.
    */
   @computed
   get displayLink() {
-    return ColorizeStore.uriFor(this.activeCid, this.imageLink)
+    return ColorizeStore.displayUriFor(this.activeCid, this.imageLink)
   }
 
   /**
@@ -139,7 +140,9 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
    */
   @action.bound
   openCompare() {
-    const photo = this.postInfo!
+    // The header keeps the previous photo's buttons while the next one loads.
+    if (!this.postInfo) return
+    const photo = this.postInfo
     const mode: CompareMode = 'streetView'
     this.navigateTo(SCREENS.COMPARE, {
       mode,
@@ -167,6 +170,7 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
 
   @action.bound
   openFullScreenImage() {
+    if (!this.postInfo) return
     this.navigateTo(SCREENS.FULL_SCREEN_IMAGE, {
       title: this.postInfo!.title,
       cid: this.activeCid!,
@@ -189,11 +193,13 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
 
   @action.bound
   share() {
+    if (!this.postInfo) return
     sharePhoto(this.postInfo!.title, this.activeCid!)
   }
 
   @action.bound
   saveImage() {
+    if (!this.postInfo) return
     // The colour version when it is on: saving gives what the screen shows.
     if (this.isColorized) saveLocalImage(this.displayLink)
     else savePhoto(this.postInfo!.title, this.postInfo!.file)
@@ -206,7 +212,26 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
 
   @action.bound
   toggleFavorite() {
-    this.isFavorite = PhotoPost.toggleFavorite(this.postInfo!, this.activeCid!)
+    if (!this.postInfo) return
+    this.isFavorite = PhotoPost.toggleFavorite(this.postInfo, this.activeCid!)
+  }
+
+  /**
+   * Another photo in place of this one, from a link or the nearby photos; back returns here (see
+   * `goBackToPhoto`).
+   */
+  @action.bound
+  openPhoto(cid: string) {
+    this.cidHistory = [...this.cidHistory, this.activeCid!]
+    this.activeCid = cid
+    this.isImageLoaded = false
+    // Also what scrolls the new post to its top: the screen shows its loading state until the post
+    // arrives, so the list mounts afresh.
+    this.postInfo = null
+    this.streetView = null
+    this.users = null
+    this.comments = []
+    this.getPhotoInfo()
   }
 
   @action.bound
@@ -214,14 +239,7 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
     const photoMatch = href.match(/\/p\/(\d+)/)
     const newsMatch = href.match(/\/news\/(\d+)/)
     if (photoMatch) {
-      this.cidHistory = [...this.cidHistory, this.activeCid!]
-      this.activeCid = photoMatch[1]
-      this.isImageLoaded = false
-      this.postInfo = null
-      this.streetView = null
-      this.users = null
-      this.comments = []
-      this.getPhotoInfo()
+      this.openPhoto(photoMatch[1])
     } else if (newsMatch) {
       try {
         const cid = Number(newsMatch[1])

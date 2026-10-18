@@ -299,9 +299,10 @@ object PhotoColorizer {
 
   /**
    * Rows of PastVu's caption bar at the bottom: one flat grey across most of the row, the
-   * caption's text aside, with no colour in it. At most a tenth of the photo.
+   * caption's text aside, with no colour in it. At most a tenth of the photo. Watermark runs it on
+   * the coloured result, where the bar stays grey, to put the AI mark above the bar.
    */
-  private fun captionRows(pixels: IntArray, width: Int, height: Int): Int {
+  internal fun captionRows(pixels: IntArray, width: Int, height: Int): Int {
     fun grey(p: Int) = (red(p) + green(p) + blue(p)) / 3
     val histogram = IntArray(256)
     for (x in 0 until width) histogram[grey(pixels[(height - 1) * width + x])]++

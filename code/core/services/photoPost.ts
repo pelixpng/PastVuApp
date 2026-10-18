@@ -17,8 +17,11 @@ export type LoadedPost = {
   comments: IComment[]
 }
 
-/** Keeps the persisted history from growing without bound. */
-export const HISTORY_LIMIT = 200
+/** Keeps the persisted history from growing without bound; the in-app hint promises 1000. */
+export const HISTORY_LIMIT = 1000
+
+/** The iOS widgets show five photos at most, so the App Group gets only those. */
+const WIDGET_HISTORY_LIMIT = 5
 
 export const toCollectionItem = (photo: Photo, cid: string): CollectionItem => ({
   title: photo.title,
@@ -47,6 +50,16 @@ export const loadPost = async (cid: string): Promise<LoadedPost> => {
 }
 
 /**
+ * Stores the viewing history and mirrors its start to the iOS widget. Every write goes through
+ * here, so a photo removed from the history also leaves the widget.
+ */
+export const saveHistory = (history: CollectionItem[]) => {
+  MMKVStorage.set('History', history)
+  IosTargetStorage.set('History', JSON.stringify(history.slice(0, WIDGET_HISTORY_LIMIT)))
+  ExtensionStorage.reloadWidget()
+}
+
+/**
  * Puts the photo at the top of the viewing history and mirrors it to the iOS widget.
  *
  * Re-visiting an already seen photo moves it back to the top rather than being ignored, so the
@@ -64,9 +77,7 @@ export const recordHistory = (
     ...history.filter(item => item.cid !== cid),
   ].slice(0, HISTORY_LIMIT)
 
-  MMKVStorage.set('History', updated)
-  IosTargetStorage.set('History', JSON.stringify(updated))
-  ExtensionStorage.reloadWidget()
+  saveHistory(updated)
   return updated
 }
 

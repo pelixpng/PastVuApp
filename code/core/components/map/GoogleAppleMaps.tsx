@@ -26,6 +26,12 @@ type Props = {
   onShowPhoto: (cid: string, title: string) => void
   onGoToLocation: (lat: number, lng: number) => void
   isTablet?: boolean
+  /**
+   * How far up from the map's bottom edge something covers it, in points, when that is more than
+   * the years slider (and the tab bar under it on tablets): the nearby-photos sheet. The
+   * attribution goes just above it.
+   */
+  bottomInset?: number
 }
 
 export const GoogleAppleMaps = ({
@@ -38,6 +44,7 @@ export const GoogleAppleMaps = ({
   onShowPhoto,
   onGoToLocation,
   isTablet,
+  bottomInset,
 }: Props) => {
   const { colors, names } = useTheme()
   const tabBarHeight = useBottomTabBarHeight()
@@ -54,8 +61,8 @@ export const GoogleAppleMaps = ({
           right: 0,
           left: isTablet ? APPLE_LOGO_LEFT + TABLET_LOGO_INSET : APPLE_LOGO_LEFT,
           bottom: isTablet
-            ? tabBarHeight - safeBottom + YEARS_SLIDER_HEIGHT
-            : YEARS_SLIDER_HEIGHT,
+            ? (bottomInset ?? tabBarHeight + YEARS_SLIDER_HEIGHT) - safeBottom
+            : (bottomInset ?? YEARS_SLIDER_HEIGHT),
         }
       : undefined
 

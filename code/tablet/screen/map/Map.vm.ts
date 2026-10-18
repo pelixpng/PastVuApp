@@ -43,6 +43,7 @@ import { t } from '../../../core/i18n'
 import { defaultRegion } from '../../../core/constants/map'
 import * as StreetView from '../../../core/services/streetView'
 import { CompareMode } from '../../../core/components/compare/CompareView'
+import { NearbySearch } from '../../../core/store/NearbySearch'
 
 export const mapRef = createRef<MapView>()
 /** The Yandex map, when that provider is selected; only one of the two refs is mounted. */
@@ -63,6 +64,8 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
 	@observable.ref places: LocationItem[] = []
 	private timeoutId: ReturnType<typeof setTimeout> | null = null
 	private collectionTimeoutId: ReturnType<typeof setTimeout> | null = null
+	/** The nearby-photos sheet in the left column; it follows the map's centre and years while open. */
+	readonly nearby: NearbySearch
 	//photo detail
 	@observable.ref comments: IComment[] = []
 	@observable.ref users: Users | null = null
@@ -109,11 +112,15 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
 			}
 		)
 		makeObservable(this)
-		// After makeObservable, so it tracks the post.
+		// After makeObservable, so they track the post and the map.
 		this.colorize = new PostColorize(
 			() => (this.postInfo ? this.postInfo.cid.toString() : null),
 			() => this.imageLink,
 			() => this.postInfo?.file
+		)
+		this.nearby = new NearbySearch(
+			() => this.coordinates,
+			() => this.yearsRange
 		)
 	}
 
@@ -389,6 +396,8 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
 	/** The colour version while it is on; `original` for the black-and-white photo under it. */
 	@action.bound
 	openFullScreenImage(original = false) {
+		// The header keeps the previous photo's buttons while the next one loads.
+		if (!this.postInfo) return
 		const colour = original ? undefined : this.colorize.localFile
 		this.navigateTo(SCREENS.FULL_SCREEN_IMAGE, {
 			title: this.postInfo!.title,
@@ -463,6 +472,7 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
 
 	@action.bound
 	toggleFavorite() {
+		if (!this.postInfo) return
 		const cid = this.postInfo!.cid.toString()
 		const favorites: CollectionItem[] = MMKVStorage.get('Favorites') ?? []
 		const title = this.postInfo!.title
@@ -501,11 +511,13 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
 
 	@action.bound
 	share() {
+		if (!this.postInfo) return
 		sharePhoto(this.postInfo!.title, this.postInfo!.cid.toString())
 	}
 
 	@action.bound
 	saveImage() {
+		if (!this.postInfo) return
 		// The colour version when it is on: saving gives what the panel shows.
 		const local = this.colorize.localFile
 		if (local) saveLocalImage(local)

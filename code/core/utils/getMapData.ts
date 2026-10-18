@@ -15,6 +15,21 @@ export const zoomLevelToAltitude = (zoomLevel: number) => {
 export const wrapLongitude = (longitude: number) =>
   ((((longitude + 180) % 360) + 360) % 360) - 180
 
+const EARTH_RADIUS_M = 6371000
+
+type Point = { latitude: number; longitude: number }
+
+/** Distance along the ground between two points, in metres; a sphere is close enough for a list. */
+export const distanceInMeters = (from: Point, to: Point) => {
+  const rad = Math.PI / 180
+  const dLat = (to.latitude - from.latitude) * rad
+  const dLon = (to.longitude - from.longitude) * rad
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(from.latitude * rad) * Math.cos(to.latitude * rad) * Math.sin(dLon / 2) ** 2
+  return 2 * EARTH_RADIUS_M * Math.asin(Math.min(1, Math.sqrt(h)))
+}
+
 /** A closed ring of [longitude, latitude] pairs: the outline of a GeoJSON polygon. */
 export type PolygonRing = [number, number][]
 

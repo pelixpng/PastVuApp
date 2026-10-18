@@ -1,7 +1,8 @@
 import { Direction } from '../types/components'
 
 export const getMarkerName = (year: number, direction: Direction | undefined) => {
-  if (direction == 'aero' || '' || undefined) {
+  // A dot where there is no direction to point at: aerial photos and those without one.
+  if (!direction || direction === 'aero') {
     if (year <= 1840) return ['dotpin1840day', 'dotpin1840night']
     else if (year <= 1850) return ['dotpin1850day', 'dotpin1850night']
     else if (year <= 1860) return ['dotpin1860day', 'dotpin1860night']

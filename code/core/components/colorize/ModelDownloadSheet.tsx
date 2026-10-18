@@ -25,15 +25,16 @@ import { MaterialIcons } from '../ui/icons'
 import { MyButton } from '../ui/buttons/MyButton'
 import { Spacer } from '../ui/Spacer'
 import ColorizerModel, {
-  MODEL_DOWNLOAD
+  MODEL_DOWNLOAD,
+  SPACE_NEEDED
 } from '../../store/ColorizerModel.store'
 import { t } from '../../i18n'
 
 /** Megabytes as iOS shows them (1000², not 1024²), so the figure matches the storage settings. */
 const megabytes = (bytes: number) => Math.round(bytes / 1_000_000)
 const MODEL_MB = megabytes(MODEL_DOWNLOAD.bytes)
-/** The zip, its unpacked package and the compiled model briefly exist side by side. */
-const SPACE_MB = 700
+/** The free space the download checks for, rounded up to 50 MB: 700 on iOS, 500 on Android. */
+const NEEDED_MB = Math.ceil(SPACE_NEEDED / 50_000_000) * 50
 const SHEET_TRAVEL = 400
 const ALL_ORIENTATIONS: ModalProps['supportedOrientations'] = [
   'portrait',
@@ -95,6 +96,7 @@ const Sheet: FC = observer(() => {
     case 'missing':
       body = (
         <>
+          <Disclaimer />
           <MyButton
             title={t('colorizeModel.download', { size: MODEL_MB })}
             func={ColorizerModel.start}
@@ -178,12 +180,13 @@ const Sheet: FC = observer(() => {
         <>
           <Text style={[s.message, { color: colors.textFirst }]}>
             {failure === 'space'
-              ? t('colorizeModel.errorSpace', { size: SPACE_MB })
+              ? t('colorizeModel.errorSpace', { size: NEEDED_MB })
               : failure === 'install'
                 ? t('colorizeModel.errorInstall')
                 : t('colorizeModel.errorNetwork')}
           </Text>
           <Spacer height={16} />
+          <Disclaimer />
           <MyButton
             title={t('colorizeModel.retry')}
             func={ColorizerModel.start}
@@ -238,6 +241,34 @@ const Sheet: FC = observer(() => {
   )
 })
 
+/**
+ * Warns before the download that AI colorization is for entertainment only. A card above the
+ * download button, followed by the gap before it: a short title that reads at a glance, then the
+ * explanation at the description's size. Tinted with the button's blue, so it reads as a note
+ * rather than an error, in both themes.
+ */
+const Disclaimer: FC = () => {
+  const { colors } = useTheme()
+  return (
+    <>
+      <View style={[s.notice, { backgroundColor: `${colors.basePrimary}1A` }]}>
+        <View style={s.noticeHeader}>
+          <MaterialIcons name="info" size={20} color={colors.basePrimary} />
+          <Spacer width={8} />
+          <Text style={[s.noticeTitle, { color: colors.textFirst }]}>
+            {t('colorizeModel.disclaimerTitle')}
+          </Text>
+        </View>
+        <Spacer height={6} />
+        <Text style={[s.description, { color: colors.textSecond }]}>
+          {t('colorizeModel.disclaimer')}
+        </Text>
+      </View>
+      <Spacer height={20} />
+    </>
+  )
+}
+
 const TextButton: FC<{ title: string; onPress: () => void; color: string }> = ({
   title,
   onPress,
@@ -274,6 +305,9 @@ const s = StyleSheet.create({
   row: { flexDirection: 'row', justifyContent: 'space-between' },
   small: { fontSize: 13, lineHeight: 18, fontWeight: '600' },
   hint: { fontSize: 13, lineHeight: 18, fontWeight: '500' },
+  notice: { borderRadius: 16, padding: 14 },
+  noticeHeader: { flexDirection: 'row', alignItems: 'center' },
+  noticeTitle: { flexShrink: 1, fontSize: 15, lineHeight: 20, fontWeight: '700' },
   installing: {
     flexDirection: 'row',
     alignItems: 'center',

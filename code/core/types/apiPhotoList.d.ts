@@ -80,3 +80,15 @@ type ClusterMarker = {
 }
 
 type MapMarker = PhotoMarker | ClusterMarker
+
+/** A photo from `ApiService.getNearbyPhotos`. */
+type NearbyPhoto = {
+  cid: string
+  title: string
+  year: number
+  /** The end of the photo's date range, when it has one; filled in by ApiService.getYearRanges. */
+  year2?: number
+  /** Relative path, served at `https://img.pastvu.com/<size>/<file>`. */
+  file: string
+  location: { latitude: number; longitude: number }
+}

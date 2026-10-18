@@ -30,7 +30,10 @@ const stripHtml = (html: string) =>
 
 export const PostListItem: FC<PostListItemProps> = observer(
   ({ title, notice, pdate, ccount, user, onPress, isSelected }) => {
-    const { colors } = useTheme()
+    const { colors, names } = useTheme()
+    // The light grey is too faint on the selected row's dark grey.
+    const metaColor =
+      isSelected && names.themeName === 'dark' ? colors.textSecond : colors.textThird
     const avatarUri = user.avatar ? `https://pastvu.com/_a/h/${user.avatar}` : null
     const formattedDate = formatDate(pdate)
     const backgroundColor = useMemo(
@@ -91,9 +94,9 @@ export const PostListItem: FC<PostListItemProps> = observer(
         ) : null}
         <Spacer height={8} />
         <View style={s.footerContainer}>
-          <Text style={[s.dateText, { color: colors.textThird }]}>{formattedDate}</Text>
+          <Text style={[s.dateText, { color: metaColor }]}>{formattedDate}</Text>
           {ccount > 0 && (
-            <Text style={[s.commentsText, { color: colors.textThird }]}>
+            <Text style={[s.commentsText, { color: metaColor }]}>
               {t('photo.commentsCount', { count: ccount })}
             </Text>
           )}
