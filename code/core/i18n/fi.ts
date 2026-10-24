@@ -29,6 +29,11 @@ export const fi = {
     markersError: 'Karttamerkkien lataus epäonnistui',
     searchLimit:
       'Yhteinen hakuraja on täynnä. Yritä muutaman minuutin kuluttua tai huomenna 🪫',
+    nearbyButton: 'Kuvat kartan keskikohdan lähellä',
+    nearbyEmpty: 'Valituilta vuosilta ei ole kuvia lähistöllä',
+    nearbyError: 'Lähistön kuvien lataus epäonnistui',
+    distanceM: '%{distance} m',
+    distanceKm: '%{distance} km',
   },
   photo: {
     infoError: 'Kuvan tietojen lataus epäonnistui',
@@ -39,6 +44,7 @@ export const fi = {
     source: 'Lähde',
     sourceMissing: 'Ei ilmoitettu',
     lastModified: 'Viimeksi muokattu',
+    nearby: 'Lähistön kuvat',
     comments: 'Kommentit',
     commentsCount: {
       one: '%{count} kommentti',
@@ -83,6 +89,8 @@ export const fi = {
     settingsDescription: 'Ladattu tähän laitteeseen, vie noin %{size} Mt. Jos poistat sen, se ladataan uudelleen seuraavalla värityskerralla.',
     remove: 'Poista neuroverkko',
     removeConfirm: 'Poistetaanko värityksen neuroverkko? Tilaa vapautuu noin %{size} Mt.',
+    disclaimerTitle: 'Vain viihteeksi',
+    disclaimer: 'Neuroverkko valitsee todennäköiset värit itse, eivätkä ne välttämättä vastaa todellisuutta, joten tulosta ei kannata pitää luotettavana kuvana aidoista väreistä. Luotettavan värityksen voivat tehdä vain ammattihistorioitsijat.',
   },
   streetView: {
     title: 'Tänään',
@@ -144,6 +152,8 @@ export const fi = {
     yandexConsentConfirm: 'Valitse Yandex Maps',
     languageSection: 'Kieli',
     languageHint: 'Sovelluksen käyttöliittymän kieli.',
+    aiWatermark: 'AI-vesileima',
+    aiWatermarkHint: 'Lisätäänkö väritettyihin kuviin merkintä ”AI COLORIZATION” kulmaan, myös galleriaan tallennettuihin?',
   },
   options: {
     themeDark: 'Tumma',

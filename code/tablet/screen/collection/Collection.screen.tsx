@@ -6,9 +6,9 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  useWindowDimensions,
   View,
 } from 'react-native'
+import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { useFocusEffect, useNavigation, useTheme } from '@react-navigation/native'
 import { observer } from 'mobx-react-lite'
 import CollectionVM, { CollectionTab } from './Collection.vm'
@@ -41,7 +41,8 @@ export const CollectionScreen = observer(() => {
   const tabBarHeight = useBottomTabBarHeight()
   const { colors } = useTheme()
   const navigation = useNavigation()
-  const { width } = useWindowDimensions()
+  // The root view's width, not Dimensions: see core/hooks/useRootSize.
+  const { width } = useSafeAreaFrame()
   const listWidth = width * 0.33
   useFocusEffect(
     useCallback(() => {
@@ -104,6 +105,7 @@ export const CollectionScreen = observer(() => {
           initialNumToRender={10}
           maxToRenderPerBatch={5}
           windowSize={5}
+          showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <View style={s.emptyContainer}>
               <MenuButton
@@ -131,6 +133,7 @@ export const CollectionScreen = observer(() => {
         openFullScreen={vm.openFullScreenImage}
         colorize={vm.colorize}
         onLinkPress={vm.openPhotoFromLink}
+        onOpenPhoto={vm.showPhoto}
         compareMode={vm.compareMode}
         closeCompare={vm.closeCompare}
         hasStreetView={vm.hasStreetView}

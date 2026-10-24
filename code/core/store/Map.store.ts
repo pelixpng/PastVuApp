@@ -22,6 +22,16 @@ class MapStore {
 
 	constructor() {
 		makeObservable(this)
+		// Yandex picked before 2.7.0 was never asked about: back to the default, so the consent
+		// sheet shows the next time Yandex is chosen.
+		if (this.mapProvider === 'yandex' && !this.yandexConsent) {
+			this.setMapProvider(defaultMapProvider)
+		}
+		// Apple Maps has no terrain type, so the option is hidden on iOS and would leave the list
+		// with nothing selected.
+		if (Platform.OS === 'ios' && this.mapType === 'terrain') {
+			this.setMapType('standard')
+		}
 	}
 
 	@action.bound

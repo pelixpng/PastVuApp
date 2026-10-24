@@ -1,7 +1,19 @@
 import { FC, useCallback } from 'react'
-import { View, Text, FlatList, Platform, useWindowDimensions } from 'react-native'
-import Animated, { SlideInRight, SlideOutRight, runOnJS } from 'react-native-reanimated'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import {
+  ActivityIndicator,
+  View,
+  FlatList,
+  Platform,
+  StyleSheet,
+} from 'react-native'
+import Animated, {
+  Easing,
+  FadeIn,
+  SlideInRight,
+  SlideOutRight,
+  runOnJS,
+} from 'react-native-reanimated'
+import { useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { HeaderIconButton } from '../../../../../core/components/ui/buttons/HeaderIconButton'
 import { Spacer } from '../../../../../core/components/ui/Spacer'
 import { useTheme } from '@react-navigation/native'
@@ -29,6 +41,10 @@ const afterSlideOut = (finished: boolean) => {
 }
 const panelEntering = SlideInRight.duration(600)
 const panelExiting = SlideOutRight.duration(600).withCallback(afterSlideOut)
+// As on the phone: the next photo's post fades in rather than snapping into place, and the spinner
+// comes late, so a post that is already cached does not flash it.
+const postEntering = FadeIn.duration(220).easing(Easing.out(Easing.cubic))
+const loaderEntering = FadeIn.delay(150).duration(200)
 
 type PhotoDetailProps = {
   comments: IComment[]
@@ -51,6 +67,8 @@ type PhotoDetailProps = {
   comparePhoto?: ComparePhoto
   isFavorite?: boolean
   toggleFavorite?: () => void
+  /** Opens another photo in this panel, here from the nearby photos. */
+  onOpenPhoto?: (cid: string) => void
 }
 
 // An observer: the colour state comes from PostColorize, not from the props.
@@ -75,13 +93,17 @@ export const PhotoDetail: FC<PhotoDetailProps> = observer(({
   comparePhoto,
   isFavorite,
   toggleFavorite,
+  onOpenPhoto,
 }) => {
-  const { width } = useWindowDimensions()
+  // The root view's width: Dimensions on iOS keeps the portrait width after the app turns itself
+  // to landscape at launch, and the panel came out a third too narrow (see core/hooks/useRootSize).
+  const { width } = useSafeAreaFrame()
   const { top, bottom } = useSafeAreaInsets()
   const { colors } = useTheme()
   const topLoader = top + 40
   const modalWidth = width * 0.67 - 32
   const renderItem = useCallback(({ item }: { item: IComment }) => <Comment comment={item} users={users} onLinkPress={onLinkPress} />, [users, onLinkPress])
+  const cid = postInfo?.cid
   // Then-and-now covers the panel; the arrow brings the post back rather than closing it. The post
   // stays mounted underneath: building it again on the way back reloaded its photos, which flickered.
   const comparing = !!(compareMode && comparePhoto)
@@ -130,33 +152,45 @@ export const PhotoDetail: FC<PhotoDetailProps> = observer(({
       </View>
       {!isImageLoaded && (
         <View
-          style={[s.loaderContainer, { backgroundColor: colors.backgroundApp, top: topLoader }]}>
-          <Text style={[s.titleText, { color: colors.textSecond }]}>{t('common.loading')}</Text>
+          style={[
+            s.loaderContainer,
+            local.loaderSpan,
+            { backgroundColor: colors.backgroundApp, top: topLoader },
+          ]}>
+          <Animated.View style={local.loader} entering={loaderEntering}>
+            <ActivityIndicator color={colors.textFirst} accessibilityLabel={t('common.loading')} />
+          </Animated.View>
         </View>
       )}
-      <FlatList
-        contentContainerStyle={{ paddingBottom: bottom + 16 }}
-        style={s.postInfoContainer}
-        showsVerticalScrollIndicator={false}
-        data={comments}
-        renderItem={renderItem}
-        keyExtractor={item => item.cid}
-        ListHeaderComponent={
-          // Switching photos clears the post until the next one arrives; meanwhile the loader
-          // covers the panel. Rendered without data, the photo's link ended in "undefined" and
-          // the "no photo" icon flashed up (and took the loader away, as it counts as loaded).
-          postInfo ? (
-            <PostInfo
-              postInfo={postInfo}
-              imageLink={imageLink}
-              onImageLoaded={onImageLoaded}
-              openFullScreen={openFullScreen}
-              onLinkPress={onLinkPress}
-              colorize={colorize}
-            />
-          ) : null
-        }
-      />
+      {/* Keyed by the photo, so the next one (from the map, a link or the nearby row) fades in;
+          the header stays put. The list is built anew with it, which also opens the next photo at
+          the top: a list kept from one photo to the next kept its offset on iOS. */}
+      <Animated.View key={cid} style={s.layer} entering={postEntering}>
+        <FlatList
+          contentContainerStyle={{ paddingBottom: bottom + 16 }}
+          style={s.postInfoContainer}
+          showsVerticalScrollIndicator={false}
+          data={comments}
+          renderItem={renderItem}
+          keyExtractor={item => item.cid}
+          ListHeaderComponent={
+            // Switching photos clears the post until the next one arrives; meanwhile the loader
+            // covers the panel. Rendered without data, the photo's link ended in "undefined" and
+            // the "no photo" icon flashed up (and took the loader away, as it counts as loaded).
+            postInfo ? (
+              <PostInfo
+                postInfo={postInfo}
+                imageLink={imageLink}
+                onImageLoaded={onImageLoaded}
+                openFullScreen={openFullScreen}
+                onLinkPress={onLinkPress}
+                colorize={colorize}
+                onOpenPhoto={onOpenPhoto}
+              />
+            ) : null
+          }
+        />
+      </Animated.View>
     </View>
   )
   return (
@@ -173,4 +207,11 @@ export const PhotoDetail: FC<PhotoDetailProps> = observer(({
       </Animated.View>
     </Animated.View>
   )
+})
+
+const local = StyleSheet.create({
+  // To the panel's bottom rather than a full panel's height down from below the header, so the
+  // spinner sits in the middle of what the cover hides.
+  loaderSpan: { bottom: 0, height: 'auto' },
+  loader: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 })

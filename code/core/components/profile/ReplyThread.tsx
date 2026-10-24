@@ -13,7 +13,7 @@ const RADIUS = 12
 /** Solid rather than translucent: the straight part and the turn overlap where they meet. */
 export const useThreadColor = () => {
   const theme = useTheme() as CustomTheme
-  return theme.names?.themeName === 'dark' ? '#4A4A4A' : '#D9DAE0'
+  return theme.names?.themeName === 'dark' ? theme.colors.baseFourth : '#D9DAE0'
 }
 
 /**

@@ -4,9 +4,9 @@ import {
   FlatList,
   StyleSheet,
   Text,
-  useWindowDimensions,
   View,
 } from 'react-native'
+import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { useNavigation, useTheme } from '@react-navigation/native'
 import { observer } from 'mobx-react-lite'
 import { HeaderIconButton } from '../../../core/components/ui/buttons/HeaderIconButton'
@@ -37,7 +37,8 @@ export const NewsScreen = observer(() => {
   const { colors } = useTheme()
   const tabBarHeight = useBottomTabBarHeight()
   const navigation = useNavigation()
-  const { width } = useWindowDimensions()
+  // The root view's width, not Dimensions: see core/hooks/useRootSize.
+  const { width } = useSafeAreaFrame()
   const listWidth = width * 0.33
   useLayoutEffect(() => {
     if (vm.selectedPhotoCid && vm.postInfo) {
@@ -136,6 +137,7 @@ export const NewsScreen = observer(() => {
             initialNumToRender={10}
             maxToRenderPerBatch={5}
             windowSize={5}
+            showsVerticalScrollIndicator={false}
             ListEmptyComponent={
               vm.loading ? (
                 <View style={s.emptyContainer}>
@@ -164,6 +166,7 @@ export const NewsScreen = observer(() => {
             initialNumToRender={10}
             maxToRenderPerBatch={5}
             windowSize={5}
+            showsVerticalScrollIndicator={false}
             ListEmptyComponent={
               vm.loading ? (
                 <View style={s.emptyContainer}>
@@ -194,6 +197,7 @@ export const NewsScreen = observer(() => {
           openFullScreen={vm.openFullScreenImage}
           colorize={vm.colorize}
           onLinkPress={vm.openPhotoFromLink}
+          onOpenPhoto={vm.showPhoto}
           compareMode={vm.compareMode}
           closeCompare={vm.closeCompare}
           hasStreetView={vm.hasStreetView}

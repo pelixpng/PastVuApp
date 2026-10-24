@@ -1,24 +1,18 @@
 import * as FileSystem from 'expo-file-system/legacy'
 import Colorizer from '../../modules/colorizer'
 
-/** How long the placeholder takes where there is no colorizer, so the progress state shows. */
-const PLACEHOLDER_DELAY_MS = 2500
-
 /**
  * Colourises a black-and-white photo and returns the result as a local file, which is what saving
  * to the gallery takes.
  *
  * The photo is coloured on device by modules/colorizer: DDColor-L on the CPU, through Core ML on
- * iOS 16+ and ONNX Runtime on Android (half precision on the Neural Engine or a GPU breaks this
- * model's colours). Where the native module is missing a placeholder waits as a request would
- * and hands back a copy of the original.
+ * iOS and ONNX Runtime on Android (half precision on the Neural Engine or a GPU breaks this
+ * model's colours).
  */
 export const colorizePhoto = async (uri: string): Promise<string> => {
+  // Only without a native build (Expo Go, web), where the palette button never shows.
+  if (!Colorizer) throw new Error('Colorizer native module is not available')
   const source = await download(uri)
-  if (!Colorizer) {
-    await new Promise(resolve => setTimeout(resolve, PLACEHOLDER_DELAY_MS))
-    return source
-  }
   try {
     return await Colorizer.colorize(source)
   } finally {
@@ -27,12 +21,21 @@ export const colorizePhoto = async (uri: string): Promise<string> => {
 }
 
 /**
+ * A copy of a coloured photo (a local file) with the "AI" mark burnt into its corner, as a new
+ * local file; the clean one is left as it is.
+ */
+export const watermarkPhoto = async (uri: string): Promise<string> => {
+  if (!Colorizer) throw new Error('Colorizer native module is not available')
+  return Colorizer.addWatermark(uri)
+}
+
+/**
  * Whether colouring makes sense for the photo: true for black-and-white ones. Judged from the
- * small thumbnail (a few kilobytes), as colour shows at any size. Where there is no colorizer
- * (Android for now) every photo counts, so the placeholder stays reachable.
+ * small thumbnail (a few kilobytes), as colour shows at any size. Without the native colorizer
+ * (Expo Go, web) nothing can be coloured, so no photo counts.
  */
 export const isMonochromePhoto = async (thumbnailUri: string): Promise<boolean> => {
-  if (!Colorizer) return true
+  if (!Colorizer) return false
   const source = await download(thumbnailUri)
   try {
     return await Colorizer.isMonochrome(source)

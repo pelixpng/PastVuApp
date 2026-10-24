@@ -33,6 +33,11 @@ class ColorizerModule : Module() {
     AsyncFunction("isMonochrome") { path: String ->
       MonochromeCheck.isMonochrome(file(path)) ?: throw UnreadablePhotoException(path)
     }
+
+    // Off the main thread like colorize: a full-size photo is decoded, drawn on and encoded again.
+    AsyncFunction("addWatermark") { path: String ->
+      Watermark.add(file(path), context.cacheDir).toUri().toString()
+    }
   }
 
   /** Accepts both a plain path and a file:// URI, as expo-file-system hands out the latter. */
@@ -47,6 +52,8 @@ class CorruptDownloadException :
   CodedException("The downloaded model is damaged or incomplete")
 
 class UnreadablePhotoException(path: String) : CodedException("Could not read the photo at $path")
+
+class UnwritablePhotoException(path: String) : CodedException("Could not write the photo to $path")
 
 class ColorizationFailedException(reason: String) : CodedException("Colorizing failed: $reason")
 

@@ -29,6 +29,11 @@ export const lt = {
     markersError: 'Nepavyko įkelti žemėlapio žymeklių',
     searchLimit:
       'Bendras paieškos limitas išnaudotas. Pabandykite po kelių minučių arba rytoj 🪫',
+    nearbyButton: 'Nuotraukos netoli žemėlapio centro',
+    nearbyEmpty: 'Netoliese nėra nuotraukų iš pasirinktų metų',
+    nearbyError: 'Nepavyko įkelti nuotraukų netoliese',
+    distanceM: '%{distance} m',
+    distanceKm: '%{distance} km',
   },
   photo: {
     infoError: 'Nepavyko įkelti nuotraukos informacijos',
@@ -39,6 +44,7 @@ export const lt = {
     source: 'Šaltinis',
     sourceMissing: 'Nenurodytas',
     lastModified: 'Paskutinis pakeitimas',
+    nearby: 'Nuotraukos netoliese',
     comments: 'Komentarai',
     commentsCount: {
       one: '%{count} komentaras',
@@ -84,6 +90,8 @@ export const lt = {
     settingsDescription: 'Atsisiųstas į įrenginį ir užima apie %{size} MB. Jei jį ištrinsite, kitą kartą spalvinant jis bus atsisiųstas iš naujo.',
     remove: 'Ištrinti neuroninį tinklą',
     removeConfirm: 'Ištrinti spalvinimo neuroninį tinklą? Atsilaisvins apie %{size} MB.',
+    disclaimerTitle: 'Tik pramogai',
+    disclaimer: 'Neuroninis tinklas pats parenka tikėtinas spalvas, kurios gali neatitikti tikrovės, todėl rezultato nereikėtų laikyti patikimu tikrųjų spalvų atvaizdu. Patikimai nuspalvinti nuotraukas gali tik profesionalūs istorikai.',
   },
   streetView: {
     title: 'Šiandien',
@@ -145,6 +153,8 @@ export const lt = {
     yandexConsentConfirm: 'Pasirinkti Yandex Maps',
     languageSection: 'Kalba',
     languageHint: 'Programėlės sąsajos kalba.',
+    aiWatermark: 'Vandens ženklas „AI“',
+    aiWatermarkHint: 'Dėti žymą „AI COLORIZATION“ nuspalvintų nuotraukų kampe, taip pat ir išsaugotų galerijoje?',
   },
   options: {
     themeDark: 'Tamsi',

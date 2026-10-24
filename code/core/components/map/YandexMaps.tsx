@@ -1,11 +1,5 @@
 import { YaMap, Marker, YaMapRef } from '@exterio/react-native-yamap-lite'
-import {
-	LayoutChangeEvent,
-	PixelRatio,
-	StyleSheet,
-	useWindowDimensions,
-	View
-} from 'react-native'
+import { LayoutChangeEvent, PixelRatio, StyleSheet, View } from 'react-native'
 import { RefObject, useEffect, useRef, useState } from 'react'
 import { useTheme } from '@react-navigation/native'
 import { Region } from 'react-native-maps'
@@ -15,6 +9,7 @@ import { getZoom } from '../../utils/getMapData'
 import { isTablet } from 'react-native-device-info'
 import { initYandexMaps } from '../../services/yandexMaps'
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
+import { useRootSize } from '../../hooks/useRootSize'
 
 const TILE_SIZE = 256
 /** Just clear of the years slider on phones, in points. */
@@ -36,6 +31,12 @@ type Props = {
 	onShowPhoto: (cid: string, title: string) => void
 	onGoToLocation: (lat: number, lng: number) => void
 	isTablet?: boolean
+	/**
+	 * How far up from the map's bottom edge something covers it, in points, when that is more than
+	 * the years slider (and the tab bar under it on tablets): the nearby-photos sheet. The logo goes
+	 * just above it.
+	 */
+	bottomInset?: number
 }
 
 /**
@@ -52,10 +53,13 @@ export const YandexMaps = ({
 	onRegionChangeComplete,
 	onShowPhoto,
 	onGoToLocation,
-	isTablet
+	isTablet,
+	bottomInset
 }: Props) => {
 	const { names } = useTheme()
-	const { width: screenWidth } = useWindowDimensions()
+	// Not useWindowDimensions: on the iPad it kept the portrait width after the turn to landscape,
+	// and the region sent on for markers came out too narrow.
+	const { width: screenWidth } = useRootSize()
 	const tabBarHeight = useBottomTabBarHeight()
 	// Yandex's terms require the logo to stay visible. The years slider covers the bottom of the map,
 	// so the logo is lifted above it: just above the slider, which on tablets sits on top of
@@ -65,7 +69,8 @@ export const YandexMaps = ({
 		Math.round(PixelRatio.getPixelSizeForLayoutSize(points))
 	const logoPadding = {
 		vertical: toNative(
-			isTablet ? tabBarHeight + PHONE_LOGO_BOTTOM : PHONE_LOGO_BOTTOM
+			bottomInset ??
+				(isTablet ? tabBarHeight + PHONE_LOGO_BOTTOM : PHONE_LOGO_BOTTOM)
 		),
 		// MapKit adds its own margin on top of the padding; 8 lands the logo 16 pt from the edge.
 		horizontal: toNative(8)

@@ -3,6 +3,7 @@ import { SCREENS } from '../../../navigation/navigation.types'
 import { CollectionItem } from './Collection.screen'
 import { BaseViewModelProvider } from '../../../provider/vm.provider'
 import { MMKVStorage } from '../../../../core/storage/mmkv'
+import { saveHistory } from '../../../../core/services/photoPost'
 import { SegmentedControlOption } from '../../../../core/components/ui/segmentedControl/SegmentedControl'
 import { t } from '../../../../core/i18n'
 
@@ -78,7 +79,7 @@ class CollectionVM extends BaseViewModelProvider<SCREENS.PHOTO_HISTORY> {
 
     if (this.selectedTab === 'viewed') {
       this.photos = this.photos.filter(photo => photo.cid !== this.pendingDeleteCid)
-      MMKVStorage.set('History', this.photos)
+      saveHistory(this.photos)
     } else {
       this.favorites = this.favorites.filter(photo => photo.cid !== this.pendingDeleteCid)
       MMKVStorage.set('Favorites', this.favorites)

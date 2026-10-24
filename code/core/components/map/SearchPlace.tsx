@@ -14,7 +14,12 @@ type SearchPlaceProps = {
   setQueryPlace: (query: string) => void
   goToLocation: (latitude: number, longitude: number) => void
   isTablet?: boolean
+  /** Called when the field takes focus, e.g. to move something out of the way of the results. */
+  onFocus?: () => void
 }
+
+/** Height of the search field, which sits at the top safe-area inset. */
+export const SEARCH_FIELD_HEIGHT = 43
 
 const LocationSearch: FC<SearchPlaceProps> = ({
   places,
@@ -22,6 +27,7 @@ const LocationSearch: FC<SearchPlaceProps> = ({
   goToLocation,
   setQueryPlace,
   isTablet,
+  onFocus,
 }) => {
   const [isFocused, setIsFocused] = useState(false)
   const { colors } = useTheme()
@@ -44,7 +50,10 @@ const LocationSearch: FC<SearchPlaceProps> = ({
           placeholderTextColor={colors.textSecond}
           value={query}
           onChangeText={setQueryPlace}
-          onFocus={() => setIsFocused(true)}
+          onFocus={() => {
+            setIsFocused(true)
+            onFocus?.()
+          }}
           onBlur={() => setIsFocused(false)}
         />
         {query.length > 0 && (
@@ -100,7 +109,7 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     paddingLeft: 12,
     paddingRight: 8,
-    height: 43,
+    height: SEARCH_FIELD_HEIGHT,
     alignItems: 'center',
     borderRadius: 12,
   },

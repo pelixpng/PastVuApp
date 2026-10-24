@@ -29,6 +29,11 @@ export const en = {
     markersError: 'Couldn’t load map markers',
     searchLimit:
       'The shared search limit has been reached. Try again in a few minutes, or tomorrow 🪫',
+    nearbyButton: 'Photos near the map center',
+    nearbyEmpty: 'No photos nearby for the selected years',
+    nearbyError: 'Couldn’t load nearby photos',
+    distanceM: '%{distance} m',
+    distanceKm: '%{distance} km',
   },
   photo: {
     infoError: 'Couldn’t load photo details',
@@ -39,6 +44,7 @@ export const en = {
     source: 'Source',
     sourceMissing: 'Not specified',
     lastModified: 'Last edited',
+    nearby: 'Nearby photos',
     comments: 'Comments',
     commentsCount: {
       one: '%{count} comment',
@@ -83,6 +89,8 @@ export const en = {
     settingsDescription: 'Downloaded to this device, it takes about %{size} MB. If you delete it, it will be downloaded again the next time you colorize.',
     remove: 'Delete neural network',
     removeConfirm: 'Delete the colorizing neural network? About %{size} MB will be freed.',
+    disclaimerTitle: 'For entertainment only',
+    disclaimer: 'The neural network picks likely colors on its own, and they may not match reality, so the result should not be taken as an accurate depiction of the real colors. Only professional historians can produce an accurate colorization.',
   },
   streetView: {
     title: 'Today',
@@ -144,6 +152,8 @@ export const en = {
     yandexConsentConfirm: 'Use Yandex Maps',
     languageSection: 'Language',
     languageHint: 'Language of the app interface.',
+    aiWatermark: 'AI watermark',
+    aiWatermarkHint: 'Add an “AI COLORIZATION” mark to the corner of colorized photos, including the ones you save?',
   },
   options: {
     themeDark: 'Dark',

@@ -34,6 +34,7 @@ import ApiService from '../../../../core/api/apiService'
 import { dedupeMarkers } from '../../../../core/services/mapMarkers'
 import { t } from '../../../../core/i18n'
 import { defaultRegion } from '../../../../core/constants/map'
+import { NearbySearch } from '../../../../core/store/NearbySearch'
 
 export const mapRef = createRef<MapView>()
 /** The Yandex map, when that provider is selected; only one of the two refs is mounted. */
@@ -53,6 +54,8 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
 	@observable queryPlace = ''
 	private timeoutId: ReturnType<typeof setTimeout> | null = null
 	private collectionTimeoutId: ReturnType<typeof setTimeout> | null = null
+	/** The nearby-photos sheet; it follows the map's centre and years while open. */
+	readonly nearby: NearbySearch
 	constructor() {
 		super()
 		autorun(() => {
@@ -84,6 +87,11 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
 			}
 		)
 		makeObservable(this)
+		// After makeObservable, so it tracks the centre and the years.
+		this.nearby = new NearbySearch(
+			() => this.coordinates,
+			() => this.yearsRange
+		)
 	}
 
 	// ------------------------------------------ Computed ------------------------------------------
@@ -96,6 +104,11 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
 	@computed
 	get mapMarkerType() {
 		return MapStore.markerType
+	}
+
+	/** The nearby-photos sheet is open; it stays so while another tab or a photo is in front. */
+	get nearbyOpen() {
+		return this.nearby.open
 	}
 
 	// ------------------------------------------ Actions ------------------------------------------
@@ -286,6 +299,16 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
 		} catch (error) {
 			Alert.alert(t('common.error'), t('map.markersError'))
 		}
+	}
+
+	@action.bound
+	toggleNearby() {
+		this.nearby.toggle()
+	}
+
+	@action.bound
+	closeNearby() {
+		this.nearby.close()
 	}
 
 	@action.bound

@@ -314,22 +314,14 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
   async getPhotoInfo(cid: string) {
     await ApiService.getPhotoInfo(cid)
       .then(async ({ result }) => {
+        // Another photo was picked while this one loaded: its answer must not land under it.
+        if (this.selectedPhotoCid !== cid) return
         this.checkStreetView(cid, result.photo)
         runInAction(() => {
           this.postInfo = result.photo
           const favorites: CollectionItem[] = MMKVStorage.get('Favorites') ?? []
           this.isFavorite = favorites.some(item => item.cid === cid)
-
-          const history: CollectionItem[] = MMKVStorage.get('History') ?? []
-          if (!history.some(item => item.cid === cid)) {
-            const title = result.photo.title
-            const description = `${result.photo.y} ${result.photo.regions
-              .map((region: any) => region.title_local)
-              .join(', ')}`
-            const file = result.photo.file
-            const updatedHistory = [{ title, description, cid, file }, ...history]
-            MMKVStorage.set('History', updatedHistory)
-          }
+          PhotoPost.recordHistory(result.photo, cid)
         })
         if (result.photo?.ccount) {
           this.getPhotoComments(cid)
@@ -341,6 +333,7 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
   @action.bound
   async getPhotoComments(cid: string) {
     await ApiService.getComments(cid).then(({ users, comments }) => {
+      if (this.selectedPhotoCid !== cid) return
       runInAction(() => {
         this.photoUsers = users
         this.photoComments = comments
@@ -356,6 +349,7 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
   /** The colour version while it is on; `original` for the black-and-white photo under it. */
   @action.bound
   openFullScreenImage(original = false) {
+    if (!this.postInfo) return
     const colour = original ? undefined : this.colorize.localFile
     this.navigateTo(SCREENS.FULL_SCREEN_IMAGE, {
       title: this.postInfo!.title,
@@ -368,6 +362,7 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
 
   @action.bound
   toggleFavorite() {
+    if (!this.postInfo) return
     const cid = this.postInfo!.cid.toString()
     const favorites: CollectionItem[] = MMKVStorage.get('Favorites') ?? []
     const title = this.postInfo!.title
@@ -388,11 +383,13 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
 
   @action.bound
   share() {
+    if (!this.postInfo) return
     sharePhoto(this.postInfo!.title, this.postInfo!.cid.toString())
   }
 
   @action.bound
   saveImage() {
+    if (!this.postInfo) return
     // The colour version when it is on: saving gives what the panel shows.
     const local = this.colorize.localFile
     if (local) saveLocalImage(local)

@@ -44,10 +44,14 @@ const COUNT_COLORS: Record<'light' | 'dark', { photos: BadgeColors; comments: Ba
     comments: { text: '#D97A1E', background: '#FCEFE2' },
   },
   dark: {
-    photos: { text: '#4CC27E', background: '#1C2A22' },
-    comments: { text: '#F2A254', background: '#2D2217' },
+    photos: { text: '#4CC27E', background: '#233A2C' },
+    comments: { text: '#F2A254', background: '#3A2C1D' },
   },
 }
+
+// The app's blue is too dim on the dark grey for small bold text, so the role gets a lighter
+// blue on a blue-tinted pill there.
+const ROLE_COLORS_DARK: BadgeColors = { text: '#7AB0FF', background: '#1E2D45' }
 
 const Badge: FC<{ text: string; colors: BadgeColors }> = ({ text, colors }) => (
   <Text style={[s.badge, { color: colors.text, backgroundColor: colors.background }]}>{text}</Text>
@@ -81,7 +85,11 @@ type ProfileSummaryProps = {
 export const ProfileSummary: FC<ProfileSummaryProps> = observer(({ profile, onShare }) => {
   const theme = useTheme() as CustomTheme
   const { colors } = theme
-  const countColors = COUNT_COLORS[theme.names?.themeName === 'dark' ? 'dark' : 'light']
+  const dark = theme.names?.themeName === 'dark'
+  const countColors = COUNT_COLORS[dark ? 'dark' : 'light']
+  const roleColors = dark
+    ? ROLE_COLORS_DARK
+    : { text: colors.basePrimary, background: colors.selectedItem }
   const realName = [profile.firstName, profile.lastName].filter(Boolean).join(' ')
   const role =
     profile.role > 9 ? t('profile.admin') : profile.role > 4 ? t('profile.moderator') : null
@@ -136,10 +144,7 @@ export const ProfileSummary: FC<ProfileSummaryProps> = observer(({ profile, onSh
               colors={countColors.comments}
             />
             {role && (
-              <Badge
-                text={role}
-                colors={{ text: colors.basePrimary, background: colors.selectedItem }}
-              />
+              <Badge text={role} colors={roleColors} />
             )}
             {profile.online && (
               <View style={s.online}>

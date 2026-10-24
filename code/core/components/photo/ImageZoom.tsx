@@ -1,10 +1,12 @@
 import { FC, useEffect, useState } from 'react'
-import { Image, View, StyleSheet, useWindowDimensions } from 'react-native'
+import { ActivityIndicator, Image, View, StyleSheet } from 'react-native'
+import { useTheme } from '@react-navigation/native'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import { fitContainer, SnapbackZoom, useImageResolution } from 'react-native-zoom-toolkit'
 import { PhotoUnavailable } from '../ui/PhotoUnavailable'
 import { Resolution } from '../../services/photoPost'
 import { ColorizingOverlay } from '../colorize/ColorizingOverlay'
+import { useRootSize } from '../../hooks/useRootSize'
 
 interface ImageZoomProps {
   uri: string
@@ -60,8 +62,14 @@ const Preview: FC<ImageZoomProps & { resolution: Resolution }> = ({
   onZoomStart,
   onZoomEnd,
 }) => {
-  const { width, height } = useWindowDimensions()
+  // Not useWindowDimensions: on the iPad it kept the portrait size after the turn to landscape.
+  const { width, height } = useRootSize()
+  const { colors } = useTheme()
   const [failed, setFailed] = useState(false)
+  // A spinner holds the photo's place until it has loaded, then the photo fades in over it.
+  const [loaded, setLoaded] = useState(false)
+  const opacity = useSharedValue(0)
+  const fadeIn = useAnimatedStyle(() => ({ opacity: opacity.value }))
   const maxPreviewHeight = height * PREVIEW_HEIGHT_RATIO
   // ---------- Image sizing ----------
   const containerFit = fitContainer(resolution.width / resolution.height, { width, height })
@@ -87,15 +95,24 @@ const Preview: FC<ImageZoomProps & { resolution: Resolution }> = ({
     <View style={s.container}>
       <SnapbackZoom onTap={openFullScreenImage} onPinchStart={onZoomStart} onGestureEnd={onZoomEnd}>
         <View style={previewSize}>
-          <Image
-            source={{ uri }}
-            style={previewSize}
-            resizeMethod="scale"
-            resizeMode="cover"
-            fadeDuration={0}
-            onLayout={onImageLoaded}
-            onError={() => setFailed(true)}
-          />
+          {!loaded && (
+            <ActivityIndicator style={StyleSheet.absoluteFill} color={colors.textThird} />
+          )}
+          <Animated.View style={fadeIn}>
+            <Image
+              source={{ uri }}
+              style={previewSize}
+              resizeMethod="scale"
+              resizeMode="cover"
+              fadeDuration={0}
+              onLayout={onImageLoaded}
+              onLoad={() => {
+                setLoaded(true)
+                opacity.value = withTiming(1, { duration: 220 })
+              }}
+              onError={() => setFailed(true)}
+            />
+          </Animated.View>
           {overlayUri && <Overlay uri={overlayUri} hidden={overlayHidden} />}
           {colorizing && <ColorizingOverlay />}
         </View>
@@ -107,7 +124,7 @@ const Preview: FC<ImageZoomProps & { resolution: Resolution }> = ({
 /** Fallback for posts that carry no dimensions: measure the remote image before laying it out. */
 const MeasuredPreview: FC<ImageZoomProps> = props => {
   const { isFetching, resolution, error } = useImageResolution({ uri: props.uri })
-  const { height } = useWindowDimensions()
+  const { height } = useRootSize()
   // ---------- Early return ----------
   // Measuring fetches the image, so a file the site no longer serves shows up here first.
   if (error) {

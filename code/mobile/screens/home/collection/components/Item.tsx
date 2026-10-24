@@ -38,9 +38,11 @@ export const PhotoListItem: FC<PhotoListItemProps> = ({
           <MaterialIcons name={icon ?? 'no-photography'} size={28} color={colors.textThird} />
         </View>
       ) : (
+        // A grey square until the thumbnail arrives and fades in.
         <Image
           source={{ uri: `https://img.pastvu.com/h/${file}` }}
-          style={s.image}
+          style={[s.image, { backgroundColor: colors.baseFifth }]}
+          transition={200}
           onError={() => {
             setImageFailed(true)
             if (!quietImageErrors) Alert.alert(t('common.error'), t('photo.imageError'))

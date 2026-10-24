@@ -2,6 +2,15 @@ internal import Expo
 import React
 import ReactAppDependencyProvider
 
+/// Shows wherever React has not drawn yet, e.g. while a tablet turns to landscape at launch.
+/// RN's default, systemBackground, is pure black in dark mode: use the app's dark grey instead
+/// (backgroundApp in core/components/theme/Theme.ts). Light mode stays white.
+private let appBackgroundColor = UIColor { traits in
+  traits.userInterfaceStyle == .dark
+    ? UIColor(red: 0x1C / 255.0, green: 0x1C / 255.0, blue: 0x1E / 255.0, alpha: 1)
+    : .white
+}
+
 @main
 class AppDelegate: ExpoAppDelegate {
   var window: UIWindow?
@@ -22,6 +31,7 @@ class AppDelegate: ExpoAppDelegate {
 
 #if os(iOS) || os(tvOS)
     window = UIWindow(frame: UIScreen.main.bounds)
+    window?.backgroundColor = appBackgroundColor
     factory.startReactNative(
       withModuleName: "main",
       in: window,
@@ -53,6 +63,12 @@ class AppDelegate: ExpoAppDelegate {
 
 class ReactNativeDelegate: ExpoReactNativeFactoryDelegate {
   // Extension point for config-plugins
+
+  override func customize(_ rootView: UIView) {
+    // Super hands the root view to Expo's subscribers, which put the splash screen on it.
+    super.customize(rootView)
+    rootView.backgroundColor = appBackgroundColor
+  }
 
   override func sourceURL(for bridge: RCTBridge) -> URL? {
     // needed to return the correct URL for expo-dev-client.

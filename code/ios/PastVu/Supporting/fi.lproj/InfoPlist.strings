@@ -1,4 +1,4 @@
-NSLocationWhenInUseUsageDescription = "Sijainnin avulla kartalla näytetään kiinnostavia kuvia lähelläsi.";
-NSPhotoLibraryAddUsageDescription = "Pyydämme käyttöoikeutta, jotta ladatut kuvat voidaan tallentaa galleriaasi myöhempää katselua varten.";
-NSPhotoLibraryUsageDescription = "Pyydämme käyttöoikeutta, jotta ladatut kuvat voidaan tallentaa galleriaasi myöhempää katselua varten.";
+NSLocationWhenInUseUsageDescription = "Sijaintia tarvitaan, jotta kartalla voidaan näyttää lähelläsi otettuja vanhoja kuvia.";
+NSPhotoLibraryAddUsageDescription = "Tarvitaan, jotta voit tallentaa galleriaan vanhan kuvan, sen väritetyn version tai ”ennen ja nyt” -vertailun.";
+NSPhotoLibraryUsageDescription = "Gallerian käyttöoikeutta tarvitaan vain niiden kuvien tallentamiseen, jotka itse päätät tallentaa. Sovellus ei selaa galleriaasi.";
 NSCameraUsageDescription = "Kameran käyttöoikeus tarvitaan, jotta voit kuvata tämän paikan tänään ja verrata sitä vanhaan kuvaan.";

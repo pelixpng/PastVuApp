@@ -29,6 +29,11 @@ export const pl = {
     markersError: 'Nie udało się wczytać znaczników na mapie',
     searchLimit:
       'Wspólny limit wyszukiwania został wyczerpany. Spróbuj za kilka minut albo jutro 🪫',
+    nearbyButton: 'Zdjęcia w pobliżu środka mapy',
+    nearbyEmpty: 'Brak zdjęć w pobliżu z wybranych lat',
+    nearbyError: 'Nie udało się wczytać zdjęć w pobliżu',
+    distanceM: '%{distance} m',
+    distanceKm: '%{distance} km',
   },
   photo: {
     infoError: 'Nie udało się wczytać informacji o zdjęciu',
@@ -39,6 +44,7 @@ export const pl = {
     source: 'Źródło',
     sourceMissing: 'Nie podano',
     lastModified: 'Ostatnia zmiana',
+    nearby: 'Zdjęcia w pobliżu',
     comments: 'Komentarze',
     commentsCount: {
       one: '%{count} komentarz',
@@ -84,6 +90,8 @@ export const pl = {
     settingsDescription: 'Pobrana na urządzenie, zajmuje około %{size} MB. Jeśli ją usuniesz, zostanie pobrana ponownie przy następnym kolorowaniu.',
     remove: 'Usuń sieć neuronową',
     removeConfirm: 'Usunąć sieć neuronową do kolorowania? Zwolni się około %{size} MB.',
+    disclaimerTitle: 'Tylko dla rozrywki',
+    disclaimer: 'Sieć neuronowa sama dobiera prawdopodobne kolory, które mogą nie odpowiadać rzeczywistości, dlatego wyniku nie należy traktować jako wiernego odwzorowania prawdziwych barw. Wiarygodną koloryzację mogą wykonać tylko zawodowi historycy.',
   },
   streetView: {
     title: 'Dziś',
@@ -145,6 +153,8 @@ export const pl = {
     yandexConsentConfirm: 'Wybierz Yandex Maps',
     languageSection: 'Język',
     languageHint: 'Język interfejsu aplikacji.',
+    aiWatermark: 'Znak wodny AI',
+    aiWatermarkHint: 'Dodawać oznaczenie „AI COLORIZATION” w rogu pokolorowanych zdjęć, także tych zapisanych w galerii?',
   },
   options: {
     themeDark: 'Ciemny',

@@ -29,6 +29,11 @@ export const fr = {
     markersError: 'Impossible de charger les repères de la carte',
     searchLimit:
       'La limite de recherche partagée est atteinte. Réessayez dans quelques minutes ou demain 🪫',
+    nearbyButton: 'Photos près du centre de la carte',
+    nearbyEmpty: 'Aucune photo à proximité pour les années choisies',
+    nearbyError: 'Impossible de charger les photos à proximité',
+    distanceM: '%{distance} m',
+    distanceKm: '%{distance} km',
   },
   photo: {
     infoError: 'Impossible de charger les informations de la photo',
@@ -39,6 +44,7 @@ export const fr = {
     source: 'Source',
     sourceMissing: 'Non précisée',
     lastModified: 'Dernière modification',
+    nearby: 'Photos à proximité',
     comments: 'Commentaires',
     commentsCount: {
       one: '%{count} commentaire',
@@ -83,6 +89,8 @@ export const fr = {
     settingsDescription: 'Téléchargé sur cet appareil, il occupe environ %{size} Mo. Si vous le supprimez, il sera de nouveau téléchargé à la prochaine colorisation.',
     remove: 'Supprimer le réseau de neurones',
     removeConfirm: 'Supprimer le réseau de neurones de colorisation ? Environ %{size} Mo seront libérés.',
+    disclaimerTitle: 'Uniquement pour le divertissement',
+    disclaimer: 'Le réseau de neurones choisit lui-même des couleurs probables, qui peuvent ne pas correspondre à la réalité : le résultat ne doit donc pas être considéré comme une représentation fidèle des couleurs réelles. Seuls des historiens professionnels peuvent réaliser une colorisation fiable.',
   },
   streetView: {
     title: 'Aujourd’hui',
@@ -144,6 +152,8 @@ export const fr = {
     yandexConsentConfirm: 'Choisir Yandex Maps',
     languageSection: 'Langue',
     languageHint: 'Langue de l’interface de l’application.',
+    aiWatermark: 'Filigrane « AI »',
+    aiWatermarkHint: 'Ajouter une mention « AI COLORIZATION » dans le coin des photos colorisées, y compris celles que vous enregistrez ?',
   },
   options: {
     themeDark: 'Sombre',

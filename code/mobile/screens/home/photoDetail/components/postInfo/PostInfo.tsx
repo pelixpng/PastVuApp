@@ -6,13 +6,15 @@ import RenderHTML from 'react-native-render-html'
 import { Spacer } from '../../../../../../core/components/ui/Spacer'
 import { formatDate } from '../../../../../../core/utils/getTime'
 import { t } from '../../../../../../core/i18n'
+import { NearbyPhotos } from '../../../../../../core/components/photo/NearbyPhotos'
 
 type PostInfoProps = {
   postInfo: Photo
   onLinkPress?: (href: string) => void
+  onOpenPhoto: (cid: string) => void
 }
 
-export const PostInfo: FC<PostInfoProps> = ({ postInfo, onLinkPress }) => {
+export const PostInfo: FC<PostInfoProps> = ({ postInfo, onLinkPress, onOpenPhoto }) => {
   const { colors } = useTheme()
   const commentTotal = postInfo.ccount || 0
   const titlesRegion = postInfo.regions?.map(region => region.title_local).join(', ')
@@ -111,6 +113,13 @@ export const PostInfo: FC<PostInfoProps> = ({ postInfo, onLinkPress }) => {
         </Text>
       )}
       <Spacer height={12} />
+      <NearbyPhotos
+        cid={String(postInfo.cid)}
+        geo={postInfo.geo}
+        onOpen={onOpenPhoto}
+        // The list's side padding: the row runs to the screen edge, its first photo under the text.
+        inset={16}
+      />
       <View style={s.row}>
         <Text style={[s.commentHeaderText, { color: colors.textFirst }]}>{t('photo.comments')} </Text>
         <Text style={[s.commentHeaderText, { color: colors.textThird }]}>{commentTotal}</Text>

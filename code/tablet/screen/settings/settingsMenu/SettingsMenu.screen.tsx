@@ -4,13 +4,15 @@ import { Container } from '../../../../core/components/ui/Container'
 import { MenuButton } from '../../../../core/components/ui/buttons/menuButton/MenuButton'
 import { Spacer } from '../../../../core/components/ui/Spacer'
 import { useVM } from '../../../../core/hooks/useVM'
-import { View, StyleSheet, useWindowDimensions } from 'react-native'
+import { View, StyleSheet } from 'react-native'
+import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { SettingsDetails } from './components/SettingsDetails'
 import { t } from '../../../../core/i18n'
 
 export const SettingsMenuScreen = observer(() => {
   const vm = useVM(SettingsVM)
-  const { width } = useWindowDimensions()
+  // The root view's width, not Dimensions: see core/hooks/useRootSize.
+  const { width } = useSafeAreaFrame()
   const widthMenu = width * 0.33 + 32
   return (
     <Container row>

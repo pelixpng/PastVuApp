@@ -1,6 +1,6 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { MaterialIcons } from '../../core/components/ui/icons'
-import { StyleSheet } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { StackParamList } from './stackParams.types'
 import { SCREENS } from './navigation.types'
 import { MapScreen } from '../screens/home/map/Map.screen'
@@ -10,10 +10,11 @@ import { SettingsMenuScreen } from '../screens/settings/settingsMenu/SettingsMen
 import { useTheme } from '@react-navigation/native'
 import { t } from '../../core/i18n'
 import { observer } from 'mobx-react-lite'
+import { PortalHost, PortalProvider } from '../../core/components/ui/portal/Portal'
 
 const Tab = createBottomTabNavigator<StackParamList>()
 
-export const BottomTabsNavigator = observer(function BottomTabsNavigator() {
+const Tabs = observer(function Tabs() {
   const { colors } = useTheme()
   return (
     <Tab.Navigator
@@ -79,7 +80,23 @@ export const BottomTabsNavigator = observer(function BottomTabsNavigator() {
   )
 })
 
+/**
+ * The tabs, with a portal layer over them and over the tab bar: the map's nearby-photos sheet draws
+ * there to cover the bar. The layer belongs to the tabs' stack card, so a photo opened from the
+ * sheet slides in over it as over the rest of the map, and the card's gesture-handler root also
+ * serves the sheet's drag.
+ */
+export const BottomTabsNavigator = () => (
+  <PortalProvider>
+    <View style={s.container}>
+      <Tabs />
+      <PortalHost />
+    </View>
+  </PortalProvider>
+)
+
 const s = StyleSheet.create({
+  container: { flex: 1 },
   tabBarLabelStyle: {
     fontSize: 11,
     lineHeight: 16,

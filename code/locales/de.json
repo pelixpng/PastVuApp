@@ -1,6 +1,6 @@
 {
-  "NSLocationWhenInUseUsageDescription": "Der Standortzugriff zeigt interessante Fotos in Ihrer Nähe auf der Karte.",
-  "NSPhotoLibraryAddUsageDescription": "Der Zugriff auf die Fotomediathek dient dazu, geladene Fotos zum späteren Ansehen zu speichern.",
-  "NSPhotoLibraryUsageDescription": "Der Zugriff auf die Fotomediathek dient dazu, geladene Fotos zum späteren Ansehen zu speichern.",
+  "NSLocationWhenInUseUsageDescription": "Der Standort wird benötigt, um auf der Karte alte Fotos anzuzeigen, die in Ihrer Nähe aufgenommen wurden.",
+  "NSPhotoLibraryAddUsageDescription": "Wird benötigt, um ein altes Foto, seine kolorierte Version oder einen Vergleich „damals und heute“ in der Galerie zu speichern.",
+  "NSPhotoLibraryUsageDescription": "Der Zugriff auf die Galerie wird nur benötigt, um Fotos zu speichern, die Sie selbst speichern möchten. Die App durchsucht Ihre Galerie nicht.",
   "NSCameraUsageDescription": "Der Kamerazugriff dient dazu, diesen Ort heute zu fotografieren und mit dem alten Foto zu vergleichen."
 }

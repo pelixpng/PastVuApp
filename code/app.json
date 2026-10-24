@@ -2,7 +2,7 @@
   "expo": {
     "name": "PastVu",
     "slug": "PastVuApp",
-    "version": "2.7.0",
+    "version": "2.8.0",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -30,7 +30,7 @@
       "requireFullScreen": true,
       "userInterfaceStyle": "automatic",
       "bundleIdentifier": "com.pelixpng.PastVuApp",
-      "buildNumber": "72",
+      "buildNumber": "75",
       "appleTeamId": "989AHJ2KDZ",
       "entitlements": {
         "com.apple.security.application-groups": [
@@ -43,7 +43,8 @@
         "PLACE_API_KEY": "$(PLACE_API_KEY)",
         "STREET_VIEW_API_KEY": "$(STREET_VIEW_API_KEY)",
         "YANDEX_MAPS_API_KEY": "$(YANDEX_MAPS_API_KEY)",
-        "NSMotionUsageDescription": "Приложение не использует данные о движении: фотографии рядом с вами подбираются только по геопозиции."
+        "NSMotionUsageDescription": "Приложение не использует данные о движении: фотографии рядом с вами подбираются только по геопозиции.",
+        "LSMinimumSystemVersion": "13.3"
       },
       "config": {
         "usesNonExemptEncryption": false
@@ -61,7 +62,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.pelixpng.PastVuApp",
-      "versionCode": 57,
+      "versionCode": 59,
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION"
