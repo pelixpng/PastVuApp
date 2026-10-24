@@ -2,6 +2,8 @@
 
 [![Release](https://img.shields.io/github/v/release/pelixpng/PastVuApp?style=for-the-badge)](https://github.com/pelixpng/PastVuApp/releases/latest) <!-- :contentReference[oaicite:0]{index=0} -->
 [![Stars](https://img.shields.io/github/stars/pelixpng/PastVuApp?style=for-the-badge)](https://github.com/pelixpng/PastVuApp/stargazers) <!-- :contentReference[oaicite:1]{index=1} -->
+![Platform](https://img.shields.io/badge/platform-iOS_|_iPadOS_|_watchOS_|_Android-blue?style=for-the-badge)
+[![Expo](https://img.shields.io/badge/Expo-SDK_57-blue?style=for-the-badge&logo=expo)](https://expo.dev)
 
 This application is a mobile version of the [PastVu
 website](https://pastvu.com/), [here's its GitHub
