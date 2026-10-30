@@ -17,4 +17,7 @@ export const Links = {
   privacyPolicy: 'https://docs.google.com/document/d/12hjy2eK9Ur7yoI7zqqrOPMxvxpeLJOhr6oz2A1B0CQk/edit',
   // The colorization model's authors; the repository carries its Apache 2.0 licence.
   ddcolor: 'https://github.com/piddnad/DDColor',
+  // Google's attribution requirements ask apps using its translation to link the Cloud
+  // Translation site from their help.
+  cloudTranslation: 'https://cloud.google.com/translate',
 }

@@ -35,7 +35,7 @@ pre_install do |installer|
       values[$1] = $2.gsub(/\A["']|["']\z/, '')
     end
   end
-  keys = %w[PLACE_API_KEY STREET_VIEW_API_KEY YANDEX_MAPS_API_KEY]
+  keys = %w[PLACE_API_KEY STREET_VIEW_API_KEY YANDEX_MAPS_API_KEY TRANSLATE_API_KEY]
   File.write(File.join(__dir__, 'Keys.xcconfig'), keys.map { |k| "#{k} = #{values[k] || ''}" }.join("\n") + "\n")
 end
 

@@ -1,53 +1,44 @@
 import { action, computed, makeObservable, observable, runInAction } from 'mobx'
-import { Alert, Linking } from 'react-native'
+import { Linking, Share } from 'react-native'
 import { BaseViewModelProvider } from '../../provider/vm.provider'
 import { SCREENS } from '../../navigation/navigation.types'
 import { SegmentedControlOption } from '../../../core/components/ui/segmentedControl/SegmentedControl'
 import ApiService from '../../../core/api/apiService'
 import { userLoginFromLink } from '../../../core/utils/userLink'
-import ApiStore from '../../../core/store/Api.store'
-import { MMKVStorage } from '../../../core/storage/mmkv'
 import { NewsItems } from '../../../core/types/apiNews'
-import { CollectionItem } from '../collection/Collection.screen'
+import type { CollectionItem } from '../../../core/services/photoPost'
 import { IComment, Users } from '../../../core/types/apiPhotoComment'
 import { getRegionPath } from '../../../core/utils/getRegionPath'
-import { saveLocalImage, savePhoto, sharePhoto } from '../../../core/utils/getPhoto'
-import { PostColorize } from '../../../core/store/PostColorize'
+import { loadNews, savedNews } from '../../../core/services/news'
+import { PhotoPanel } from '../../../core/store/PhotoPanel'
 import { t } from '../../../core/i18n'
-import * as PhotoPost from '../../../core/services/photoPost'
-import * as StreetView from '../../../core/services/streetView'
-import { CompareMode } from '../../../core/components/compare/CompareView'
 
 export type NewsTab = 'posts' | 'photos'
 
 class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
   @observable selectedTab: NewsTab = 'posts'
-  @observable news: NewsItems[] = []
+  /**
+   * The feed kept from the last visit shows at once; the fresh one replaces it. A reference: the
+   * feed is replaced whole, never edited, so its 154 posts need no deep conversion.
+   */
+  @observable.ref news: NewsItems[] = savedNews() ?? []
   @observable historyItems: CollectionItem[] = []
   @observable loading = true
   @observable newsError = false
+  @observable photosLoading = true
   @observable photosError = false
   @observable selectedPostId: string | null = null
 
   // post detail
-  @observable activePost: NewsItems | null = null
+  @observable.ref activePost: NewsItems | null = null
   @observable.ref postHistory: NewsItems[] = []
   @observable.ref postComments: IComment[] = []
   @observable.ref postUsers: Users | null = null
 
-  // photo detail
-  @observable.ref postInfo: Photo | null = null
-  @observable.ref photoComments: IComment[] = []
-  @observable.ref photoUsers: Users | null = null
-  @observable selectedPhotoCid: string | null = null
-  @observable showLoader = false
-  @observable isImageLoaded = false
-  @observable isFavorite = false
-  @observable.ref streetView: StreetView.StreetViewInfo | null = null
-  /** The panel shows the then-and-now view in place of the post, in this mode. */
-  @observable compareMode: CompareMode | null = null
-
-  private regionsMap: Map<number, any> = new Map()
+  /** A photo from the list or a link, shown in place of the post while it is open. */
+  readonly panel = new PhotoPanel({
+    openFullScreen: params => this.navigateTo(SCREENS.FULL_SCREEN_IMAGE, params),
+  })
 
   // A getter, not a field: a field is evaluated once when the view model is constructed and
   // would keep the language that was active back then.
@@ -59,36 +50,14 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
     ]
   }
 
-  /** The open photo's colour version: palette, colour photo, comparison with the original. */
-  readonly colorize: PostColorize
-
   constructor() {
     super()
     makeObservable(this)
-    // After makeObservable, so it tracks the post.
-    this.colorize = new PostColorize(
-      () => (this.postInfo ? this.postInfo.cid.toString() : null),
-      () => this.imageLink,
-      () => this.postInfo?.file,
-    )
     this.loadAll()
   }
 
-  private async loadAll() {
-    try {
-      await this.loadRegions()
-    } catch {}
-    await Promise.allSettled([this.loadNews(), this.loadPhotos()])
-  }
-
-  @computed
-  get displayedPosts(): NewsItems[] {
-    return this.news
-  }
-
-  @computed
-  get displayedPhotos(): CollectionItem[] {
-    return this.historyItems
+  private loadAll() {
+    return Promise.allSettled([this.loadNews(), this.loadPhotos()])
   }
 
   @computed
@@ -96,34 +65,8 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
     return this.postHistory.length > 0
   }
 
-  @computed
-  get streetViewTarget() {
-    return StreetView.streetViewTarget(this.postInfo)
-  }
-
-  /** Google confirmed a panorama, or could not be asked: either way the header offers it. */
-  @computed
-  get hasStreetView() {
-    return this.streetView !== null && this.streetView.available !== false
-  }
-
-  @computed
-  get comparePhoto() {
-    return this.postInfo
-      ? { uri: this.colorize.displayLink, year: this.postInfo.y, ...PhotoPost.photoResolution(this.postInfo) }
-      : undefined
-  }
-
-  @computed
-  get imageLink() {
-    return `https://img.pastvu.com/${ApiStore.photoQualitySettings}/${this.postInfo?.file}`
-  }
-
   @action.bound
   async retry() {
-    if (this.regionsMap.size === 0) {
-      await this.loadRegions()
-    }
     if (this.selectedTab === 'posts') {
       await this.loadNews()
     } else {
@@ -139,9 +82,10 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
   @action.bound
   async loadNews() {
     try {
-      this.loading = true
+      // The spinner only stands in for an empty list: news kept from the last visit stay shown.
+      this.loading = this.news.length === 0
       this.newsError = false
-      const newsData = await ApiService.getNews()
+      const newsData = await loadNews(true)
       runInAction(() => {
         this.news = newsData
         this.loading = false
@@ -157,28 +101,24 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
   @action.bound
   async loadPhotos() {
     try {
+      this.photosLoading = true
       this.photosError = false
-      const photosData = await ApiService.getRecentPhotos()
+      // The photos bring the names of their regions.
+      const { photos, rhash } = await ApiService.getRecentPhotos()
       runInAction(() => {
-        this.historyItems = photosData.map((photo: any) => ({
+        this.historyItems = photos.map(photo => ({
           title: photo.title,
-          description: `${photo.year}, ${getRegionPath(photo.rs, this.regionsMap)}`,
+          description: [photo.year, getRegionPath(photo.rs, rhash)].filter(Boolean).join(', '),
           cid: photo.cid.toString(),
           file: photo.file,
         }))
+        this.photosLoading = false
       })
     } catch {
       runInAction(() => {
+        this.photosLoading = false
         this.photosError = true
       })
-    }
-  }
-
-  @action.bound
-  async loadRegions() {
-    try {
-      this.regionsMap = await ApiService.getRegions()
-    } catch {
     }
   }
 
@@ -186,7 +126,8 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
 
   @action.bound
   openPost(post: NewsItems) {
-    this.selectedPhotoCid = null
+    // The photo is closed, not just hidden, so tapping it again opens it.
+    this.panel.close()
     this.selectedPostId = post._id
     this.activePost = post
     this.postHistory = []
@@ -197,9 +138,12 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
 
   @action.bound
   async loadPostComments() {
-    if (!this.activePost) return
+    const post = this.activePost
+    if (!post) return
     try {
-      const { users, comments } = await ApiService.getNewsComments(this.activePost.cid)
+      const { users, comments } = await ApiService.getNewsComments(post.cid)
+      // Another post may have been opened while the comments were on their way.
+      if (this.activePost !== post) return
       runInAction(() => {
         this.postUsers = users
         this.postComments = comments
@@ -251,149 +195,21 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
     return true
   }
 
-  // -------------------------------- Photo detail --------------------------------
-
-  /** Runs after the post is shown: the button appears once Google confirms a panorama. */
+  /** The open post, in the same words as the profile shares one. */
   @action.bound
-  async checkStreetView(cid: string, photo: Photo) {
-    const target = StreetView.streetViewTarget(photo)
-    if (!target) return
-    const info = await StreetView.checkAvailability(target)
-    if (this.selectedPhotoCid !== cid) return
-    runInAction(() => {
-      this.streetView = info
+  shareNews() {
+    // The header is built in a layout effect, and the post may have changed since.
+    if (!this.activePost) return
+    Share.share({
+      message: `${this.activePost.title}: https://pastvu.com/news/${this.activePost.cid}`,
     })
   }
 
-  /**
-   * On the tablet the comparison replaces the post inside the same panel, not a new screen. It
-   * always opens on Street View, even without a panorama, so the camera never pops up unasked.
-   */
-  @action.bound
-  openCompare() {
-    this.compareMode = 'streetView'
-  }
-
-  @action.bound
-  closeCompare() {
-    this.compareMode = null
-  }
-
-  @action.bound
-  closePhoto() {
-    this.selectedPhotoCid = null
-    this.postInfo = null
-    this.streetView = null
-    this.compareMode = null
-    this.photoComments = []
-    this.photoUsers = null
-    this.isImageLoaded = false
-  }
+  // -------------------------------- Photo detail --------------------------------
 
   @action.bound
   showPhoto(cid: string) {
-    if (cid !== this.postInfo?.cid.toString()) {
-      if (this.postInfo) {
-        runInAction(() => {
-          this.postInfo = null
-          this.streetView = null
-          this.compareMode = null
-          this.photoComments = []
-          this.photoUsers = null
-          this.isImageLoaded = false
-        })
-      } else {
-        this.showLoader = true
-      }
-      this.selectedPhotoCid = cid
-      this.getPhotoInfo(cid)
-    }
-  }
-
-  @action.bound
-  async getPhotoInfo(cid: string) {
-    await ApiService.getPhotoInfo(cid)
-      .then(async ({ result }) => {
-        // Another photo was picked while this one loaded: its answer must not land under it.
-        if (this.selectedPhotoCid !== cid) return
-        this.checkStreetView(cid, result.photo)
-        runInAction(() => {
-          this.postInfo = result.photo
-          const favorites: CollectionItem[] = MMKVStorage.get('Favorites') ?? []
-          this.isFavorite = favorites.some(item => item.cid === cid)
-          PhotoPost.recordHistory(result.photo, cid)
-        })
-        if (result.photo?.ccount) {
-          this.getPhotoComments(cid)
-        }
-      })
-      .catch(() => Alert.alert(t('common.error'), t('photo.infoError')))
-  }
-
-  @action.bound
-  async getPhotoComments(cid: string) {
-    await ApiService.getComments(cid).then(({ users, comments }) => {
-      if (this.selectedPhotoCid !== cid) return
-      runInAction(() => {
-        this.photoUsers = users
-        this.photoComments = comments
-      })
-    })
-  }
-
-  @action.bound
-  onImageLoad() {
-    this.isImageLoaded = true
-  }
-
-  /** The colour version while it is on; `original` for the black-and-white photo under it. */
-  @action.bound
-  openFullScreenImage(original = false) {
-    if (!this.postInfo) return
-    const colour = original ? undefined : this.colorize.localFile
-    this.navigateTo(SCREENS.FULL_SCREEN_IMAGE, {
-      title: this.postInfo!.title,
-      cid: this.postInfo!.cid.toString(),
-      uri: colour ?? this.imageLink,
-      file: this.postInfo!.file,
-      localFile: colour,
-    })
-  }
-
-  @action.bound
-  toggleFavorite() {
-    if (!this.postInfo) return
-    const cid = this.postInfo!.cid.toString()
-    const favorites: CollectionItem[] = MMKVStorage.get('Favorites') ?? []
-    const title = this.postInfo!.title
-    const description = `${this.postInfo!.y} ${this.postInfo!.regions
-      .map(region => region.title_local)
-      .join(', ')}`
-    const file = this.postInfo!.file
-
-    if (this.isFavorite) {
-      const updatedFavorites = favorites.filter(item => item.cid !== cid)
-      MMKVStorage.set('Favorites', updatedFavorites)
-      this.isFavorite = false
-    } else {
-      MMKVStorage.set('Favorites', [{ title, description, cid, file }, ...favorites])
-      this.isFavorite = true
-    }
-  }
-
-  @action.bound
-  share() {
-    if (!this.postInfo) return
-    sharePhoto(this.postInfo!.title, this.postInfo!.cid.toString())
-  }
-
-  @action.bound
-  saveImage() {
-    if (!this.postInfo) return
-    // The colour version when it is on: saving gives what the panel shows.
-    const local = this.colorize.localFile
-    if (local) saveLocalImage(local)
-    else savePhoto(this.postInfo!.title, this.postInfo!.file)
+    this.panel.select(cid)
   }
 }
 

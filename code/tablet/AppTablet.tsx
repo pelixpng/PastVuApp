@@ -117,8 +117,6 @@ export default observer(function AppTablet() {
 })
 
 const s = StyleSheet.create({
-  back: { marginLeft: Platform.OS === 'android' ? 5 : 16 },
-  icons: { flexDirection: 'row', marginRight: 16 },
   settingsTitle: { fontSize: 17, lineHeight: 28, fontWeight: 'bold' },
   // 44 pt button around a 24 pt glyph: 6 keeps the glyph 16 from the edge.
   profileBack: { marginLeft: 6 },

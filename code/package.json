@@ -1,6 +1,6 @@
 {
   "name": "pastvuapp",
-  "version": "2.8.0",
+  "version": "2.9.0",
   "scripts": {
     "start": "expo start --dev-client",
     "android": "expo run:android",
@@ -67,6 +67,8 @@
           "expo-camera"
         ],
         "exclude": [
+          "@expo/dom-webview",
+          "expo-keep-awake",
           "react-native-view-shot"
         ]
       },

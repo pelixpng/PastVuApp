@@ -26,9 +26,17 @@ export const hu = {
   },
   map: {
     searchPlaceholder: 'Keresés…',
+    yandexHiddenTitle: 'A térkép a fordítás idejére el van rejtve',
+    yandexHiddenText:
+      'A Google feltételei nem engedik, hogy a fordításai a Yandex Térkép logója mellett jelenjenek meg, a Yandex feltételei pedig tiltják a logó elrejtését. Ezért amíg fordítás látható, a térkép el van rejtve. Akkor jelenik meg újra, amikor megjeleníti az eredetit vagy bezárja a fotót. A beállításokban másik térképet is választhat.',
+    streetViewHiddenTitle: 'A térkép az összehasonlítás idejére el van rejtve',
+    streetViewHiddenText:
+      'A Google feltételei nem engedik, hogy a Street View-panorámák más térkép mellett jelenjenek meg. A térkép akkor jelenik meg újra, amikor bezárja az összehasonlítást.',
     markersError: 'Nem sikerült betölteni a térképjelölőket',
-    searchLimit:
-      'A közös keresési limit kimerült. Próbálja újra néhány perc múlva vagy holnap 🪫',
+    searchEmpty: 'Nincs találat',
+    searchBusy: 'A kereső jelenleg túlterhelt. Próbálja újra egy perc múlva',
+    searchDayLimit: 'A napi keresési limit kimerült. Próbálja újra holnap',
+    searchError: 'A keresés nem sikerült. Ellenőrizze a kapcsolatot',
     nearbyButton: 'Fotók a térkép közepének közelében',
     nearbyEmpty: 'A kiválasztott évekből nincs fotó a közelben',
     nearbyError: 'Nem sikerült betölteni a közeli fotókat',
@@ -68,6 +76,16 @@ export const hu = {
     processing: 'Színezés…',
     processingHint: 'Ez akár %{seconds} másodpercig is tarthat',
     error: 'Nem sikerült kiszínezni a fényképet. Próbálja újra',
+  },
+  translate: {
+    show: 'Fordítás a Google segítségével',
+    hide: 'Eredeti megjelenítése',
+    loading: 'Fordítás…',
+    failed: 'A fordítás nem sikerült',
+    retry: 'Újra',
+    button: 'Fordítás a Google segítségével',
+    error: 'A fordítás nem sikerült. Próbálja újra',
+    dayLimit: 'A mai fordítási keret elfogyott. Próbálja újra holnap',
   },
   colorizeModel: {
     title: 'Fekete-fehér fotók színezése',
@@ -154,6 +172,9 @@ export const hu = {
     languageHint: 'Az alkalmazás felületének nyelve.',
     aiWatermark: '„AI” vízjel',
     aiWatermarkHint: 'Kerüljön „AI COLORIZATION” jelzés a színezett fotók sarkába, a galériába mentettekre is?',
+    translation: 'Fordítás',
+    translationHint:
+      'Megjelenjenek a „Fordítás a Google segítségével” gombok a más nyelvű fotóknál és hozzászólásoknál?',
   },
   options: {
     themeDark: 'Sötét',
@@ -182,6 +203,9 @@ export const hu = {
     github: 'Az alkalmazás forráskódja a GitHubon',
     privacyPolicy: 'Adatvédelmi irányelvek',
     yandexTerms: 'A Yandex Maps felhasználási feltételei',
+    translationTitle: 'Fordítás',
+    translationText:
+      'A hozzászólásokat és a fotók leírását a Google Fordító fordítja. A gépi fordítás hibákat tartalmazhat. A Google közleménye:',
     creditsTitle: 'Köszönetnyilvánítás',
     creditsText:
       'A fotók és adataik a nyílt PastVu API-ból származnak. A helykeresést a LocationIQ biztosítja. A térképeket Androidon a Google Maps Platform, iOS-en az Apple Maps jeleníti meg, választhatóan a Yandex Maps. A mai panorámákat a Google Street View adja. A fekete-fehér fotókat közvetlenül az eszközön színezi a DDColor neurális háló (Kang és mtsai, ICCV 2023, Apache 2.0 licenc).',

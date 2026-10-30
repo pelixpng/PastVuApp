@@ -2,6 +2,7 @@ import { SCREENS } from './navigation.types'
 import { NewsItems } from '../../core/types/apiNews.d'
 import { StreetViewTarget } from '../../core/services/streetView'
 import { CompareMode, ComparePhoto } from '../../core/components/compare/CompareView'
+import type { FullScreenParams } from '../../core/services/photoPost'
 
 export type StackParamList = {
   [SCREENS.BOTTOM_TAB_NAVIGATOR]: undefined
@@ -10,14 +11,7 @@ export type StackParamList = {
   [SCREENS.NEWS]: undefined
   [SCREENS.SETTINGS_MENU]: undefined
   [SCREENS.PHOTO_DETAIL]: { cid: string; title: string }
-  [SCREENS.FULL_SCREEN_IMAGE]: {
-    uri: string
-    title: string
-    cid: string
-    file: string
-    /** The colour version on disk, saved in place of the original while it is shown. */
-    localFile?: string
-  }
+  [SCREENS.FULL_SCREEN_IMAGE]: FullScreenParams
   [SCREENS.COMPARE]: {
     /** Ties the palette button here to the post's colour version. */
     cid: string

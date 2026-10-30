@@ -1,4 +1,5 @@
 import { SCREENS } from './navigation.types'
+import type { FullScreenParams } from '../../core/services/photoPost'
 
 export type StackParamList = {
   [SCREENS.BOTTOM_TAB_NAVIGATOR]: undefined
@@ -6,13 +7,6 @@ export type StackParamList = {
   [SCREENS.PHOTO_HISTORY]: undefined
   [SCREENS.NEWS]: undefined
   [SCREENS.SETTINGS_MENU]: undefined
-  [SCREENS.FULL_SCREEN_IMAGE]: {
-    uri: string
-    title: string
-    cid: string
-    file: string
-    /** The colour version's local file, saved as is instead of downloading the photo. */
-    localFile?: string
-  }
+  [SCREENS.FULL_SCREEN_IMAGE]: FullScreenParams
   [SCREENS.PROFILE]: { login: string }
 } & Record<SCREENS, object | undefined>

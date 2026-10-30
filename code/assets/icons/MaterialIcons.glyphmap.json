@@ -3,7 +3,6 @@
   "article": 61250,
   "close": 58829,
   "compare": 58297,
-  "error-outline": 57345,
   "favorite": 59517,
   "favorite-border": 59518,
   "history": 59529,
@@ -19,5 +18,6 @@
   "search": 59574,
   "settings": 59576,
   "share": 59405,
+  "translate": 59618,
   "view-agenda": 59625
 }

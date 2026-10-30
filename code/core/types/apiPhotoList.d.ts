@@ -39,8 +39,6 @@ type getPhotoListProps = {
 type getClustersPhotosProps = {
   /** Closed rings of [longitude, latitude], one request each. */
   polygons: [number, number][][]
-  latitude: number
-  longitude: number
   yearStart: number
   yearEnd: number
   zoom: number

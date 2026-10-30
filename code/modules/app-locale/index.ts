@@ -16,6 +16,22 @@ type AppLocaleModule = {
    * override right after switching back to "system" and would keep the old language on screen.
    */
   getSystemLocale(): string | null
+
+  /**
+   * Guesses the language of each text on the device itself; nothing leaves the device. Resolves,
+   * per text and in the same order, the ISO 639-1 base code of its most likely language (`'ru'`,
+   * `'en'`, `'zh'`), or `null` when the text is empty, the top guess is below 0.6 confidence, or
+   * the OS offers no detection (Android before 10).
+   *
+   * `appLanguage` is the language the app runs in. iOS leans towards it on short texts that read as
+   * either of two related languages, such as a Russian place name that could pass for Ukrainian.
+   * Belarusian, Serbian Cyrillic, Estonian, Latvian and Lithuanian, which iOS has no model for, it
+   * tells by their own letters. Android's classifier knows them all and takes no hint.
+   *
+   * Optional because a binary built before this method existed lacks it; callers treat a missing
+   * method like an unknown language.
+   */
+  detectLanguages?(texts: string[], appLanguage: string): Promise<(string | null)[]>
 }
 
 export default requireNativeModule<AppLocaleModule>('AppLocale')

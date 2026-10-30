@@ -26,9 +26,19 @@ export const de = {
   },
   map: {
     searchPlaceholder: 'Suchen…',
+    yandexHiddenTitle: 'Die Karte ist während der Übersetzung ausgeblendet',
+    yandexHiddenText:
+      'Die Bedingungen von Google erlauben keine Übersetzungen von Google neben dem Logo von Yandex Maps, und die Bedingungen von Yandex verbieten, dieses Logo auszublenden. Solange eine Übersetzung angezeigt wird, ist die Karte daher ausgeblendet. Sie erscheint wieder, wenn Sie das Original anzeigen oder das Foto schließen. In den Einstellungen können Sie auch eine andere Karte wählen.',
+    streetViewHiddenTitle: 'Die Karte ist während des Vergleichs ausgeblendet',
+    streetViewHiddenText:
+      'Die Bedingungen von Google erlauben keine Street-View-Panoramen neben einer anderen Karte. Die Karte erscheint wieder, wenn Sie den Vergleich schließen.',
     markersError: 'Kartenmarkierungen konnten nicht geladen werden',
-    searchLimit:
-      'Das gemeinsame Suchlimit ist erreicht. Versuchen Sie es in ein paar Minuten oder morgen erneut 🪫',
+    searchEmpty: 'Nichts gefunden',
+    searchBusy:
+      'Die Suche ist gerade überlastet. Versuchen Sie es in einer Minute erneut',
+    searchDayLimit:
+      'Das tägliche Suchlimit ist erreicht. Versuchen Sie es morgen erneut',
+    searchError: 'Suche fehlgeschlagen. Prüfen Sie die Verbindung',
     nearbyButton: 'Fotos in der Nähe der Kartenmitte',
     nearbyEmpty: 'Keine Fotos in der Nähe aus den gewählten Jahren',
     nearbyError: 'Fotos in der Nähe konnten nicht geladen werden',
@@ -68,6 +78,16 @@ export const de = {
     processing: 'Wird koloriert…',
     processingHint: 'Das kann bis zu %{seconds} Sekunden dauern',
     error: 'Das Foto konnte nicht koloriert werden. Bitte versuchen Sie es erneut',
+  },
+  translate: {
+    show: 'Mit Google übersetzen',
+    hide: 'Original anzeigen',
+    loading: 'Wird übersetzt…',
+    failed: 'Übersetzung fehlgeschlagen',
+    retry: 'Erneut versuchen',
+    button: 'Mit Google übersetzen',
+    error: 'Die Übersetzung ist fehlgeschlagen. Bitte versuchen Sie es erneut',
+    dayLimit: 'Das Übersetzungslimit für heute ist erreicht. Versuchen Sie es morgen erneut',
   },
   colorizeModel: {
     title: 'Schwarzweißfotos kolorieren',
@@ -154,6 +174,9 @@ export const de = {
     languageHint: 'Sprache der App-Oberfläche.',
     aiWatermark: 'Wasserzeichen „AI“',
     aiWatermarkHint: 'Kolorierte Fotos in der Ecke mit „AI COLORIZATION“ kennzeichnen, auch die gespeicherten?',
+    translation: 'Übersetzung',
+    translationHint:
+      'Die Schaltflächen „Mit Google übersetzen“ bei Fotos und Kommentaren in anderen Sprachen anzeigen?',
   },
   options: {
     themeDark: 'Dunkel',
@@ -182,6 +205,9 @@ export const de = {
     github: 'Quellcode der App auf GitHub',
     privacyPolicy: 'Datenschutzerklärung',
     yandexTerms: 'Nutzungsbedingungen von Yandex Maps',
+    translationTitle: 'Übersetzung',
+    translationText:
+      'Kommentare und Fotobeschreibungen übersetzt Google Übersetzer. Maschinelle Übersetzungen können Fehler enthalten. Hinweis von Google:',
     creditsTitle: 'Danksagungen',
     creditsText:
       'Fotos und ihre Angaben stammen aus der offenen PastVu-API. Die Ortssuche läuft über LocationIQ. Karten werden mit Google Maps Platform auf Android und Apple Maps auf iOS dargestellt, wahlweise mit Yandex Maps. Die Panoramen von heute liefert Google Street View. Schwarzweißfotos koloriert das neuronale Netz DDColor (Kang et al., ICCV 2023, Apache-2.0-Lizenz) direkt auf dem Gerät.',

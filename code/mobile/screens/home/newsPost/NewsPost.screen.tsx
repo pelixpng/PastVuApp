@@ -6,7 +6,7 @@ import RenderHTML from 'react-native-render-html'
 import { useCallback, useLayoutEffect } from 'react'
 import { HeaderIconButton } from '../../../../core/components/ui/buttons/HeaderIconButton'
 import NewsPostVM from './NewsPost.vm'
-import { Comment } from '../photoDetail/components/comment/Comment'
+import { Comment } from '../../../../core/components/comment/Comment'
 import { Container } from '../../../../core/components/ui/Container'
 import { Spacer } from '../../../../core/components/ui/Spacer'
 import { useVM } from '../../../../core/hooks/useVM'
@@ -34,7 +34,12 @@ export const NewsPostScreen = observer(() => {
 
   const renderItem = useCallback(
     ({ item }: { item: IComment }) => (
-      <Comment comment={item} users={vm.users} onLinkPress={vm.openPhotoFromLink} />
+      <Comment
+        comment={item}
+        users={vm.users}
+        onLinkPress={vm.openPhotoFromLink}
+        replyWidth="88%"
+      />
     ),
     [vm.users, vm.openPhotoFromLink],
   )

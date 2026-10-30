@@ -34,7 +34,7 @@ export interface UserGalleryPhoto {
   file: string
   title: string
   year?: number
-  /** Region cids, from the country down. */
+  /** Region cids, the deepest first; 0 first for a photo without coordinates. */
   rs?: number[]
 }
 

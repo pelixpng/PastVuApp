@@ -1,4 +1,5 @@
 import { IComment, IComments } from '../types/apiPhotoComment'
+import { NewsPhoto } from '../types/apiNews'
 import {
   LocationItem,
   NearbyPhoto,
@@ -11,6 +12,7 @@ import { getColor } from '../utils/getColor'
 import { getAngle } from '../utils/getDirection'
 import { getMarkerName, getMarkerClusterName } from '../utils/getMarker'
 import { wrapLongitude } from '../utils/getMapData'
+import { RegionHash } from '../utils/getRegionPath'
 import { getApiKey } from '../../modules/app-keys'
 import {
   UserComment,
@@ -34,6 +36,41 @@ export class ApiError extends Error {
 }
 
 /**
+ * Why a place search failed: one of LocationIQ's rate limits (per second, per minute, per day),
+ * or anything else, from a network failure to a rejected key.
+ */
+export type PlaceSearchFailure = 'second' | 'minute' | 'day' | 'error'
+
+/** A place search that brought no answer; `status` is the HTTP status, when there was one. */
+export class PlaceSearchError extends Error {
+  constructor(
+    readonly kind: PlaceSearchFailure,
+    readonly status?: number,
+  ) {
+    super(`searchPlace failed: ${kind}${status ? ` (HTTP ${status})` : ''}`)
+  }
+}
+
+/**
+ * Which limit a 429 is for, from the `error` LocationIQ sends with it. An unreadable or unknown
+ * reason is taken for the per-second limit, the one the app runs into in practice.
+ */
+const rateLimit = (reason: unknown): PlaceSearchFailure => {
+  switch (reason) {
+    case 'Rate Limited Minute':
+      return 'minute'
+    case 'Rate Limited Day':
+      return 'day'
+    default:
+      return 'second'
+  }
+}
+
+/** A fetch given up through its AbortSignal, as opposed to one that failed. */
+export const isAbort = (error: unknown) =>
+  (error as { name?: unknown } | null)?.name === 'AbortError'
+
+/**
  * Calls a method of the PastVu HTTP API.
  *
  * News, the front-page feed, the region list and news comments used to go over a socket.io
@@ -55,6 +92,22 @@ const apiGet = async (method: string, params?: object) => {
 
 const text = (value: unknown): string | undefined =>
   typeof value === 'string' && value.trim() ? value.trim() : undefined
+
+/**
+ * A discussion's comment tree as one list: each comment followed by its replies, depth first, the
+ * order the comment list draws them in (indented by their `level`).
+ */
+const flattenComments = (comments: IComment[]): IComment[] => {
+  const flat: IComment[] = []
+  const walk = (list: IComment[]) => {
+    for (const comment of list) {
+      flat.push(comment)
+      if (comment.comments) walk(comment.comments)
+    }
+  }
+  walk(comments)
+  return flat
+}
 
 export default class ApiService {
   static async getPhotoList(params: getPhotoListProps) {
@@ -197,30 +250,54 @@ export default class ApiService {
   }
 
   static async getComments(cid: string) {
-    const response = await fetch(`${BASE_URL}?method=comment.giveForObj&params={"cid":${cid}}`)
-    const json = (await response.json()) as IComments
-    let convertComments: IComment[] = []
-    function getConvertComments(comments: IComment[]) {
-      for (let comment of comments) {
-        convertComments.push(comment)
-        comment.comments && getConvertComments(comment.comments)
-      }
-    }
-    getConvertComments(json.result.comments)
+    const result = (await apiGet('comment.giveForObj', {
+      cid: Number(cid),
+    })) as IComments['result']
     return {
-      users: json.result.users,
-      comments: convertComments,
+      users: result.users,
+      comments: flattenComments(result.comments),
     }
   }
 
-  static async searchPlace(query: string) {
-    const response = await fetch(
-      `${PLACE_API_URL}/autocomplete?key=${PLACE_API_KEY}&q=${query}&format=json&limit=5`,
-    )
-    if (!response.ok) {
-      throw new Error(response.status.toString())
+  /**
+   * Places matching `query` as typed so far, up to 8, named in `lang` where LocationIQ has that
+   * language. Nothing found is an empty list rather than an error: LocationIQ answers it with 404
+   * "Unable to geocode". Throws PlaceSearchError for a refusal, a network failure or an answer
+   * that is not a list, and rethrows the fetch's own AbortError untouched when `signal` aborts it.
+   */
+  static async searchPlace(
+    query: string,
+    lang: string,
+    signal?: AbortSignal,
+  ): Promise<LocationItem[]> {
+    const params = new URLSearchParams({
+      key: PLACE_API_KEY,
+      q: query,
+      limit: '8',
+      dedupe: '1',
+      'accept-language': lang,
+      format: 'json',
+    })
+    let response: Response
+    try {
+      response = await fetch(`${PLACE_API_URL}/autocomplete?${params}`, { signal })
+    } catch (error) {
+      if (isAbort(error)) throw error
+      throw new PlaceSearchError('error')
     }
-    return (await response.json()) as LocationItem[]
+    if (response.status === 404) return []
+    if (response.status === 429) {
+      // Which limit was hit decides whether waiting a moment helps.
+      const body = await response.json().catch(() => null)
+      throw new PlaceSearchError(rateLimit(body?.error), 429)
+    }
+    if (response.status === 401 || response.status === 403) {
+      console.warn(`LocationIQ rejected the place search key (HTTP ${response.status})`)
+    }
+    if (!response.ok) throw new PlaceSearchError('error', response.status)
+    const places = await response.json().catch(() => null)
+    if (!Array.isArray(places)) throw new PlaceSearchError('error', response.status)
+    return places as LocationItem[]
   }
 
   static async getNews() {
@@ -230,23 +307,16 @@ export default class ApiService {
 
   static async getNewsComments(cid: number) {
     const result = await apiGet('comment.giveForObj', { cid, type: 'news' })
-    let convertComments: IComment[] = []
-    function getConvertComments(comments: IComment[]) {
-      for (let comment of comments) {
-        convertComments.push(comment)
-        comment.comments && getConvertComments(comment.comments)
-      }
-    }
-    getConvertComments(result.comments)
     return {
       users: result.users,
-      comments: convertComments,
+      comments: flattenComments(result.comments),
     }
   }
 
-  static async getRecentPhotos() {
+  /** The site's latest photos, with the names of their regions (absent when there are none). */
+  static async getRecentPhotos(): Promise<{ photos: NewsPhoto[]; rhash: RegionHash }> {
     const result = await apiGet('photo.givePublicIndex')
-    return result.photos
+    return { photos: result.photos ?? [], rhash: result.rhash ?? {} }
   }
 
   /**
@@ -277,12 +347,16 @@ export default class ApiService {
     }
   }
 
-  /** One page of the photos a user uploaded, newest first, with the total for paging. */
+  /**
+   * One page of the photos a user uploaded, newest first, with the total for paging and the names
+   * of the page's regions (absent from an empty page).
+   */
   static async getUserPhotos(login: string, skip: number, limit: number) {
     const result = await apiGet('photo.giveUserGallery', { login, skip, limit })
     return {
       total: Number(result.count) || 0,
       photos: (result.photos ?? []) as UserGalleryPhoto[],
+      rhash: (result.rhash ?? {}) as RegionHash,
     }
   }
 
@@ -299,14 +373,5 @@ export default class ApiService {
       comments: (result.comments ?? []) as UserComment[],
       objects: (result.objs ?? {}) as Record<string, UserCommentObject>,
     }
-  }
-
-  static async getRegions(): Promise<Map<number, any>> {
-    const result = await apiGet('region.giveListPublic')
-    const regionsMap = new Map<number, any>()
-    result.regions.forEach((region: any) => {
-      regionsMap.set(region.cid, region)
-    })
-    return regionsMap
   }
 }

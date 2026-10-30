@@ -121,8 +121,8 @@ export const NearbyPhotos: FC<NearbyPhotosProps> = observer(
 const s = StyleSheet.create({
   // More than the 12 above the title: the thumbnails end on a hard edge, text on its leading.
   container: { marginBottom: 16 },
-  // commentHeaderText from the phone and tablet postInfo/style.ts, so the two sections read as
-  // equals; change them together.
+  // commentHeaderText from core/components/post/PostText.tsx, so the two sections read as equals;
+  // change them together.
   title: { fontSize: 17, fontWeight: '800', lineHeight: 28 },
   thumbnail: { borderRadius: 14 },
   placeholderRow: { flexDirection: 'row', gap: GAP, overflow: 'hidden' },

@@ -10,13 +10,7 @@ import { useVM } from '../../../../core/hooks/useVM'
 import { SegmentedControl } from '../../../../core/components/ui/segmentedControl/SegmentedControl'
 import { ConfirmationSheet } from '../../../../core/components/ui/confirmationSheet/ConfirmationSheet'
 import { t } from '../../../../core/i18n'
-
-export interface CollectionItem {
-  title: string
-  description: string
-  cid: string
-  file: string
-}
+import type { CollectionItem } from '../../../../core/services/photoPost'
 
 const Separator = () => <Spacer height={16} />
 

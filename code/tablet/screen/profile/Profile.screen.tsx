@@ -5,6 +5,7 @@ import { observer } from 'mobx-react-lite'
 import { useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { HeaderIconButton } from '../../../core/components/ui/buttons/HeaderIconButton'
 import { ColorizeButtons } from '../../../core/components/colorize/ColorizeButtons'
+import { TranslateButton } from '../../../core/components/translate/TranslateButton'
 import { Spacer } from '../../../core/components/ui/Spacer'
 import { SegmentedControl } from '../../../core/components/ui/segmentedControl/SegmentedControl'
 import { FilterChips } from '../../../core/components/ui/FilterChips'
@@ -25,7 +26,7 @@ import { useTabsAnchor } from '../../../core/hooks/useTabsAnchor'
 import { t } from '../../../core/i18n'
 import { refreshWindowRegion } from '../../../modules/window-region'
 import { ItemHistory } from '../collection/components/itemHistory/Item'
-import { Comment } from '../map/components/comment/Comment'
+import { Comment } from '../../../core/components/comment/Comment'
 import { PhotoDetail } from '../collection/components/photoDetail/PhotoDetail'
 import { NewsDetail } from '../news/components/newsDetail/NewsDetail'
 import ProfileVM from './Profile.vm'
@@ -47,28 +48,35 @@ export const ProfileScreen = observer(() => {
   const { bottom } = useSafeAreaInsets()
   const { colors } = useTheme()
   const vm = useVM(ProfileVM)
+  const { panel } = vm
   const threadColor = useThreadColor()
   // Switching photos and comments must not throw a scrolled list back up to the header.
   const tabs = useTabsAnchor<ProfileRow>(CONTENT_TOP)
 
   useLayoutEffect(() => {
+    // Captured so the header closure keeps the post TypeScript has narrowed to non-null.
+    const post = panel.postInfo
     navigation.setOptions({
-      headerRight: vm.postInfo
+      headerRight: post
         ? () => (
             <View style={s.header}>
+              {/* Translation only over the post itself: then-and-now does not show its text. */}
+              {!panel.compareMode && (
+                <TranslateButton cid={post.cid} title={post.title} desc={post.desc} />
+              )}
               {/* Palette and the comparison with the original; the latter not over the then-and-now view. */}
-              <ColorizeButtons colorize={vm.colorize} showCompareOriginal={!vm.compareMode} />
-              <HeaderIconButton name="compare" color={colors.textFirst} onPress={vm.openCompare} />
+              <ColorizeButtons colorize={panel.colorize} showCompareOriginal={!panel.compareMode} />
+              <HeaderIconButton name="compare" color={colors.textFirst} onPress={panel.openCompare} />
               <Spacer width={4} />
               <HeaderIconButton
-                name={vm.isFavorite ? 'favorite' : 'favorite-border'}
+                name={panel.isFavorite ? 'favorite' : 'favorite-border'}
                 color={colors.textFirst}
                 onPress={vm.toggleFavorite}
               />
               <Spacer width={4} />
-              <HeaderIconButton name="save-alt" color={colors.textFirst} onPress={vm.saveImage} />
+              <HeaderIconButton name="save-alt" color={colors.textFirst} onPress={panel.saveImage} />
               <Spacer width={4} />
-              <HeaderIconButton name="share" color={colors.textFirst} onPress={vm.share} />
+              <HeaderIconButton name="share" color={colors.textFirst} onPress={panel.share} />
             </View>
           )
         : vm.showsNews
@@ -79,7 +87,7 @@ export const ProfileScreen = observer(() => {
             )
           : undefined,
     })
-  }, [vm.postInfo, vm.showsNews, vm.isFavorite, vm.compareMode, colors.textFirst, navigation, vm])
+  }, [panel.postInfo, vm.showsNews, panel.isFavorite, panel.compareMode, colors.textFirst, navigation, vm, panel])
 
   const renderItem = useCallback(
     ({ item }: { item: ProfileRow }) => {
@@ -102,7 +110,7 @@ export const ProfileScreen = observer(() => {
       }
       const selected =
         item.kind === 'photo'
-          ? vm.selectedItem === item.cid
+          ? vm.panel.cid === item.cid
           : vm.showsNews && vm.selectedNewsCid === item.cid
       return (
         <View>
@@ -141,7 +149,7 @@ export const ProfileScreen = observer(() => {
             scrollEventThrottle={16}
             data={vm.activeRows}
             // Rows read the selection inside renderItem, which the list does not track.
-            extraData={`${vm.profileTab}:${vm.commentTarget}:${vm.selectedItem}:${vm.selectedNewsCid}`}
+            extraData={`${vm.profileTab}:${vm.commentTarget}:${panel.cid}:${vm.selectedNewsCid}`}
             keyExtractor={keyExtractor}
             renderItem={renderItem}
             ListHeaderComponent={
@@ -203,25 +211,7 @@ export const ProfileScreen = observer(() => {
           onLinkPress={vm.openPanelLink}
         />
       ) : (
-        <PhotoDetail
-          postInfo={vm.postInfo}
-          users={vm.users}
-          comments={vm.comments}
-          onImageLoaded={vm.onImageLoad}
-          imageLink={vm.imageLink}
-          isImageLoaded={vm.isImageLoaded}
-          showLoader={vm.showLoader}
-          photoSelected={vm.selectedItem !== null}
-          openFullScreen={vm.openFullScreenImage}
-          colorize={vm.colorize}
-          onLinkPress={vm.openPanelLink}
-          onOpenPhoto={vm.openPhoto}
-          compareMode={vm.compareMode}
-          closeCompare={vm.closeCompare}
-          hasStreetView={vm.hasStreetView}
-          streetView={vm.streetView}
-          comparePhoto={vm.comparePhoto}
-        />
+        <PhotoDetail panel={panel} onLinkPress={vm.openPanelLink} onOpenPhoto={vm.openPhoto} />
       )}
     </View>
   )

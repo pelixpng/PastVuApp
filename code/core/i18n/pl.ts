@@ -26,9 +26,18 @@ export const pl = {
   },
   map: {
     searchPlaceholder: 'Szukaj…',
+    yandexHiddenTitle: 'Mapa jest ukryta na czas tłumaczenia',
+    yandexHiddenText:
+      'Zasady Google nie pozwalają pokazywać jego tłumaczeń obok logo Map Yandex, a zasady Yandex — ukrywać tego logo. Dlatego, dopóki na ekranie jest tłumaczenie, mapa jest ukryta. Wróci, gdy pokażesz oryginał lub zamkniesz zdjęcie. Możesz też wybrać inną mapę w ustawieniach.',
+    streetViewHiddenTitle: 'Mapa jest ukryta na czas porównania',
+    streetViewHiddenText:
+      'Zasady Google nie pozwalają pokazywać panoram Street View obok innej mapy. Mapa wróci, gdy zamkniesz porównanie.',
     markersError: 'Nie udało się wczytać znaczników na mapie',
-    searchLimit:
-      'Wspólny limit wyszukiwania został wyczerpany. Spróbuj za kilka minut albo jutro 🪫',
+    searchEmpty: 'Nic nie znaleziono',
+    searchBusy: 'Wyszukiwarka jest teraz przeciążona. Spróbuj za minutę',
+    searchDayLimit:
+      'Dzienny limit wyszukiwania został wyczerpany. Spróbuj jutro',
+    searchError: 'Wyszukiwanie nie powiodło się. Sprawdź połączenie',
     nearbyButton: 'Zdjęcia w pobliżu środka mapy',
     nearbyEmpty: 'Brak zdjęć w pobliżu z wybranych lat',
     nearbyError: 'Nie udało się wczytać zdjęć w pobliżu',
@@ -69,6 +78,16 @@ export const pl = {
     processing: 'Kolorowanie…',
     processingHint: 'To może potrwać do %{seconds} sekund',
     error: 'Nie udało się pokolorować zdjęcia. Spróbuj ponownie',
+  },
+  translate: {
+    show: 'Przetłumacz za pomocą Google',
+    hide: 'Pokaż oryginał',
+    loading: 'Tłumaczenie…',
+    failed: 'Nie udało się przetłumaczyć',
+    retry: 'Spróbuj ponownie',
+    button: 'Przetłumacz za pomocą Google',
+    error: 'Nie udało się przetłumaczyć. Spróbuj ponownie',
+    dayLimit: 'Dzisiejszy limit tłumaczeń został wyczerpany. Spróbuj jutro',
   },
   colorizeModel: {
     title: 'Kolorowanie zdjęć cz.-b.',
@@ -155,6 +174,9 @@ export const pl = {
     languageHint: 'Język interfejsu aplikacji.',
     aiWatermark: 'Znak wodny AI',
     aiWatermarkHint: 'Dodawać oznaczenie „AI COLORIZATION” w rogu pokolorowanych zdjęć, także tych zapisanych w galerii?',
+    translation: 'Tłumaczenie',
+    translationHint:
+      'Pokazywać przyciski „Przetłumacz za pomocą Google” przy zdjęciach i komentarzach w innych językach?',
   },
   options: {
     themeDark: 'Ciemny',
@@ -183,6 +205,9 @@ export const pl = {
     github: 'Kod aplikacji na GitHubie',
     privacyPolicy: 'Polityka prywatności',
     yandexTerms: 'Warunki korzystania z Yandex Maps',
+    translationTitle: 'Tłumaczenie',
+    translationText:
+      'Komentarze i opisy zdjęć tłumaczy Tłumacz Google. Tłumaczenie maszynowe może zawierać błędy. Informacja od Google:',
     creditsTitle: 'Podziękowania',
     creditsText:
       'Zdjęcia i ich opisy pochodzą z otwartego API PastVu. Wyszukiwanie miejsc obsługuje LocationIQ. Mapy są wyświetlane przez Google Maps Platform na Androidzie i Apple Maps na iOS, opcjonalnie przez Yandex Maps. Panoramy „dziś” dostarcza Google Street View. Czarno-białe zdjęcia koloruje bezpośrednio na urządzeniu sieć neuronowa DDColor (Kang i in., ICCV 2023, licencja Apache 2.0).',

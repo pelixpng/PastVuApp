@@ -7,6 +7,7 @@ import { t } from '../../../core/i18n'
 import { SegmentedControlOption } from '../../../core/components/ui/segmentedControl/SegmentedControl'
 import { FilterChip } from '../../../core/components/ui/FilterChips'
 import { NewsItems } from '../../../core/types/apiNews'
+import { findNews } from '../../../core/services/news'
 import { IComment, Users } from '../../../core/types/apiPhotoComment'
 import { formatNumber } from '../../../core/utils/formatNumber'
 import {
@@ -44,7 +45,6 @@ class ProfileVM extends CollectionVM<SCREENS.PROFILE> {
   @observable.ref newsPostComments: IComment[] = []
   @observable.ref newsPostUsers: Users | null = null
   private login = ''
-  private newsFeed: NewsItems[] | null = null
   readonly userPhotos = new PagedList<ProfilePhotoRow>(page => fetchPhotosPage(this.login, page))
   readonly photoComments = new PagedList<UserCommentItem>(page =>
     fetchCommentsPage(this.login, page, 'photo', this.setCommentCounts),
@@ -56,8 +56,7 @@ class ProfileVM extends CollectionVM<SCREENS.PROFILE> {
   constructor() {
     super()
     makeObservable(this)
-    // Opening a photo records it in the history through the inherited list. It has to hold the
-    // saved history first, or the first photo opened here would replace the whole history.
+    // The inherited lists start from the saved history and favourites, as in the collection.
     this.getPhotos()
     autorun(() => {
       const login = this.screenParams?.login
@@ -113,8 +112,12 @@ class ProfileVM extends CollectionVM<SCREENS.PROFILE> {
       : groupComments(this.commentList.items, this.login)
   }
 
-  /** The author of every comment in the tab, for their avatar next to each one. */
-  @computed
+  /**
+   * The author of every comment in the tab, for their avatar next to each one. Kept alive: the
+   * rows read it outside any reaction, where it would be worked out anew on every read, and a new
+   * object draws every comment on screen again.
+   */
+  @computed({ keepAlive: true })
   get commentUsers(): Users | null {
     return this.profileState.status === 'ready' ? commentAuthor(this.profileState.profile) : null
   }
@@ -122,25 +125,31 @@ class ProfileVM extends CollectionVM<SCREENS.PROFILE> {
   /** The right panel shows a news post only while no photo is open there. */
   @computed
   get showsNews(): boolean {
-    return this.selectedNews !== null && this.selectedItem === null
+    return this.selectedNews !== null && this.panel.cid === null
   }
 
   @action.bound
   setCommentCounts(counts: CommentCounts) {
+    // Every page brings them; the same totals again would only redraw the list.
+    const current = this.commentCounts
+    if (current?.photo === counts.photo && current.news === counts.news) return
     this.commentCounts = counts
   }
 
   @action.bound
   async loadProfile() {
     this.profileState = { status: 'loading' }
+    // The first page needs only the login, so it goes out with the profile rather than after it;
+    // the list stays hidden until the profile is in.
+    const list = this.profileTab === 'photos' ? this.userPhotos : this.commentList
+    if (list.items.length === 0) list.loadMore()
     const state = await loadProfileState(this.login)
     runInAction(() => {
       this.profileState = state
     })
-    if (state.status === 'ready') this.activeList.loadMore()
   }
 
-  /** Named apart from `share`, which shares the open photo. */
+  /** Named apart from the panel's `share`, which shares the open photo. */
   @action.bound
   shareProfile() {
     const name = this.profileState.status === 'ready' ? this.profileState.profile.disp : undefined
@@ -185,17 +194,10 @@ class ProfileVM extends CollectionVM<SCREENS.PROFILE> {
   @action.bound
   async showNews(cid: string) {
     // The photo steps aside completely, so the next one opened starts from a clean panel.
-    this.selectedItem = null
-    this.postInfo = null
-    this.compareMode = null
-    this.comments = []
-    this.users = null
-    this.streetView = null
-    this.isImageLoaded = false
+    this.panel.close()
     this.selectedNewsCid = cid
     try {
-      if (!this.newsFeed) this.newsFeed = await ApiService.getNews()
-      const post = this.newsFeed?.find(news => String(news.cid) === cid)
+      const post = await findNews(Number(cid))
       if (!post) {
         Linking.openURL(`https://pastvu.com/news/${cid}`)
         return

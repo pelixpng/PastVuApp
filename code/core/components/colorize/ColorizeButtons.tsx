@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { ActivityIndicator, StyleSheet, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { observer } from 'mobx-react-lite'
 import { useTheme } from '@react-navigation/native'
 import Animated, { Easing, ZoomIn, ZoomOut } from 'react-native-reanimated'
@@ -20,7 +20,7 @@ type Props = {
  * The tablet's colour buttons for a header row of 44 pt buttons 4 pt apart, each followed by that
  * gap. Once coloured, the button stacking the colour version above the original grows in on the
  * left. The palette, only on black-and-white photos, colours the photo or goes back to the
- * original, with a spinner in its place meanwhile.
+ * original; it is greyed out while colouring, as the photo itself shows the progress.
  */
 export const ColorizeButtons: FC<Props> = observer(({ colorize, showCompareOriginal = true }) => {
   const { colors } = useTheme()
@@ -39,8 +39,13 @@ export const ColorizeButtons: FC<Props> = observer(({ colorize, showCompareOrigi
         </Animated.View>
       )}
       {colorize.isColorizing ? (
-        <View style={[s.spinner, s.gap]}>
-          <ActivityIndicator color={colors.textFirst} />
+        <View style={s.gap}>
+          <HeaderIconButton
+            name="palette"
+            color={colors.textThird}
+            disabled
+            accessibilityLabel={t('colorize.processing')}
+          />
         </View>
       ) : colorize.canColorize ? (
         <View style={s.gap}>
@@ -58,6 +63,4 @@ export const ColorizeButtons: FC<Props> = observer(({ colorize, showCompareOrigi
 
 const s = StyleSheet.create({
   gap: { marginRight: 4 },
-  // The 44 pt box of a header button, so the row does not shift while the photo is being coloured.
-  spinner: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center' },
 })

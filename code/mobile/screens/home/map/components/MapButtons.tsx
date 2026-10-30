@@ -94,7 +94,7 @@ export const MapButtons: FC<MapButtonsProps> = observer(
 					/>
 				</TouchableOpacity>
 				<Spacer height={GAP} />
-				<LocationButton onPress={onLocate} inline />
+				<LocationButton onPress={onLocate} />
 			</Animated.View>
 		)
 	}

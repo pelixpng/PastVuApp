@@ -26,9 +26,17 @@ export const lv = {
   },
   map: {
     searchPlaceholder: 'Meklēt…',
+    yandexHiddenTitle: 'Karte ir paslēpta tulkojuma laikā',
+    yandexHiddenText:
+      'Google noteikumi neļauj rādīt tā tulkojumus blakus Yandex Kartes logotipam, bet Yandex noteikumi aizliedz šo logotipu paslēpt. Tāpēc, kamēr ekrānā ir tulkojums, karte ir paslēpta. Tā atgriezīsies, kad parādīsiet oriģinālu vai aizvērsiet fotoattēlu. Iestatījumos var izvēlēties arī citu karti.',
+    streetViewHiddenTitle: 'Karte ir paslēpta salīdzināšanas laikā',
+    streetViewHiddenText:
+      'Google noteikumi neļauj rādīt Street View panorāmas blakus citai kartei. Karte atgriezīsies, kad aizvērsiet salīdzinājumu.',
     markersError: 'Neizdevās ielādēt kartes atzīmes',
-    searchLimit:
-      'Kopējais meklēšanas limits ir izsmelts. Mēģiniet pēc dažām minūtēm vai rīt 🪫',
+    searchEmpty: 'Nekas netika atrasts',
+    searchBusy: 'Meklēšana pašlaik ir pārslogota. Mēģiniet pēc minūtes',
+    searchDayLimit: 'Dienas meklēšanas limits ir izsmelts. Mēģiniet rīt',
+    searchError: 'Meklēšana neizdevās. Pārbaudiet savienojumu',
     nearbyButton: 'Fotogrāfijas kartes centra tuvumā',
     nearbyEmpty: 'Tuvumā nav fotogrāfiju no izvēlētajiem gadiem',
     nearbyError: 'Neizdevās ielādēt fotogrāfijas tuvumā',
@@ -69,6 +77,16 @@ export const lv = {
     processing: 'Krāsojam…',
     processingHint: 'Tas var aizņemt līdz %{seconds} sekundēm',
     error: 'Neizdevās iekrāsot fotoattēlu. Mēģiniet vēlreiz',
+  },
+  translate: {
+    show: 'Tulkot ar Google',
+    hide: 'Rādīt oriģinālu',
+    loading: 'Tulkojam…',
+    failed: 'Tulkošana neizdevās',
+    retry: 'Mēģināt vēlreiz',
+    button: 'Tulkot ar Google',
+    error: 'Tulkošana neizdevās. Mēģiniet vēlreiz',
+    dayLimit: 'Šodienas tulkojumu limits ir izsmelts. Mēģiniet rīt',
   },
   colorizeModel: {
     title: 'Melnbalto fotoattēlu krāsošana',
@@ -155,6 +173,9 @@ export const lv = {
     languageHint: 'Lietotnes saskarnes valoda.',
     aiWatermark: 'Ūdenszīme „AI“',
     aiWatermarkHint: 'Pievienot atzīmi „AI COLORIZATION“ krāsoto fotoattēlu stūrī, arī galerijā saglabātajos?',
+    translation: 'Tulkošana',
+    translationHint:
+      'Rādīt pogas “Tulkot ar Google” pie fotoattēliem un komentāriem citās valodās?',
   },
   options: {
     themeDark: 'Tumšs',
@@ -183,6 +204,9 @@ export const lv = {
     github: 'Lietotnes kods GitHub',
     privacyPolicy: 'Privātuma politika',
     yandexTerms: 'Yandex Maps lietošanas noteikumi',
+    translationTitle: 'Tulkošana',
+    translationText:
+      'Komentārus un fotoattēlu aprakstus tulko Google tulkotājs. Mašīntulkojumā var būt kļūdas. Google paziņojums:',
     creditsTitle: 'Pateicības',
     creditsText:
       'Fotogrāfijas un to dati nāk no atvērtā PastVu API. Vietu meklēšanu nodrošina LocationIQ. Kartes attēlo Google Maps Platform sistēmā Android un Apple Maps sistēmā iOS, pēc izvēles Yandex Maps. Mūsdienu panorāmas sniedz Google Street View. Melnbaltos fotoattēlus tieši ierīcē krāso neironu tīkls DDColor (Kang u. c., ICCV 2023, Apache 2.0 licence).',

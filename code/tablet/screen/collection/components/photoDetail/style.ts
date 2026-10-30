@@ -17,8 +17,6 @@ export const s = StyleSheet.create({
     height: 44,
     alignItems: 'center',
   },
-  iconContainer: { flexDirection: 'row' },
-  postInfoContainer: { paddingHorizontal: 16 },
   loaderContainer: {
     width: '110%',
     height: '100%',

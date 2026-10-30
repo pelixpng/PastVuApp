@@ -5,7 +5,6 @@ import { t } from '../i18n'
 import { IComment, Users } from '../types/apiPhotoComment'
 import { UserProfile } from '../types/apiUserProfile'
 import { getRegionPath } from '../utils/getRegionPath'
-import { loadRegions } from './regions'
 
 /**
  * What the phone and tablet profile screens share: loading the profile and serving the user's
@@ -93,18 +92,15 @@ export const fetchPhotosPage = async (
   page: number,
 ): Promise<Page<ProfilePhotoRow>> => {
   const skip = page * PHOTOS_PER_PAGE
-  const [{ total, photos }, regions] = await Promise.all([
-    ApiService.getUserPhotos(login, skip, PHOTOS_PER_PAGE),
-    // Without region names the rows still work, with the year alone.
-    loadRegions().catch(() => new Map<number, any>()),
-  ])
+  // The page brings the names of its own regions.
+  const { total, photos, rhash } = await ApiService.getUserPhotos(login, skip, PHOTOS_PER_PAGE)
   return {
     items: photos.map(photo => ({
       kind: 'photo' as const,
       key: String(photo.cid),
       cid: String(photo.cid),
       title: photo.title,
-      description: [photo.year, getRegionPath(photo.rs ?? [], regions)]
+      description: [photo.year, getRegionPath(photo.rs, rhash)]
         .filter(Boolean)
         .join(', '),
       file: photo.file,
@@ -156,6 +152,30 @@ export const fetchCommentsPage = async (
 }
 
 /**
+ * Each loaded comment in the shape the comment component takes, made once per item: the rows are
+ * grouped anew with every page, and a new object each time redrew every comment on screen. A paged
+ * list keeps the items it already has, so the item is a lasting key.
+ */
+const shownComments = new WeakMap<UserCommentItem, IComment>()
+
+const shownComment = (item: UserCommentItem, login: string): IComment => {
+  let comment = shownComments.get(item)
+  if (!comment) {
+    comment = {
+      cid: item.comment.cid,
+      user: login,
+      txt: item.comment.txt,
+      stamp: item.comment.stamp,
+      s: 5,
+      type: 0,
+      level: 0,
+    }
+    shownComments.set(item, comment)
+  }
+  return comment
+}
+
+/**
  * The comments as the tab shows them: each photo or post once, followed by the user's comments
  * under it. Consecutive comments on the same one share its row; the list stays in time order, so
  * something the user came back to later appears again further down.
@@ -195,15 +215,7 @@ export const groupComments = (items: UserCommentItem[], login: string): ProfileR
     previous = {
       kind: 'comment',
       key: `comment-${item.comment.cid}`,
-      comment: {
-        cid: item.comment.cid,
-        user: login,
-        txt: item.comment.txt,
-        stamp: item.comment.stamp,
-        s: 5,
-        type: 0,
-        level: 0,
-      },
+      comment: shownComment(item, login),
       target: item.target,
       targetCid: item.object.cid,
       targetTitle: item.object.title,

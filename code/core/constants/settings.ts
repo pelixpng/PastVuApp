@@ -2,7 +2,7 @@ import { Platform } from 'react-native'
 import { OptionsRadioButton } from '../components/ui/buttons/radioButton/RadioButtons'
 import { t } from '../i18n'
 
-const showClusterOptions = (): OptionsRadioButton[] => [
+const yesNoOptions = (): OptionsRadioButton[] => [
 	{ label: t('common.yes'), value: 'yes' },
 	{ label: t('common.no'), value: 'no' }
 ]
@@ -57,7 +57,7 @@ const languageOptions = (): OptionsRadioButton[] => [
 export const SettingsOptions = {
 	languageOptions,
 	mapProviderOptions,
-	showClusterOptions,
+	yesNoOptions,
 	themeOptions,
 	photoQualityOptions,
 	mapTypeOptions,

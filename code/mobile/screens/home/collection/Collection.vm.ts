@@ -1,9 +1,9 @@
 import { action, computed, makeObservable, observable } from 'mobx'
 import { SCREENS } from '../../../navigation/navigation.types'
-import { CollectionItem } from './Collection.screen'
 import { BaseViewModelProvider } from '../../../provider/vm.provider'
 import { MMKVStorage } from '../../../../core/storage/mmkv'
 import { saveHistory } from '../../../../core/services/photoPost'
+import type { CollectionItem } from '../../../../core/services/photoPost'
 import { SegmentedControlOption } from '../../../../core/components/ui/segmentedControl/SegmentedControl'
 import { t } from '../../../../core/i18n'
 

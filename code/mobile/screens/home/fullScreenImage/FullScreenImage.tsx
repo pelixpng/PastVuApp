@@ -2,7 +2,7 @@ import { View, Image, Platform, Dimensions } from 'react-native'
 import { fitContainer, ResumableZoom, useImageResolution } from 'react-native-zoom-toolkit'
 import Animated, { SlideInUp, Easing, SlideOutUp } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useState } from 'react'
+import { ReactElement, useState } from 'react'
 import { HeaderIconButton } from '../../../../core/components/ui/buttons/HeaderIconButton'
 import { Spacer } from '../../../../core/components/ui/Spacer'
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native'
@@ -12,6 +12,19 @@ import { s } from './style'
 import { saveLocalImage, savePhoto, sharePhoto } from '../../../../core/utils/getPhoto'
 import { useSwipeToClose } from '../../../../core/hooks/useSwipeToClose'
 import { useLightStatusBar } from '../../../../core/hooks/useLightStatusBar'
+import type { Resolution } from '../../../../core/services/photoPost'
+
+/** Fallback for a photo opened without its size: measure it before laying it out. */
+const Measured = ({
+  uri,
+  children,
+}: {
+  uri: string
+  children: (resolution: Resolution) => ReactElement
+}) => {
+  const { isFetching, resolution } = useImageResolution({ uri })
+  return isFetching || resolution === undefined ? null : children(resolution)
+}
 
 export const FullScreenImage = () => {
   const { width, height } = Dimensions.get('screen')
@@ -20,9 +33,6 @@ export const FullScreenImage = () => {
   const { params } = useRoute<RouteProp<StackParamList, typeof SCREENS.FULL_SCREEN_IMAGE>>()
   const { top } = useSafeAreaInsets()
   const paddingTop = top + (Platform.OS === 'android' ? 15 : 10)
-  const { isFetching, resolution } = useImageResolution({
-    uri: params.uri,
-  })
 
   // The photo sits on black, so the status bar goes white whatever the theme.
   useLightStatusBar()
@@ -33,15 +43,27 @@ export const FullScreenImage = () => {
     navigation.goBack,
   )
 
-  if (isFetching || resolution === undefined) {
-    return <View />
+  const photo = (resolution: Resolution) => {
+    const containerFit = fitContainer(resolution.width / resolution.height, {
+      width,
+      height,
+    })
+    return (
+      <ResumableZoom
+        maxScale={5}
+        {...zoomCallbacks}
+        onTap={() => setVisibleHeader(!visibleHeader)}
+        style={{
+          alignSelf: 'baseline',
+          marginTop: height / 2 - containerFit.height / 2,
+        }}>
+        <Image source={{ uri: params?.uri }} style={containerFit} resizeMethod="scale" />
+      </ResumableZoom>
+    )
   }
 
-  const containerFit = fitContainer(resolution.width / resolution.height, {
-    width,
-    height,
-  })
-
+  // The background and the header show at once, even while the photo is measured or when that
+  // fails, so the tap that opened the screen is answered and back is always there.
   return (
     <View>
       <Animated.View style={[s.background, { width, height }, backgroundStyle]} />
@@ -71,16 +93,11 @@ export const FullScreenImage = () => {
             </View>
           </Animated.View>
         )}
-        <ResumableZoom
-          maxScale={5}
-          {...zoomCallbacks}
-          onTap={() => setVisibleHeader(!visibleHeader)}
-          style={{
-            alignSelf: 'baseline',
-            marginTop: height / 2 - containerFit.height / 2,
-          }}>
-          <Image source={{ uri: params?.uri }} style={containerFit} resizeMethod="scale" />
-        </ResumableZoom>
+        {params.resolution ? (
+          photo(params.resolution)
+        ) : (
+          <Measured uri={params.uri}>{photo}</Measured>
+        )}
       </Animated.View>
     </View>
   )

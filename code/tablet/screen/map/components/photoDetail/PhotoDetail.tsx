@@ -18,16 +18,17 @@ import { HeaderIconButton } from '../../../../../core/components/ui/buttons/Head
 import { Spacer } from '../../../../../core/components/ui/Spacer'
 import { useTheme } from '@react-navigation/native'
 import { observer } from 'mobx-react-lite'
-import { IComment, Users } from '../../../../../core/types/apiPhotoComment'
+import { IComment } from '../../../../../core/types/apiPhotoComment'
 import { PostInfo } from '../postInfo/PostInfo'
-import { Comment } from '../comment/Comment'
+import { Comment } from '../../../../../core/components/comment/Comment'
 import { s } from './style'
 import { t } from '../../../../../core/i18n'
-import { CompareMode, ComparePhoto, CompareView } from '../../../../../core/components/compare/CompareView'
-import { StreetViewInfo, streetViewTarget } from '../../../../../core/services/streetView'
+import { CompareView } from '../../../../../core/components/compare/CompareView'
+import { streetViewTarget } from '../../../../../core/services/streetView'
 import { refreshWindowRegion } from '../../../../../modules/window-region'
-import { PostColorize } from '../../../../../core/store/PostColorize'
+import { PhotoPanel } from '../../../../../core/store/PhotoPanel'
 import { ColorizeButtons } from '../../../../../core/components/colorize/ColorizeButtons'
+import { TranslateButton } from '../../../../../core/components/translate/TranslateButton'
 
 // Google Maps renders into a SurfaceView, so Android keeps a hint of which parts of the window are
 // transparent over it. The hint is recomputed only in a window layout pass, which React Native never
@@ -47,54 +48,21 @@ const postEntering = FadeIn.duration(220).easing(Easing.out(Easing.cubic))
 const loaderEntering = FadeIn.delay(150).duration(200)
 
 type PhotoDetailProps = {
-  comments: IComment[]
-  users: Users | null
-  postInfo: Photo | null
-  imageLink: string
-  isImageLoaded: boolean
-  share: () => void
-  saveImage: () => void
-  onImageLoaded: () => void
+  panel: PhotoPanel
   closePhoto: () => void
-  openFullScreen: (original?: boolean) => void
   onLinkPress?: (href: string) => void
-  colorize?: PostColorize
-  hasStreetView?: boolean
-  openCompare?: () => void
-  compareMode?: CompareMode | null
-  closeCompare?: () => void
-  streetView?: StreetViewInfo | null
-  comparePhoto?: ComparePhoto
-  isFavorite?: boolean
-  toggleFavorite?: () => void
   /** Opens another photo in this panel, here from the nearby photos. */
   onOpenPhoto?: (cid: string) => void
 }
 
-// An observer: the colour state comes from PostColorize, not from the props.
+// An observer: the post and its colour state come from the panel, not from the props.
 export const PhotoDetail: FC<PhotoDetailProps> = observer(({
+  panel,
   closePhoto,
-  comments,
-  users,
-  postInfo,
-  imageLink,
-  onImageLoaded,
-  isImageLoaded,
-  openFullScreen,
-  saveImage,
-  share,
   onLinkPress,
-  colorize,
-  hasStreetView,
-  openCompare,
-  compareMode,
-  closeCompare,
-  streetView,
-  comparePhoto,
-  isFavorite,
-  toggleFavorite,
   onOpenPhoto,
 }) => {
+  const { postInfo, comments, users, colorize, compareMode, comparePhoto, streetView } = panel
   // The root view's width: Dimensions on iOS keeps the portrait width after the app turns itself
   // to landscape at launch, and the panel came out a third too narrow (see core/hooks/useRootSize).
   const { width } = useSafeAreaFrame()
@@ -102,30 +70,25 @@ export const PhotoDetail: FC<PhotoDetailProps> = observer(({
   const { colors } = useTheme()
   const topLoader = top + 40
   const modalWidth = width * 0.67 - 32
-  const renderItem = useCallback(({ item }: { item: IComment }) => <Comment comment={item} users={users} onLinkPress={onLinkPress} />, [users, onLinkPress])
+  const renderItem = useCallback(({ item }: { item: IComment }) => <Comment comment={item} users={users} onLinkPress={onLinkPress} replyWidth="94%" style={local.underPhoto} />, [users, onLinkPress])
   const cid = postInfo?.cid
   // Then-and-now covers the panel; the arrow brings the post back rather than closing it. The post
   // stays mounted underneath: building it again on the way back reloaded its photos, which flickered.
   const comparing = !!(compareMode && comparePhoto)
+  const target = comparing && panel.hasStreetView ? streetViewTarget(postInfo) : null
   const compare = comparing ? (
     <View style={[s.panel, { backgroundColor: colors.backgroundApp }]}>
       <View style={[s.header, { marginTop: top + 5, marginBottom: 5 }]}>
-        <HeaderIconButton name="arrow-back" color={colors.textFirst} onPress={closeCompare} />
-        {colorize && (
-          <View style={s.iconContainer}>
-            <ColorizeButtons colorize={colorize} showCompareOriginal={false} />
-          </View>
-        )}
+        <HeaderIconButton name="arrow-back" color={colors.textFirst} onPress={panel.closeCompare} />
+        <View style={s.iconContainer}>
+          <ColorizeButtons colorize={colorize} showCompareOriginal={false} />
+        </View>
       </View>
       <CompareView
-        colorizing={colorize?.isColorizing}
+        colorizing={colorize.isColorizing}
         photo={comparePhoto}
         initialMode={compareMode}
-        target={
-          hasStreetView && streetViewTarget(postInfo)
-            ? { ...streetViewTarget(postInfo)!, panoId: streetView?.panoId }
-            : null
-        }
+        target={target ? { ...target, panoId: streetView?.panoId } : null}
         panoramaYear={streetView?.year}
         fit="contain"
       />
@@ -140,17 +103,18 @@ export const PhotoDetail: FC<PhotoDetailProps> = observer(({
       <View style={[s.header, { marginTop: top + 5, marginBottom: 5 }]}>
         <HeaderIconButton name="arrow-back" color={colors.textFirst} onPress={closePhoto} />
         <View style={s.iconContainer}>
-          {colorize && <ColorizeButtons colorize={colorize} />}
-          <HeaderIconButton name="compare" color={colors.textFirst} onPress={openCompare} />
+          {postInfo && <TranslateButton cid={postInfo.cid} title={postInfo.title} desc={postInfo.desc} />}
+          <ColorizeButtons colorize={colorize} />
+          <HeaderIconButton name="compare" color={colors.textFirst} onPress={panel.openCompare} />
           <Spacer width={4} />
-          <HeaderIconButton name={isFavorite ? 'favorite' : 'favorite-border'} color={colors.textFirst} onPress={toggleFavorite} />
+          <HeaderIconButton name={panel.isFavorite ? 'favorite' : 'favorite-border'} color={colors.textFirst} onPress={panel.toggleFavorite} />
           <Spacer width={4} />
-          <HeaderIconButton name="save-alt" color={colors.textFirst} onPress={saveImage} />
+          <HeaderIconButton name="save-alt" color={colors.textFirst} onPress={panel.saveImage} />
           <Spacer width={4} />
-          <HeaderIconButton name="share" color={colors.textFirst} onPress={share} />
+          <HeaderIconButton name="share" color={colors.textFirst} onPress={panel.share} />
         </View>
       </View>
-      {!isImageLoaded && (
+      {!panel.isImageLoaded && (
         <View
           style={[
             s.loaderContainer,
@@ -180,9 +144,10 @@ export const PhotoDetail: FC<PhotoDetailProps> = observer(({
             postInfo ? (
               <PostInfo
                 postInfo={postInfo}
-                imageLink={imageLink}
-                onImageLoaded={onImageLoaded}
-                openFullScreen={openFullScreen}
+                imageLink={panel.imageLink}
+                onImageLoaded={panel.onImageLoad}
+                onImageResolution={panel.onImageResolution}
+                openFullScreen={panel.openFullScreen}
                 onLinkPress={onLinkPress}
                 colorize={colorize}
                 onOpenPhoto={onOpenPhoto}
@@ -214,4 +179,6 @@ const local = StyleSheet.create({
   // spinner sits in the middle of what the cover hides.
   loaderSpan: { bottom: 0, height: 'auto' },
   loader: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  // Below the photo in the list header, so the photo covers the comments while it is zoomed.
+  underPhoto: { zIndex: -1 },
 })
