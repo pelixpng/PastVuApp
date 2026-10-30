@@ -1,5 +1,5 @@
-import { BackHandler, StyleSheet, View } from 'react-native'
-import MapVM, { mapRef, yamapRef } from './Map.vm'
+import { BackHandler, Platform, StyleSheet, View } from 'react-native'
+import MapVM from './Map.vm'
 import {
 	YEARS_SLIDER_HEIGHT,
 	YearsSlider
@@ -15,13 +15,23 @@ import { GoogleAppleMaps } from '../../../core/components/map/GoogleAppleMaps'
 import { YandexMaps } from '../../../core/components/map/YandexMaps'
 import MapStore from '../../../core/store/Map.store'
 import { useCallback, useMemo } from 'react'
-import { useFocusEffect } from '@react-navigation/native'
+import { useFocusEffect, useTheme } from '@react-navigation/native'
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
 import {
 	useSafeAreaFrame,
 	useSafeAreaInsets
 } from 'react-native-safe-area-context'
 import { MapButtons } from './components/mapButtons/MapButtons'
+import {
+	StreetViewNotice,
+	YandexTranslationNotice
+} from './components/mapHiddenNotice/MapHiddenNotice'
+import { refreshWindowRegion } from '../../../modules/window-region'
+import TranslationStore, {
+	commentTranslationId,
+	photoTranslationId
+} from '../../../core/store/Translation.store'
 import {
 	miniSheetHeight,
 	NearbyPhotosSheet,
@@ -58,6 +68,27 @@ const TUCK = 16
 
 export const MapScreen = observer(() => {
 	const vm = useVM(MapVM)
+	const { colors } = useTheme()
+	// Google's badge is on screen once the post or any of its comments shows a translation.
+	const { postInfo, comments } = vm.panel
+	const translationShown =
+		!!postInfo &&
+		(TranslationStore.state(photoTranslationId(postInfo.cid)) === 'translated' ||
+			comments.some(
+				comment =>
+					TranslationStore.state(commentTranslationId(comment.cid)) === 'translated'
+			))
+	// What hides the map behind the open post, if anything. Google's Maps terms forbid Street View
+	// on a screen with a non-Google map, and then-and-now opens on it: an Apple map (every map on
+	// iOS that is not Yandex) or a Yandex one goes while it is open.
+	const nonGoogleMap = Platform.OS === 'ios' || MapStore.mapProvider === 'yandex'
+	const mapCover = !vm.showPhotoDetail
+		? null
+		: vm.panel.compareMode && nonGoogleMap
+			? 'streetView'
+			: MapStore.mapProvider === 'yandex' && translationShown
+				? 'translation'
+				: null
 	const nearbyOpen = vm.nearby.open
 	// The root view's size, as the column's '33%' takes it: Dimensions keeps the portrait size after
 	// the app turns itself to landscape (see core/hooks/useRootSize).
@@ -131,34 +162,32 @@ export const MapScreen = observer(() => {
 	return (
 		<View style={s.flexOne}>
 			<SearchPlace
-				places={vm.places}
-				query={vm.queryPlace}
-				setQueryPlace={vm.setQueryPlace}
-				goToLocation={vm.goToLocation}
+				search={vm.map.placeSearch}
+				goToLocation={vm.map.goToLocation}
 				onFocus={closeNearbyForSearch}
 				isTablet
 			/>
 			{MapStore.mapProvider === 'yandex' ? (
 				<YandexMaps
-					mapRef={yamapRef}
-					markers={vm.photoCollection.markers}
-					initialRegion={vm.coordinates}
-					onRegionChangeComplete={vm.setCoordinate}
+					mapRef={vm.map.yamapRef}
+					markers={vm.map.photoCollection.markers}
+					initialRegion={vm.map.coordinates}
+					onRegionChangeComplete={vm.map.setCoordinate}
 					onShowPhoto={vm.showPhoto}
-					onGoToLocation={vm.zoomToCluster}
+					onGoToLocation={vm.map.zoomToCluster}
 					isTablet
 					bottomInset={mapBottomInset}
 				/>
 			) : (
 				<GoogleAppleMaps
-					mapRef={mapRef}
-					markers={vm.photoCollection.markers}
+					mapRef={vm.map.mapRef}
+					markers={vm.map.photoCollection.markers}
 					mapType={vm.mapTypeSetting}
 					mapMarkerType={vm.mapMarkerType}
-					initialRegion={vm.coordinates}
-					onRegionChangeComplete={vm.setCoordinate}
+					initialRegion={vm.map.coordinates}
+					onRegionChangeComplete={vm.map.setCoordinate}
 					onShowPhoto={vm.showPhoto}
-					onGoToLocation={vm.zoomToCluster}
+					onGoToLocation={vm.map.zoomToCluster}
 					isTablet
 					bottomInset={mapBottomInset}
 				/>
@@ -176,41 +205,70 @@ export const MapScreen = observer(() => {
 					column={column}
 				/>
 			)}
+			{/* While a translation shows beside a Yandex map, the post takes the whole screen: Google's
+			    terms forbid its logo, which marks every translation, on a screen that shows a competing
+			    search service's, and Yandex's terms forbid hiding or covering its logo on a map in
+			    sight. Untranslated, the post stays beside the map. Then-and-now does the same beside
+			    any map but Google's (see mapCover). */}
+			{mapCover && (
+				<Animated.View
+					style={[s.cover, { backgroundColor: colors.backgroundApp }]}
+					entering={COVER_IN}
+					exiting={COVER_OUT}
+					onLayout={refreshWindowRegion}
+				>
+					{/* In the left column, between the top and the tab bar: why the map is gone. */}
+					<View
+						style={[
+							s.notice,
+							{
+								top: top + 16,
+								bottom: tabBarHeight + 16,
+								left: COLUMN_LEFT,
+								width: columnWidth
+							}
+						]}
+					>
+						{mapCover === 'streetView' ? <StreetViewNotice /> : <YandexTranslationNotice />}
+					</View>
+				</Animated.View>
+			)}
 			{vm.showPhotoDetail && (
 				<PhotoDetail
-					postInfo={vm.postInfo}
-					users={vm.users}
-					comments={vm.comments}
+					panel={vm.panel}
 					closePhoto={vm.closePhoto}
-					onImageLoaded={vm.onImageLoad}
-					openFullScreen={vm.openFullScreenImage}
-					colorize={vm.colorize}
-					saveImage={vm.saveImage}
-					share={vm.share}
-					imageLink={vm.imageLink}
-					isImageLoaded={vm.isImageLoaded}
 					onLinkPress={vm.openPhotoFromLink}
 					onOpenPhoto={vm.showPhoto}
-					isFavorite={vm.isFavorite}
-					toggleFavorite={vm.toggleFavorite}
-					hasStreetView={vm.hasStreetView}
-					openCompare={vm.openCompare}
-					compareMode={vm.compareMode}
-					closeCompare={vm.closeCompare}
-					streetView={vm.streetView}
-					comparePhoto={vm.comparePhoto}
 				/>
 			)}
 			<MapButtons
 				nearbyOpen={nearbyOpen}
 				onToggleNearby={vm.nearby.toggle}
-				onLocate={vm.getCurrentLocation}
+				onLocate={vm.map.getCurrentLocation}
 			/>
-			<YearsSlider value={vm.yearsRange} setValue={vm.setYearsRange} isTablet />
+			<YearsSlider
+				value={vm.map.yearsRange}
+				setValue={vm.map.setYearsRange}
+				isTablet
+			/>
 		</View>
 	)
 })
 
+/** In step with the post panel sliding in and out. */
+const COVER_IN = FadeIn.duration(600)
+const COVER_OUT = FadeOut.duration(600)
+
 const s = StyleSheet.create({
-	flexOne: { flex: 1 }
+	flexOne: { flex: 1 },
+	// Under the post panel (zIndex 50), over the map, the search field, its buttons and the slider.
+	cover: {
+		position: 'absolute',
+		top: 0,
+		right: 0,
+		bottom: 0,
+		left: 0,
+		zIndex: 49
+	},
+	notice: { position: 'absolute' }
 })

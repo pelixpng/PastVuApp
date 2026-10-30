@@ -5,7 +5,8 @@ struct SlideShowProvider: TimelineProvider {
     private let displayInterval: TimeInterval = 1800
     
     func placeholder(in context: Context) -> SlideShowEntry {
-      SlideShowEntry(date: Date(), items: loadSampleItems())
+      // WidgetKit redacts the placeholder, so the sample photo would never show; skip encoding it.
+      SlideShowEntry(date: Date(), items: loadSampleItems(withImage: false))
     }
     
     func getSnapshot(in context: Context, completion: @escaping (SlideShowEntry) -> Void) {
@@ -47,7 +48,7 @@ struct SlideShowProvider: TimelineProvider {
   }
 
     
-    private func loadSampleItems() -> [HistoryListEntryItem] {
+    private func loadSampleItems(withImage: Bool = true) -> [HistoryListEntryItem] {
         let sampleHistoryItems = [
             HistoryItem(
                 cid: "1527279",
@@ -60,7 +61,7 @@ struct SlideShowProvider: TimelineProvider {
         return sampleHistoryItems.map {
             HistoryListEntryItem(
                 historyItem: $0,
-                imageData: UIImage(named: "historySlidePreview")?.heicData()
+                imageData: withImage ? UIImage(named: "historySlidePreview")?.heicData() : nil
             )
         }
     }

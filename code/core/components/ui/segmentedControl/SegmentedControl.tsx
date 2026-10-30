@@ -64,19 +64,16 @@ export const SegmentedControl: FC<SegmentedControlProps> = ({
           ]}
         />
       )}
-      {options.map((option, index) => {
+      {options.map(option => {
         const isSelected = option.value === selectedValue
-        const isFirst = index === 0
-        const isLast = index === options.length - 1
 
         return (
           <SegmentItem
             key={option.value}
             option={option}
             isSelected={isSelected}
-            isFirst={isFirst}
-            isLast={isLast}
-            colors={colors}
+            textColor={colors.textSecond}
+            selectedTextColor={colors.textFirst}
             onChange={onChange}
           />
         )
@@ -88,18 +85,16 @@ export const SegmentedControl: FC<SegmentedControlProps> = ({
 type SegmentItemProps = {
   option: SegmentedControlOption
   isSelected: boolean
-  isFirst: boolean
-  isLast: boolean
-  colors: any
+  textColor: string
+  selectedTextColor: string
   onChange: (value: string) => void
 }
 
 const SegmentItem: FC<SegmentItemProps> = ({
   option,
   isSelected,
-  isFirst,
-  isLast,
-  colors,
+  textColor,
+  selectedTextColor,
   onChange,
 }) => {
   const animation = useSharedValue(0)
@@ -112,14 +107,14 @@ const SegmentItem: FC<SegmentItemProps> = ({
   }, [isSelected, animation])
 
   const animatedTextStyle = useAnimatedStyle(() => {
-    const color = interpolateColor(animation.value, [0, 1], [colors.textSecond, colors.textFirst])
+    const color = interpolateColor(animation.value, [0, 1], [textColor, selectedTextColor])
 
     return { color }
   })
 
   return (
     <TouchableOpacity
-      style={[s.segment, isFirst && s.segmentFirst, isLast && s.segmentLast]}
+      style={s.segment}
       onPress={() => onChange(option.value)}
       activeOpacity={0.7}>
       <Animated.Text
@@ -136,7 +131,6 @@ const s = StyleSheet.create({
     borderRadius: 99,
     padding: 4,
     gap: 6,
-    position: 'relative',
   },
   indicator: {
     position: 'absolute',
@@ -157,12 +151,6 @@ const s = StyleSheet.create({
     overflow: 'hidden',
     zIndex: 1,
   },
-  segmentBackground: {
-    borderRadius: 0,
-  },
-  segmentFirst: {},
-  segmentLast: {},
-  segmentSelected: {},
   segmentText: {
     fontSize: 13,
     lineHeight: 20,

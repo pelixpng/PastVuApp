@@ -6,7 +6,7 @@ import NewsVM, { NewsTab } from './News.vm'
 import { useVM } from '../../../../core/hooks/useVM'
 import { SegmentedControl } from '../../../../core/components/ui/segmentedControl/SegmentedControl'
 import type { NewsItems } from '../../../../core/types/apiNews'
-import type { CollectionItem } from '../collection/Collection.screen'
+import type { CollectionItem } from '../../../../core/services/photoPost'
 import { PhotoListItem } from '../collection/components/Item'
 import { Spacer } from '../../../../core/components/ui/Spacer'
 import { PostListItem } from './components/PostListItem/PostListItem'
@@ -95,7 +95,7 @@ export const NewsScreen = observer(() => {
             windowSize={5}
             showsVerticalScrollIndicator={false}
             ListEmptyComponent={
-              vm.loading ? (
+              vm.photosLoading ? (
                 <View style={s.emptyContainer}>
                   <ActivityIndicator size="large" color="gray" />
                 </View>

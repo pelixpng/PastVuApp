@@ -14,5 +14,11 @@ public class AppKeysModule: Module {
       // An unresolved reference means the xcconfig was missing at build time.
       return value.hasPrefix("$(") ? "" : value
     }
+
+    // What a Google key restricted to this app checks: requests made outside Google's own SDKs
+    // have to name the app in the X-Ios-Bundle-Identifier header themselves.
+    Function("identity") { () -> [String: String] in
+      return ["bundleId": Bundle.main.bundleIdentifier ?? ""]
+    }
   }
 }

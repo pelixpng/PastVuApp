@@ -5,7 +5,7 @@ import { StackActions, useNavigation, useTheme } from '@react-navigation/native'
 import RenderHTML from 'react-native-render-html'
 import { NewsItems } from '../../../../../core/types/apiNews'
 import { IComment, Users } from '../../../../../core/types/apiPhotoComment'
-import { Comment } from '../../../map/components/comment/Comment'
+import { Comment } from '../../../../../core/components/comment/Comment'
 import { Spacer } from '../../../../../core/components/ui/Spacer'
 import { formatDate } from '../../../../../core/utils/getTime'
 import StandardAvatar from '../../../../../assets/avatar.png'
@@ -31,7 +31,7 @@ export const NewsDetail: FC<NewsDetailProps> = ({ post, comments, users, onLinkP
 
   const renderItem = useCallback(
     ({ item }: { item: IComment }) => (
-      <Comment comment={item} users={users} onLinkPress={onLinkPress} />
+      <Comment comment={item} users={users} onLinkPress={onLinkPress} replyWidth="94%" />
     ),
     [users, onLinkPress],
   )

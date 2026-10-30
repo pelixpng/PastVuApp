@@ -26,9 +26,19 @@ export const fr = {
   },
   map: {
     searchPlaceholder: 'Rechercher…',
+    yandexHiddenTitle: 'La carte est masquée pendant la traduction',
+    yandexHiddenText:
+      'Les conditions de Google n’autorisent pas l’affichage de ses traductions à côté du logo de Yandex Maps, et celles de Yandex interdisent de masquer ce logo. Tant qu’une traduction est affichée, la carte est donc masquée. Elle réapparaît lorsque vous affichez l’original ou fermez la photo. Vous pouvez aussi choisir une autre carte dans les réglages.',
+    streetViewHiddenTitle: 'La carte est masquée pendant la comparaison',
+    streetViewHiddenText:
+      'Les conditions de Google n’autorisent pas l’affichage des panoramas Street View à côté d’une autre carte. La carte réapparaît lorsque vous fermez la comparaison.',
     markersError: 'Impossible de charger les repères de la carte',
-    searchLimit:
-      'La limite de recherche partagée est atteinte. Réessayez dans quelques minutes ou demain 🪫',
+    searchEmpty: 'Aucun résultat',
+    searchBusy:
+      'La recherche est saturée pour le moment. Réessayez dans une minute',
+    searchDayLimit:
+      'La limite quotidienne de recherche est atteinte. Réessayez demain',
+    searchError: 'Échec de la recherche. Vérifiez votre connexion',
     nearbyButton: 'Photos près du centre de la carte',
     nearbyEmpty: 'Aucune photo à proximité pour les années choisies',
     nearbyError: 'Impossible de charger les photos à proximité',
@@ -68,6 +78,16 @@ export const fr = {
     processing: 'Colorisation…',
     processingHint: 'Cela peut prendre jusqu’à %{seconds} secondes',
     error: 'Impossible de coloriser la photo. Veuillez réessayer',
+  },
+  translate: {
+    show: 'Traduire avec Google',
+    hide: 'Afficher l’original',
+    loading: 'Traduction…',
+    failed: 'Impossible de traduire',
+    retry: 'Réessayer',
+    button: 'Traduire avec Google',
+    error: 'Impossible de traduire. Veuillez réessayer',
+    dayLimit: 'La limite de traductions du jour est atteinte. Réessayez demain',
   },
   colorizeModel: {
     title: 'Coloriser les photos N&B',
@@ -154,6 +174,9 @@ export const fr = {
     languageHint: 'Langue de l’interface de l’application.',
     aiWatermark: 'Filigrane « AI »',
     aiWatermarkHint: 'Ajouter une mention « AI COLORIZATION » dans le coin des photos colorisées, y compris celles que vous enregistrez ?',
+    translation: 'Traduction',
+    translationHint:
+      'Afficher les boutons « Traduire avec Google » pour les photos et les commentaires dans d’autres langues ?',
   },
   options: {
     themeDark: 'Sombre',
@@ -182,6 +205,9 @@ export const fr = {
     github: 'Code source de l’application sur GitHub',
     privacyPolicy: 'Politique de confidentialité',
     yandexTerms: 'Conditions d’utilisation de Yandex Maps',
+    translationTitle: 'Traduction',
+    translationText:
+      'Les commentaires et les descriptions des photos sont traduits par Google Traduction. Une traduction automatique peut contenir des erreurs. Avis de Google :',
     creditsTitle: 'Remerciements',
     creditsText:
       'Les photos et leurs informations proviennent de l’API ouverte de PastVu. La recherche de lieux est assurée par LocationIQ. Les cartes sont affichées avec Google Maps Platform sur Android et Apple Plans sur iOS, ou au choix avec Yandex Maps. Les panoramas d’aujourd’hui viennent de Google Street View. Les photos en noir et blanc sont colorisées directement sur l’appareil par le réseau de neurones DDColor (Kang et al., ICCV 2023, licence Apache 2.0).',

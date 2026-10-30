@@ -26,9 +26,17 @@ export const cs = {
   },
   map: {
     searchPlaceholder: 'Hledat…',
+    yandexHiddenTitle: 'Mapa je během překladu skrytá',
+    yandexHiddenText:
+      'Podmínky Googlu nedovolují zobrazovat jeho překlady vedle loga Map Yandex a podmínky Yandexu nedovolují toto logo skrývat. Proto je mapa skrytá, dokud je na obrazovce překlad. Vrátí se, když zobrazíte originál nebo zavřete fotografii. V nastavení můžete také vybrat jinou mapu.',
+    streetViewHiddenTitle: 'Mapa je během porovnání skrytá',
+    streetViewHiddenText:
+      'Podmínky Googlu nedovolují zobrazovat panoramata Street View vedle jiné mapy. Mapa se vrátí, když porovnání zavřete.',
     markersError: 'Nepodařilo se načíst značky na mapě',
-    searchLimit:
-      'Sdílený limit vyhledávání byl vyčerpán. Zkuste to za pár minut nebo zítra 🪫',
+    searchEmpty: 'Nic nenalezeno',
+    searchBusy: 'Vyhledávání je teď přetížené. Zkuste to za minutu',
+    searchDayLimit: 'Denní limit vyhledávání byl vyčerpán. Zkuste to zítra',
+    searchError: 'Vyhledávání se nezdařilo. Zkontrolujte připojení',
     nearbyButton: 'Fotografie v okolí středu mapy',
     nearbyEmpty: 'V okolí nejsou fotografie z vybraných let',
     nearbyError: 'Fotografie v okolí se nepodařilo načíst',
@@ -69,6 +77,16 @@ export const cs = {
     processing: 'Kolorování…',
     processingHint: 'Může to trvat až %{seconds} sekund',
     error: 'Fotografii se nepodařilo kolorovat. Zkuste to znovu',
+  },
+  translate: {
+    show: 'Přeložit pomocí Google',
+    hide: 'Zobrazit originál',
+    loading: 'Překládání…',
+    failed: 'Překlad se nezdařil',
+    retry: 'Zkusit znovu',
+    button: 'Přeložit pomocí Google',
+    error: 'Překlad se nezdařil. Zkuste to znovu',
+    dayLimit: 'Dnešní limit překladů je vyčerpán. Zkuste to zítra',
   },
   colorizeModel: {
     title: 'Kolorování černobílých fotek',
@@ -155,6 +173,9 @@ export const cs = {
     languageHint: 'Jazyk rozhraní aplikace.',
     aiWatermark: 'Vodoznak AI',
     aiWatermarkHint: 'Přidávat značku „AI COLORIZATION“ do rohu kolorovaných fotografií, včetně těch uložených do galerie?',
+    translation: 'Překlad',
+    translationHint:
+      'Zobrazovat tlačítka „Přeložit pomocí Google“ u fotografií a komentářů v jiných jazycích?',
   },
   options: {
     themeDark: 'Tmavý',
@@ -183,6 +204,9 @@ export const cs = {
     github: 'Zdrojový kód aplikace na GitHubu',
     privacyPolicy: 'Zásady ochrany osobních údajů',
     yandexTerms: 'Podmínky používání Yandex Maps',
+    translationTitle: 'Překlad',
+    translationText:
+      'Komentáře a popisy fotografií překládá Překladač Google. Strojový překlad může obsahovat chyby. Upozornění od Google:',
     creditsTitle: 'Poděkování',
     creditsText:
       'Fotografie a jejich údaje pocházejí z otevřeného API PastVu. Vyhledávání míst zajišťuje LocationIQ. Mapy vykresluje Google Maps Platform na Androidu a Apple Maps na iOS, volitelně Yandex Maps. Dnešní panoramata poskytuje Google Street View. Černobílé fotky koloruje přímo v zařízení neuronová síť DDColor (Kang a kol., ICCV 2023, licence Apache 2.0).',

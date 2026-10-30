@@ -2,10 +2,10 @@ import { action, computed, makeObservable, observable, reaction } from 'mobx'
 import ColorizeStore from './Colorize.store'
 
 /**
- * The colour version of the photo in one post panel (the tablet's map, collection, news and
- * profile): whether the palette shows, what the photo shows, and the colour version stacked above
- * the original. A thin view over ColorizeStore, so colour switched on in one panel shows in every
- * other place the photo appears.
+ * The colour version of the photo in one post view (the phone's post screen; the tablet's map,
+ * collection, news and profile panels): whether the palette shows, what the photo shows, and the
+ * colour version stacked above the original. A thin view over ColorizeStore, so colour switched
+ * on in one view shows in every other place the photo appears.
  *
  * Create it after the owner's makeObservable, so the getters read observables that are tracked.
  */

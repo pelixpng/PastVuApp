@@ -23,6 +23,12 @@ interface ImageZoomProps {
   openFullScreenImage: () => void
   onImageLoaded: () => void
   /**
+   * The photo's size as it loaded, so full screen can show it without measuring it again. It may
+   * come downscaled to fit the preview, but keeps the photo's proportions. With the link it loaded
+   * from, so the size is not taken for another file.
+   */
+  onImageResolution?: (resolution: Resolution, uri: string) => void
+  /**
    * A pinch begins and, after the photo springs back, ends. With two photos stacked the zoomed one
    * has to be raised, or it grows under its neighbour.
    */
@@ -59,6 +65,7 @@ const Preview: FC<ImageZoomProps & { resolution: Resolution }> = ({
   resolution,
   openFullScreenImage,
   onImageLoaded,
+  onImageResolution,
   onZoomStart,
   onZoomEnd,
 }) => {
@@ -106,9 +113,13 @@ const Preview: FC<ImageZoomProps & { resolution: Resolution }> = ({
               resizeMode="cover"
               fadeDuration={0}
               onLayout={onImageLoaded}
-              onLoad={() => {
+              onLoad={e => {
                 setLoaded(true)
                 opacity.value = withTiming(1, { duration: 220 })
+                const { source } = e.nativeEvent
+                if (source.width > 0 && source.height > 0) {
+                  onImageResolution?.({ width: source.width, height: source.height }, uri)
+                }
               }}
               onError={() => setFailed(true)}
             />

@@ -26,9 +26,17 @@ export const et = {
   },
   map: {
     searchPlaceholder: 'Otsi…',
+    yandexHiddenTitle: 'Kaart on tõlke ajaks peidetud',
+    yandexHiddenText:
+      'Google’i tingimused ei luba näidata tema tõlkeid Yandexi kaartide logo kõrval ja Yandexi tingimused keelavad selle logo peitmise. Seetõttu on kaart peidetud, kuni ekraanil on tõlge. See ilmub tagasi, kui näitate originaali või sulgete foto. Seadetes saate valida ka teise kaardi.',
+    streetViewHiddenTitle: 'Kaart on võrdluse ajaks peidetud',
+    streetViewHiddenText:
+      'Google’i tingimused ei luba näidata Street View panoraame teise kaardi kõrval. Kaart ilmub tagasi, kui sulgete võrdluse.',
     markersError: 'Kaardimärkide laadimine ebaõnnestus',
-    searchLimit:
-      'Ühine otsingulimiit on täis. Proovige mõne minuti pärast või homme 🪫',
+    searchEmpty: 'Midagi ei leitud',
+    searchBusy: 'Otsing on praegu ülekoormatud. Proovige minuti pärast uuesti',
+    searchDayLimit: 'Päevane otsingulimiit on täis. Proovige homme uuesti',
+    searchError: 'Otsing ebaõnnestus. Kontrollige ühendust',
     nearbyButton: 'Fotod kaardi keskpunkti lähedal',
     nearbyEmpty: 'Valitud aastatest pole lähedal fotosid',
     nearbyError: 'Lähedal olevate fotode laadimine ebaõnnestus',
@@ -68,6 +76,16 @@ export const et = {
     processing: 'Värvimine…',
     processingHint: 'See võib võtta kuni %{seconds} sekundit',
     error: 'Fotot ei õnnestunud värvida. Proovige uuesti',
+  },
+  translate: {
+    show: 'Tõlgi Google’i abil',
+    hide: 'Näita originaali',
+    loading: 'Tõlkimine…',
+    failed: 'Tõlkimine ebaõnnestus',
+    retry: 'Proovi uuesti',
+    button: 'Tõlgi Google’i abil',
+    error: 'Tõlkimine ebaõnnestus. Proovige uuesti',
+    dayLimit: 'Tänane tõlkelimiit on täis. Proovige homme uuesti',
   },
   colorizeModel: {
     title: 'Mustvalgete fotode värvimine',
@@ -154,6 +172,9 @@ export const et = {
     languageHint: 'Rakenduse liidese keel.',
     aiWatermark: 'Vesimärk „AI“',
     aiWatermarkHint: 'Kas lisada värvitud fotode nurka märge „AI COLORIZATION“, ka galeriisse salvestatud fotodele?',
+    translation: 'Tõlkimine',
+    translationHint:
+      'Kas näidata teistes keeltes fotode ja kommentaaride juures nuppe „Tõlgi Google’i abil”?',
   },
   options: {
     themeDark: 'Tume',
@@ -182,6 +203,9 @@ export const et = {
     github: 'Rakenduse lähtekood GitHubis',
     privacyPolicy: 'Privaatsuspoliitika',
     yandexTerms: 'Yandex Mapsi kasutustingimused',
+    translationTitle: 'Tõlkimine',
+    translationText:
+      'Kommentaare ja fotode kirjeldusi tõlgib Google’i tõlge. Masintõlkes võib olla vigu. Google’i teade:',
     creditsTitle: 'Tänusõnad',
     creditsText:
       'Fotod ja nende andmed tulevad avatud PastVu API-st. Kohaotsingut pakub LocationIQ. Kaarte kuvab Androidis Google Maps Platform ja iOS-is Apple Maps, soovi korral Yandex Maps. Tänased panoraamid annab Google Street View. Mustvalgeid fotosid värvib otse seadmes närvivõrk DDColor (Kang jt, ICCV 2023, Apache 2.0 litsents).',

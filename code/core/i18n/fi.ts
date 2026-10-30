@@ -26,9 +26,17 @@ export const fi = {
   },
   map: {
     searchPlaceholder: 'Hae…',
+    yandexHiddenTitle: 'Kartta on piilotettu käännöksen ajaksi',
+    yandexHiddenText:
+      'Googlen ehdot eivät salli sen käännösten näyttämistä Yandex Mapsin logon vieressä, eivätkä Yandexin ehdot salli logon piilottamista. Siksi kartta on piilossa niin kauan kuin näytöllä on käännös. Se palaa, kun näytät alkuperäisen tai suljet kuvan. Voit myös valita toisen kartan asetuksista.',
+    streetViewHiddenTitle: 'Kartta on piilotettu vertailun ajaksi',
+    streetViewHiddenText:
+      'Googlen ehdot eivät salli Street View -panoraamojen näyttämistä toisen kartan vieressä. Kartta palaa, kun suljet vertailun.',
     markersError: 'Karttamerkkien lataus epäonnistui',
-    searchLimit:
-      'Yhteinen hakuraja on täynnä. Yritä muutaman minuutin kuluttua tai huomenna 🪫',
+    searchEmpty: 'Ei tuloksia',
+    searchBusy: 'Haku on nyt ruuhkautunut. Yritä uudelleen minuutin kuluttua',
+    searchDayLimit: 'Päivittäinen hakuraja on täynnä. Yritä uudelleen huomenna',
+    searchError: 'Haku epäonnistui. Tarkista yhteys',
     nearbyButton: 'Kuvat kartan keskikohdan lähellä',
     nearbyEmpty: 'Valituilta vuosilta ei ole kuvia lähistöllä',
     nearbyError: 'Lähistön kuvien lataus epäonnistui',
@@ -68,6 +76,16 @@ export const fi = {
     processing: 'Väritetään…',
     processingHint: 'Tämä voi kestää jopa %{seconds} sekuntia',
     error: 'Kuvan värittäminen epäonnistui. Yritä uudelleen',
+  },
+  translate: {
+    show: 'Käännä Googlella',
+    hide: 'Näytä alkuperäinen',
+    loading: 'Käännetään…',
+    failed: 'Kääntäminen epäonnistui',
+    retry: 'Yritä uudelleen',
+    button: 'Käännä Googlella',
+    error: 'Kääntäminen epäonnistui. Yritä uudelleen',
+    dayLimit: 'Päivän käännösraja on täynnä. Yritä huomenna uudelleen',
   },
   colorizeModel: {
     title: 'Mustavalkokuvien väritys',
@@ -154,6 +172,9 @@ export const fi = {
     languageHint: 'Sovelluksen käyttöliittymän kieli.',
     aiWatermark: 'AI-vesileima',
     aiWatermarkHint: 'Lisätäänkö väritettyihin kuviin merkintä ”AI COLORIZATION” kulmaan, myös galleriaan tallennettuihin?',
+    translation: 'Käännökset',
+    translationHint:
+      'Näytetäänkö ”Käännä Googlella” -painikkeet muunkielisissä kuvissa ja kommenteissa?',
   },
   options: {
     themeDark: 'Tumma',
@@ -182,6 +203,9 @@ export const fi = {
     github: 'Sovelluksen lähdekoodi GitHubissa',
     privacyPolicy: 'Tietosuojakäytäntö',
     yandexTerms: 'Yandex Mapsin käyttöehdot',
+    translationTitle: 'Käännökset',
+    translationText:
+      'Kommentit ja kuvien kuvaukset kääntää Google-kääntäjä. Konekäännöksessä voi olla virheitä. Googlen ilmoitus:',
     creditsTitle: 'Kiitokset',
     creditsText:
       'Kuvat ja niiden tiedot tulevat avoimesta PastVu-rajapinnasta. Paikkahaun tarjoaa LocationIQ. Kartat piirtää Google Maps Platform Androidilla ja Apple Maps iOS:llä, valinnaisesti Yandex Maps. Nykypäivän panoraamat tulevat Google Street View’stä. Mustavalkokuvat värittää suoraan laitteessa DDColor-neuroverkko (Kang ym., ICCV 2023, Apache 2.0 -lisenssi).',

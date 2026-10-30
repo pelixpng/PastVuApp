@@ -3,6 +3,7 @@ import ApiService from '../api/apiService'
 import { MMKVStorage } from '../storage/mmkv'
 import { IosTargetStorage } from '../storage/appleTarget'
 import { IComment, Users } from '../types/apiPhotoComment'
+import * as StreetView from './streetView'
 
 export type CollectionItem = {
   title: string
@@ -15,6 +16,11 @@ export type LoadedPost = {
   photo: Photo
   users: Users | null
   comments: IComment[]
+  /**
+   * Whether Street View has a panorama by the photo; null where one makes no sense. Asked as soon
+   * as the photo brings its place, alongside the comments rather than after them.
+   */
+  streetView: Promise<StreetView.StreetViewInfo | null>
 }
 
 /** Keeps the persisted history from growing without bound; the in-app hint promises 1000. */
@@ -22,6 +28,9 @@ export const HISTORY_LIMIT = 1000
 
 /** The iOS widgets show five photos at most, so the App Group gets only those. */
 const WIDGET_HISTORY_LIMIT = 5
+
+/** The widget mirror this process last wrote; undefined until the first save after launch. */
+let widgetHistory: string | undefined
 
 export const toCollectionItem = (photo: Photo, cid: string): CollectionItem => ({
   title: photo.title,
@@ -38,24 +47,33 @@ export const toCollectionItem = (photo: Photo, cid: string): CollectionItem => (
  * the post: they degrade to an empty list while the photo still renders.
  */
 export const loadPost = async (cid: string): Promise<LoadedPost> => {
-  const [info, discussion] = await Promise.all([
-    ApiService.getPhotoInfo(cid),
-    ApiService.getComments(cid).catch(() => null),
-  ])
+  const comments = ApiService.getComments(cid).catch(() => null)
+  const info = await ApiService.getPhotoInfo(cid)
+  const target = StreetView.streetViewTarget(info.result.photo)
+  // Never rejects: a failed check answers `unknown`.
+  const streetView = target ? StreetView.checkAvailability(target) : Promise.resolve(null)
+  const discussion = await comments
   return {
     photo: info.result.photo,
     users: discussion?.users ?? null,
     comments: discussion?.comments ?? [],
+    streetView,
   }
 }
 
 /**
  * Stores the viewing history and mirrors its start to the iOS widget. Every write goes through
  * here, so a photo removed from the history also leaves the widget.
+ *
+ * Each reload makes every placed widget download its photos again, so the mirror is rewritten and
+ * the widgets reloaded only when those five entries change, not when the top photo is reopened.
  */
 export const saveHistory = (history: CollectionItem[]) => {
   MMKVStorage.set('History', history)
-  IosTargetStorage.set('History', JSON.stringify(history.slice(0, WIDGET_HISTORY_LIMIT)))
+  const mirror = JSON.stringify(history.slice(0, WIDGET_HISTORY_LIMIT))
+  if (mirror === widgetHistory) return
+  widgetHistory = mirror
+  IosTargetStorage.set('History', mirror)
   ExtensionStorage.reloadWidget()
 }
 
@@ -99,6 +117,18 @@ export const toggleFavorite = (photo: Photo, cid: string): boolean => {
 }
 
 export type Resolution = { width: number; height: number }
+
+/** What the full-screen route takes, on the phone and the tablet. */
+export type FullScreenParams = {
+  title: string
+  cid: string
+  uri: string
+  file: string
+  /** The colour version on disk, saved in place of the original while it is shown. */
+  localFile?: string
+  /** The photo's size when already known; the screen measures the photo only without it. */
+  resolution?: Resolution
+}
 
 /**
  * Rendered size of the photo, known from the post data before the image is fetched.

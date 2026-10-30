@@ -1,24 +1,28 @@
-import { action, computed, makeObservable, observable } from 'mobx'
+import { action, computed, makeObservable, observable, runInAction } from 'mobx'
 import { SCREENS } from '../../../navigation/navigation.types'
 import { BaseViewModelProvider } from '../../../provider/vm.provider'
 import { SegmentedControlOption } from '../../../../core/components/ui/segmentedControl/SegmentedControl'
 import ApiService from '../../../../core/api/apiService'
-import { NewsItems, NewsPhoto } from '../../../../core/types/apiNews'
-import { CollectionItem } from '../collection/Collection.screen'
+import { NewsItems } from '../../../../core/types/apiNews'
+import type { CollectionItem } from '../../../../core/services/photoPost'
 import { getRegionPath } from '../../../../core/utils/getRegionPath'
+import { loadNews, savedNews } from '../../../../core/services/news'
 import { t } from '../../../../core/i18n'
 
 export type NewsTab = 'posts' | 'photos'
 
 class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
   @observable selectedTab: NewsTab = 'posts'
-  @observable news: NewsItems[] = []
-  @observable photos: NewsPhoto[] = []
+  /**
+   * The feed kept from the last visit shows at once; the fresh one replaces it. A reference: the
+   * feed is replaced whole, never edited, so its 154 posts need no deep conversion.
+   */
+  @observable.ref news: NewsItems[] = savedNews() ?? []
   @observable historyItems: CollectionItem[] = []
   @observable loading: boolean = true
   @observable newsError = false
+  @observable photosLoading = true
   @observable photosError = false
-  private regionsMap: Map<number, any> = new Map()
 
   // A getter, not a field: a field is evaluated once when the view model is constructed and
   // would keep the language that was active back then.
@@ -36,15 +40,8 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
     this.loadAll()
   }
 
-  private async loadAll() {
-    await this.loadRegions()
-    await Promise.allSettled([this.loadNews(), this.loadPhotos()])
-  }
-
-  // ------------------------------------------ Computed ------------------------------------------
-  @computed
-  get displayedData(): NewsItems[] | CollectionItem[] {
-    return this.selectedTab === 'posts' ? this.news : this.historyItems
+  private loadAll() {
+    return Promise.allSettled([this.loadNews(), this.loadPhotos()])
   }
 
   // ------------------------------------------ Actions ------------------------------------------
@@ -56,9 +53,6 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
 
   @action.bound
   async retry() {
-    if (this.regionsMap.size === 0) {
-      await this.loadRegions()
-    }
     if (this.selectedTab === 'posts') {
       await this.loadNews()
     } else {
@@ -68,42 +62,50 @@ class NewsVM extends BaseViewModelProvider<SCREENS.NEWS> {
 
   @action.bound
   async loadNews() {
+    // The spinner only stands in for an empty list: news kept from the last visit stay shown.
+    this.loading = this.news.length === 0
+    this.newsError = false
     try {
-      this.loading = true
-      this.newsError = false
-      const newsData = await ApiService.getNews()
-      this.news = newsData
+      const newsData = await loadNews(true)
+      runInAction(() => {
+        this.news = newsData
+      })
     } catch (error) {
-      console.log('❌ Error loading news:', error)
-      this.newsError = true
+      if (__DEV__) console.log('❌ Error loading news:', error)
+      runInAction(() => {
+        this.newsError = true
+      })
     } finally {
-      this.loading = false
+      runInAction(() => {
+        this.loading = false
+      })
     }
   }
 
   @action.bound
   async loadPhotos() {
+    this.photosLoading = true
+    this.photosError = false
     try {
-      this.photosError = false
-      const photosData = await ApiService.getRecentPhotos()
-      this.historyItems = photosData.map((photo: NewsPhoto) => ({
-        title: photo.title,
-        description: `${photo.year}, ${getRegionPath(photo.rs, this.regionsMap)}`,
-        cid: photo.cid.toString(),
-        file: photo.file,
-      }))
+      // The photos bring the names of their regions.
+      const { photos, rhash } = await ApiService.getRecentPhotos()
+      runInAction(() => {
+        this.historyItems = photos.map(photo => ({
+          title: photo.title,
+          description: [photo.year, getRegionPath(photo.rs, rhash)].filter(Boolean).join(', '),
+          cid: photo.cid.toString(),
+          file: photo.file,
+        }))
+      })
     } catch (error) {
-      console.log('❌ Error loading photos:', error)
-      this.photosError = true
-    }
-  }
-
-  @action.bound
-  async loadRegions() {
-    try {
-      this.regionsMap = await ApiService.getRegions()
-    } catch (error) {
-      console.log('❌ Error loading regions:', error)
+      if (__DEV__) console.log('❌ Error loading photos:', error)
+      runInAction(() => {
+        this.photosError = true
+      })
+    } finally {
+      runInAction(() => {
+        this.photosLoading = false
+      })
     }
   }
 

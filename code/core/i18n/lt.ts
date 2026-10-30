@@ -26,9 +26,17 @@ export const lt = {
   },
   map: {
     searchPlaceholder: 'Ieškoti…',
+    yandexHiddenTitle: 'Žemėlapis paslėptas, kol rodomas vertimas',
+    yandexHiddenText:
+      '„Google“ taisyklės neleidžia rodyti jos vertimų šalia „Yandex“ žemėlapių logotipo, o „Yandex“ taisyklės draudžia šį logotipą slėpti. Todėl, kol ekrane rodomas vertimas, žemėlapis paslėptas. Jis grįš, kai parodysite originalą arba uždarysite nuotrauką. Nustatymuose taip pat galite pasirinkti kitą žemėlapį.',
+    streetViewHiddenTitle: 'Žemėlapis paslėptas, kol atidarytas palyginimas',
+    streetViewHiddenText:
+      '„Google“ taisyklės neleidžia rodyti „Street View“ panoramų šalia kito žemėlapio. Žemėlapis grįš, kai uždarysite palyginimą.',
     markersError: 'Nepavyko įkelti žemėlapio žymeklių',
-    searchLimit:
-      'Bendras paieškos limitas išnaudotas. Pabandykite po kelių minučių arba rytoj 🪫',
+    searchEmpty: 'Nieko nerasta',
+    searchBusy: 'Paieška šiuo metu perkrauta. Pabandykite po minutės',
+    searchDayLimit: 'Dienos paieškos limitas išnaudotas. Pabandykite rytoj',
+    searchError: 'Paieška nepavyko. Patikrinkite ryšį',
     nearbyButton: 'Nuotraukos netoli žemėlapio centro',
     nearbyEmpty: 'Netoliese nėra nuotraukų iš pasirinktų metų',
     nearbyError: 'Nepavyko įkelti nuotraukų netoliese',
@@ -69,6 +77,16 @@ export const lt = {
     processing: 'Spalvinama…',
     processingHint: 'Tai gali užtrukti iki %{seconds} sekundžių',
     error: 'Nepavyko nuspalvinti nuotraukos. Bandykite dar kartą',
+  },
+  translate: {
+    show: 'Versti naudojant „Google“',
+    hide: 'Rodyti originalą',
+    loading: 'Verčiama…',
+    failed: 'Nepavyko išversti',
+    retry: 'Bandyti dar kartą',
+    button: 'Versti naudojant „Google“',
+    error: 'Nepavyko išversti. Bandykite dar kartą',
+    dayLimit: 'Šiandienos vertimų limitas išnaudotas. Pabandykite rytoj',
   },
   colorizeModel: {
     title: 'Nespalvotų nuotraukų spalvinimas',
@@ -155,6 +173,9 @@ export const lt = {
     languageHint: 'Programėlės sąsajos kalba.',
     aiWatermark: 'Vandens ženklas „AI“',
     aiWatermarkHint: 'Dėti žymą „AI COLORIZATION“ nuspalvintų nuotraukų kampe, taip pat ir išsaugotų galerijoje?',
+    translation: 'Vertimas',
+    translationHint:
+      'Rodyti vertimo su „Google“ mygtukus prie nuotraukų ir komentarų kitomis kalbomis?',
   },
   options: {
     themeDark: 'Tamsi',
@@ -183,6 +204,9 @@ export const lt = {
     github: 'Programėlės kodas „GitHub“',
     privacyPolicy: 'Privatumo politika',
     yandexTerms: 'Yandex Maps naudojimo sąlygos',
+    translationTitle: 'Vertimas',
+    translationText:
+      'Komentarus ir nuotraukų aprašymus verčia „Google“ vertėjas. Mašininiame vertime gali būti klaidų. „Google“ pranešimas:',
     creditsTitle: 'Padėkos',
     creditsText:
       'Nuotraukos ir jų duomenys gaunami iš atviros PastVu API. Vietų paiešką teikia LocationIQ. Žemėlapius rodo „Google Maps Platform“ sistemoje „Android“ ir „Apple Maps“ sistemoje „iOS“, pasirinktinai „Yandex Maps“. Šių dienų panoramas teikia „Google Street View“. Nespalvotas nuotraukas tiesiog įrenginyje spalvina neuroninis tinklas DDColor (Kang ir kt., ICCV 2023, Apache 2.0 licencija).',

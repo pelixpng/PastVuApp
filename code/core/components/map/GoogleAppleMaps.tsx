@@ -1,7 +1,7 @@
 import MapView, { Marker, MapType, Region } from 'react-native-maps'
 import { Platform, StyleSheet } from 'react-native'
 import { RefObject } from 'react'
-import { useTheme } from '@react-navigation/native'
+import { useIsFocused, useTheme } from '@react-navigation/native'
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { MapMarker } from '../../types/apiPhotoList'
@@ -49,6 +49,10 @@ export const GoogleAppleMaps = ({
   const { colors, names } = useTheme()
   const tabBarHeight = useBottomTabBarHeight()
   const { bottom: safeBottom } = useSafeAreaInsets()
+  // The map stays in the window under the other tabs and under the screens pushed over them, and
+  // while the blue dot is on, the location keeps updating (on Android at high accuracy every 5 s).
+  // So the dot is shown only while the map is in front.
+  const isFocused = useIsFocused()
   // Apple's terms require the Apple Maps logo and its legal link to stay visible. MapKit draws
   // them in the bottom-left corner, inside the map's layout margins, which is where the years
   // slider covers them; on tablets, the slider and the tab bar under it. The margins lift them
@@ -74,7 +78,7 @@ export const GoogleAppleMaps = ({
       userInterfaceStyle={names.themeName}
       customMapStyle={colors.MapTheme}
       onRegionChangeComplete={onRegionChangeComplete}
-      showsUserLocation={true}
+      showsUserLocation={isFocused}
       showsMyLocationButton={false}
       initialRegion={initialRegion}
       showsPointsOfInterests={false}

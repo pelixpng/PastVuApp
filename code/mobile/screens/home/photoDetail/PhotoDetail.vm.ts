@@ -3,31 +3,45 @@ import { SCREENS } from '../../../navigation/navigation.types'
 import { Alert, Linking } from 'react-native'
 import { BaseViewModelProvider } from '../../../provider/vm.provider'
 import { IComment, Users } from '../../../../core/types/apiPhotoComment'
-import ApiService from '../../../../core/api/apiService'
+import { findNews } from '../../../../core/services/news'
 import { userLoginFromLink } from '../../../../core/utils/userLink'
 import { saveLocalImage, savePhoto, sharePhoto } from '../../../../core/utils/getPhoto'
-import ColorizeStore from '../../../../core/store/Colorize.store'
 import ApiStore from '../../../../core/store/Api.store'
+import { PostColorize } from '../../../../core/store/PostColorize'
 import * as PhotoPost from '../../../../core/services/photoPost'
 import { t } from '../../../../core/i18n'
 import * as StreetView from '../../../../core/services/streetView'
 import { CompareMode } from '../../../../core/components/compare/CompareView'
 
 class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
-  @observable comments: IComment[] = []
-  @observable users: Users | null = null
-  @observable postInfo: Photo | null = null
-  @observable isImageLoaded = false
+  // References, not deep observables: server data is replaced, never edited, and deep conversion of
+  // a long discussion froze the screen for a tenth of a second or more.
+  @observable.ref comments: IComment[] = []
+  @observable.ref users: Users | null = null
+  @observable.ref postInfo: Photo | null = null
   @observable isFavorite = false
   @observable activeCid: string | null = null
   @observable.ref streetView: StreetView.StreetViewInfo | null = null
   @observable.ref cidHistory: string[] = []
-  /** The photo whose colour version is shown above its original; see `isComparingOriginal`. */
-  @observable comparingCid: string | null = null
+
+  /** The open photo's colour version: palette, colour photo, comparison with the original. */
+  readonly colorize: PostColorize
+
+  /**
+   * The preview's size once it has loaded, which full screen takes instead of measuring the photo
+   * again. From the loaded file, not the post data: a /h/ thumbnail is cut to its own proportions.
+   */
+  private loadedResolution: { uri: string; resolution: PhotoPost.Resolution } | null = null
 
   constructor() {
     super()
     makeObservable(this)
+    // After makeObservable, so it tracks the photo.
+    this.colorize = new PostColorize(
+      () => this.activeCid,
+      () => this.imageLink,
+      () => this.postInfo?.file,
+    )
     autorun(() => {
       if (this.screenParams?.cid) {
         this.activeCid = this.screenParams.cid
@@ -44,42 +58,17 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
   }
 
   @computed
-  get isColorized() {
-    return ColorizeStore.isColorized(this.activeCid)
-  }
-
-  @computed
-  get canColorize() {
-    return ColorizeStore.canColorize(this.activeCid)
-  }
-
-  @computed
-  get isColorizing() {
-    return ColorizeStore.isColorizing(this.activeCid)
-  }
-
-  /**
-   * What every view of the photo shows and saving takes: the post, full screen and the compare
-   * screen. The colour version while it is switched on, with the "AI" mark unless that is off in
-   * settings; the original otherwise.
-   */
-  @computed
-  get displayLink() {
-    return ColorizeStore.displayUriFor(this.activeCid, this.imageLink)
-  }
-
-  /**
-   * The colour version stacked above the black-and-white original. Tied to the photo, so it ends by
-   * itself when another post opens or the colour is switched off.
-   */
-  @computed
-  get isComparingOriginal() {
-    return this.comparingCid !== null && this.comparingCid === this.activeCid && this.isColorized
-  }
-
-  @computed
   get imageResolution() {
     return this.postInfo ? PhotoPost.photoResolution(this.postInfo) : undefined
+  }
+
+  /**
+   * The preview's size for full screen, only when it opens that same file. The colour version may
+   * have been made at another photo quality, and a late load from the previous photo carries its
+   * own link; a local colour file is cheap to measure.
+   */
+  private resolutionFor(uri: string) {
+    return this.loadedResolution?.uri === uri ? this.loadedResolution.resolution : undefined
   }
 
   @computed
@@ -104,7 +93,7 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
   async getPhotoInfo() {
     const cid = this.activeCid!
     try {
-      const { photo, users, comments } = await PhotoPost.loadPost(cid)
+      const { photo, users, comments, streetView } = await PhotoPost.loadPost(cid)
       // Another photo may have been opened while this request was in flight (comments link into
       // other posts). Without this the slower, older response would overwrite the newer one.
       if (this.activeCid !== cid) return
@@ -115,20 +104,20 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
         this.isFavorite = PhotoPost.isFavorite(cid)
       })
       PhotoPost.recordHistory(photo, cid)
-      ColorizeStore.checkMonochrome(cid, `https://img.pastvu.com/h/${photo.file}`)
-      this.checkStreetView(cid)
+      this.checkStreetView(cid, streetView)
     } catch {
       Alert.alert(t('common.error'), t('photo.infoError'))
     }
   }
 
-  /** Runs after the post is shown: the button appears once Google confirms a panorama. */
+  /**
+   * Runs once the post is shown: the button appears when Google confirms a panorama. The question
+   * went out with the post, as soon as the photo brought its place.
+   */
   @action.bound
-  async checkStreetView(cid: string) {
-    const target = this.streetViewTarget
-    if (!target) return
-    const info = await StreetView.checkAvailability(target)
-    if (this.activeCid !== cid) return
+  async checkStreetView(cid: string, check: Promise<StreetView.StreetViewInfo | null>) {
+    const info = await check
+    if (!info || this.activeCid !== cid) return
     runInAction(() => {
       this.streetView = info
     })
@@ -159,24 +148,21 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
   /** The palette button: colours the photo on device, or goes back to the original. */
   @action.bound
   toggleColorize() {
-    if (this.activeCid && this.postInfo) ColorizeStore.toggle(this.activeCid, this.imageLink)
-  }
-
-  /** The button next to the palette: the colour version above the original, or back to one photo. */
-  @action.bound
-  toggleCompareOriginal() {
-    this.comparingCid = this.isComparingOriginal ? null : this.activeCid
+    // The header keeps the previous photo's buttons while the next one loads.
+    if (this.postInfo) this.colorize.toggle()
   }
 
   @action.bound
   openFullScreenImage() {
     if (!this.postInfo) return
+    const uri = this.colorize.displayLink
     this.navigateTo(SCREENS.FULL_SCREEN_IMAGE, {
       title: this.postInfo!.title,
       cid: this.activeCid!,
-      uri: this.displayLink,
+      uri,
       file: this.postInfo!.file,
-      localFile: this.isColorized ? this.displayLink : undefined,
+      localFile: this.colorize.localFile,
+      resolution: this.resolutionFor(uri),
     })
   }
 
@@ -188,6 +174,7 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
       cid: this.activeCid!,
       uri: this.imageLink,
       file: this.postInfo!.file,
+      resolution: this.resolutionFor(this.imageLink),
     })
   }
 
@@ -201,13 +188,13 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
   saveImage() {
     if (!this.postInfo) return
     // The colour version when it is on: saving gives what the screen shows.
-    if (this.isColorized) saveLocalImage(this.displayLink)
+    if (this.colorize.isColorized) saveLocalImage(this.colorize.displayLink)
     else savePhoto(this.postInfo!.title, this.postInfo!.file)
   }
 
   @action.bound
-  onImageLoad() {
-    this.isImageLoaded = true
+  onImageResolution(resolution: PhotoPost.Resolution, uri: string) {
+    this.loadedResolution = { uri, resolution }
   }
 
   @action.bound
@@ -224,7 +211,6 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
   openPhoto(cid: string) {
     this.cidHistory = [...this.cidHistory, this.activeCid!]
     this.activeCid = cid
-    this.isImageLoaded = false
     // Also what scrolls the new post to its top: the screen shows its loading state until the post
     // arrives, so the list mounts afresh.
     this.postInfo = null
@@ -243,10 +229,10 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
     } else if (newsMatch) {
       try {
         const cid = Number(newsMatch[1])
-        const news = await ApiService.getNews()
-        const post = news.find((n: { cid: number }) => n.cid === cid)
+        const post = await findNews(cid)
         if (post) {
-          this.navigateTo(SCREENS.NEWS_POST, post)
+          // Pushed: a news post may already be lower in the stack, under this photo.
+          this.pushTo(SCREENS.NEWS_POST, post)
         } else {
           Linking.openURL(`https://pastvu.com/news/${cid}`)
         }
@@ -269,7 +255,6 @@ class PhotoDetailVM extends BaseViewModelProvider<SCREENS.PHOTO_DETAIL> {
     const previousCid = this.cidHistory[this.cidHistory.length - 1]
     this.cidHistory = this.cidHistory.slice(0, -1)
     this.activeCid = previousCid
-    this.isImageLoaded = false
     this.postInfo = null
     this.streetView = null
     this.users = null

@@ -24,7 +24,7 @@ import { useVM } from '../../../core/hooks/useVM'
 import { useTabsAnchor } from '../../../core/hooks/useTabsAnchor'
 import { t } from '../../../core/i18n'
 import { PhotoListItem } from '../home/collection/components/Item'
-import { Comment } from '../home/photoDetail/components/comment/Comment'
+import { Comment } from '../../../core/components/comment/Comment'
 import ProfileVM from './Profile.vm'
 
 const keyExtractor = (row: ProfileRow) => row.key

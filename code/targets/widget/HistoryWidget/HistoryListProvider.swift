@@ -112,7 +112,8 @@ struct HistoryListProvider: TimelineProvider {
   }
     
     private func loadImageData(for file: String) async -> Data? {
-        guard let url = URL(string: "https://img.pastvu.com/d/\(file)") else { return nil }
+        // The 246 px /h/ thumbnail covers a 90 pt cell; /d/ costs over ten times the bytes.
+        guard let url = URL(string: "https://img.pastvu.com/h/\(file)") else { return nil }
         do {
             let (data, _) = try await URLSession.shared.data(from: url)
           return data

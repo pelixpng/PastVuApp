@@ -1,5 +1,5 @@
 import { BackHandler, StyleSheet, View } from 'react-native'
-import MapVM, { mapRef, yamapRef } from './Map.vm'
+import MapVM from './Map.vm'
 import { YearsSlider } from '../../../../core/components/map/YearsSlider'
 import { observer } from 'mobx-react-lite'
 import {
@@ -97,32 +97,30 @@ export const MapScreen = observer(() => {
 	return (
 		<View style={s.flexOne}>
 			<SearchPlace
-				places={vm.places}
-				query={vm.queryPlace}
-				setQueryPlace={vm.setQueryPlace}
-				goToLocation={vm.goToLocation}
+				search={vm.map.placeSearch}
+				goToLocation={vm.map.goToLocation}
 				onFocus={closeSheetForSearch}
 			/>
 			{MapStore.mapProvider === 'yandex' ? (
 				<YandexMaps
-					mapRef={yamapRef}
-					markers={vm.photoCollection.markers}
-					initialRegion={vm.coordinates}
-					onRegionChangeComplete={vm.setCoordinate}
+					mapRef={vm.map.yamapRef}
+					markers={vm.map.photoCollection.markers}
+					initialRegion={vm.map.coordinates}
+					onRegionChangeComplete={vm.map.setCoordinate}
 					onShowPhoto={vm.showPhoto}
-					onGoToLocation={vm.zoomToCluster}
+					onGoToLocation={vm.map.zoomToCluster}
 					bottomInset={mapBottomInset}
 				/>
 			) : (
 				<GoogleAppleMaps
-					mapRef={mapRef}
-					markers={vm.photoCollection.markers}
+					mapRef={vm.map.mapRef}
+					markers={vm.map.photoCollection.markers}
 					mapType={vm.mapTypeSetting}
 					mapMarkerType={vm.mapMarkerType}
-					initialRegion={vm.coordinates}
-					onRegionChangeComplete={vm.setCoordinate}
+					initialRegion={vm.map.coordinates}
+					onRegionChangeComplete={vm.map.setCoordinate}
 					onShowPhoto={vm.showPhoto}
-					onGoToLocation={vm.zoomToCluster}
+					onGoToLocation={vm.map.zoomToCluster}
 					bottomInset={mapBottomInset}
 				/>
 			)}
@@ -132,9 +130,12 @@ export const MapScreen = observer(() => {
 				tabBarHeight={tabBarHeight}
 				nearbyOpen={nearbyOpen}
 				onToggleNearby={vm.toggleNearby}
-				onLocate={vm.getCurrentLocation}
+				onLocate={vm.map.getCurrentLocation}
 			/>
-			<YearsSlider value={vm.yearsRange} setValue={vm.setYearsRange} />
+			<YearsSlider
+				value={vm.map.yearsRange}
+				setValue={vm.map.setYearsRange}
+			/>
 			{isTabSelected && (nearbyOpen || sheet.onScreen) && (
 				<Portal>
 					<NearbyPhotosSheet

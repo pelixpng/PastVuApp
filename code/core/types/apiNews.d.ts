@@ -23,7 +23,8 @@ export interface NewsPhoto {
   cid: number
   dir: string
   file: string
-  rs: [number, number]
+  /** Region cids, the deepest first; 0 first for a photo without coordinates. */
+  rs?: number[]
   s: number
   title: string
   year: number

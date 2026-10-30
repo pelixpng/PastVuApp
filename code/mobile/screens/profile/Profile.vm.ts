@@ -2,11 +2,10 @@ import { action, autorun, computed, makeObservable, observable, runInAction } fr
 import { Linking } from 'react-native'
 import { SCREENS } from '../../navigation/navigation.types'
 import { BaseViewModelProvider } from '../../provider/vm.provider'
-import ApiService from '../../../core/api/apiService'
 import { t } from '../../../core/i18n'
 import { SegmentedControlOption } from '../../../core/components/ui/segmentedControl/SegmentedControl'
 import { FilterChip } from '../../../core/components/ui/FilterChips'
-import { NewsItems } from '../../../core/types/apiNews'
+import { findNews } from '../../../core/services/news'
 import { Users } from '../../../core/types/apiPhotoComment'
 import { formatNumber } from '../../../core/utils/formatNumber'
 import { userLoginFromLink } from '../../../core/utils/userLink'
@@ -35,7 +34,6 @@ class ProfileVM extends BaseViewModelProvider<SCREENS.PROFILE> {
   @observable commentTarget: CommentTarget = 'photo'
   @observable.ref commentCounts: CommentCounts | null = null
   private login = ''
-  private newsFeed: NewsItems[] | null = null
   readonly userPhotos = new PagedList<ProfilePhotoRow>(page => fetchPhotosPage(this.login, page))
   readonly photoComments = new PagedList<UserCommentItem>(page =>
     fetchCommentsPage(this.login, page, 'photo', this.setCommentCounts),
@@ -101,25 +99,35 @@ class ProfileVM extends BaseViewModelProvider<SCREENS.PROFILE> {
       : groupComments(this.commentList.items, this.login)
   }
 
-  /** The author of every comment in the tab, for their avatar next to each one. */
-  @computed
+  /**
+   * The author of every comment in the tab, for their avatar next to each one. Kept alive: the
+   * rows read it outside any reaction, where it would be worked out anew on every read, and a new
+   * object draws every comment on screen again.
+   */
+  @computed({ keepAlive: true })
   get commentUsers(): Users | null {
     return this.profileState.status === 'ready' ? commentAuthor(this.profileState.profile) : null
   }
 
   @action.bound
   setCommentCounts(counts: CommentCounts) {
+    // Every page brings them; the same totals again would only redraw the list.
+    const current = this.commentCounts
+    if (current?.photo === counts.photo && current.news === counts.news) return
     this.commentCounts = counts
   }
 
   @action.bound
   async loadProfile() {
     this.profileState = { status: 'loading' }
+    // The first page needs only the login, so it goes out with the profile rather than after it;
+    // the list stays hidden until the profile is in.
+    const list = this.profileTab === 'photos' ? this.userPhotos : this.commentList
+    if (list.items.length === 0) list.loadMore()
     const state = await loadProfileState(this.login)
     runInAction(() => {
       this.profileState = state
     })
-    if (state.status === 'ready') this.activeList.loadMore()
   }
 
   /** Named apart from `share`, which shares the open photo on the tablet. */
@@ -157,8 +165,7 @@ class ProfileVM extends BaseViewModelProvider<SCREENS.PROFILE> {
   @action.bound
   async openNews(cid: string) {
     try {
-      if (!this.newsFeed) this.newsFeed = await ApiService.getNews()
-      const post = this.newsFeed?.find(news => String(news.cid) === cid)
+      const post = await findNews(Number(cid))
       if (post) {
         this.pushTo(SCREENS.NEWS_POST, post)
         return

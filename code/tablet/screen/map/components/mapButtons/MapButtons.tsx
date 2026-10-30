@@ -19,8 +19,8 @@ type MapButtonsProps = {
 }
 
 /**
- * The tablet map's round buttons in the bottom-right corner: nearby photos over my location. They
- * stand where the location button stood alone, and a photo's panel covers them as it covered it.
+ * The tablet map's round buttons in the bottom-right corner: nearby photos over my location. A
+ * photo's panel covers them.
  */
 export const MapButtons: FC<MapButtonsProps> = observer(
 	({ nearbyOpen, onToggleNearby, onLocate }) => {
@@ -28,8 +28,7 @@ export const MapButtons: FC<MapButtonsProps> = observer(
 		const { bottom } = useSafeAreaInsets()
 		return (
 			<View
-				// LocationButton's own tablet place: clear of the navigation bar, 16 from the edge like the
-				// search field and the slider.
+				// Clear of the navigation bar, 16 from the edge like the search field and the slider.
 				style={[s.container, { bottom: 24 + bottom }]}
 				pointerEvents="box-none"
 				// A new view over Google Maps on Android: the window's transparent region is gathered again
@@ -51,7 +50,7 @@ export const MapButtons: FC<MapButtonsProps> = observer(
 					/>
 				</TouchableOpacity>
 				<Spacer height={GAP} />
-				<LocationButton onPress={onLocate} inline />
+				<LocationButton onPress={onLocate} />
 			</View>
 		)
 	}

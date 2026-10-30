@@ -1,5 +1,5 @@
 import { useLayoutEffect } from 'react'
-import { ActivityIndicator, StyleSheet, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native'
 import { observer } from 'mobx-react-lite'
 import { StackParamList } from '../../../navigation/stackParams.types'
@@ -18,13 +18,18 @@ export const CompareScreen = observer(() => {
   const canColorize = ColorizeStore.canColorize(params.cid)
 
   // The same palette button as in the post, also only on black-and-white photos: the colour
-  // version shows here and there alike.
+  // version shows here and there alike. Greyed out while colouring, as the photo shows the progress.
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () =>
         colorizing ? (
-          <View style={s.spinner}>
-            <ActivityIndicator color={colors.textFirst} />
+          <View style={s.header}>
+            <HeaderIconButton
+              name="palette"
+              color={colors.textThird}
+              disabled
+              accessibilityLabel={t('colorize.processing')}
+            />
           </View>
         ) : canColorize ? (
           <View style={s.header}>
@@ -57,5 +62,4 @@ const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'black' },
   // 44 pt boxes around 24 pt glyphs: 6 keeps the glyph 16 from the edge, as on the post.
   header: { marginRight: 6 },
-  spinner: { width: 44, height: 44, marginRight: 6, justifyContent: 'center', alignItems: 'center' },
 })

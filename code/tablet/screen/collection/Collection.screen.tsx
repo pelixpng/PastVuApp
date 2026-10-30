@@ -20,16 +20,11 @@ import { PhotoDetail } from './components/photoDetail/PhotoDetail'
 import { Container } from '../../../core/components/ui/Container'
 import { HeaderIconButton } from '../../../core/components/ui/buttons/HeaderIconButton'
 import { ColorizeButtons } from '../../../core/components/colorize/ColorizeButtons'
+import { TranslateButton } from '../../../core/components/translate/TranslateButton'
 import { SegmentedControl } from '../../../core/components/ui/segmentedControl/SegmentedControl'
 import { t } from '../../../core/i18n'
+import type { CollectionItem } from '../../../core/services/photoPost'
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
-
-export interface CollectionItem {
-  title: string
-  description: string
-  cid: string
-  file: string
-}
 
 const ListHeader = () => <Spacer height={8} />
 const ListFooter = () => <Spacer height={80} />
@@ -38,6 +33,7 @@ const keyExtractor = (item: CollectionItem) => item.cid
 
 export const CollectionScreen = observer(() => {
   const vm = useVM(CollectionVM)
+  const { panel } = vm
   const tabBarHeight = useBottomTabBarHeight()
   const { colors } = useTheme()
   const navigation = useNavigation()
@@ -50,23 +46,27 @@ export const CollectionScreen = observer(() => {
     }, [vm]),
   )
   useLayoutEffect(() => {
-    if (!vm.postInfo) return
+    if (!panel.postInfo) return
+    // Taken now: the post is cleared when another photo is picked, and the header may draw meanwhile.
+    const { cid, title, desc } = panel.postInfo
     navigation.setOptions({
       headerRight: () => (
         <View style={s.header}>
+          {/* Translation only over the post itself: then-and-now does not show its text. */}
+          {!panel.compareMode && <TranslateButton cid={cid} title={title} desc={desc} />}
           {/* Palette and the comparison with the original; the latter not over the then-and-now view. */}
-          <ColorizeButtons colorize={vm.colorize} showCompareOriginal={!vm.compareMode} />
-          <HeaderIconButton name="compare" color={colors.textFirst} onPress={vm.openCompare} />
+          <ColorizeButtons colorize={panel.colorize} showCompareOriginal={!panel.compareMode} />
+          <HeaderIconButton name="compare" color={colors.textFirst} onPress={panel.openCompare} />
           <Spacer width={4} />
-          <HeaderIconButton name={vm.isFavorite ? 'favorite' : 'favorite-border'} color={colors.textFirst} onPress={vm.toggleFavorite} />
+          <HeaderIconButton name={panel.isFavorite ? 'favorite' : 'favorite-border'} color={colors.textFirst} onPress={vm.toggleFavorite} />
           <Spacer width={4} />
-          <HeaderIconButton name="save-alt" color={colors.textFirst} onPress={vm.saveImage} />
+          <HeaderIconButton name="save-alt" color={colors.textFirst} onPress={panel.saveImage} />
           <Spacer width={4} />
-          <HeaderIconButton name="share" color={colors.textFirst} onPress={vm.share} />
+          <HeaderIconButton name="share" color={colors.textFirst} onPress={panel.share} />
         </View>
       ),
     })
-  }, [vm.postInfo, vm.isFavorite, vm.compareMode, colors.textFirst, navigation])
+  }, [panel.postInfo, panel.isFavorite, panel.compareMode, colors.textFirst, navigation])
 
   const renderItem = useCallback(
     ({ item }: { item: CollectionItem }) => (
@@ -74,7 +74,7 @@ export const CollectionScreen = observer(() => {
         title={item.title}
         description={item.description}
         file={item.file}
-        isSelected={vm.selectedItem === item.cid}
+        isSelected={vm.panel.cid === item.cid}
         onPress={() => vm.showPhoto(item.cid)}
         onRemove={() => vm.showDeleteModal(item.cid)}
       />
@@ -95,6 +95,8 @@ export const CollectionScreen = observer(() => {
         </View>
         <FlatList
           data={vm.displayedData}
+          // Rows read the selection inside renderItem, which the list does not track.
+          extraData={panel.cid}
           style={s.list}
           // The tablet tab bar floats over the content, so the list needs to end above it.
           contentContainerStyle={{ paddingBottom: tabBarHeight + 16 }}
@@ -121,25 +123,7 @@ export const CollectionScreen = observer(() => {
           }
         />
       </View>
-      <PhotoDetail
-        postInfo={vm.postInfo}
-        users={vm.users}
-        comments={vm.comments}
-        onImageLoaded={vm.onImageLoad}
-        imageLink={vm.imageLink}
-        isImageLoaded={vm.isImageLoaded}
-        showLoader={vm.showLoader}
-        photoSelected={vm.selectedItem !== null}
-        openFullScreen={vm.openFullScreenImage}
-        colorize={vm.colorize}
-        onLinkPress={vm.openPhotoFromLink}
-        onOpenPhoto={vm.showPhoto}
-        compareMode={vm.compareMode}
-        closeCompare={vm.closeCompare}
-        hasStreetView={vm.hasStreetView}
-        streetView={vm.streetView}
-        comparePhoto={vm.comparePhoto}
-      />
+      <PhotoDetail panel={panel} onLinkPress={vm.openPhotoFromLink} onOpenPhoto={vm.showPhoto} />
       <Modal
         visible={vm.isDeleteModalVisible}
         transparent

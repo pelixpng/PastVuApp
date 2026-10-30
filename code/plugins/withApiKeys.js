@@ -20,7 +20,7 @@ const path = require('path')
  *
  * `modules/app-keys` reads the values at runtime. Nothing is written to a tracked file.
  */
-const KEYS = ['PLACE_API_KEY', 'STREET_VIEW_API_KEY', 'YANDEX_MAPS_API_KEY']
+const KEYS = ['PLACE_API_KEY', 'STREET_VIEW_API_KEY', 'YANDEX_MAPS_API_KEY', 'TRANSLATE_API_KEY']
 
 const gradleBlock = `        // PastVu: API keys come from the project's .env at build time and land in the manifest as
         // <meta-data>, read by modules/app-keys. See plugins/withApiKeys.js.

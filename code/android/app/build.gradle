@@ -103,11 +103,12 @@ android {
             PLACE_API_KEY: pastvuKey('PLACE_API_KEY_ANDROID') ?: pastvuKey('PLACE_API_KEY'),
             STREET_VIEW_API_KEY: pastvuKey('STREET_VIEW_API_KEY_ANDROID') ?: pastvuKey('STREET_VIEW_API_KEY'),
             YANDEX_MAPS_API_KEY: pastvuKey('YANDEX_MAPS_API_KEY_ANDROID') ?: pastvuKey('YANDEX_MAPS_API_KEY'),
+            TRANSLATE_API_KEY: pastvuKey('TRANSLATE_API_KEY_ANDROID') ?: pastvuKey('TRANSLATE_API_KEY'),
         ]
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 59
-        versionName "2.8.0"
+        versionCode 60
+        versionName "2.9.0"
 
         // PastVu: phones only (arm64 and 32-bit arm), for every native library, not just React
         // Native's: reactNativeArchitectures in gradle.properties only governs the libraries built

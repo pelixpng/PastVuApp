@@ -26,9 +26,18 @@ export const en = {
   },
   map: {
     searchPlaceholder: 'Search…',
+    yandexHiddenTitle: 'The map is hidden while a translation is shown',
+    yandexHiddenText:
+      'Google’s terms don’t allow its translations next to the Yandex Maps logo, and Yandex’s terms don’t allow hiding that logo. So while a translation is on screen, the map is hidden. It comes back when you show the original or close the photo. You can also choose another map in the settings.',
+    streetViewHiddenTitle: 'The map is hidden during the comparison',
+    streetViewHiddenText:
+      'Google’s terms don’t allow Street View panoramas next to another map. The map comes back when you close the comparison.',
     markersError: 'Couldn’t load map markers',
-    searchLimit:
-      'The shared search limit has been reached. Try again in a few minutes, or tomorrow 🪫',
+    searchEmpty: 'Nothing found',
+    searchBusy: 'Search is busy right now. Try again in a minute',
+    searchDayLimit:
+      'The daily search limit has been reached. Try again tomorrow',
+    searchError: 'Search failed. Check your connection',
     nearbyButton: 'Photos near the map center',
     nearbyEmpty: 'No photos nearby for the selected years',
     nearbyError: 'Couldn’t load nearby photos',
@@ -68,6 +77,16 @@ export const en = {
     processing: 'Colorizing…',
     processingHint: 'This may take up to %{seconds} seconds',
     error: "Couldn't colorize the photo. Please try again",
+  },
+  translate: {
+    show: 'Translate with Google',
+    hide: 'Show original',
+    loading: 'Translating…',
+    failed: 'Couldn’t translate',
+    retry: 'Try again',
+    button: 'Translate with Google',
+    error: 'Couldn’t translate. Please try again',
+    dayLimit: 'Today’s translation limit is used up. Try again tomorrow',
   },
   colorizeModel: {
     title: 'Colorizing B&W photos',
@@ -154,6 +173,9 @@ export const en = {
     languageHint: 'Language of the app interface.',
     aiWatermark: 'AI watermark',
     aiWatermarkHint: 'Add an “AI COLORIZATION” mark to the corner of colorized photos, including the ones you save?',
+    translation: 'Translation',
+    translationHint:
+      'Show the “Translate with Google” buttons on photos and comments in other languages?',
   },
   options: {
     themeDark: 'Dark',
@@ -182,6 +204,9 @@ export const en = {
     github: 'App source on GitHub',
     privacyPolicy: 'Privacy policy',
     yandexTerms: 'Yandex Maps Terms of Use',
+    translationTitle: 'Translation',
+    translationText:
+      'Comments and photo descriptions are translated by Google Translate. Machine translation can contain mistakes. Google’s notice:',
     creditsTitle: 'Credits',
     creditsText:
       'Photos and their details come from the open PastVu API. Place search is powered by LocationIQ. Maps are rendered with Google Maps Platform on Android and Apple Maps on iOS, or optionally Yandex Maps. Today’s panoramas come from Google Street View. Black-and-white photos are colorized right on the device by the DDColor neural network (Kang et al., ICCV 2023, Apache 2.0 license).',

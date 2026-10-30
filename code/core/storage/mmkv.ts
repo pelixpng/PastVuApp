@@ -18,6 +18,8 @@ type MMKVStorageType =
   | 'locale'
   | 'yandexConsent'
   | 'aiWatermark'
+  | 'translation'
+  | 'News'
 
 type TValue = string | number | object
 

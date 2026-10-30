@@ -11,6 +11,7 @@ import { useNavigation, useTheme } from '@react-navigation/native'
 import { observer } from 'mobx-react-lite'
 import { HeaderIconButton } from '../../../core/components/ui/buttons/HeaderIconButton'
 import { ColorizeButtons } from '../../../core/components/colorize/ColorizeButtons'
+import { TranslateButton } from '../../../core/components/translate/TranslateButton'
 import NewsVM, { NewsTab } from './News.vm'
 import { useVM } from '../../../core/hooks/useVM'
 import { Spacer } from '../../../core/components/ui/Spacer'
@@ -21,7 +22,7 @@ import { NewsDetail } from './components/newsDetail/NewsDetail'
 import { PhotoDetail } from '../collection/components/photoDetail/PhotoDetail'
 import { ItemHistory } from '../collection/components/itemHistory/Item'
 import type { NewsItems } from '../../../core/types/apiNews'
-import type { CollectionItem } from '../collection/Collection.screen'
+import type { CollectionItem } from '../../../core/services/photoPost'
 import { t } from '../../../core/i18n'
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
 
@@ -34,6 +35,7 @@ const photoKeyExtractor = (item: CollectionItem) => item.cid
 
 export const NewsScreen = observer(() => {
   const vm = useVM(NewsVM)
+  const { panel } = vm
   const { colors } = useTheme()
   const tabBarHeight = useBottomTabBarHeight()
   const navigation = useNavigation()
@@ -41,26 +43,30 @@ export const NewsScreen = observer(() => {
   const { width } = useSafeAreaFrame()
   const listWidth = width * 0.33
   useLayoutEffect(() => {
-    if (vm.selectedPhotoCid && vm.postInfo) {
+    if (panel.cid && panel.postInfo) {
+      // Taken now: the post is cleared when another photo is picked, and the header may draw meanwhile.
+      const { cid, title, desc } = panel.postInfo
       navigation.setOptions({
         headerLeft: vm.selectedTab === 'posts'
           ? () => (
               <View style={{ marginLeft: 6 }}>
-                <HeaderIconButton name="arrow-back" color={colors.textFirst} onPress={vm.closePhoto} />
+                <HeaderIconButton name="arrow-back" color={colors.textFirst} onPress={panel.close} />
               </View>
             )
           : undefined,
         headerRight: () => (
           <View style={s.header}>
+            {/* Translation only over the post itself: then-and-now does not show its text. */}
+            {!panel.compareMode && <TranslateButton cid={cid} title={title} desc={desc} />}
             {/* Palette and the comparison with the original; the latter not over the then-and-now view. */}
-            <ColorizeButtons colorize={vm.colorize} showCompareOriginal={!vm.compareMode} />
-            <HeaderIconButton name="compare" color={colors.textFirst} onPress={vm.openCompare} />
+            <ColorizeButtons colorize={panel.colorize} showCompareOriginal={!panel.compareMode} />
+            <HeaderIconButton name="compare" color={colors.textFirst} onPress={panel.openCompare} />
             <Spacer width={4} />
-            <HeaderIconButton name={vm.isFavorite ? 'favorite' : 'favorite-border'} color={colors.textFirst} onPress={vm.toggleFavorite} />
+            <HeaderIconButton name={panel.isFavorite ? 'favorite' : 'favorite-border'} color={colors.textFirst} onPress={panel.toggleFavorite} />
             <Spacer width={4} />
-            <HeaderIconButton name="save-alt" color={colors.textFirst} onPress={vm.saveImage} />
+            <HeaderIconButton name="save-alt" color={colors.textFirst} onPress={panel.saveImage} />
             <Spacer width={4} />
-            <HeaderIconButton name="share" color={colors.textFirst} onPress={vm.share} />
+            <HeaderIconButton name="share" color={colors.textFirst} onPress={panel.share} />
           </View>
         ),
       })
@@ -75,14 +81,14 @@ export const NewsScreen = observer(() => {
           : undefined,
         headerRight: () => (
           <View style={s.header}>
-            <HeaderIconButton name="share" color={colors.textFirst} />
+            <HeaderIconButton name="share" color={colors.textFirst} onPress={vm.shareNews} />
           </View>
         ),
       })
     } else {
       navigation.setOptions({ headerLeft: undefined, headerRight: undefined })
     }
-  }, [vm.selectedPhotoCid, vm.selectedTab, vm.activePost, vm.postInfo, vm.isFavorite, vm.compareMode, vm.canGoBack, colors.textFirst, navigation])
+  }, [panel.cid, vm.selectedTab, vm.activePost, panel.postInfo, panel.isFavorite, panel.compareMode, vm.canGoBack, colors.textFirst, navigation])
 
   const renderPost = useCallback(
     ({ item }: { item: NewsItems }) => (
@@ -105,7 +111,7 @@ export const NewsScreen = observer(() => {
         title={item.title}
         description={item.description}
         file={item.file}
-        isSelected={vm.selectedPhotoCid === item.cid}
+        isSelected={vm.panel.cid === item.cid}
         onPress={() => vm.showPhoto(item.cid)}
       />
     ),
@@ -125,7 +131,7 @@ export const NewsScreen = observer(() => {
         </View>
         {vm.selectedTab === 'posts' ? (
           <FlatList<NewsItems>
-            data={vm.displayedPosts}
+            data={vm.news}
             style={s.postListContainer}
             // The tablet tab bar floats over the content, so the list needs to end above it.
             contentContainerStyle={{ paddingBottom: tabBarHeight + 16 }}
@@ -155,7 +161,7 @@ export const NewsScreen = observer(() => {
           />
         ) : (
           <FlatList<CollectionItem>
-            data={vm.displayedPhotos}
+            data={vm.historyItems}
             style={s.list}
             contentContainerStyle={{ paddingBottom: tabBarHeight + 16 }}
             ListHeaderComponent={ListHeader}
@@ -168,7 +174,7 @@ export const NewsScreen = observer(() => {
             windowSize={5}
             showsVerticalScrollIndicator={false}
             ListEmptyComponent={
-              vm.loading ? (
+              vm.photosLoading ? (
                 <View style={s.emptyContainer}>
                   <ActivityIndicator size="large" color="gray" />
                 </View>
@@ -184,26 +190,8 @@ export const NewsScreen = observer(() => {
           />
         )}
       </View>
-      {vm.selectedPhotoCid ? (
-        <PhotoDetail
-          postInfo={vm.postInfo}
-          comments={vm.photoComments}
-          users={vm.photoUsers}
-          onImageLoaded={vm.onImageLoad}
-          imageLink={vm.imageLink}
-          isImageLoaded={vm.isImageLoaded}
-          showLoader={vm.showLoader}
-          photoSelected={!!vm.selectedPhotoCid}
-          openFullScreen={vm.openFullScreenImage}
-          colorize={vm.colorize}
-          onLinkPress={vm.openPhotoFromLink}
-          onOpenPhoto={vm.showPhoto}
-          compareMode={vm.compareMode}
-          closeCompare={vm.closeCompare}
-          hasStreetView={vm.hasStreetView}
-          streetView={vm.streetView}
-          comparePhoto={vm.comparePhoto}
-        />
+      {panel.cid ? (
+        <PhotoDetail panel={panel} onLinkPress={vm.openPhotoFromLink} onOpenPhoto={vm.showPhoto} />
       ) : (
         <NewsDetail
           post={vm.activePost}

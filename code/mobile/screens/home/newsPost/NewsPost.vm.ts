@@ -5,13 +5,15 @@ import { BaseViewModelProvider } from '../../../provider/vm.provider'
 import { IComment, Users } from '../../../../core/types/apiPhotoComment'
 import { NewsItems } from '../../../../core/types/apiNews'
 import ApiService from '../../../../core/api/apiService'
+import { findNews } from '../../../../core/services/news'
 import { userLoginFromLink } from '../../../../core/utils/userLink'
 
 class NewsPostVM extends BaseViewModelProvider<SCREENS.NEWS_POST> {
-  @observable comments: IComment[] = []
-  @observable users: Users | null = null
-  @observable activePost: NewsItems | null = null
-  @observable.ref postHistory: NewsItems[] = []
+  // References, not deep observables: server data is replaced, never edited, and deep conversion of
+  // a long discussion froze the screen for a tenth of a second or more.
+  @observable.ref comments: IComment[] = []
+  @observable.ref users: Users | null = null
+  @observable.ref activePost: NewsItems | null = null
 
   constructor() {
     super()
@@ -31,23 +33,22 @@ class NewsPostVM extends BaseViewModelProvider<SCREENS.NEWS_POST> {
     return this.activePost
   }
 
-  @computed
-  get canGoBack() {
-    return this.postHistory.length > 0
-  }
-
   // ------------------------------------------ Actions ------------------------------------------
 
   @action.bound
   async loadComments() {
+    const post = this.activePost!
     try {
       this.comments = []
       this.users = null
-      const { users, comments } = await ApiService.getNewsComments(this.activePost!.cid)
+      const { users, comments } = await ApiService.getNewsComments(post.cid)
+      // A news link may have opened another post while this request was in flight. Without this
+      // the slower, older response would put its comments under the newer post.
+      if (this.activePost !== post) return
       this.users = users
       this.comments = comments
     } catch (error) {
-      console.log('Error loading news comments:', error)
+      if (__DEV__) console.log('Error loading news comments:', error)
     }
   }
 
@@ -57,14 +58,13 @@ class NewsPostVM extends BaseViewModelProvider<SCREENS.NEWS_POST> {
     const newsMatch = href.match(/\/news\/(\d+)/)
     if (photoMatch) {
       const cid = photoMatch[1]
-      this.navigateTo(SCREENS.PHOTO_DETAIL, { cid, title: `#${cid}` })
+      // Pushed: a photo detail may already be lower in the stack, under this post.
+      this.pushTo(SCREENS.PHOTO_DETAIL, { cid, title: `#${cid}` })
     } else if (newsMatch) {
       try {
         const cid = Number(newsMatch[1])
-        const news = await ApiService.getNews()
-        const post = news.find((n: { cid: number }) => n.cid === cid)
+        const post = await findNews(cid)
         if (post) {
-          this.postHistory = [...this.postHistory, this.activePost!]
           this.activePost = post
           this.loadComments()
         } else {
@@ -86,16 +86,6 @@ class NewsPostVM extends BaseViewModelProvider<SCREENS.NEWS_POST> {
   @action.bound
   openProfile(login: string) {
     this.pushTo(SCREENS.PROFILE, { login })
-  }
-
-  @action.bound
-  goBackToPost() {
-    if (this.postHistory.length === 0) return false
-    const previousPost = this.postHistory[this.postHistory.length - 1]
-    this.postHistory = this.postHistory.slice(0, -1)
-    this.activePost = previousPost
-    this.loadComments()
-    return true
   }
 
   @action.bound
