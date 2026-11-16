@@ -53,10 +53,10 @@ export const ModelDownloadSheet: FC = observer(() => (
     visible={ColorizerModel.sheetVisible}
     transparent
     animationType="none"
-    // A modal is portrait-only by default on iOS, which would turn the landscape iPad app around.
+    // A modal is portrait-only by default on iOS, which would turn a landscape app around.
     supportedOrientations={ALL_ORIENTATIONS}
     onRequestClose={ColorizerModel.hideSheet}>
-    {/* The sheet sits above the navigator, outside any safe-area provider, so it brings its own. */}
+    {/* A modal is a window of its own, so the sheet measures its own safe area. */}
     <SafeAreaProvider>
       <Sheet />
     </SafeAreaProvider>

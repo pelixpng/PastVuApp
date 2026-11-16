@@ -11,17 +11,22 @@ import { useTheme } from '@react-navigation/native'
 import { t } from '../../core/i18n'
 import { observer } from 'mobx-react-lite'
 import { PortalHost, PortalProvider } from '../../core/components/ui/portal/Portal'
+import { useHeaderEdgeStyles } from '../../core/hooks/useHeaderEdgeStyles'
 
 const Tab = createBottomTabNavigator<StackParamList>()
 
 const Tabs = observer(function Tabs() {
   const { colors } = useTheme()
+  const headerEdgeStyles = useHeaderEdgeStyles('left')
   return (
     <Tab.Navigator
       initialRouteName={SCREENS.MAP}
       // Keep inactive tabs attached: detaching tears the native MapView out of the hierarchy, and
       // rebuilding it on return redraws the map and loses part of the markers.
       detachInactiveScreens={false}
+      // Full width, as on any iPhone, also beside iPhone Duo's vertical bar (a side inset of 84 pt
+      // on its cover display), which bottom-tabs would otherwise keep clear on both sides.
+      safeAreaInsets={{ left: 0, right: 0 }}
       screenOptions={{
         tabBarActiveTintColor: colors.basePrimary,
         tabBarInactiveTintColor: colors.textThird,
@@ -35,6 +40,7 @@ const Tabs = observer(function Tabs() {
         },
         headerTitle: '',
         headerTitleAlign: 'left',
+        ...headerEdgeStyles,
         headerTitleStyle: s.headerTitleStyle,
         headerTintColor: colors.textFirst,
         tabBarHideOnKeyboard: true,

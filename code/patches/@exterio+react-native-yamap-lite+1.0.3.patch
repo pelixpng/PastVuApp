@@ -942,6 +942,18 @@ index 328a725..41d309b 100644
      [_view removeReactSubview:childComponentView];
      [childComponentView removeFromSuperview];
    }
+diff --git a/node_modules/@exterio/react-native-yamap-lite/ios/ClusteredYamapLiteViewManager.mm b/node_modules/@exterio/react-native-yamap-lite/ios/ClusteredYamapLiteViewManager.mm
+index 29b4762..a726f8e 100644
+--- a/node_modules/@exterio/react-native-yamap-lite/ios/ClusteredYamapLiteViewManager.mm
++++ b/node_modules/@exterio/react-native-yamap-lite/ios/ClusteredYamapLiteViewManager.mm
+@@ -1,6 +1,6 @@
+ #import <React/RCTViewManager.h>
+ #import <React/RCTUIManager.h>
+-#import "RCTBridge.h"
++#import <React/RCTBridge.h>
+ 
+ @interface ClusteredYamapLiteViewManager : RCTViewManager
+ @end
 diff --git a/node_modules/@exterio/react-native-yamap-lite/ios/Components/Circle.swift b/node_modules/@exterio/react-native-yamap-lite/ios/Components/Circle.swift
 deleted file mode 100644
 index 210f5c0..0000000
@@ -2024,6 +2036,18 @@ index eaa60cf..a5af430 100644
      [_view removeReactSubview:childComponentView];
      [childComponentView removeFromSuperview];
    }
+diff --git a/node_modules/@exterio/react-native-yamap-lite/ios/YamapLiteViewManager.mm b/node_modules/@exterio/react-native-yamap-lite/ios/YamapLiteViewManager.mm
+index 82c8163..aaa2e29 100644
+--- a/node_modules/@exterio/react-native-yamap-lite/ios/YamapLiteViewManager.mm
++++ b/node_modules/@exterio/react-native-yamap-lite/ios/YamapLiteViewManager.mm
+@@ -1,6 +1,6 @@
+ #import <React/RCTViewManager.h>
+ #import <React/RCTUIManager.h>
+-#import "RCTBridge.h"
++#import <React/RCTBridge.h>
+ 
+ @interface YamapLiteViewManager : RCTViewManager
+ @end
 diff --git a/node_modules/@exterio/react-native-yamap-lite/lib/module/Components/Circle.js b/node_modules/@exterio/react-native-yamap-lite/lib/module/Components/Circle.js
 deleted file mode 100644
 index c09b8f9..0000000

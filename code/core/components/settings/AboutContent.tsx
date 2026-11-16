@@ -10,8 +10,8 @@ import { LinkButtonPair } from './LinkButtonPair'
 import { Links } from '../../constants/links'
 import { formatLongDate, t } from '../../i18n'
 
-const APP_VERSION = '2.9.0'
-const RELEASE_DATE = new Date('2026-10-28')
+const APP_VERSION = '2.10.0'
+const RELEASE_DATE = new Date('2026-11-14')
 
 /**
  * The About section, the same on a phone and a tablet. The screen around it supplies the scrolling

@@ -21,12 +21,16 @@ export class BaseViewModelProvider<SCREEN extends SCREENS> {
     return this.navigator?.getCurrentRoute()?.params as StackParamList[SCREEN]
   }
 
+  /**
+   * Goes back to the screen, with the new params, when one with the same name is already in the
+   * stack, instead of opening a second copy on top.
+   */
   navigateTo<C extends SCREENS>(screen: C, params?: StackParamList[C]) {
-    this.navigator?.navigate(screen as string, params)
+    this.navigator?.navigate(screen as string, params, { pop: true })
   }
 
   /**
-   * Opens the screen on top even when one with the same name is already in the stack: `navigate`
+   * Opens the screen on top even when one with the same name is already in the stack: `navigateTo`
    * would jump back to it instead (profile, then a photo, then another profile).
    */
   pushTo<C extends SCREENS>(screen: C, params?: StackParamList[C]) {

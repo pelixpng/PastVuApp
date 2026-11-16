@@ -51,7 +51,7 @@ export const PostListItem: FC<PostListItemProps> = observer(
             cachePolicy="disk"
           />
           <Spacer width={8} />
-          <Text style={[s.userNameText, { color: colors.textFirst }]}>
+          <Text numberOfLines={1} style={[s.userNameText, { color: colors.textFirst }]}>
             {user.disp || user.login}
           </Text>
         </View>

@@ -11,24 +11,25 @@ import Animated, {
   FadeIn,
   SlideInRight,
   SlideOutRight,
-  runOnJS,
 } from 'react-native-reanimated'
-import { useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
+import { scheduleOnRN } from 'react-native-worklets'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { HeaderIconButton } from '../../../../../core/components/ui/buttons/HeaderIconButton'
-import { Spacer } from '../../../../../core/components/ui/Spacer'
 import { useTheme } from '@react-navigation/native'
 import { observer } from 'mobx-react-lite'
 import { IComment } from '../../../../../core/types/apiPhotoComment'
 import { PostInfo } from '../postInfo/PostInfo'
 import { Comment } from '../../../../../core/components/comment/Comment'
-import { s } from './style'
+import { HEADER_SIDE, POST_PADDING, s } from './style'
 import { t } from '../../../../../core/i18n'
 import { CompareView } from '../../../../../core/components/compare/CompareView'
 import { streetViewTarget } from '../../../../../core/services/streetView'
 import { refreshWindowRegion } from '../../../../../modules/window-region'
 import { PhotoPanel } from '../../../../../core/store/PhotoPanel'
 import { ColorizeButtons } from '../../../../../core/components/colorize/ColorizeButtons'
-import { TranslateButton } from '../../../../../core/components/translate/TranslateButton'
+import { HEADER_BUTTON_SIZE } from '../../../../../core/utils/headerGap'
+import { PanelActions } from '../../../../components/PanelActions'
+import { useTabletLayout } from '../../../../hooks/useTabletLayout'
 
 // Google Maps renders into a SurfaceView, so Android keeps a hint of which parts of the window are
 // transparent over it. The hint is recomputed only in a window layout pass, which React Native never
@@ -38,13 +39,14 @@ import { TranslateButton } from '../../../../../core/components/translate/Transl
 // the pass runs again so the map area becomes transparent again.
 const afterSlideOut = (finished: boolean) => {
   'worklet'
-  if (finished) runOnJS(refreshWindowRegion)()
+  if (finished) scheduleOnRN(refreshWindowRegion)
 }
 const panelEntering = SlideInRight.duration(600)
 const panelExiting = SlideOutRight.duration(600).withCallback(afterSlideOut)
 // As on the phone: the next photo's post fades in rather than snapping into place, and the spinner
 // comes late, so a post that is already cached does not flash it.
 const postEntering = FadeIn.duration(220).easing(Easing.out(Easing.cubic))
+const compareEntering = FadeIn.duration(200).easing(Easing.out(Easing.cubic))
 const loaderEntering = FadeIn.delay(150).duration(200)
 
 type PhotoDetailProps = {
@@ -53,6 +55,11 @@ type PhotoDetailProps = {
   onLinkPress?: (href: string) => void
   /** Opens another photo in this panel, here from the nearby photos. */
   onOpenPhoto?: (cid: string) => void
+  /**
+   * Then-and-now may show. False while the cover over an Apple or Yandex map is still fading in:
+   * Street View must not appear beside that map (see the map screen).
+   */
+  compareReady?: boolean
 }
 
 // An observer: the post and its colour state come from the panel, not from the props.
@@ -61,25 +68,30 @@ export const PhotoDetail: FC<PhotoDetailProps> = observer(({
   closePhoto,
   onLinkPress,
   onOpenPhoto,
+  compareReady = true,
 }) => {
   const { postInfo, comments, users, colorize, compareMode, comparePhoto, streetView } = panel
-  // The root view's width: Dimensions on iOS keeps the portrait width after the app turns itself
-  // to landscape at launch, and the panel came out a third too narrow (see core/hooks/useRootSize).
-  const { width } = useSafeAreaFrame()
+  // From the root view's size, not Dimensions, which on iOS can keep the width from before a turn
+  // and leave the panel too narrow (see core/hooks/useRootSize).
+  const layout = useTabletLayout()
   const { top, bottom } = useSafeAreaInsets()
   const { colors } = useTheme()
   const topLoader = top + 40
-  const modalWidth = width * 0.67 - 32
   const renderItem = useCallback(({ item }: { item: IComment }) => <Comment comment={item} users={users} onLinkPress={onLinkPress} replyWidth="94%" style={local.underPhoto} />, [users, onLinkPress])
   const cid = postInfo?.cid
-  // Then-and-now covers the panel; the arrow brings the post back rather than closing it. The post
-  // stays mounted underneath: building it again on the way back reloaded its photos, which flickered.
+  // Then-and-now covers the panel. The post stays mounted underneath: building it again on the way
+  // back reloaded its photos, which flickered.
   const comparing = !!(compareMode && comparePhoto)
   const target = comparing && panel.hasStreetView ? streetViewTarget(postInfo) : null
-  const compare = comparing ? (
-    <View style={[s.panel, { backgroundColor: colors.backgroundApp }]}>
-      <View style={[s.header, { marginTop: top + 5, marginBottom: 5 }]}>
-        <HeaderIconButton name="arrow-back" color={colors.textFirst} onPress={panel.closeCompare} />
+  // The panel runs under iPhone Duo's vertical bar at the right, with the status bar at its top:
+  // the header's buttons keep clear of it.
+  const headerEdge = { paddingRight: HEADER_SIDE + layout.rightInset }
+  const compare = comparing && compareReady ? (
+    <Animated.View
+      entering={compareEntering}
+      style={[s.panel, { backgroundColor: colors.backgroundApp }]}>
+      <View style={[s.header, headerEdge, { marginTop: top + 5, marginBottom: 5 }]}>
+        <HeaderIconButton name="close" color={colors.textFirst} onPress={panel.closeCompare} />
         <View style={s.iconContainer}>
           <ColorizeButtons colorize={colorize} showCompareOriginal={false} />
         </View>
@@ -92,7 +104,7 @@ export const PhotoDetail: FC<PhotoDetailProps> = observer(({
         panoramaYear={streetView?.year}
         fit="contain"
       />
-    </View>
+    </Animated.View>
   ) : null
   const post = (
     <View
@@ -100,19 +112,15 @@ export const PhotoDetail: FC<PhotoDetailProps> = observer(({
       pointerEvents={comparing ? 'none' : 'auto'}
       accessibilityElementsHidden={comparing}
       importantForAccessibility={comparing ? 'no-hide-descendants' : 'auto'}>
-      <View style={[s.header, { marginTop: top + 5, marginBottom: 5 }]}>
+      <View style={[s.header, headerEdge, { marginTop: top + 5, marginBottom: 5 }]}>
         <HeaderIconButton name="arrow-back" color={colors.textFirst} onPress={closePhoto} />
-        <View style={s.iconContainer}>
-          {postInfo && <TranslateButton cid={postInfo.cid} title={postInfo.title} desc={postInfo.desc} />}
-          <ColorizeButtons colorize={colorize} />
-          <HeaderIconButton name="compare" color={colors.textFirst} onPress={panel.openCompare} />
-          <Spacer width={4} />
-          <HeaderIconButton name={panel.isFavorite ? 'favorite' : 'favorite-border'} color={colors.textFirst} onPress={panel.toggleFavorite} />
-          <Spacer width={4} />
-          <HeaderIconButton name="save-alt" color={colors.textFirst} onPress={panel.saveImage} />
-          <Spacer width={4} />
-          <HeaderIconButton name="share" color={colors.textFirst} onPress={panel.share} />
-        </View>
+        {/* The header's width less its side padding and the back arrow: in a narrow panel the
+            buttons draw closer together rather than run past the edge. */}
+        <PanelActions
+          panel={panel}
+          post={postInfo}
+          width={layout.panelWidth - 2 * HEADER_SIDE - HEADER_BUTTON_SIZE - layout.rightInset}
+        />
       </View>
       {!panel.isImageLoaded && (
         <View
@@ -151,8 +159,9 @@ export const PhotoDetail: FC<PhotoDetailProps> = observer(({
                 onLinkPress={onLinkPress}
                 colorize={colorize}
                 onOpenPhoto={onOpenPhoto}
+                contentWidth={layout.panelWidth - 2 * POST_PADDING}
               />
-            ) : null
+            ) : undefined
           }
         />
       </Animated.View>
@@ -163,7 +172,12 @@ export const PhotoDetail: FC<PhotoDetailProps> = observer(({
       exiting={panelExiting}
       onLayout={refreshWindowRegion}
       pointerEvents="box-none"
-      style={[s.modal, s.slideFrame, Platform.OS === 'android' && s.regionAnchor, { width: modalWidth }]}>
+      style={[
+        s.modal,
+        s.slideFrame,
+        Platform.OS === 'android' && s.regionAnchor,
+        { width: layout.panelWidth },
+      ]}>
       <Animated.View
         entering={panelEntering}
         style={[s.panel, { backgroundColor: colors.backgroundApp }]}>

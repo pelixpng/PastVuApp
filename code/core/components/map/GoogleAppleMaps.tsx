@@ -1,6 +1,6 @@
-import MapView, { Marker, MapType, Region } from 'react-native-maps'
+import MapView, { Camera, Marker, MapType, Region } from 'react-native-maps'
 import { Platform, StyleSheet } from 'react-native'
-import { RefObject } from 'react'
+import { RefObject, useState } from 'react'
 import { useIsFocused, useTheme } from '@react-navigation/native'
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -22,7 +22,14 @@ type Props = {
   mapType: MapType
   mapMarkerType: string
   initialRegion: Region
+  /**
+   * Where a map built again in this session starts instead of `initialRegion`: a region fitted into
+   * a map of another shape, after iPhone Duo folds or unfolds, would come out zoomed out.
+   */
+  initialCamera?: Camera
   onRegionChangeComplete: (region: Region) => void
+  /** The camera after each move, for the next map to start from. */
+  onCameraChange?: (camera: Camera) => void
   onShowPhoto: (cid: string, title: string) => void
   onGoToLocation: (lat: number, lng: number) => void
   isTablet?: boolean
@@ -40,7 +47,9 @@ export const GoogleAppleMaps = ({
   mapType,
   mapMarkerType,
   initialRegion,
+  initialCamera,
   onRegionChangeComplete,
+  onCameraChange,
   onShowPhoto,
   onGoToLocation,
   isTablet,
@@ -53,6 +62,11 @@ export const GoogleAppleMaps = ({
   // while the blue dot is on, the location keeps updating (on Android at high accuracy every 5 s).
   // So the dot is shown only while the map is in front.
   const isFocused = useIsFocused()
+  // The camera to start from, taken once and passed only until the map is ready: AIRMap applies an
+  // initialCamera it has not used yet whenever one comes, so one arriving with a later render (the
+  // first camera reported this session) would move the map back under the user's finger.
+  const [startCamera] = useState(initialCamera)
+  const [ready, setReady] = useState(false)
   // Apple's terms require the Apple Maps logo and its legal link to stay visible. MapKit draws
   // them in the bottom-left corner, inside the map's layout margins, which is where the years
   // slider covers them; on tablets, the slider and the tab bar under it. The margins lift them
@@ -77,10 +91,24 @@ export const GoogleAppleMaps = ({
       mapPadding={attributionPadding}
       userInterfaceStyle={names.themeName}
       customMapStyle={colors.MapTheme}
-      onRegionChangeComplete={onRegionChangeComplete}
+      onRegionChangeComplete={region => {
+        onRegionChangeComplete(region)
+        if (onCameraChange) {
+          mapRef.current
+            ?.getCamera()
+            .then(onCameraChange)
+            .catch(() => undefined)
+        }
+      }}
       showsUserLocation={isFocused}
       showsMyLocationButton={false}
-      initialRegion={initialRegion}
+      // With a camera to start from, the region goes on Android: the map there applies a region
+      // after the camera it was built with (MapView applyBridgedProps), so a map remounted as a
+      // foldable folds fitted the old window's region into the new one and zoomed out each time.
+      initialRegion={Platform.OS === 'android' && startCamera ? undefined : initialRegion}
+      // On iOS applied after the region, which it then overrides (AIRMap beginLoading).
+      initialCamera={ready ? undefined : startCamera}
+      onMapReady={() => setReady(true)}
       showsPointsOfInterests={false}
       loadingBackgroundColor={colors.backgroundApp}
       moveOnMarkerPress={false}

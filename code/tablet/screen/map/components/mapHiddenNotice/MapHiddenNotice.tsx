@@ -1,5 +1,5 @@
-import { FC } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { FC, PropsWithChildren } from 'react'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { useTheme } from '@react-navigation/native'
 import { observer } from 'mobx-react-lite'
 import { UICard } from '../../../../../core/components/ui/UICards'
@@ -27,13 +27,23 @@ const MapHiddenCard: FC<{ title: string; text: string }> = ({ title, text }) => 
 }
 
 /**
+ * The column the cards stand in. It scrolls once they are taller than the room between the top and
+ * the tab bar, as in a short window, so the translation switch at the bottom stays in reach.
+ */
+const NoticeColumn: FC<PropsWithChildren> = ({ children }) => (
+	<ScrollView style={s.column} contentContainerStyle={s.content}>
+		{children}
+	</ScrollView>
+)
+
+/**
  * What stands where the Yandex map was while a translated post is open beside it: why the map is
  * gone, and the settings' translation switch, which, turned off, brings the map straight back.
  */
 export const YandexTranslationNotice: FC = observer(() => {
 	const { colors } = useTheme()
 	return (
-		<View style={s.column}>
+		<NoticeColumn>
 			<MapHiddenCard title={t('map.yandexHiddenTitle')} text={t('map.yandexHiddenText')} />
 			<Spacer height={16} />
 			<UICard>
@@ -51,23 +61,25 @@ export const YandexTranslationNotice: FC = observer(() => {
 					setValue={value => TranslationStore.setEnabled(value === 'yes')}
 				/>
 			</UICard>
-		</View>
+		</NoticeColumn>
 	)
 })
 
 /** What stands where an Apple or Yandex map was while then-and-now is open beside it. */
 export const StreetViewNotice: FC = observer(() => (
-	<View style={s.column}>
+	<NoticeColumn>
 		<MapHiddenCard
 			title={t('map.streetViewHiddenTitle')}
 			text={t('map.streetViewHiddenText')}
 		/>
-	</View>
+	</NoticeColumn>
 ))
 
 const s = StyleSheet.create({
-	// From the top of the column, where the search field stood, level with the post's header.
-	column: { flex: 1, justifyContent: 'flex-start' },
+	column: { flex: 1 },
+	// From the top of the column, where the search field stood, level with the post's header. The
+	// scroll view itself is 16 wider on every side, so the cards' shadows are not cut off.
+	content: { padding: 16 },
 	icon: {
 		width: 40,
 		height: 40,

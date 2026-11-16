@@ -1,5 +1,5 @@
-import { FC, useState } from 'react'
-import { ActivityIndicator, Linking, StyleSheet, Text, View } from 'react-native'
+import { FC, useEffect, useRef, useState } from 'react'
+import { Linking, StyleSheet, Text, View } from 'react-native'
 import { WebView } from 'react-native-webview'
 import { useTheme } from '@react-navigation/native'
 import { FontAwesome5 } from '../ui/icons'
@@ -13,6 +13,7 @@ import {
 } from '../../services/streetView'
 import { MyButton } from '../ui/buttons/MyButton'
 import { Spacer } from '../ui/Spacer'
+import { LoadingCover } from '../ui/LoadingCover'
 
 type Props = {
   target: StreetViewTarget
@@ -20,6 +21,9 @@ type Props = {
 }
 
 const openInGoogleMaps = (target: StreetViewTarget) => Linking.openURL(googleMapsUrl(target))
+
+/** How long the cover stays after the page has loaded, while the embed draws its first view. */
+const SETTLE_MS = 300
 
 /**
  * The panorama itself. Fills its parent.
@@ -31,6 +35,8 @@ export const StreetViewPanorama: FC<Props> = ({ target, year }) => {
   const { colors } = useTheme()
   const [loading, setLoading] = useState(true)
   const [failed, setFailed] = useState(false)
+  const settle = useRef<ReturnType<typeof setTimeout>>(undefined)
+  useEffect(() => () => clearTimeout(settle.current), [])
 
   if (!isStreetViewConfigured() || failed) {
     return (
@@ -57,14 +63,13 @@ export const StreetViewPanorama: FC<Props> = ({ target, year }) => {
         allowsInlineMediaPlayback
         scrollEnabled={false}
         bounces={false}
-        onLoadEnd={() => setLoading(false)}
+        // The embed draws its first view a moment after its page has loaded, on black.
+        onLoadEnd={() => {
+          settle.current = setTimeout(() => setLoading(false), SETTLE_MS)
+        }}
         onError={() => setFailed(true)}
       />
-      {loading && (
-        <View style={s.loader}>
-          <ActivityIndicator color="white" />
-        </View>
-      )}
+      {loading && <LoadingCover />}
       {year !== undefined && (
         <View style={s.badge}>
           <Text style={s.badgeText}>{t('streetView.shotIn', { year })}</Text>
@@ -77,16 +82,6 @@ export const StreetViewPanorama: FC<Props> = ({ target, year }) => {
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'black' },
   webview: { flex: 1, backgroundColor: 'black' },
-  loader: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'black',
-  },
   // Bottom left, above the embed's footer strip: its address card is top left, its controls run
   // down the right edge and the Google logo sits bottom centre, so this corner stays clear.
   badge: {

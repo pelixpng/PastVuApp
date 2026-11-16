@@ -10,7 +10,8 @@ import {
 } from 'react-native'
 import { MaterialIcons } from '../ui/icons'
 import { useTheme } from '@react-navigation/native'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { EdgeInsets, useSafeAreaInsets } from 'react-native-safe-area-context'
+import { ScreenRect, cameraBesideTop, topLevelWith } from '../../utils/sideCamera'
 import { Spacer } from '../ui/Spacer'
 import { t } from '../../i18n'
 import { observer } from 'mobx-react-lite'
@@ -24,13 +25,53 @@ import {
 type SearchPlaceProps = {
   search: PlaceSearch
   goToLocation: (latitude: number, longitude: number) => void
-  isTablet?: boolean
+  /**
+   * The tablet's left column, which the field and its results stand in: `left` from the screen's
+   * left edge and `width`. Without it, the phone's whole width less 16 pt each side.
+   */
+  column?: { left: number; width: number }
   /** Called when the field takes focus, e.g. to move something out of the way of the results. */
   onFocus?: () => void
+  /**
+   * Where the field stands beside a camera (see searchFieldBesideCamera): its top, and on the phone
+   * its padding. In the tablet's column only the top counts.
+   */
+  besideCamera?: SearchFieldBesideCamera | null
 }
 
 /** Height of the search field, which sits at the top safe-area inset. */
 export const SEARCH_FIELD_HEIGHT = 43
+
+/** Between the search field and a camera beside it, as between the field and the screen's edge. */
+const CAMERA_GAP = 16
+
+export type SearchFieldBesideCamera = {
+  top: number
+  paddingLeft?: number
+  paddingRight?: number
+}
+
+/**
+ * Where the phone's search field stands when a camera is beside the top of the screen rather than
+ * above it: level with the camera, centred on it, and ending before it. iPhone Duo's cover display
+ * has its camera in the top-right corner and a top safe-area inset of 0, so at the inset the field
+ * would run under the camera. Null where a camera sits within the top inset, as on other iPhones.
+ *
+ * `regions` are what the hardware covers of the screen (see modules/window-region
+ * ReservedRegionsView), `insets` the safe-area insets and `width` the screen's.
+ */
+export const searchFieldBesideCamera = (
+  regions: ScreenRect[],
+  insets: EdgeInsets,
+  width: number,
+): SearchFieldBesideCamera | null => {
+  const camera = cameraBesideTop(regions, insets, width, SEARCH_FIELD_HEIGHT)
+  if (!camera) return null
+  const fieldTop = topLevelWith(camera, SEARCH_FIELD_HEIGHT, insets.top)
+  return camera.x + camera.width / 2 > width / 2
+    ? { top: fieldTop, paddingRight: width - camera.x + CAMERA_GAP }
+    : { top: fieldTop, paddingLeft: camera.x + camera.width + CAMERA_GAP }
+}
 
 /**
  * The line that stands in for the list when a search brings back no places, or null when the list
@@ -55,7 +96,13 @@ const statusText = (status: PlaceSearchStatus): string | null => {
 const failed = (status: PlaceSearchStatus) =>
   status === 'busy' || status === 'dayLimit' || status === 'error'
 
-const LocationSearch: FC<SearchPlaceProps> = ({ search, goToLocation, isTablet, onFocus }) => {
+const LocationSearch: FC<SearchPlaceProps> = ({
+  search,
+  goToLocation,
+  column,
+  onFocus,
+  besideCamera,
+}) => {
   const [isFocused, setIsFocused] = useState(false)
   const { colors } = useTheme()
   const { top } = useSafeAreaInsets()
@@ -67,10 +114,14 @@ const LocationSearch: FC<SearchPlaceProps> = ({ search, goToLocation, isTablet, 
     <View
       style={[
         s.container,
-        { top },
-        isTablet
-          ? { width: '33%', left: 16, alignSelf: 'flex-start' }
-          : { width: '100%', paddingHorizontal: 16 },
+        { top: besideCamera?.top ?? top },
+        column
+          ? { width: column.width, left: column.left, alignSelf: 'flex-start' }
+          : {
+              width: '100%',
+              paddingLeft: besideCamera?.paddingLeft ?? 16,
+              paddingRight: besideCamera?.paddingRight ?? 16,
+            },
       ]}>
       <View style={[s.searchContainer, { backgroundColor: colors.backgroundApp }]}>
         <MaterialIcons name="search" size={25} color={colors.textThird} />

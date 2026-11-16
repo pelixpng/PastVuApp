@@ -57,6 +57,8 @@ export const MapButtons: FC<MapButtonsProps> = observer(
 )
 
 const s = StyleSheet.create({
+	// At the window's edge, as on an iPad, also on iPhone Duo: there they stand in the lower part of
+	// the vertical bar, under the status bar at its top.
 	container: { position: 'absolute', right: 16 },
 	button: { padding: 16, borderRadius: 100 }
 })

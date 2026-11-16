@@ -25,7 +25,14 @@ import {
 	useSafeAreaFrame,
 	useSafeAreaInsets
 } from 'react-native-safe-area-context'
-import { Gesture, GestureDetector } from 'react-native-gesture-handler'
+import {
+	GestureDetector,
+	PanGestureConfig,
+	TapGestureConfig,
+	useCompetingGestures,
+	usePanGesture,
+	useTapGesture
+} from 'react-native-gesture-handler'
 import Animated, {
 	cancelAnimation,
 	Easing,
@@ -85,6 +92,8 @@ const OVERDRAG = 24
  * column's on the tablet), 4:3, the next one peeking in.
  */
 const CARD_SHARE = 0.62
+/** A card's height to its width: 4:3. */
+const CARD_ASPECT = 0.75
 const CARD_GAP = 12
 /** Under the cards, above the home indicator. */
 const CARD_BOTTOM = 12
@@ -96,21 +105,33 @@ const CARD_BOTTOM = 12
  */
 const SWAP_BAND = 12
 
-const cardSize = (sheetWidth: number) => {
-	const width = Math.round(sheetWidth * CARD_SHARE)
-	return { width, height: Math.round(width * 0.75) }
+/** A card's size: CARD_SHARE of the sheet's width, or `maxWidth` if that is narrower. */
+const cardSize = (sheetWidth: number, maxWidth = Infinity) => {
+	const width = Math.round(Math.min(sheetWidth * CARD_SHARE, maxWidth))
+	return { width, height: Math.round(width * CARD_ASPECT) }
 }
 
-/** How tall the low sheet with its row of cards is, its empty bottom strip included. */
-export const miniSheetHeight = (sheetWidth: number, bottomInset: number) =>
-	HEADER_HEIGHT + cardSize(sheetWidth).height + CARD_BOTTOM + bottomInset
+/**
+ * How tall the low sheet with its row of cards is, its empty bottom strip included. `maxCardWidth`
+ * as in SheetColumn.
+ */
+export const miniSheetHeight = (
+	sheetWidth: number,
+	bottomInset: number,
+	maxCardWidth?: number
+) => HEADER_HEIGHT + cardSize(sheetWidth, maxCardWidth).height + CARD_BOTTOM + bottomInset
+
+/** The widest card whose low sheet, `bottomInset` included, is no taller than `height`. */
+export const cardWidthWithin = (height: number, bottomInset: number) =>
+	Math.floor((height - HEADER_HEIGHT - CARD_BOTTOM - bottomInset) / CARD_ASPECT)
 const ACCESSIBILITY_ACTIONS = [{ name: 'activate' }]
 
 /**
  * The map screen's half of the sheet: its height and stop, which open collapsed and slide away as
  * `open` changes; whether it is on the screen, so the screen keeps it mounted while it slides away;
- * and whether the map's logo should stand above it. The logo rises once the sheet has arrived and
- * comes down once it has gone, so the map is not relaid out in the middle of a slide.
+ * and, for the phone, which stop the map's logo should stand above. The logo rises once the sheet
+ * has arrived and comes down once it has gone, so the map is not relaid out in the middle of a
+ * slide.
  */
 export const useNearbySheet = (
 	open: boolean,
@@ -122,9 +143,10 @@ export const useNearbySheet = (
 	const snap = useSharedValue<SheetSnap>(SheetSnap.Closed)
 	// Mounted while open and while it slides away after closing.
 	const [onScreen, setOnScreen] = useState(false)
-	// The stop the map's logo stands above: the one the sheet last came to rest at, none while it is
-	// away. The phone keeps it above the collapsed sheet when expanded (the map is hidden then); the
-	// tablet, whose map stays in sight right of the sheet, lifts it above the expanded one.
+	// The stop the phone's map logo stands above: the one the sheet last came to rest at, none while
+	// it is away. The phone keeps the logo above the collapsed sheet when expanded, as the map is
+	// hidden then. The tablet, whose map stays in sight beside the sheet, follows
+	// useSheetRestHeight instead.
 	const [logoStop, setLogoStop] = useState<SheetSnap>(SheetSnap.Closed)
 
 	// Opening always starts collapsed. A sheet that is mounting slides in by itself once laid out,
@@ -183,11 +205,45 @@ export const useNearbySheet = (
 		},
 		(stop, before) => {
 			if (stop !== -1 && stop !== before) scheduleOnRN(setLogoStop, stop)
-		},
-		[collapsedHeight, miniHeight, expandedHeight]
+		}
 	)
 
 	return { height, snap, onScreen, logoStop }
+}
+
+/**
+ * The height the sheet last came to rest at, whichever stop it was, or 0 once it has slid away.
+ * Unlike useNearbySheet's `logoStop`, it keeps that height while the stops themselves change, as
+ * on a turn of the tablet, until the sheet has slid to the new one; a logo lifted by it moves, and
+ * the map is laid out again, only once the sheet has arrived.
+ */
+export const useSheetRestHeight = (
+	height: SharedValue<number>,
+	snap: SharedValue<SheetSnap>,
+	miniHeight: number,
+	collapsedHeight: number,
+	expandedHeight: number
+) => {
+	const [restHeight, setRestHeight] = useState(0)
+	useAnimatedReaction(
+		() => {
+			const target =
+				snap.value === SheetSnap.Expanded
+					? expandedHeight
+					: snap.value === SheetSnap.Collapsed
+						? collapsedHeight
+						: snap.value === SheetSnap.Mini
+							? miniHeight
+							: 0
+			// On its way, dragged, or still to slide to a stop that has just changed: none yet (-1),
+			// and the last one stays.
+			return Math.abs(height.value - target) <= 1 ? target : -1
+		},
+		(rest, before) => {
+			if (rest !== -1 && rest !== before) scheduleOnRN(setRestHeight, rest)
+		}
+	)
+	return restHeight
 }
 
 /**
@@ -200,6 +256,11 @@ export type SheetColumn = {
 	width: number
 	bottom: number
 	tucked: number
+	/**
+	 * Cards no wider than this, for a window too short for cards sized from the column: their row
+	 * would not fit under the list's opening height. Pass the same to miniSheetHeight.
+	 */
+	maxCardWidth?: number
 }
 
 type NearbyPhotosSheetProps = {
@@ -213,6 +274,8 @@ type NearbyPhotosSheetProps = {
 	expandedHeight: number
 	/** The tablet's left column; without it, the phone's whole width, over the tab bar. */
 	column?: SheetColumn
+	/** On the phone, as SheetColumn's: pass the same to miniSheetHeight. */
+	maxCardWidth?: number
 }
 
 const Separator = () => <Spacer height={16} />
@@ -358,7 +421,8 @@ export const NearbyPhotosSheet: FC<NearbyPhotosSheetProps> = observer(
 		miniHeight,
 		collapsedHeight,
 		expandedHeight,
-		column
+		column,
+		maxCardWidth
 	}) => {
 		const { colors } = useTheme()
 		const { bottom: safeBottom } = useSafeAreaInsets()
@@ -366,7 +430,9 @@ export const NearbyPhotosSheet: FC<NearbyPhotosSheetProps> = observer(
 		// The strip at the bottom that holds nothing: the home indicator's on the phone, the part
 		// behind the slider's card on the tablet.
 		const bottom = column ? column.tucked : safeBottom
-		const card = cardSize(column ? column.width : screenWidth)
+		const card = column
+			? cardSize(column.width, column.maxCardWidth)
+			: cardSize(screenWidth, maxCardWidth)
 		const [expanded, setExpanded] = useState(false)
 		// The low sheet shows cards instead of rows; they swap half-way between the two stops.
 		const [showCards, setShowCards] = useState(false)
@@ -405,8 +471,7 @@ export const NearbyPhotosSheet: FC<NearbyPhotosSheetProps> = observer(
 				if (now === before) return
 				cardsShown.value = now
 				scheduleOnRN(setShowCards, now)
-			},
-			[miniHeight, collapsedHeight]
+			}
 		)
 
 		// Each fades out on its own side of half-way, so whichever one is on screen when they swap is
@@ -493,9 +558,13 @@ export const NearbyPhotosSheet: FC<NearbyPhotosSheetProps> = observer(
 			[moved, snap, height, expandedHeight, collapsedHeight, miniHeight]
 		)
 
-		const gesture = useMemo(() => {
-			const pan = Gesture.Pan()
-				.onStart(event => {
+		// Memoized, so the gestures stay the same while the sheet renders again mid-drag (the cards
+		// swap in half-way down). The Babel plugin does not look inside useMemo for gesture callbacks,
+		// so these are marked as worklets by hand.
+		const panConfig = useMemo<PanGestureConfig>(
+			() => ({
+				onActivate: event => {
+					'worklet'
 					if (snap.value === SheetSnap.Closed) return
 					cancelAnimation(height)
 					moved.value = true
@@ -503,8 +572,9 @@ export const NearbyPhotosSheet: FC<NearbyPhotosSheetProps> = observer(
 					dragFrom.value = snap.value
 					// The pan starts once the finger has moved a little; count from where the sheet is now.
 					dragStart.value = height.value + event.translationY
-				})
-				.onUpdate(event => {
+				},
+				onUpdate: event => {
+					'worklet'
 					if (!dragging.value) return
 					// Only from the row of cards does it follow the finger all the way down.
 					const lowest =
@@ -513,11 +583,12 @@ export const NearbyPhotosSheet: FC<NearbyPhotosSheetProps> = observer(
 						Math.max(dragStart.value - event.translationY, lowest),
 						expandedHeight
 					)
-				})
-				.onEnd((event, success) => {
+				},
+				onDeactivate: event => {
+					'worklet'
 					if (!dragging.value) return
 					dragging.value = false
-					if (!success) {
+					if (event.canceled) {
 						moveTo(snap.value)
 						return
 					}
@@ -547,25 +618,35 @@ export const NearbyPhotosSheet: FC<NearbyPhotosSheetProps> = observer(
 					}
 					moveTo(to)
 					if (to === SheetSnap.Closed) scheduleOnRN(close)
-				})
-			const tap = Gesture.Tap().onEnd((_event, success) => {
-				if (!success || snap.value === SheetSnap.Closed) return
-				moveTo(snap.value === SheetSnap.Collapsed ? SheetSnap.Expanded : SheetSnap.Collapsed)
-			})
-			return Gesture.Race(pan, tap)
-		}, [
-			snap,
-			height,
-			moved,
-			dragging,
-			dragStart,
-			dragFrom,
-			moveTo,
-			close,
-			miniHeight,
-			collapsedHeight,
-			expandedHeight
-		])
+				}
+			}),
+			[
+				snap,
+				height,
+				moved,
+				dragging,
+				dragStart,
+				dragFrom,
+				moveTo,
+				close,
+				miniHeight,
+				collapsedHeight,
+				expandedHeight
+			]
+		)
+		const tapConfig = useMemo<TapGestureConfig>(
+			() => ({
+				onDeactivate: event => {
+					'worklet'
+					if (event.canceled || snap.value === SheetSnap.Closed) return
+					moveTo(snap.value === SheetSnap.Collapsed ? SheetSnap.Expanded : SheetSnap.Collapsed)
+				}
+			}),
+			[snap, moveTo]
+		)
+		const pan = usePanGesture(panConfig)
+		const tap = useTapGesture(tapConfig)
+		const gesture = useCompetingGestures(pan, tap)
 
 		// VoiceOver and TalkBack cannot drag: activating the grabber does what a tap on it does.
 		const onAccessibilityAction = (event: AccessibilityActionEvent) => {
@@ -713,6 +794,7 @@ export const NearbyPhotosSheet: FC<NearbyPhotosSheetProps> = observer(
 												(expanded ? 0 : expandedHeight - collapsedHeight)
 										}
 									]}
+									showsVerticalScrollIndicator={false}
 									initialNumToRender={8}
 									maxToRenderPerBatch={5}
 									windowSize={5}

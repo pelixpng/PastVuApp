@@ -4,7 +4,7 @@ import { Comment } from '../../../../core/components/comment/Comment'
 import PhotoDetailVM from './PhotoDetail.vm'
 import { IComment } from '../../../../core/types/apiPhotoComment'
 import { Container } from '../../../../core/components/ui/Container'
-import { useNavigation, useTheme } from '@react-navigation/native'
+import { useNavigation, useRoute, useTheme } from '@react-navigation/native'
 import { PostText } from '../../../../core/components/post/PostText'
 import { Spacer } from '../../../../core/components/ui/Spacer'
 import { useCallback, useEffect, useLayoutEffect, useState } from 'react'
@@ -16,13 +16,25 @@ import {
   showsTranslateButton,
 } from '../../../../core/components/translate/TranslateButton'
 import { useVM } from '../../../../core/hooks/useVM'
+import { HEADER_BUTTONS, headerGap } from '../../../../core/utils/headerGap'
 import { t } from '../../../../core/i18n'
+import { UiHandoff, phonePhotoKey } from '../../../../core/store/UiHandoff'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Animated, { Easing, FadeIn, ZoomIn, ZoomOut } from 'react-native-reanimated'
 
 export const PhotoDetailScreen = observer(() => {
   const vm = useVM(PhotoDetailVM)
   const { colorize } = vm
+  // The photo this screen shows, for the tablet interface if the device unfolds (see App.tsx):
+  // a photo opened from the post replaces the one in the route's params on the same screen.
+  const { key } = useRoute()
+  useEffect(
+    () =>
+      UiHandoff.registerPanel(phonePhotoKey(key), () =>
+        vm.activeCid ? { cid: vm.activeCid, title: vm.postInfo?.title ?? '' } : null,
+      ),
+    [key, vm],
+  )
   const { colors } = useTheme()
   const insets = useSafeAreaInsets()
   // The colour photo above the original is being zoomed and has to cover it.
@@ -199,24 +211,6 @@ export const PhotoDetailScreen = observer(() => {
 })
 
 const noop = () => {}
-
-/** Always in the header: compare, favourite, save and share. */
-const HEADER_BUTTONS = 4
-/** HeaderIconButton's touch target. */
-const HEADER_BUTTON_SIZE = 44
-/** The header row's right margin and the room the back button needs on the left. */
-const HEADER_RESERVED = 6 + 56
-
-/**
- * The space between header buttons: 4 pt, or less when that many do not fit beside the back
- * button. With the comparison with the original, translation and palette all shown there are
- * seven, which at 4 pt apart overrun a 375 pt wide phone.
- */
-const headerGap = (width: number, buttons: number) =>
-  Math.max(
-    0,
-    Math.min(4, (width - HEADER_RESERVED - buttons * HEADER_BUTTON_SIZE) / (buttons - 1)),
-  )
 
 const BUTTON_IN = ZoomIn.duration(220).easing(Easing.out(Easing.cubic))
 const POST_IN = FadeIn.duration(220).easing(Easing.out(Easing.cubic))

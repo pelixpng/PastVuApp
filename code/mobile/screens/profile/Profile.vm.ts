@@ -1,4 +1,4 @@
-import { action, autorun, computed, makeObservable, observable, runInAction } from 'mobx'
+import { action, computed, makeObservable, observable, runInAction } from 'mobx'
 import { Linking } from 'react-native'
 import { SCREENS } from '../../navigation/navigation.types'
 import { BaseViewModelProvider } from '../../provider/vm.provider'
@@ -45,13 +45,18 @@ class ProfileVM extends BaseViewModelProvider<SCREENS.PROFILE> {
   constructor() {
     super()
     makeObservable(this)
-    autorun(() => {
-      const login = this.screenParams?.login
-      if (login && login !== this.login) {
-        this.login = login
-        this.loadProfile()
-      }
-    })
+  }
+
+  /**
+   * Loads the profile of `login`, which the screen passes from its own route. Not screenParams:
+   * those are the focused route's, and a profile can mount under a photo opened over it at once,
+   * as when the tablet interface hands both over (see core/store/UiHandoff).
+   */
+  @action.bound
+  showProfile(login: string) {
+    if (!login || login === this.login) return
+    this.login = login
+    this.loadProfile()
   }
 
   // Getters, not fields, so the labels follow a language switch.

@@ -52,8 +52,7 @@ export const MapButtons: FC<MapButtonsProps> = observer(
 			() => sheetHeight.value > collapsedHeight + FADE_DISTANCE / 2,
 			(now, before) => {
 				if (now !== before) scheduleOnRN(setHidden, now)
-			},
-			[collapsedHeight]
+			}
 		)
 
 		const style = useAnimatedStyle(() => {

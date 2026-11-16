@@ -2,7 +2,7 @@
   "expo": {
     "name": "PastVu",
     "slug": "PastVuApp",
-    "version": "2.9.0",
+    "version": "2.10.0",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -30,7 +30,7 @@
       "requireFullScreen": true,
       "userInterfaceStyle": "automatic",
       "bundleIdentifier": "com.pelixpng.PastVuApp",
-      "buildNumber": "76",
+      "buildNumber": "77",
       "appleTeamId": "989AHJ2KDZ",
       "entitlements": {
         "com.apple.security.application-groups": [
@@ -39,7 +39,6 @@
       },
       "icon": "./assets/PastVu.icon",
       "infoPlist": {
-        "EXDefaultScreenOrientationMask": "UIInterfaceOrientationMaskAll",
         "PLACE_API_KEY": "$(PLACE_API_KEY)",
         "STREET_VIEW_API_KEY": "$(STREET_VIEW_API_KEY)",
         "YANDEX_MAPS_API_KEY": "$(YANDEX_MAPS_API_KEY)",
@@ -62,7 +61,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.pelixpng.PastVuApp",
-      "versionCode": 60,
+      "versionCode": 61,
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION"
@@ -85,7 +84,7 @@
           "android": {
             "minSdkVersion": 28,
             "enableMinifyInReleaseBuilds": true,
-            "extraProguardRules": "# React Native view managers of the Yandex map fork are looked up by name.\n-keep class com.yamaplite.** { *; }\n# MMKV and the app's own Expo modules are called from native/JSI code.\n-keep class com.margelo.** { *; }\n-keep class expo.modules.applocale.** { *; }\n-keep class expo.modules.appkeys.** { *; }\n-keep class expo.modules.screencapture.** { *; }\n-keep class expo.modules.windowregion.** { *; }\n-keep class expo.modules.colorizer.** { *; }\n# ONNX Runtime's Java classes are created and read from its native library.\n-keep class ai.onnxruntime.** { *; }\n# expo-camera is built from source with the barcode scanner disabled: its ML Kit\n# references stay in the bytecode but are never reached.\n-dontwarn com.google.mlkit.**",
+            "extraProguardRules": "# React Native view managers of the Yandex map fork are looked up by name.\n-keep class com.yamaplite.** { *; }\n# MMKV and the app's own Expo modules are called from native/JSI code.\n-keep class com.margelo.** { *; }\n-keep class expo.modules.applocale.** { *; }\n-keep class expo.modules.appkeys.** { *; }\n-keep class expo.modules.screencapture.** { *; }\n-keep class expo.modules.windowregion.** { *; }\n-keep class expo.modules.colorizer.** { *; }\n# ONNX Runtime's Java classes are created and read from its native library.\n-keep class ai.onnxruntime.** { *; }\n# expo-camera is built from source with the barcode and document scanners disabled: their\n# ML Kit references stay in the bytecode but are never reached.\n-dontwarn com.google.mlkit.**\n# WorkManager (pulled in by react-native-maps) creates its Room database and input mergers by\n# reflection at app start. Their library rules keep the classes but not the no-arg constructors,\n# which R8 strips if android.r8.strictFullModeForKeepRules is turned on in gradle.properties.\n-keep class * extends androidx.room.RoomDatabase { <init>(); }\n-keep class * extends androidx.work.InputMerger { <init>(); }",
             "buildArchs": [
               "armeabi-v7a",
               "arm64-v8a"
@@ -166,7 +165,8 @@
           "allowDynamicLocaleChangesAndroid": true
         }
       ],
-      "./plugins/withApiKeys"
+      "./plugins/withApiKeys",
+      "expo-font"
     ]
   }
 }

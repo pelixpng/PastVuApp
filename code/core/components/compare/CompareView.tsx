@@ -12,7 +12,9 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
+import type { ViewInstance } from 'react-native'
 import { CameraView, useCameraPermissions } from 'expo-camera'
+import type { LensInfo } from 'expo-camera'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTheme } from '@react-navigation/native'
 import { fitContainer, SnapbackZoom } from 'react-native-zoom-toolkit'
@@ -20,12 +22,13 @@ import { fitContainer, SnapbackZoom } from 'react-native-zoom-toolkit'
 // react-native-view-shot is linked on iOS only. On Android the panorama's WebView draws on the
 // GPU and a view snapshot leaves it black, so the PixelCopy module below is used there and the
 // library is excluded from the Android build (package.json, expo.autolinking.android.exclude).
-// Required lazily: its native spec is resolved at import time and would throw where it is absent.
+// Required on iOS only, so Android does not load its JS either and `captureRef` stays null there.
 const captureRef: typeof import('react-native-view-shot').captureRef | null =
   Platform.OS === 'ios' ? require('react-native-view-shot').captureRef : null
 import { FontAwesome5 } from '../ui/icons'
 import { MaterialIcons } from '../ui/icons'
 import { StreetViewPanorama } from '../streetView/StreetViewPanorama'
+import { LoadingCover } from '../ui/LoadingCover'
 import { StreetViewTarget } from '../../services/streetView'
 import { MyButton } from '../ui/buttons/MyButton'
 import { ColorizingOverlay } from '../colorize/ColorizingOverlay'
@@ -50,9 +53,10 @@ export type CompareMode = 'camera' | 'streetView'
 /**
  * A camera choice the user can tap: a physical lens on iOS, or a zoom step on Android.
  *
- * expo-camera lists real lenses only on iOS (`getAvailableLensesAsync`), and gives no zoom
- * factors, so labels go by lens type. Android exposes just a 0..1 fraction of the maximum zoom,
- * so the second step there is a digital crop of roughly 2x, not a second lens.
+ * expo-camera lists real lenses only on iOS (`getAvailableLensesAsync`) and gives no zoom
+ * factors, so the labels there come from the local CameraLenses module. Android exposes just a
+ * 0..1 fraction of the maximum zoom, so the second step there is a digital crop of roughly 2x,
+ * not a second lens. `lens` is the device type passed to `selectedLens`.
  */
 type Lens = { label: string; lens?: string; zoom?: number; order?: number }
 
@@ -67,13 +71,20 @@ const factorLabel = (factor: number) =>
 
 /**
  * iOS lenses, from the local CameraLenses module: physical back lenses with the zoom factors
- * AVFoundation switches at, named exactly as expo-camera expects in `selectedLens`. Only lenses
- * expo-camera itself lists are offered, so a name mismatch can never leave a dead button.
+ * AVFoundation switches at, keyed by the device type expo-camera matches `selectedLens` against.
+ * Only lenses expo-camera itself lists are offered, so a key it does not know can never leave a
+ * dead button.
  */
-const iosLenses = (available: string[]): Lens[] => {
+const iosLenses = (available: LensInfo[]): Lens[] => {
+  const listed = new Set(available.map(l => l.deviceType))
   const lenses: Lens[] = []
-  for (const lens of (CameraLenses?.getBackLenses() ?? []).filter(l => available.includes(l.name))) {
-    lenses.push({ label: factorLabel(lens.factor), lens: lens.name, zoom: 0, order: lens.factor })
+  for (const lens of (CameraLenses?.getBackLenses() ?? []).filter(l => listed.has(l.deviceType))) {
+    lenses.push({
+      label: factorLabel(lens.factor),
+      lens: lens.deviceType,
+      zoom: 0,
+      order: lens.factor,
+    })
     // A native-resolution crop (2x on a 48 MP wide) counts as a lens, as in the system camera.
     // expo-camera maps `zoom` exponentially, so invert that to land on the exact factor.
     for (const crop of lens.cropFactors) {
@@ -81,7 +92,7 @@ const iosLenses = (available: string[]): Lens[] => {
       if (factor <= 1 || lens.maxZoom <= 1) continue
       lenses.push({
         label: factorLabel(factor),
-        lens: lens.name,
+        lens: lens.deviceType,
         zoom: Math.min(1, Math.log(crop) / Math.log(lens.maxZoom)),
         order: factor,
       })
@@ -126,7 +137,7 @@ export const CompareView: FC<Props> = ({
 }) => {
   const { bottom } = useSafeAreaInsets()
   const { colors } = useTheme()
-  const collage = useRef<View>(null)
+  const collage = useRef<ViewInstance>(null)
   const camera = useRef<CameraView>(null)
   const [mode, setMode] = useState<CompareMode>(initialMode)
   const [shot, setShot] = useState<string | null>(null)
@@ -136,6 +147,9 @@ export const CompareView: FC<Props> = ({
   const [busy, setBusy] = useState(false)
   const [permission, requestPermission] = useCameraPermissions()
   const [area, setArea] = useState({ width: 0, height: 0 })
+  // The original is often not in the image cache yet, so it may take a moment to arrive.
+  const [loadedUri, setLoadedUri] = useState<string | null>(null)
+  const oldLoaded = loadedUri === photo.uri
   const onLayout = (e: LayoutChangeEvent) => setArea(e.nativeEvent.layout)
 
   // Ask as soon as the camera is shown, not on the first shutter press.
@@ -225,6 +239,8 @@ export const CompareView: FC<Props> = ({
             style={StyleSheet.absoluteFill}
             resizeMode="contain"
             resizeMethod="scale"
+            onLoad={() => setLoadedUri(photo.uri)}
+            onError={() => setLoadedUri(photo.uri)}
           />
           {colorizing && <ColorizingOverlay />}
         </View>
@@ -296,7 +312,10 @@ export const CompareView: FC<Props> = ({
       <View style={s.area} onLayout={onLayout}>
         {area.height > 0 && (
           <View ref={collage} collapsable={false}>
-            <View style={[box, s.box, s.zoomBox]}>{oldPhoto}</View>
+            <View style={[box, s.box, s.zoomBox]}>
+              {oldPhoto}
+              {!oldLoaded && <LoadingCover />}
+            </View>
             <View style={[box, s.box]}>{today}</View>
           </View>
         )}

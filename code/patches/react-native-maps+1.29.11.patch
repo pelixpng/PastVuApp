@@ -1,8 +1,8 @@
 diff --git a/node_modules/react-native-maps/android/src/main/java/com/rnmaps/fabric/MarkerManager.java b/node_modules/react-native-maps/android/src/main/java/com/rnmaps/fabric/MarkerManager.java
-index c2ea41f..356395b 100644
+index 56709d7..e2373ad 100644
 --- a/node_modules/react-native-maps/android/src/main/java/com/rnmaps/fabric/MarkerManager.java
 +++ b/node_modules/react-native-maps/android/src/main/java/com/rnmaps/fabric/MarkerManager.java
-@@ -220,6 +220,15 @@ public class MarkerManager extends ViewGroupManager<MapMarker> implements RNMaps
+@@ -226,6 +226,15 @@ public class MarkerManager extends ViewGroupManager<MapMarker> implements RNMaps
  
      @Override
      public void setPinColor(MapMarker view, @Nullable Integer value) {
@@ -18,26 +18,8 @@ index c2ea41f..356395b 100644
          float[] hsv = new float[3];
          Color.colorToHSV(value, hsv);
          // NOTE: android only supports a hue
-diff --git a/node_modules/react-native-maps/ios/AirMaps/AIRMap.mm b/node_modules/react-native-maps/ios/AirMaps/AIRMap.mm
-index f7da1e0..6550079 100644
---- a/node_modules/react-native-maps/ios/AirMaps/AIRMap.mm
-+++ b/node_modules/react-native-maps/ios/AirMaps/AIRMap.mm
-@@ -157,7 +157,12 @@ - (void)insertReactSubview:(id<RCTComponent>)subview atIndex:(NSInteger)atIndex
-             [self insertReactSubview:(UIView *)childSubviews[i] atIndex:atIndex];
-         }
-     }
--    [_reactSubviews insertObject:(UIView *)subview atIndex:(NSUInteger) atIndex];
-+    // Fabric's index addresses its own child list, which can drift from `_reactSubviews` when the
-+    // map view survives a mount/unmount cycle -- returning to this tab drops the annotations from
-+    // `_reactSubviews` while Fabric still counts them. The next insert then lands past the end and
-+    // NSMutableArray throws, taking the app down as soon as new markers arrive. Clamp instead.
-+    NSUInteger insertionIndex = MIN((NSUInteger)MAX(atIndex, (NSInteger)0), _reactSubviews.count);
-+    [_reactSubviews insertObject:(UIView *)subview atIndex:insertionIndex];
- }
- #pragma clang diagnostic pop
- 
 diff --git a/node_modules/react-native-maps/ios/AirMaps/AIRMapMarker.m b/node_modules/react-native-maps/ios/AirMaps/AIRMapMarker.m
-index 89dfd9a..c4a6d29 100644
+index 82ec843..ae7f893 100644
 --- a/node_modules/react-native-maps/ios/AirMaps/AIRMapMarker.m
 +++ b/node_modules/react-native-maps/ios/AirMaps/AIRMapMarker.m
 @@ -366,6 +366,17 @@ - (void)setImageSrc:(NSString *)imageSrc
@@ -66,10 +48,10 @@ index e4fc048..91b6de5 100644
 -#define HAVE_GOOGLE_MAPS 1
 +#define HAVE_GOOGLE_MAPS 0
 diff --git a/node_modules/react-native-maps/ios/AirMaps/RNMapsMapView.mm b/node_modules/react-native-maps/ios/AirMaps/RNMapsMapView.mm
-index 447520d..59b6753 100644
+index fcee5e2..747daae 100644
 --- a/node_modules/react-native-maps/ios/AirMaps/RNMapsMapView.mm
 +++ b/node_modules/react-native-maps/ios/AirMaps/RNMapsMapView.mm
-@@ -37,6 +37,8 @@ @interface RNMapsMapView () <RCTRNMapsMapViewViewProtocol>
+@@ -39,6 +39,8 @@ @interface RNMapsMapView () <RCTRNMapsMapViewViewProtocol>
  @end
  
  @implementation RNMapsMapView {
@@ -78,7 +60,7 @@ index 447520d..59b6753 100644
      AIRMap *_view;
      AIRMapManager* _legacyMapManager;
  }
-@@ -132,6 +134,14 @@ - (void) prepareMapView
+@@ -134,6 +136,14 @@ - (void) prepareMapView
  
      self.contentView = _view;
  
@@ -93,7 +75,7 @@ index 447520d..59b6753 100644
      _view.onLongPress = [self](NSDictionary* dictionary) {
          if (_eventEmitter) {
              // Extract values from the NSDictionary
-@@ -437,30 +447,40 @@ - (instancetype)initWithFrame:(CGRect)frame
+@@ -439,36 +449,46 @@ - (instancetype)initWithFrame:(CGRect)frame
  
  
  - (void)mountChildComponentView:(UIView<RCTComponentViewProtocol> *)childComponentView index:(NSInteger)index{
@@ -106,6 +88,10 @@ index 447520d..59b6753 100644
          RNMapsMarkerView* fabricMarker = (RNMapsMarkerView *) childComponentView;
 -        [_view insertReactSubview:[fabricMarker marker] atIndex:index];
 +        child = (UIView *)[fabricMarker marker];
+     } else if ([childComponentView isKindOfClass:[RNMapsPolygonView class]]){
+         RNMapsPolygonView* fabricPolygon = (RNMapsPolygonView *) childComponentView;
+-        [_view insertReactSubview:[fabricPolygon polygon] atIndex:index];
++        child = (UIView *)[fabricPolygon polygon];
      }
      else  {
 -        [_view insertReactSubview:childComponentView atIndex:index];
@@ -131,6 +117,10 @@ index 447520d..59b6753 100644
         RNMapsMarkerView* fabricMarker = (RNMapsMarkerView *) childComponentView;
 -        [_view removeReactSubview:[fabricMarker marker]];
 +        child = (UIView *)[fabricMarker marker];
+    } else if ([childComponentView isKindOfClass:[RNMapsPolygonView class]]){
+        RNMapsPolygonView* fabricPolygon = (RNMapsPolygonView *) childComponentView;
+-        [_view removeReactSubview:[fabricPolygon polygon]];
++        child = (UIView *)[fabricPolygon polygon];
     } else {
 -        [_view removeReactSubview:childComponentView];
 +        child = childComponentView;
@@ -200,7 +190,7 @@ index 6fd5565..fc95d30 100644
  export const MAP_TYPES: MapTypes = {
    STANDARD: 'standard',
 diff --git a/node_modules/react-native-maps/src/decorateMapComponent.ts b/node_modules/react-native-maps/src/decorateMapComponent.ts
-index 3b52d77..fe4d7a1 100644
+index e21b239..abb33dc 100644
 --- a/node_modules/react-native-maps/src/decorateMapComponent.ts
 +++ b/node_modules/react-native-maps/src/decorateMapComponent.ts
 @@ -8,17 +8,17 @@ import {
@@ -230,7 +220,7 @@ index 3b52d77..fe4d7a1 100644
 +import type {MapWMSTile} from './MapWMSTile';
  import {Commands} from './MapViewNativeComponent';
  import GooglePolygon from './specs/NativeComponentGooglePolygon';
- import FabricMarker from './specs/NativeComponentMarker';
+ import ApplePolygon from './specs/NativeComponentPolygon';
 diff --git a/node_modules/react-native-maps/src/index.ts b/node_modules/react-native-maps/src/index.ts
 index 11851ca..c689e72 100644
 --- a/node_modules/react-native-maps/src/index.ts

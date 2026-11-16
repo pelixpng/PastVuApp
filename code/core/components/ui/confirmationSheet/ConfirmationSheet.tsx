@@ -6,8 +6,8 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
-  runOnJS,
 } from 'react-native-reanimated'
+import { scheduleOnRN } from 'react-native-worklets'
 import { Spacer } from '../Spacer'
 import { t } from '../../../i18n'
 
@@ -47,14 +47,14 @@ export const ConfirmationSheet: FC<ConfirmationSheetProps> = ({
   const handleClose = () => {
     opacity.value = withTiming(0, { duration: 200 })
     translateY.value = withTiming(300, { duration: 250 }, () => {
-      runOnJS(onCancel)()
+      scheduleOnRN(onCancel)
     })
   }
 
   const handleConfirm = () => {
     opacity.value = withTiming(0, { duration: 200 })
     translateY.value = withTiming(300, { duration: 250 }, () => {
-      runOnJS(onConfirm)()
+      scheduleOnRN(onConfirm)
     })
   }
 
@@ -71,7 +71,7 @@ export const ConfirmationSheet: FC<ConfirmationSheetProps> = ({
       visible={visible}
       transparent
       animationType="none"
-      // A modal is portrait-only by default on iOS, which would turn the landscape iPad app around.
+      // A modal is portrait-only by default on iOS, which would turn a landscape app around.
       supportedOrientations={['portrait', 'portrait-upside-down', 'landscape-left', 'landscape-right']}
       onRequestClose={handleClose}>
       <Animated.View style={[s.overlay, overlayStyle]}>

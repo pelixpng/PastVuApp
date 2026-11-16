@@ -1,8 +1,13 @@
 import { View, Image, Platform, Dimensions } from 'react-native'
-import { fitContainer, ResumableZoom, useImageResolution } from 'react-native-zoom-toolkit'
+import {
+  fitContainer,
+  ResumableZoom,
+  useImageResolution,
+  type ResumableZoomRefType,
+} from 'react-native-zoom-toolkit'
 import Animated, { SlideInUp, Easing, SlideOutUp } from 'react-native-reanimated'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { ReactElement, useState } from 'react'
+import { useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
+import { ReactElement, useLayoutEffect, useRef, useState } from 'react'
 import { HeaderIconButton } from '../../../../core/components/ui/buttons/HeaderIconButton'
 import { Spacer } from '../../../../core/components/ui/Spacer'
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native'
@@ -12,7 +17,14 @@ import { s } from './style'
 import { saveLocalImage, savePhoto, sharePhoto } from '../../../../core/utils/getPhoto'
 import { useSwipeToClose } from '../../../../core/hooks/useSwipeToClose'
 import { useLightStatusBar } from '../../../../core/hooks/useLightStatusBar'
+import { cameraBesideTop, topLevelWith } from '../../../../core/utils/sideCamera'
 import type { Resolution } from '../../../../core/services/photoPost'
+
+/** The header's buttons, 44 pt boxes, and the room above them under the top inset. */
+const BUTTON_SIZE = 44
+const BUTTON_TOP = Platform.OS === 'android' ? 15 : 10
+/** Between the header's last button and a camera beside it. */
+const CAMERA_GAP = 8
 
 /** Fallback for a photo opened without its size: measure it before laying it out. */
 const Measured = ({
@@ -27,12 +39,29 @@ const Measured = ({
 }
 
 export const FullScreenImage = () => {
-  const { width, height } = Dimensions.get('screen')
+  // On Android the edge-to-edge root view: like the screen it runs under the navigation bar, and
+  // unlike it, it is the window's when split-screen gives the phone's interface a part of a
+  // tablet's or an unfolded screen (App.tsx). The screen's size would crop the photo there.
+  const frame = useSafeAreaFrame()
+  const { width, height } = Platform.OS === 'android' ? frame : Dimensions.get('screen')
   const [visibleHeader, setVisibleHeader] = useState(true)
   const navigation = useNavigation()
   const { params } = useRoute<RouteProp<StackParamList, typeof SCREENS.FULL_SCREEN_IMAGE>>()
-  const { top } = useSafeAreaInsets()
-  const paddingTop = top + (Platform.OS === 'android' ? 15 : 10)
+  const insets = useSafeAreaInsets()
+  const { top } = insets
+  // On iPhone Duo's cover display the camera is in the top-right corner, below the top inset: the
+  // header stands level with it, its buttons ending before it (see core/utils/sideCamera).
+  const camera = cameraBesideTop([], insets, width, BUTTON_TOP + BUTTON_SIZE)
+  const paddingTop = camera ? topLevelWith(camera, BUTTON_SIZE, top) : top + BUTTON_TOP
+  const zoom = useRef<ResumableZoomRefType>(null)
+
+  // A resized window refits the photo, as the tablet's full-screen photo does on a turn, but
+  // ResumableZoom keeps the scale and offset set against the old size: a zoomed photo panned to an
+  // edge would end up off-centre, with black beside it. Back to base zoom, without animation (see
+  // tablet/screen/fullScreenImage). On mount the zoom is already at its base.
+  useLayoutEffect(() => {
+    zoom.current?.reset(false)
+  }, [width, height])
 
   // The photo sits on black, so the status bar goes white whatever the theme.
   useLightStatusBar()
@@ -50,6 +79,7 @@ export const FullScreenImage = () => {
     })
     return (
       <ResumableZoom
+        ref={zoom}
         maxScale={5}
         {...zoomCallbacks}
         onTap={() => setVisibleHeader(!visibleHeader)}
@@ -72,7 +102,11 @@ export const FullScreenImage = () => {
           <Animated.View
             entering={SlideInUp.duration(600).easing(Easing.out(Easing.quad))}
             exiting={SlideOutUp.duration(600).easing(Easing.in(Easing.quad))}
-            style={[s.header, { paddingTop }]}>
+            style={[
+              s.header,
+              { paddingTop },
+              camera && { paddingRight: width - camera.x + CAMERA_GAP },
+            ]}>
             <HeaderIconButton name="arrow-back" color="white" onPress={() => navigation.goBack()} />
             <View style={s.actionIcons}>
               <HeaderIconButton

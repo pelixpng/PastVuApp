@@ -39,7 +39,6 @@ export const useSwipeToClose = (screenHeight: number, onClose: () => void) => {
     closing => {
       if (closing) scheduleOnRN(onClose)
     },
-    [onClose],
   )
 
   const contentStyle = useAnimatedStyle(() => ({

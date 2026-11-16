@@ -6,11 +6,13 @@ export const s = StyleSheet.create({
     height: 80,
     borderRadius: 16,
   },
+  // The selected row's highlight is a card, rounded like the news cards beside it.
   mainContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 8,
     paddingHorizontal: 16,
+    borderRadius: 16,
   },
   placeholder: { justifyContent: 'center', alignItems: 'center' },
   infoContainer: { flex: 1 },

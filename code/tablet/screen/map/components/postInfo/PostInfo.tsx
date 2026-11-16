@@ -20,6 +20,12 @@ type PostInfoProps = {
   colorize?: PostColorize
   /** Opens another photo in this panel; without it the nearby photos are left out. */
   onOpenPhoto?: (cid: string) => void
+  /**
+   * The width of the column the post is laid out in, inside its panel's side padding. The photo is
+   * fitted to it, not to the window: a window-wide fit is wider than the panel in portrait, and the
+   * panel would clip its sides.
+   */
+  contentWidth: number
 }
 
 // An observer: the colour version comes and goes without the panel re-rendering.
@@ -32,6 +38,7 @@ export const PostInfo: FC<PostInfoProps> = observer(({
   onLinkPress,
   colorize,
   onOpenPhoto,
+  contentWidth,
 }) => {
   // The colour photo above the original is being zoomed and has to cover it.
   const [colourRaised, setColourRaised] = useState(false)
@@ -47,6 +54,7 @@ export const PostInfo: FC<PostInfoProps> = observer(({
             onImageLoaded={noop}
             onZoomStart={() => setColourRaised(true)}
             onZoomEnd={() => setColourRaised(false)}
+            maxWidth={contentWidth}
           />
         </ColourReveal>
       )}
@@ -61,6 +69,7 @@ export const PostInfo: FC<PostInfoProps> = observer(({
         openFullScreenImage={() => openFullScreen(comparing)}
         onImageLoaded={onImageLoaded}
         onImageResolution={onImageResolution}
+        maxWidth={contentWidth}
       />
       <Spacer height={12} />
       <PostText postInfo={postInfo} onLinkPress={onLinkPress} onOpenPhoto={onOpenPhoto} />
