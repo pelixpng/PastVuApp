@@ -1,25 +1,26 @@
 import { FC, useCallback } from 'react'
 import {
   ActivityIndicator,
+  BackHandler,
   View,
   Text,
   FlatList,
   StyleSheet,
 } from 'react-native'
 import Animated, { Easing, FadeIn } from 'react-native-reanimated'
-import { useTheme } from '@react-navigation/native'
+import { useFocusEffect, useTheme } from '@react-navigation/native'
 import { observer } from 'mobx-react-lite'
 import { IComment } from '../../../../../core/types/apiPhotoComment'
-import { s } from './style'
+import { PANE_PADDING, s } from './style'
 import { PostInfo } from '../../../map/components/postInfo/PostInfo'
 import { Comment } from '../../../../../core/components/comment/Comment'
 import { Spacer } from '../../../../../core/components/ui/Spacer'
 import { t } from '../../../../../core/i18n'
-import { useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
-import { HeaderIconButton } from '../../../../../core/components/ui/buttons/HeaderIconButton'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { CompareView } from '../../../../../core/components/compare/CompareView'
 import { streetViewTarget } from '../../../../../core/services/streetView'
 import { PhotoPanel } from '../../../../../core/store/PhotoPanel'
+import { useTabletLayout } from '../../../../hooks/useTabletLayout'
 
 // As on the phone: the next photo's post fades in rather than snapping into place, and the spinner
 // comes late, so a post that is already cached does not flash it.
@@ -33,14 +34,28 @@ type PhotoDetailProps = {
   onOpenPhoto?: (cid: string) => void
 }
 
-// An observer: the post and its colour state come from the panel, not from the props.
-export const PhotoDetail: FC<PhotoDetailProps> = observer(({ panel, onLinkPress, onOpenPhoto }) => {
+/**
+ * The photo's pane beside a list `listWidth` wide (see useTabletLayout), on the collection, news
+ * and profile screens, out to the window's right edge: as wide as the map's photo panel, so a post
+ * is laid out the same on every screen.
+ * An observer: the post and its colour state come from the panel, not from the props.
+ */
+export const PhotoDetail: FC<PhotoDetailProps> = observer(({
+  panel,
+  onLinkPress,
+  onOpenPhoto,
+}) => {
   const { postInfo, comments, users, colorize, compareMode, comparePhoto, streetView } = panel
   const { colors } = useTheme()
   const { bottom } = useSafeAreaInsets()
-  // The root view's width, not Dimensions: see core/hooks/useRootSize.
-  const { width } = useSafeAreaFrame()
-  const modalWidth = width * 0.67 - 32
+  const layout = useTabletLayout()
+  const paneWidth = layout.panelWidth
+  // The photo is fitted to the column inside the pane's padding, so it is never wider than the
+  // pane and cut off at the sides.
+  const contentWidth = paneWidth - 2 * PANE_PADDING
+  // Always a width, never flex: switched from a width to flex on a turn, the pane kept the old
+  // width and ran off the screen.
+  const frameStyle = { width: paneWidth }
   const renderItem = useCallback(
     ({ item }: { item: IComment }) => (
       <Comment
@@ -53,9 +68,25 @@ export const PhotoDetail: FC<PhotoDetailProps> = observer(({ panel, onLinkPress,
     ),
     [users, onLinkPress],
   )
+  // Then-and-now covers the panel, and the cross that takes the then-and-now button's place in the
+  // screen header brings the post back (see PanelActions). The post stays mounted underneath:
+  // building it again on the way back reloaded its photos, which flickered.
+  const comparing = !!(compareMode && comparePhoto)
+  // Android's back button leaves then-and-now first. Only while this screen is in front: the other
+  // tabs stay mounted with their own panels.
+  useFocusEffect(
+    useCallback(() => {
+      if (!comparing) return
+      const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+        panel.closeCompare()
+        return true
+      })
+      return () => subscription.remove()
+    }, [comparing, panel]),
+  )
   if (!postInfo) {
     return (
-      <View style={[s.modal, { width: modalWidth }]}>
+      <View style={[s.frame, frameStyle, s.modal]}>
         <Spacer height={18} />
         {/* A photo is picked: a spinner while its post is on its way, not "pick a photo". */}
         {panel.cid !== null ? (
@@ -73,12 +104,9 @@ export const PhotoDetail: FC<PhotoDetailProps> = observer(({ panel, onLinkPress,
     )
   }
 
-  // Then-and-now covers the panel; the arrow brings the post back. The post stays mounted
-  // underneath: building it again on the way back reloaded its photos, which flickered.
-  const comparing = !!(compareMode && comparePhoto)
   const target = comparing && panel.hasStreetView ? streetViewTarget(postInfo) : null
   return (
-    <View style={[s.frame, { width: modalWidth }]}>
+    <View style={[s.frame, frameStyle]}>
       {/* Keyed by the photo, so the next one (from the list, a link or the nearby row) fades in.
           Then-and-now and the colour leave it be. */}
       <Animated.View
@@ -102,8 +130,8 @@ export const PhotoDetail: FC<PhotoDetailProps> = observer(({ panel, onLinkPress,
         <FlatList
           // The list takes over the panel's side padding, so the nearby photos can scroll out to
           // the panel's edges instead of being cut off at the text column.
-          style={{ marginHorizontal: -16 }}
-          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: bottom + 16 }}
+          style={{ marginHorizontal: -PANE_PADDING }}
+          contentContainerStyle={{ paddingHorizontal: PANE_PADDING, paddingBottom: bottom + 16 }}
           showsVerticalScrollIndicator={false}
           data={comments}
           renderItem={renderItem}
@@ -118,6 +146,7 @@ export const PhotoDetail: FC<PhotoDetailProps> = observer(({ panel, onLinkPress,
               onLinkPress={onLinkPress}
               colorize={colorize}
               onOpenPhoto={onOpenPhoto}
+              contentWidth={contentWidth}
             />
           }
         />
@@ -125,9 +154,6 @@ export const PhotoDetail: FC<PhotoDetailProps> = observer(({ panel, onLinkPress,
       {comparing && (
         <View style={[s.modal, s.cover, { backgroundColor: colors.backgroundApp }]}>
           <Spacer height={18} />
-          <View style={s.header}>
-            <HeaderIconButton name="arrow-back" color={colors.textFirst} onPress={panel.closeCompare} />
-          </View>
           <CompareView
             colorizing={colorize.isColorizing}
             photo={comparePhoto!}

@@ -1,22 +1,17 @@
 import { StyleSheet } from 'react-native'
 
+/** The pane's side padding: the post's content column is the pane's width less twice this. */
+export const PANE_PADDING = 16
+
 export const s = StyleSheet.create({
-  // Holds the post and, over it, then-and-now; no padding, so the cover lines up with the post.
+  // The pane right of the list. Holds the post and, over it, then-and-now; no padding, so the
+  // cover lines up with the post. Its width comes from PhotoDetail.
   frame: { height: '100%' },
   modal: {
     height: '100%',
-    paddingHorizontal: 16,
+    paddingHorizontal: PANE_PADDING,
   },
   cover: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    // 44 pt buttons around 24 pt glyphs: 6 keeps the glyphs 16 from the edges.
-    paddingHorizontal: 6,
-    width: '100%',
-    height: 44,
-    alignItems: 'center',
-  },
   loaderContainer: {
     width: '110%',
     height: '100%',

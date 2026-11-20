@@ -1,7 +1,7 @@
 import * as Location from 'expo-location'
 import { action, autorun, makeObservable, observable, reaction } from 'mobx'
 import { Alert, Keyboard, Platform } from 'react-native'
-import MapView, { Region } from 'react-native-maps'
+import MapView, { Camera, Region } from 'react-native-maps'
 import { createRef } from 'react'
 import type { YaMapRef } from '@exterio/react-native-yamap-lite'
 import {
@@ -24,6 +24,11 @@ import { PlaceSearch } from './PlaceSearch'
 /** Matches `cameraZoomRange.minCenterCoordinateDistance` on the MapView. */
 const MIN_ALTITUDE = 100
 
+/** A map's camera as last reported, by the map that reported it: the two take different ones. */
+export type MapCamera =
+	| { provider: 'maps'; camera: Camera }
+	| { provider: 'yandex'; lat: number; lon: number; zoom: number }
+
 /**
  * The photo map, shared by the phone and the tablet: the area in view and the years on the slider,
  * both kept between launches, the markers for them, the place search over the map and the camera's
@@ -41,6 +46,12 @@ export class PhotoMap {
 	) ?? [1840, 2000]
 	/** The place search in the field over the map. */
 	readonly placeSearch = new PlaceSearch()
+	/**
+	 * The map's last camera, kept in memory only: when iPhone Duo folds or unfolds, the map built
+	 * again for the other interface, of another shape, starts from it. Started from `coordinates`
+	 * instead, a region fitted into the new shape, the map zoomed out a little on every fold.
+	 */
+	camera: MapCamera | null = null
 	private collectionTimeoutId: ReturnType<typeof setTimeout> | null = null
 	/** Counts the marker requests: only the latest one's answer may reach the map. */
 	private markersRequest = 0
@@ -75,6 +86,30 @@ export class PhotoMap {
 	setYearsRange(years: [number, number]) {
 		this.yearsRange = years
 		MMKVStorage.set('RangeYears', years)
+	}
+
+	/** The camera for a react-native-maps map to start from, if one of those reported last. */
+	get mapsCamera() {
+		return this.camera?.provider === 'maps' ? this.camera.camera : undefined
+	}
+
+	/** The camera for a Yandex map to start from, if one reported last; it goes to the native map. */
+	get yandexCamera() {
+		if (this.camera?.provider !== 'yandex') return undefined
+		const { lat, lon, zoom } = this.camera
+		return { lat, lon, zoom }
+	}
+
+	/** Keeps the camera a react-native-maps map reports (see `camera`). */
+	@action.bound
+	setMapsCamera(camera: Camera) {
+		this.camera = { provider: 'maps', camera }
+	}
+
+	/** Keeps the camera a Yandex map reports (see `camera`). */
+	@action.bound
+	setYandexCamera(camera: { lat: number; lon: number; zoom: number }) {
+		this.camera = { provider: 'yandex', ...camera }
 	}
 
 	@action.bound

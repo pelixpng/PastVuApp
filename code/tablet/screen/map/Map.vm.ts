@@ -5,15 +5,14 @@ import { BaseViewModelProvider } from '../../provider/vm.provider'
 import { SCREENS } from '../../navigation/navigation.types'
 import { Linking } from 'react-native'
 import { PhotoPanel } from '../../../core/store/PhotoPanel'
-import { NearbySearch } from '../../../core/store/NearbySearch'
-import { PhotoMap } from '../../../core/store/PhotoMap'
+import { mapSession } from '../../../core/store/MapSession'
 
 class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
 	//map data
-	/** The map's area, years and markers, the place search and the camera. */
-	readonly map = new PhotoMap()
+	/** The map's area, years and markers, the place search and the camera (see MapSession). */
+	readonly map = mapSession().map
 	/** The nearby-photos sheet in the left column; it follows the map's centre and years while open. */
-	readonly nearby: NearbySearch
+	readonly nearby = mapSession().nearby
 	//photo detail
 	@observable showPhotoDetail = false
 	/** The post panel over the map; a marker tapped again loads its photo again. */
@@ -24,10 +23,6 @@ class MapVM extends BaseViewModelProvider<SCREENS.MAP> {
 	constructor() {
 		super()
 		makeObservable(this)
-		this.nearby = new NearbySearch(
-			() => this.map.coordinates,
-			() => this.map.yearsRange
-		)
 	}
 
 	// ------------------------------------------ Computed ------------------------------------------

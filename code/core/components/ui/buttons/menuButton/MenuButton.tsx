@@ -11,12 +11,24 @@ type MenuButtonProps = {
   description: string
   icon: 'mail' | 'info' | 'settings' | 'history'
   onPress?: () => void
+  /**
+   * The section shown beside the menu right now, as in the tablet's settings, where the menu stays
+   * on screen next to it. Screen readers announce it as selected; the card looks the same, since
+   * the section itself shows beside it. Off by default.
+   */
+  selected?: boolean
 }
 
-export const MenuButton: FC<MenuButtonProps> = ({ title, description, icon, onPress }) => {
+export const MenuButton: FC<MenuButtonProps> = ({
+  title,
+  description,
+  icon,
+  onPress,
+  selected = false,
+}) => {
   const { colors } = useTheme()
   return (
-    <UICard onPress={onPress}>
+    <UICard onPress={onPress} accessibilityState={selected ? { selected } : undefined}>
       <View style={s.container}>
         <View style={s.textBlock}>
           <Text style={[s.titleText, { color: colors.textFirst }]}>{title}</Text>

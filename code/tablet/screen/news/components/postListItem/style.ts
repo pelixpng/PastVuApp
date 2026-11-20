@@ -15,6 +15,7 @@ export const s = StyleSheet.create({
     borderRadius: 99,
   },
   userNameText: {
+    flexShrink: 1,
     fontSize: 13,
     lineHeight: 20,
     fontWeight: '800',
@@ -38,10 +39,14 @@ export const s = StyleSheet.create({
     fontSize: 13,
     lineHeight: 20,
   },
+  // In a narrow column (an unfolded iPhone in portrait) the comment count goes under the date
+  // rather than past the card's edge.
   footerContainer: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     alignItems: 'center',
+    columnGap: 8,
   },
   dateText: {
     fontSize: 12,

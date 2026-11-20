@@ -9,19 +9,24 @@ import {
 	SEARCH_FIELD_HEIGHT,
 	SearchPlace
 } from '../../../core/components/map/SearchPlace'
+import { topOnUnfoldedCameraLine } from '../../../core/utils/sideCamera'
 import { useVM } from '../../../core/hooks/useVM'
 import { PhotoDetail } from './components/photoDetail/PhotoDetail'
 import { GoogleAppleMaps } from '../../../core/components/map/GoogleAppleMaps'
 import { YandexMaps } from '../../../core/components/map/YandexMaps'
 import MapStore from '../../../core/store/Map.store'
-import { useCallback, useMemo } from 'react'
+import { FC, ReactNode, useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react'
 import { useFocusEffect, useTheme } from '@react-navigation/native'
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
+import Animated, {
+	cancelAnimation,
+	FadeOut,
+	useAnimatedStyle,
+	useSharedValue,
+	withTiming
+} from 'react-native-reanimated'
+import { scheduleOnRN } from 'react-native-worklets'
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
-import {
-	useSafeAreaFrame,
-	useSafeAreaInsets
-} from 'react-native-safe-area-context'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { MapButtons } from './components/mapButtons/MapButtons'
 import {
 	StreetViewNotice,
@@ -33,16 +38,17 @@ import TranslationStore, {
 	photoTranslationId
 } from '../../../core/store/Translation.store'
 import {
+	cardWidthWithin,
 	miniSheetHeight,
 	NearbyPhotosSheet,
 	SheetColumn,
-	SheetSnap,
-	useNearbySheet
+	useNearbySheet,
+	useSheetRestHeight
 } from '../../../mobile/screens/home/map/components/NearbyPhotosSheet'
+import { useTabletLayout } from '../../hooks/useTabletLayout'
+import { SCREENS } from '../../navigation/navigation.types'
+import { usePanelHandoff } from '../../hooks/usePanelHandoff'
 
-/** The left column, as the search field, the years slider and the tab bar take it. */
-const COLUMN_LEFT = 16
-const COLUMN_SHARE = 0.33
 /** Room left between the expanded sheet and the search field above it, as on the phone. */
 const SEARCH_GAP = 12
 /**
@@ -65,9 +71,19 @@ const COLLAPSED_SHARE = 0.55
  * read as one column.
  */
 const TUCK = 16
+/**
+ * In a short window (see TabletLayout.short) the cards are made narrower, so the row of cards stays
+ * this far below the list's opening height: about what the shortest full-screen tablets leave
+ * (a 1280x800 Android tablet about 50 pt, an iPad mini in landscape 58), room for the list and the
+ * cards to fade out on their own sides of half-way (see the sheet's SWAP_BAND).
+ */
+const SHORT_STOP_GAP = 48
+/** Narrower than a list row's thumbnail, a card would show less than the list does. */
+const MIN_CARD_WIDTH = 80
 
 export const MapScreen = observer(() => {
 	const vm = useVM(MapVM)
+	usePanelHandoff(SCREENS.MAP, vm.panel, vm.showPhoto, () => vm.showPhotoDetail)
 	const { colors } = useTheme()
 	// Google's badge is on screen once the post or any of its comments shows a translation.
 	const { postInfo, comments } = vm.panel
@@ -89,38 +105,63 @@ export const MapScreen = observer(() => {
 			: MapStore.mapProvider === 'yandex' && translationShown
 				? 'translation'
 				: null
+	// What the cover has fully hidden the map for. Then-and-now waits for it over an Apple or Yandex
+	// map, so the map fades out rather than vanishing and Street View never shows beside it.
+	const [coveredFor, setCoveredFor] = useState<MapCoverReason | null>(null)
+	const compareReady = mapCover !== 'streetView' || coveredFor === 'streetView'
 	const nearbyOpen = vm.nearby.open
-	// The root view's size, as the column's '33%' takes it: Dimensions keeps the portrait size after
-	// the app turns itself to landscape (see core/hooks/useRootSize).
-	const { height: screenHeight, width: screenWidth } = useSafeAreaFrame()
+	// From the root view's size, not Dimensions, which on iOS can keep the size from before a turn
+	// (see core/hooks/useRootSize).
+	const layout = useTabletLayout()
+	// The search field, the years slider, the sheet and the notice share the column with the tab bar.
+	const { columnLeft, columnWidth, height: screenHeight } = layout
 	const { top } = useSafeAreaInsets()
+	// Level with the camera on an iPhone unfolded in portrait, otherwise at the top inset.
+	const fieldTop = topOnUnfoldedCameraLine(top, SEARCH_FIELD_HEIGHT) ?? top
 	const tabBarHeight = useBottomTabBarHeight()
-	const columnWidth = screenWidth * COLUMN_SHARE
+	// Where the search field and the years slider stand, the same column as the sheet's.
+	const fieldColumn = useMemo(
+		() => ({ left: columnLeft, width: columnWidth }),
+		[columnLeft, columnWidth]
+	)
 	// The top of the slider's card, from the bottom of the screen, and the room from there up to the
 	// search field's bottom.
 	const cardTop = tabBarHeight + YEARS_SLIDER_HEIGHT
-	const room = screenHeight - top - SEARCH_FIELD_HEIGHT - cardTop
+	const room = screenHeight - fieldTop - SEARCH_FIELD_HEIGHT - cardTop
 	// The stops count from the sheet's bottom edge, which is tucked behind the card.
 	const collapsedHeight = Math.round(room * COLLAPSED_SHARE) + TUCK
-	// Dragged down, it drops to a row of large photos, sized from the column, instead of closing.
+	// Dragged down, it drops to a row of large photos, sized from the column, instead of closing. In
+	// a short window cards that wide would reach the opening height or past it, leaving no stop
+	// between the two, so they are made narrower.
+	const maxCardWidth = layout.short
+		? Math.max(MIN_CARD_WIDTH, cardWidthWithin(collapsedHeight - SHORT_STOP_GAP, TUCK))
+		: undefined
 	const miniHeight = Math.min(
-		miniSheetHeight(columnWidth, TUCK),
+		miniSheetHeight(columnWidth, TUCK, maxCardWidth),
 		collapsedHeight
 	)
 	const expandedHeight = Math.max(collapsedHeight, room - SEARCH_GAP - LOGO_ROOM + TUCK)
 	const column = useMemo<SheetColumn>(
 		() => ({
-			left: COLUMN_LEFT,
+			left: columnLeft,
 			width: columnWidth,
 			bottom: cardTop - TUCK,
-			tucked: TUCK
+			tucked: TUCK,
+			maxCardWidth
 		}),
-		[columnWidth, cardTop]
+		[columnLeft, columnWidth, cardTop, maxCardWidth]
 	)
-	// Opens collapsed (mounted in this commit, it slides in once laid out), slides away on closing,
-	// and tells when the map's logo goes above it.
+	// Opens collapsed (mounted in this commit, it slides in once laid out) and slides away on
+	// closing; the height it comes to rest at lifts the map's logo (see mapBottomInset).
 	const sheet = useNearbySheet(
 		nearbyOpen,
+		miniHeight,
+		collapsedHeight,
+		expandedHeight
+	)
+	const restHeight = useSheetRestHeight(
+		sheet.height,
+		sheet.snap,
 		miniHeight,
 		collapsedHeight,
 		expandedHeight
@@ -148,16 +189,15 @@ export const MapScreen = observer(() => {
 	}, [vm])
 
 	// Apple's and Yandex's terms want their logos in sight. They sit just above the slider, where the
-	// sheet comes up: once it has come to rest they stand above it, at whichever stop. Counted from
-	// the bottom of the screen.
+	// sheet comes up: once it has come to rest they stand above it, at whichever stop. The height it
+	// rested at, not the stop's current one: when a turn changes the stops, the logo, and the map's
+	// layout with it, moves once the sheet has slid there rather than at the start of the slide. No
+	// higher than the expanded stop, though, which a height from before a turn to a shorter window
+	// can be: above it the logo would be off the screen. Counted from the bottom of the screen.
 	const mapBottomInset =
-		sheet.logoStop === SheetSnap.Mini
-			? column.bottom + miniHeight
-			: sheet.logoStop === SheetSnap.Collapsed
-				? column.bottom + collapsedHeight
-				: sheet.logoStop === SheetSnap.Expanded
-					? column.bottom + expandedHeight
-					: undefined
+		restHeight > 0
+			? column.bottom + Math.min(restHeight, expandedHeight)
+			: undefined
 
 	return (
 		<View style={s.flexOne}>
@@ -165,11 +205,14 @@ export const MapScreen = observer(() => {
 				search={vm.map.placeSearch}
 				goToLocation={vm.map.goToLocation}
 				onFocus={closeNearbyForSearch}
-				isTablet
+				column={fieldColumn}
+				besideCamera={{ top: fieldTop }}
 			/>
 			{MapStore.mapProvider === 'yandex' ? (
 				<YandexMaps
 					mapRef={vm.map.yamapRef}
+					initialCamera={vm.map.yandexCamera}
+					onCameraChange={vm.map.setYandexCamera}
 					markers={vm.map.photoCollection.markers}
 					initialRegion={vm.map.coordinates}
 					onRegionChangeComplete={vm.map.setCoordinate}
@@ -181,6 +224,8 @@ export const MapScreen = observer(() => {
 			) : (
 				<GoogleAppleMaps
 					mapRef={vm.map.mapRef}
+					initialCamera={vm.map.mapsCamera}
+					onCameraChange={vm.map.setMapsCamera}
 					markers={vm.map.photoCollection.markers}
 					mapType={vm.mapTypeSetting}
 					mapMarkerType={vm.mapMarkerType}
@@ -205,33 +250,30 @@ export const MapScreen = observer(() => {
 					column={column}
 				/>
 			)}
-			{/* While a translation shows beside a Yandex map, the post takes the whole screen: Google's
-			    terms forbid its logo, which marks every translation, on a screen that shows a competing
-			    search service's, and Yandex's terms forbid hiding or covering its logo on a map in
-			    sight. Untranslated, the post stays beside the map. Then-and-now does the same beside
-			    any map but Google's (see mapCover). */}
+			{/* While a translation shows beside a Yandex map, the map is covered and the post stays in
+			    its panel: Google's terms forbid its logo, which marks every translation, on a screen
+			    that shows a competing search service's, and Yandex's terms forbid hiding or covering
+			    its logo on a map in sight. Untranslated, the post stays beside the map. Then-and-now
+			    does the same beside any map but Google's (see mapCover). */}
 			{mapCover && (
-				<Animated.View
-					style={[s.cover, { backgroundColor: colors.backgroundApp }]}
-					entering={COVER_IN}
-					exiting={COVER_OUT}
-					onLayout={refreshWindowRegion}
-				>
-					{/* In the left column, between the top and the tab bar: why the map is gone. */}
+				<MapCover reason={mapCover} color={colors.backgroundApp} onCovered={setCoveredFor}>
+					{/* In the left column, between the top and the tab bar: why the map is gone. As wide
+					    as the lists on the other tabs, so the cards inside, 16 in, line up with the
+					    column. */}
 					<View
 						style={[
 							s.notice,
 							{
-								top: top + 16,
-								bottom: tabBarHeight + 16,
-								left: COLUMN_LEFT,
-								width: columnWidth
+								top,
+								bottom: tabBarHeight,
+								left: columnLeft - 16,
+								width: layout.listWidth
 							}
 						]}
 					>
 						{mapCover === 'streetView' ? <StreetViewNotice /> : <YandexTranslationNotice />}
 					</View>
-				</Animated.View>
+				</MapCover>
 			)}
 			{vm.showPhotoDetail && (
 				<PhotoDetail
@@ -239,6 +281,7 @@ export const MapScreen = observer(() => {
 					closePhoto={vm.closePhoto}
 					onLinkPress={vm.openPhotoFromLink}
 					onOpenPhoto={vm.showPhoto}
+					compareReady={compareReady}
 				/>
 			)}
 			<MapButtons
@@ -249,15 +292,64 @@ export const MapScreen = observer(() => {
 			<YearsSlider
 				value={vm.map.yearsRange}
 				setValue={vm.map.setYearsRange}
-				isTablet
+				column={fieldColumn}
 			/>
 		</View>
 	)
 })
 
 /** In step with the post panel sliding in and out. */
-const COVER_IN = FadeIn.duration(600)
+const COVER_FADE = { duration: 600 }
+/** Short: then-and-now waits for it, after the tap. */
+const STREET_VIEW_FADE = { duration: 250 }
 const COVER_OUT = FadeOut.duration(600)
+
+type MapCoverReason = 'streetView' | 'translation'
+
+type MapCoverProps = {
+	reason: MapCoverReason
+	color: string
+	/** The cover has turned opaque for this reason; null once it is gone. */
+	onCovered: (reason: MapCoverReason | null) => void
+	children: ReactNode
+}
+
+/**
+ * The opaque cover over the map. For a translation it fades in with the post panel sliding in; for
+ * Street View quickly, after the tap, and then-and-now opens only once it is opaque (see
+ * `onCovered`): Google's terms forbid Street View on a screen that shows an Apple or Yandex map.
+ * A cover already opaque for a translation counts at once. It fades out either way.
+ */
+const MapCover: FC<MapCoverProps> = ({ reason, color, onCovered, children }) => {
+	const opacity = useSharedValue(0)
+	useLayoutEffect(() => {
+		if (opacity.value >= 1) {
+			onCovered(reason)
+			return
+		}
+		cancelAnimation(opacity)
+		opacity.value = withTiming(
+			1,
+			reason === 'streetView' ? STREET_VIEW_FADE : COVER_FADE,
+			finished => {
+				if (finished) scheduleOnRN(onCovered, reason)
+			}
+		)
+	}, [reason, opacity, onCovered])
+	useEffect(() => () => onCovered(null), [onCovered])
+	const fade = useAnimatedStyle(() => ({ opacity: opacity.value }))
+	return (
+		<Animated.View
+			style={[s.cover, { backgroundColor: color }, fade]}
+			exiting={COVER_OUT}
+			// A new view over the map: on Android the window's transparent region is gathered again
+			// with it (see modules/window-region).
+			onLayout={refreshWindowRegion}
+		>
+			{children}
+		</Animated.View>
+	)
+}
 
 const s = StyleSheet.create({
 	flexOne: { flex: 1 },

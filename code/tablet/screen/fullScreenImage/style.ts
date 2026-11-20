@@ -1,5 +1,8 @@
 import { StyleSheet } from 'react-native'
 
+/** 44 pt buttons around 24 pt glyphs: 6 keeps the glyphs 16 from the edges. */
+export const HEADER_SIDE = 6
+
 export const s = StyleSheet.create({
   background: {
     position: 'absolute',
@@ -10,8 +13,7 @@ export const s = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    // 44 pt buttons around 24 pt glyphs: 6 keeps the glyphs 16 from the edges.
-    paddingHorizontal: 6,
+    paddingHorizontal: HEADER_SIDE,
     paddingBottom: 10,
     position: 'absolute',
     top: 0,

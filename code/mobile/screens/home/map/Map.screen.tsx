@@ -1,16 +1,18 @@
 import { BackHandler, StyleSheet, View } from 'react-native'
+import { ReservedRegionsView, ScreenRect } from '../../../../modules/window-region'
 import MapVM from './Map.vm'
 import { YearsSlider } from '../../../../core/components/map/YearsSlider'
 import { observer } from 'mobx-react-lite'
 import {
 	SEARCH_FIELD_HEIGHT,
-	SearchPlace
+	SearchPlace,
+	searchFieldBesideCamera
 } from '../../../../core/components/map/SearchPlace'
 import { useVM } from '../../../../core/hooks/useVM'
 import { GoogleAppleMaps } from '../../../../core/components/map/GoogleAppleMaps'
 import { YandexMaps } from '../../../../core/components/map/YandexMaps'
 import MapStore from '../../../../core/store/Map.store'
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { useFocusEffect, useNavigationState } from '@react-navigation/native'
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
 import {
@@ -21,6 +23,7 @@ import { Portal } from '../../../../core/components/ui/portal/Portal'
 import { SCREENS } from '../../../navigation/navigation.types'
 import { MapButtons } from './components/MapButtons'
 import {
+	cardWidthWithin,
 	miniSheetHeight,
 	NearbyPhotosSheet,
 	SheetSnap,
@@ -31,6 +34,14 @@ import {
 const SEARCH_GAP = 12
 /** Share of the screen the sheet opens to, counted from its very bottom. */
 const COLLAPSED_SHARE = 0.45
+/**
+ * The row of cards stays at least this far below the list's opening height, room for the list and
+ * the cards to fade out on their own sides of half-way (see the sheet's SWAP_BAND), as on the
+ * tablet's short windows.
+ */
+const MIN_STOP_GAP = 48
+/** Narrower than a list row's thumbnail, a card would show less than the list does. */
+const MIN_CARD_WIDTH = 80
 
 export const MapScreen = observer(() => {
 	const vm = useVM(MapVM)
@@ -38,14 +49,30 @@ export const MapScreen = observer(() => {
 	// The whole screen, the strip the app draws under the Android navigation bar included, which
 	// the window's size can leave out.
 	const { height: screenHeight, width: screenWidth } = useSafeAreaFrame()
-	const { top, bottom } = useSafeAreaInsets()
+	const insets = useSafeAreaInsets()
+	const { top, bottom } = insets
+	// What the hardware covers of the screen: on iPhone Duo's cover display the camera is in the
+	// top-right corner, below the top inset, and the search field stands level with it.
+	const [occlusions, setOcclusions] = useState<ScreenRect[]>([])
+	const besideCamera = searchFieldBesideCamera(occlusions, insets, screenWidth)
+	const fieldTop = besideCamera?.top ?? top
 	// The sheet opens to COLLAPSED_SHARE of the screen and pulls up to just under the search field.
 	const collapsedHeight = Math.round(screenHeight * COLLAPSED_SHARE)
-	// Dragged down, it drops to a row of large photos instead of closing.
-	const miniHeight = Math.min(miniSheetHeight(screenWidth, bottom), collapsedHeight)
+	// Dragged down, it drops to a row of large photos instead of closing. On a short screen, such as
+	// iPhone Duo's cover display (466x678), cards sized from the width would reach the opening
+	// height, leaving no stop between the two, and at the top the sheet showed neither the list nor
+	// the cards: there they are made narrower.
+	const maxCardWidth = Math.max(
+		MIN_CARD_WIDTH,
+		cardWidthWithin(collapsedHeight - MIN_STOP_GAP, bottom)
+	)
+	const miniHeight = Math.min(
+		miniSheetHeight(screenWidth, bottom, maxCardWidth),
+		collapsedHeight
+	)
 	const expandedHeight = Math.max(
 		collapsedHeight,
-		screenHeight - top - SEARCH_FIELD_HEIGHT - SEARCH_GAP
+		screenHeight - fieldTop - SEARCH_FIELD_HEIGHT - SEARCH_GAP
 	)
 	// The sheet draws in the tabs' card, under any photo pushed over the tabs, so it only has to go
 	// when another tab is chosen.
@@ -96,14 +123,24 @@ export const MapScreen = observer(() => {
 
 	return (
 		<View style={s.flexOne}>
+			{ReservedRegionsView && (
+				<ReservedRegionsView
+					style={StyleSheet.absoluteFill}
+					pointerEvents="none"
+					onOcclusionChange={event => setOcclusions(event.nativeEvent.regions)}
+				/>
+			)}
 			<SearchPlace
 				search={vm.map.placeSearch}
 				goToLocation={vm.map.goToLocation}
 				onFocus={closeSheetForSearch}
+				besideCamera={besideCamera}
 			/>
 			{MapStore.mapProvider === 'yandex' ? (
 				<YandexMaps
 					mapRef={vm.map.yamapRef}
+					initialCamera={vm.map.yandexCamera}
+					onCameraChange={vm.map.setYandexCamera}
 					markers={vm.map.photoCollection.markers}
 					initialRegion={vm.map.coordinates}
 					onRegionChangeComplete={vm.map.setCoordinate}
@@ -114,6 +151,8 @@ export const MapScreen = observer(() => {
 			) : (
 				<GoogleAppleMaps
 					mapRef={vm.map.mapRef}
+					initialCamera={vm.map.mapsCamera}
+					onCameraChange={vm.map.setMapsCamera}
 					markers={vm.map.photoCollection.markers}
 					mapType={vm.mapTypeSetting}
 					mapMarkerType={vm.mapMarkerType}
@@ -146,6 +185,7 @@ export const MapScreen = observer(() => {
 						miniHeight={miniHeight}
 						collapsedHeight={collapsedHeight}
 						expandedHeight={expandedHeight}
+						maxCardWidth={maxCardWidth}
 					/>
 				</Portal>
 			)}

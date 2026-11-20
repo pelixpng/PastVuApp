@@ -34,6 +34,12 @@ interface ImageZoomProps {
    */
   onZoomStart?: () => void
   onZoomEnd?: () => void
+  /**
+   * The widest the preview may be, for a photo laid out in a column narrower than the window, as in
+   * the tablet's side panel. Fitted to the window alone, the photo would spill past the column and
+   * the panel would clip its sides. Without it the preview fits the window.
+   */
+  maxWidth?: number
 }
 
 const PREVIEW_HEIGHT_RATIO = 0.4
@@ -68,8 +74,9 @@ const Preview: FC<ImageZoomProps & { resolution: Resolution }> = ({
   onImageResolution,
   onZoomStart,
   onZoomEnd,
+  maxWidth,
 }) => {
-  // Not useWindowDimensions: on the iPad it kept the portrait size after the turn to landscape.
+  // Not useWindowDimensions, which on iOS can keep the size from before a turn (see useRootSize).
   const { width, height } = useRootSize()
   const { colors } = useTheme()
   const [failed, setFailed] = useState(false)
@@ -80,13 +87,20 @@ const Preview: FC<ImageZoomProps & { resolution: Resolution }> = ({
   const maxPreviewHeight = height * PREVIEW_HEIGHT_RATIO
   // ---------- Image sizing ----------
   const containerFit = fitContainer(resolution.width / resolution.height, { width, height })
-  const previewSize =
+  const windowFit =
     containerFit.height > maxPreviewHeight
       ? {
           height: maxPreviewHeight,
           width: (maxPreviewHeight * containerFit.width) / containerFit.height,
         }
       : containerFit
+  // Scaled down to the column only when the window's fit is wider than it: a photo that already
+  // fits keeps exactly the size the window gives it, and the height cap above still holds.
+  const widthLimit = maxWidth === undefined ? Infinity : Math.max(0, maxWidth)
+  const previewSize =
+    windowFit.width > widthLimit
+      ? { width: widthLimit, height: (widthLimit * windowFit.height) / windowFit.width }
+      : windowFit
   if (failed) {
     return (
       <View style={s.container}>
@@ -100,7 +114,14 @@ const Preview: FC<ImageZoomProps & { resolution: Resolution }> = ({
   }
   return (
     <View style={s.container}>
-      <SnapbackZoom onTap={openFullScreenImage} onPinchStart={onZoomStart} onGestureEnd={onZoomEnd}>
+      {/* Keyed by the preview's size: SnapbackZoom pins its child to the size it measured at the
+          first pinch, so after a turn or a resize the photo would keep the old size and sit off
+          centre. The load state above survives, so the photo does not fade in again. */}
+      <SnapbackZoom
+        key={`${Math.round(previewSize.width)}x${Math.round(previewSize.height)}`}
+        onTap={openFullScreenImage}
+        onPinchStart={onZoomStart}
+        onGestureEnd={onZoomEnd}>
         <View style={previewSize}>
           {!loaded && (
             <ActivityIndicator style={StyleSheet.absoluteFill} color={colors.textThird} />
@@ -141,7 +162,11 @@ const MeasuredPreview: FC<ImageZoomProps> = props => {
   if (error) {
     return (
       <View style={s.container}>
-        <PhotoUnavailable height={height * PREVIEW_HEIGHT_RATIO} onLayout={props.onImageLoaded} />
+        <PhotoUnavailable
+          width={props.maxWidth}
+          height={height * PREVIEW_HEIGHT_RATIO}
+          onLayout={props.onImageLoaded}
+        />
       </View>
     )
   }

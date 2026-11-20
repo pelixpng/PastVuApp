@@ -1,4 +1,4 @@
-import { createRef, useEffect, useMemo } from 'react'
+import { createRef, useEffect, useMemo, useState } from 'react'
 import { AppState, Platform, StatusBar, useColorScheme, View, StyleSheet } from 'react-native'
 import { MaterialIcons } from '../core/components/ui/icons'
 import { observer } from 'mobx-react-lite'
@@ -26,6 +26,8 @@ import { CompareScreen } from './screens/home/compare/Compare.screen'
 import { ProfileScreen } from './screens/profile/Profile.screen'
 import { t } from '../core/i18n'
 import { ModelDownloadSheet } from '../core/components/colorize/ModelDownloadSheet'
+import { useHeaderEdgeStyles } from '../core/hooks/useHeaderEdgeStyles'
+import { phoneInitialState } from './navigation/handoff'
 
 export const Stack = createStackNavigator<StackParamList>()
 export let NavigationRef = createRef<NavigationContainerRef<ParamListBase>>()
@@ -38,6 +40,9 @@ export default observer(function AppMobile() {
       ThemeStore.selectedTheme === 'light' || (isSystemTheme && colorScheme === 'light')
     return isLightTheme ? LightTheme : DarkTheme
   }, [ThemeStore.selectedTheme, colorScheme])
+  const headerEdgeStyles = useHeaderEdgeStyles('center')
+  // The tab and photo the tablet interface had open, when this one takes over from it (App.tsx).
+  const [initialState] = useState(phoneInitialState)
   useEffect(() => {
     if (Platform.OS !== 'android') return
     const apply = () =>
@@ -51,7 +56,7 @@ export default observer(function AppMobile() {
     return () => subscription.remove()
   }, [theme, colorScheme])
   return (
-    <NavigationContainer ref={NavigationRef} theme={theme}>
+    <NavigationContainer ref={NavigationRef} theme={theme} initialState={initialState}>
       {/* Follows the app's theme, not the system one: with a light app on a dark system
           (or vice versa) `auto` painted the status bar the wrong colour and it vanished.
           On Android the navigation bar goes through react-native-edge-to-edge, while the status
@@ -75,7 +80,8 @@ export default observer(function AppMobile() {
           headerTitleStyle: s.settingsTitle,
           headerTitleAlign: 'center',
           headerShadowVisible: false,
-          headerBackTitleVisible: false,
+          headerBackButtonDisplayMode: 'minimal',
+          ...headerEdgeStyles,
           gestureResponseDistance: 200,
           presentation: Platform.OS === 'android' ? 'transparentModal' : undefined,
           title: '',

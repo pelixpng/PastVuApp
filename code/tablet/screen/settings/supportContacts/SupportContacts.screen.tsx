@@ -1,13 +1,17 @@
-import { StyleSheet } from 'react-native'
+import { FC } from 'react'
+import { StyleProp, ViewStyle } from 'react-native'
 import { Container } from '../../../../core/components/ui/Container'
 import { SupportContent } from '../../../../core/components/settings/SupportContent'
 
-export const SupportContactsScreen = () => (
-  <Container style={s.container}>
-    <SupportContent wide />
+type SupportContactsScreenProps = {
+  /** Side margins for the width the settings menu leaves. */
+  style: StyleProp<ViewStyle>
+  /** The two buttons side by side, when the content is wide enough for their labels. */
+  wide: boolean
+}
+
+export const SupportContactsScreen: FC<SupportContactsScreenProps> = ({ style, wide }) => (
+  <Container style={style}>
+    <SupportContent wide={wide} />
   </Container>
 )
-
-const s = StyleSheet.create({
-  container: { paddingRight: 48, paddingLeft: 32 },
-})

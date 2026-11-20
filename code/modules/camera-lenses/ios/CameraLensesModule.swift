@@ -4,11 +4,11 @@ import ExpoModulesCore
 /**
  * The back lenses with the zoom factor the system camera prints for each ("0.5", "1", "5").
  *
- * expo-camera only knows lenses by localized name, and nothing in its API says how strong they
+ * expo-camera only knows lenses by device type, and nothing in its API says how strong they
  * are. AVFoundation does: a virtual device (triple / dual-wide / dual) lists its physical
  * constituents and the zoom factors at which it switches between them, so dividing those by the
- * wide lens's own factor gives the familiar labels. Names are the same `localizedName` values
- * expo-camera uses, so the result can be passed straight into `selectedLens`.
+ * wide lens's own factor gives the familiar labels. Each lens carries the `deviceType` raw value
+ * that expo-camera matches `selectedLens` against, so it can be passed straight into that prop.
  */
 public class CameraLensesModule: Module {
   public func definition() -> ModuleDefinition {
@@ -31,7 +31,7 @@ public class CameraLensesModule: Module {
           crops = Array(Set(factors.map { Double($0) }))
         }
         return [
-          "name": lens.localizedName,
+          "deviceType": lens.deviceType.rawValue,
           "factor": factor,
           "maxZoom": lens.activeFormat.videoMaxZoomFactor,
           "cropFactors": crops,

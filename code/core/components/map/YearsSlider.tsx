@@ -8,13 +8,17 @@ import { YearsRangeType } from '../../types/components'
 type YearsSliderProps = {
   value: YearsRangeType
   setValue: (value: YearsRangeType) => void
-  isTablet?: boolean
+  /**
+   * The tablet's left column: the slider's card stands there on the floating tab bar, `left` from
+   * the screen's left edge and `width` wide. Without it, the phone's whole width at the bottom.
+   */
+  column?: { left: number; width: number }
 }
 
 /** How far the slider reaches up from its bottom edge, in points: padding, two lines and the track. */
 export const YEARS_SLIDER_HEIGHT = 12 + 20 + 25 + 20 + 8
 
-const YearsSliderComponent: FC<YearsSliderProps> = ({ value, setValue, isTablet }) => {
+const YearsSliderComponent: FC<YearsSliderProps> = ({ value, setValue, column }) => {
   const { colors } = useTheme()
   const tabBarHeight = useBottomTabBarHeight()
   const [tmpRange, setTmpRange] = useState<YearsRangeType>(value)
@@ -23,8 +27,8 @@ const YearsSliderComponent: FC<YearsSliderProps> = ({ value, setValue, isTablet 
       style={[
         s.container,
         { backgroundColor: colors.backgroundApp },
-        isTablet
-          ? { bottom: tabBarHeight, width: '33%', left: 16 }
+        column
+          ? { bottom: tabBarHeight, width: column.width, left: column.left }
           : { bottom: 0, width: '100%' },
       ]}>
       <Text style={[s.currentYearsText, { color: colors.textFirst }]}>

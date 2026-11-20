@@ -1,9 +1,14 @@
 import { StyleSheet } from 'react-native'
 
+/** The header row's padding on each side. */
+export const HEADER_SIDE = 6
+/** The post list's side padding: the post's column is the panel's width less twice this. */
+export const POST_PADDING = 16
+
 export const s = StyleSheet.create({
+  // Pinned to the right edge; the width comes from the tablet layout.
   modal: {
     height: '100%',
-    width: '64%',
     position: 'absolute',
     zIndex: 50,
     right: 0,
@@ -19,13 +24,13 @@ export const s = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     // 44 pt buttons around 24 pt glyphs: 6 keeps the glyphs 16 from the edges.
-    paddingHorizontal: 6,
+    paddingHorizontal: HEADER_SIDE,
     width: '100%',
     height: 44,
     alignItems: 'center',
   },
   iconContainer: { flexDirection: 'row' },
-  postInfoContainer: { paddingHorizontal: 16 },
+  postInfoContainer: { paddingHorizontal: POST_PADDING },
   loaderContainer: {
     width: '100%',
     height: '100%',

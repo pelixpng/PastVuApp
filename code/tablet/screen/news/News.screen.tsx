@@ -6,12 +6,9 @@ import {
   Text,
   View,
 } from 'react-native'
-import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { useNavigation, useTheme } from '@react-navigation/native'
 import { observer } from 'mobx-react-lite'
 import { HeaderIconButton } from '../../../core/components/ui/buttons/HeaderIconButton'
-import { ColorizeButtons } from '../../../core/components/colorize/ColorizeButtons'
-import { TranslateButton } from '../../../core/components/translate/TranslateButton'
 import NewsVM, { NewsTab } from './News.vm'
 import { useVM } from '../../../core/hooks/useVM'
 import { Spacer } from '../../../core/components/ui/Spacer'
@@ -25,6 +22,10 @@ import type { NewsItems } from '../../../core/types/apiNews'
 import type { CollectionItem } from '../../../core/services/photoPost'
 import { t } from '../../../core/i18n'
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
+import { useTabletLayout } from '../../hooks/useTabletLayout'
+import { usePanelHandoff } from '../../hooks/usePanelHandoff'
+import { SCREENS } from '../../navigation/navigation.types'
+import { PanelActions } from '../../components/PanelActions'
 
 const Separator = () => <Spacer height={8} />
 const ListHeader = () => <Spacer height={16} />
@@ -36,45 +37,34 @@ const photoKeyExtractor = (item: CollectionItem) => item.cid
 export const NewsScreen = observer(() => {
   const vm = useVM(NewsVM)
   const { panel } = vm
+  usePanelHandoff(SCREENS.NEWS, panel, vm.showPhoto)
   const { colors } = useTheme()
   const tabBarHeight = useBottomTabBarHeight()
   const navigation = useNavigation()
-  // The root view's width, not Dimensions: see core/hooks/useRootSize.
-  const { width } = useSafeAreaFrame()
-  const listWidth = width * 0.33
+  const { listWidth, leftInset } = useTabletLayout()
   useLayoutEffect(() => {
     if (panel.cid && panel.postInfo) {
       // Taken now: the post is cleared when another photo is picked, and the header may draw meanwhile.
       const { cid, title, desc } = panel.postInfo
+      const post = { cid, title, desc }
       navigation.setOptions({
         headerLeft: vm.selectedTab === 'posts'
           ? () => (
-              <View style={{ marginLeft: 6 }}>
+              <View style={s.headerLeft}>
                 <HeaderIconButton name="arrow-back" color={colors.textFirst} onPress={panel.close} />
               </View>
             )
           : undefined,
-        headerRight: () => (
-          <View style={s.header}>
-            {/* Translation only over the post itself: then-and-now does not show its text. */}
-            {!panel.compareMode && <TranslateButton cid={cid} title={title} desc={desc} />}
-            {/* Palette and the comparison with the original; the latter not over the then-and-now view. */}
-            <ColorizeButtons colorize={panel.colorize} showCompareOriginal={!panel.compareMode} />
-            <HeaderIconButton name="compare" color={colors.textFirst} onPress={panel.openCompare} />
-            <Spacer width={4} />
-            <HeaderIconButton name={panel.isFavorite ? 'favorite' : 'favorite-border'} color={colors.textFirst} onPress={panel.toggleFavorite} />
-            <Spacer width={4} />
-            <HeaderIconButton name="save-alt" color={colors.textFirst} onPress={panel.saveImage} />
-            <Spacer width={4} />
-            <HeaderIconButton name="share" color={colors.textFirst} onPress={panel.share} />
-          </View>
-        ),
+        // The header stays while then-and-now covers the photo, so in compare mode the buttons that
+        // belong to the post drop out. The row observes the panel itself; only another post has to
+        // set it again.
+        headerRight: () => <PanelActions panel={panel} post={post} sharedWithCompare style={s.header} />,
       })
     } else if (vm.selectedTab === 'posts' && vm.activePost) {
       navigation.setOptions({
         headerLeft: vm.canGoBack
           ? () => (
-              <View style={{ marginLeft: 6 }}>
+              <View style={s.headerLeft}>
                 <HeaderIconButton name="arrow-back" color={colors.textFirst} onPress={vm.goBackToPost} />
               </View>
             )
@@ -88,7 +78,7 @@ export const NewsScreen = observer(() => {
     } else {
       navigation.setOptions({ headerLeft: undefined, headerRight: undefined })
     }
-  }, [panel.cid, vm.selectedTab, vm.activePost, panel.postInfo, panel.isFavorite, panel.compareMode, vm.canGoBack, colors.textFirst, navigation])
+  }, [vm, panel, panel.cid, vm.selectedTab, vm.activePost, panel.postInfo, vm.canGoBack, colors.textFirst, navigation])
 
   const renderPost = useCallback(
     ({ item }: { item: NewsItems }) => (
@@ -120,7 +110,11 @@ export const NewsScreen = observer(() => {
 
   return (
     <Container row>
-      <View style={{ width: listWidth }}>
+      {/* The pane beside it shows a photo (see PhotoDetail) or a news post out to the window's
+          right edge. */}
+      {/* Ends where the floating tab bar begins, so the rows scroll out of sight above it rather
+          than showing around it. */}
+      <View style={{ width: listWidth, marginLeft: leftInset, marginBottom: tabBarHeight }}>
         <Spacer height={18} />
         <View style={{ paddingHorizontal: 16 }}>
           <SegmentedControl
@@ -132,9 +126,8 @@ export const NewsScreen = observer(() => {
         {vm.selectedTab === 'posts' ? (
           <FlatList<NewsItems>
             data={vm.news}
-            style={s.postListContainer}
-            // The tablet tab bar floats over the content, so the list needs to end above it.
-            contentContainerStyle={{ paddingBottom: tabBarHeight + 16 }}
+            style={s.list}
+            contentContainerStyle={s.listContent}
             ListHeaderComponent={ListHeader}
             ListFooterComponent={ListFooter}
             ItemSeparatorComponent={Separator}
@@ -163,7 +156,7 @@ export const NewsScreen = observer(() => {
           <FlatList<CollectionItem>
             data={vm.historyItems}
             style={s.list}
-            contentContainerStyle={{ paddingBottom: tabBarHeight + 16 }}
+            contentContainerStyle={s.listContent}
             ListHeaderComponent={ListHeader}
             ListFooterComponent={ListFooter}
             ItemSeparatorComponent={Separator}
@@ -191,7 +184,11 @@ export const NewsScreen = observer(() => {
         )}
       </View>
       {panel.cid ? (
-        <PhotoDetail panel={panel} onLinkPress={vm.openPhotoFromLink} onOpenPhoto={vm.showPhoto} />
+        <PhotoDetail
+          panel={panel}
+          onLinkPress={vm.openPhotoFromLink}
+          onOpenPhoto={vm.showPhoto}
+        />
       ) : (
         <NewsDetail
           post={vm.activePost}
@@ -207,8 +204,10 @@ export const NewsScreen = observer(() => {
 const s = StyleSheet.create({
   // 44 pt buttons around 24 pt glyphs: 6 keeps the glyphs 16 from the edge.
   header: { flexDirection: 'row', marginRight: 6 },
-  list: { flex: 1 },
-  postListContainer: { flex: 1, paddingHorizontal: 16 },
+  headerLeft: { marginLeft: 6 },
+  // 16 in from each side, in line with the floating tab bar under the list.
+  list: { flex: 1, paddingHorizontal: 16 },
+  listContent: { paddingBottom: 16 },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',

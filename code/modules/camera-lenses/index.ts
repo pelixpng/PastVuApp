@@ -2,8 +2,11 @@ import { Platform } from 'react-native'
 import { requireOptionalNativeModule } from 'expo-modules-core'
 
 export type BackLens = {
-  /** The localized device name expo-camera uses for `selectedLens`. */
-  name: string
+  /**
+   * AVFoundation device type, e.g. "AVCaptureDeviceTypeBuiltInUltraWideCamera": the key
+   * expo-camera matches `selectedLens` against and lists in `getAvailableLensesAsync`.
+   */
+  deviceType: string
   /** Zoom factor relative to the wide lens: 0.5, 1, 2, 3, 5... */
   factor: number
   /** Largest `videoZoomFactor` this lens accepts; expo-camera's `zoom` prop is `maxZoom ** zoom`. */

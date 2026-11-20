@@ -1,7 +1,7 @@
-import { useCallback, useLayoutEffect } from 'react'
+import { useCallback, useEffect, useLayoutEffect } from 'react'
 import { FlatList, Pressable, StyleSheet, View } from 'react-native'
 import { observer } from 'mobx-react-lite'
-import { useNavigation, useTheme } from '@react-navigation/native'
+import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Container } from '../../../core/components/ui/Container'
 import { HeaderIconButton } from '../../../core/components/ui/buttons/HeaderIconButton'
@@ -26,6 +26,8 @@ import { t } from '../../../core/i18n'
 import { PhotoListItem } from '../home/collection/components/Item'
 import { Comment } from '../../../core/components/comment/Comment'
 import ProfileVM from './Profile.vm'
+import { SCREENS } from '../../navigation/navigation.types'
+import { StackParamList } from '../../navigation/stackParams.types'
 
 const keyExtractor = (row: ProfileRow) => row.key
 /** The content's top padding, where the list header starts. */
@@ -33,6 +35,8 @@ const CONTENT_TOP = 16
 
 export const ProfileScreen = observer(() => {
   const vm = useVM(ProfileVM)
+  const { login } = useRoute<RouteProp<StackParamList, SCREENS.PROFILE>>().params
+  useEffect(() => vm.showProfile(login), [vm, login])
   const { bottom } = useSafeAreaInsets()
   const threadColor = useThreadColor()
   const navigation = useNavigation()

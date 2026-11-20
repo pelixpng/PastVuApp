@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
-import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { useFocusEffect, useNavigation, useTheme } from '@react-navigation/native'
 import { observer } from 'mobx-react-lite'
 import CollectionVM, { CollectionTab } from './Collection.vm'
@@ -18,28 +17,33 @@ import { Spacer } from '../../../core/components/ui/Spacer'
 import { MenuButton } from '../../../core/components/ui/buttons/menuButton/MenuButton'
 import { PhotoDetail } from './components/photoDetail/PhotoDetail'
 import { Container } from '../../../core/components/ui/Container'
-import { HeaderIconButton } from '../../../core/components/ui/buttons/HeaderIconButton'
-import { ColorizeButtons } from '../../../core/components/colorize/ColorizeButtons'
-import { TranslateButton } from '../../../core/components/translate/TranslateButton'
 import { SegmentedControl } from '../../../core/components/ui/segmentedControl/SegmentedControl'
 import { t } from '../../../core/i18n'
 import type { CollectionItem } from '../../../core/services/photoPost'
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
+import { useTabletLayout } from '../../hooks/useTabletLayout'
+import { usePanelHandoff } from '../../hooks/usePanelHandoff'
+import { SCREENS } from '../../navigation/navigation.types'
+import { PanelActions } from '../../components/PanelActions'
 
 const ListHeader = () => <Spacer height={8} />
 const ListFooter = () => <Spacer height={80} />
 
 const keyExtractor = (item: CollectionItem) => item.cid
 
+const DIALOG_WIDTH = 360
+/** The delete dialog keeps at least this much from the window's sides when the window is narrow. */
+const DIALOG_MARGIN = 16
+
 export const CollectionScreen = observer(() => {
   const vm = useVM(CollectionVM)
   const { panel } = vm
+  usePanelHandoff(SCREENS.PHOTO_HISTORY, panel, vm.showPhoto)
   const tabBarHeight = useBottomTabBarHeight()
   const { colors } = useTheme()
   const navigation = useNavigation()
-  // The root view's width, not Dimensions: see core/hooks/useRootSize.
-  const { width } = useSafeAreaFrame()
-  const listWidth = width * 0.33
+  const layout = useTabletLayout()
+  const dialogWidth = Math.min(DIALOG_WIDTH, layout.width - 2 * DIALOG_MARGIN)
   useFocusEffect(
     useCallback(() => {
       vm.getPhotos()
@@ -49,24 +53,22 @@ export const CollectionScreen = observer(() => {
     if (!panel.postInfo) return
     // Taken now: the post is cleared when another photo is picked, and the header may draw meanwhile.
     const { cid, title, desc } = panel.postInfo
+    const post = { cid, title, desc }
     navigation.setOptions({
+      // The header stays while then-and-now covers the post, so in compare mode the buttons that
+      // belong to the post drop out. The row observes the panel itself; only another post has to
+      // set it again.
       headerRight: () => (
-        <View style={s.header}>
-          {/* Translation only over the post itself: then-and-now does not show its text. */}
-          {!panel.compareMode && <TranslateButton cid={cid} title={title} desc={desc} />}
-          {/* Palette and the comparison with the original; the latter not over the then-and-now view. */}
-          <ColorizeButtons colorize={panel.colorize} showCompareOriginal={!panel.compareMode} />
-          <HeaderIconButton name="compare" color={colors.textFirst} onPress={panel.openCompare} />
-          <Spacer width={4} />
-          <HeaderIconButton name={panel.isFavorite ? 'favorite' : 'favorite-border'} color={colors.textFirst} onPress={vm.toggleFavorite} />
-          <Spacer width={4} />
-          <HeaderIconButton name="save-alt" color={colors.textFirst} onPress={panel.saveImage} />
-          <Spacer width={4} />
-          <HeaderIconButton name="share" color={colors.textFirst} onPress={panel.share} />
-        </View>
+        <PanelActions
+          panel={panel}
+          post={post}
+          sharedWithCompare
+          onToggleFavorite={vm.toggleFavorite}
+          style={s.header}
+        />
       ),
     })
-  }, [panel.postInfo, panel.isFavorite, panel.compareMode, colors.textFirst, navigation])
+  }, [panel, panel.postInfo, vm.toggleFavorite, navigation])
 
   const renderItem = useCallback(
     ({ item }: { item: CollectionItem }) => (
@@ -84,7 +86,15 @@ export const CollectionScreen = observer(() => {
 
   return (
     <Container row>
-      <View style={{ width: listWidth }}>
+      {/* The photo's pane beside it takes its width from the window (see PhotoDetail). */}
+      {/* Ends where the floating tab bar begins, so the rows scroll out of sight above it rather
+          than showing around it. */}
+      <View
+        style={{
+          width: layout.listWidth,
+          marginLeft: layout.leftInset,
+          marginBottom: tabBarHeight,
+        }}>
         <Spacer height={18} />
         <View style={s.segmentHeader}>
           <SegmentedControl
@@ -98,8 +108,7 @@ export const CollectionScreen = observer(() => {
           // Rows read the selection inside renderItem, which the list does not track.
           extraData={panel.cid}
           style={s.list}
-          // The tablet tab bar floats over the content, so the list needs to end above it.
-          contentContainerStyle={{ paddingBottom: tabBarHeight + 16 }}
+          contentContainerStyle={s.listContent}
           ListFooterComponent={ListFooter}
           keyExtractor={keyExtractor}
           ListHeaderComponent={ListHeader}
@@ -123,15 +132,21 @@ export const CollectionScreen = observer(() => {
           }
         />
       </View>
-      <PhotoDetail panel={panel} onLinkPress={vm.openPhotoFromLink} onOpenPhoto={vm.showPhoto} />
+      <PhotoDetail
+        panel={panel}
+        onLinkPress={vm.openPhotoFromLink}
+        onOpenPhoto={vm.showPhoto}
+      />
       <Modal
         visible={vm.isDeleteModalVisible}
         transparent
         animationType="fade"
-        supportedOrientations={['landscape']}
+        // A modal is portrait-only by default on iOS, which would turn a landscape app around.
+        supportedOrientations={['portrait', 'portrait-upside-down', 'landscape-left', 'landscape-right']}
         onRequestClose={vm.hideDeleteModal}>
         <Pressable style={s.overlay} onPress={vm.hideDeleteModal}>
-          <View style={[s.modalContainer, { backgroundColor: colors.baseSecond }]}>
+          <View
+            style={[s.modalContainer, { width: dialogWidth, backgroundColor: colors.baseSecond }]}>
             <Text style={[s.modalTitle, { color: colors.textThird }]}>
               {vm.deleteConfirmationTitle}
             </Text>
@@ -157,11 +172,13 @@ export const CollectionScreen = observer(() => {
 })
 
 const s = StyleSheet.create({
-  emptyContainer: { paddingHorizontal: 16, paddingTop: 16 },
+  emptyContainer: { paddingTop: 16 },
   // 44 pt buttons around 24 pt glyphs: 6 keeps the glyphs 16 from the edge.
   header: { flexDirection: 'row', marginRight: 6 },
   segmentHeader: { paddingHorizontal: 16 },
-  list: { flex: 1 },
+  // 16 in from each side, in line with the floating tab bar under the list.
+  list: { flex: 1, paddingHorizontal: 16 },
+  listContent: { paddingBottom: 16 },
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -173,7 +190,6 @@ const s = StyleSheet.create({
     paddingBottom: 16,
     paddingTop: 29,
     paddingHorizontal: 24,
-    width: 360,
   },
   modalTitle: {
     fontSize: 14,

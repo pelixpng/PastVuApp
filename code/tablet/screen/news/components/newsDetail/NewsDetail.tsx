@@ -1,8 +1,13 @@
-import { FC, useCallback } from 'react'
+import { FC, memo, useCallback, useMemo } from 'react'
 import { View, Text, FlatList, Pressable, StyleSheet } from 'react-native'
 import { Image } from 'expo-image'
 import { StackActions, useNavigation, useTheme } from '@react-navigation/native'
-import RenderHTML from 'react-native-render-html'
+import RenderHTML, {
+  DomVisitorCallbacks,
+  MixedStyleDeclaration,
+  MixedStyleRecord,
+  RenderHTMLProps,
+} from 'react-native-render-html'
 import { NewsItems } from '../../../../../core/types/apiNews'
 import { IComment, Users } from '../../../../../core/types/apiPhotoComment'
 import { Comment } from '../../../../../core/components/comment/Comment'
@@ -10,49 +15,68 @@ import { Spacer } from '../../../../../core/components/ui/Spacer'
 import { formatDate } from '../../../../../core/utils/getTime'
 import StandardAvatar from '../../../../../assets/avatar.png'
 import { t } from '../../../../../core/i18n'
-import { useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { StackParamList } from '../../../../navigation/stackParams.types'
 import { SCREENS } from '../../../../navigation/navigation.types'
+import { useTabletLayout } from '../../../../hooks/useTabletLayout'
+// The same padding as a photo's pane in this place, so the two line up as the pane switches.
+import { PANE_PADDING } from '../../../collection/components/photoDetail/style'
 
-type NewsDetailProps = {
-  post: NewsItems | null
-  comments: IComment[]
-  users: Users | null
+const Separator = () => <Spacer height={12} />
+const keyExtractor = (item: IComment) => item.cid
+
+// At module level, and the styles in PostHeader memoised: RenderHTML builds its render engine
+// again whenever one of them changes identity.
+const domVisitors: DomVisitorCallbacks = {
+  onElement: el => {
+    // An image with no address, or a blank one, becomes a span rather than an empty image box.
+    if (el.tagName === 'img') {
+      const src = el.attribs?.src
+      if (!src || src === 'about:///blank' || src === 'about:blank') {
+        el.tagName = 'span'
+      }
+    }
+  },
+}
+
+type PostHeaderProps = {
+  post: NewsItems
+  /** The widest the post's images may be: at most the text column inside the pane's padding. */
+  contentWidth: number
   onLinkPress?: (href: string) => void
 }
 
-export const NewsDetail: FC<NewsDetailProps> = ({ post, comments, users, onLinkPress }) => {
+/**
+ * The post above its comments: author, date, title, text and the comment count. Its own component,
+ * handed to the list as an element, so the list updates it in place: an inline component would be
+ * a new type on every render, and the list would mount it again and parse the post's HTML anew,
+ * as on each step of a turn or a window resize.
+ */
+const PostHeader = memo(function PostHeader({
+  post,
+  contentWidth,
+  onLinkPress,
+}: PostHeaderProps) {
   const { colors } = useTheme()
   const navigation = useNavigation()
-  const { bottom } = useSafeAreaInsets()
-  // The root view's width, not Dimensions: see core/hooks/useRootSize.
-  const { width } = useSafeAreaFrame()
-  const detailWidth = width * 0.67 - 32
-
-  const renderItem = useCallback(
-    ({ item }: { item: IComment }) => (
-      <Comment comment={item} users={users} onLinkPress={onLinkPress} replyWidth="94%" />
-    ),
-    [users, onLinkPress],
+  const source = useMemo(() => ({ html: `<p>${post.txt || ''}</p>` }), [post.txt])
+  const baseStyle = useMemo<MixedStyleDeclaration>(
+    () => ({ fontSize: 13, lineHeight: 20, color: colors.textSecond }),
+    [colors.textSecond],
   )
-
-  if (!post) {
-    return (
-      <View style={[s.container, { width: detailWidth }]}>
-        <Spacer height={18} />
-        <View style={s.emptyContainer}>
-          <Text style={[s.emptyText, { color: colors.textThird }]}>
-            {t('news.selectPost')}
-          </Text>
-        </View>
-      </View>
-    )
-  }
-
+  // No maxWidth for img: RenderHTML already fits every image to contentWidth, and leaving the
+  // width out keeps the render engine from being rebuilt when the pane changes width.
+  const tagsStyles = useMemo<MixedStyleRecord>(
+    () => ({ a: { color: colors.basePrimary, textDecorationLine: 'underline' } }),
+    [colors.basePrimary],
+  )
+  const renderersProps = useMemo<RenderHTMLProps['renderersProps']>(
+    () => ({ a: { onPress: (_, href) => onLinkPress?.(href) } }),
+    [onLinkPress],
+  )
   const avatarUri = post.user?.avatar ? `https://pastvu.com/_a/h/${post.user.avatar}` : null
   const formattedDate = post.pdate ? formatDate(post.pdate) : ''
-
-  const ListHeader = () => (
+  return (
     <View style={s.headerContainer}>
       <Pressable
         style={s.userRow}
@@ -80,35 +104,12 @@ export const NewsDetail: FC<NewsDetailProps> = ({ post, comments, users, onLinkP
       <Text style={[s.title, { color: colors.textFirst }]}>{post.title}</Text>
       <Spacer height={16} />
       <RenderHTML
-        source={{ html: `<p>${post.txt || ''}</p>` }}
-        contentWidth={detailWidth - 32}
-        domVisitors={{
-          onElement: (el) => {
-            if (el.tagName === 'img') {
-              const src = el.attribs?.src
-              if (!src || src === 'about:///blank' || src === 'about:blank') {
-                el.tagName = 'span'
-              }
-            }
-          },
-        }}
-        baseStyle={{
-          fontSize: 13,
-          lineHeight: 20,
-          color: colors.textSecond,
-        }}
-        tagsStyles={{
-          a: {
-            color: colors.basePrimary,
-            textDecorationLine: 'underline',
-          },
-          img: {
-            maxWidth: detailWidth - 32,
-          },
-        }}
-        renderersProps={{
-          a: { onPress: (_, href) => onLinkPress?.(href) },
-        }}
+        source={source}
+        contentWidth={contentWidth}
+        domVisitors={domVisitors}
+        baseStyle={baseStyle}
+        tagsStyles={tagsStyles}
+        renderersProps={renderersProps}
       />
       <Spacer height={24} />
       <View style={s.commentsHeader}>
@@ -118,18 +119,60 @@ export const NewsDetail: FC<NewsDetailProps> = ({ post, comments, users, onLinkP
       <Spacer height={12} />
     </View>
   )
+})
+
+type NewsDetailProps = {
+  post: NewsItems | null
+  comments: IComment[]
+  users: Users | null
+  onLinkPress?: (href: string) => void
+}
+
+/**
+ * The news post's pane beside a list `listWidth` wide (see useTabletLayout), on the news and
+ * profile screens: it fills the row out to the window's right edge.
+ */
+export const NewsDetail: FC<NewsDetailProps> = ({ post, comments, users, onLinkPress }) => {
+  const { colors } = useTheme()
+  const { bottom } = useSafeAreaInsets()
+  // The pane is what the list leaves of the window, as wide as a photo's (see PhotoDetail): the
+  // post's images are fitted to the text column inside its padding.
+  const layout = useTabletLayout()
+  const contentWidth = layout.panelWidth - 2 * PANE_PADDING
+
+  const renderItem = useCallback(
+    ({ item }: { item: IComment }) => (
+      <Comment comment={item} users={users} onLinkPress={onLinkPress} replyWidth="94%" />
+    ),
+    [users, onLinkPress],
+  )
+
+  if (!post) {
+    return (
+      <View style={s.container}>
+        <Spacer height={18} />
+        <View style={s.emptyContainer}>
+          <Text style={[s.emptyText, { color: colors.textThird }]}>
+            {t('news.selectPost')}
+          </Text>
+        </View>
+      </View>
+    )
+  }
 
   return (
-    <View style={[s.container, { width: detailWidth }]}>
+    <View style={s.container}>
       <Spacer height={18} />
       <FlatList
         contentContainerStyle={{ paddingBottom: bottom + 16 }}
         showsVerticalScrollIndicator={false}
         data={comments}
         renderItem={renderItem}
-        keyExtractor={item => item.cid}
-        ListHeaderComponent={ListHeader}
-        ItemSeparatorComponent={() => <Spacer height={12} />}
+        keyExtractor={keyExtractor}
+        ListHeaderComponent={
+          <PostHeader post={post} contentWidth={contentWidth} onLinkPress={onLinkPress} />
+        }
+        ItemSeparatorComponent={Separator}
         style={s.list}
       />
     </View>
@@ -137,11 +180,12 @@ export const NewsDetail: FC<NewsDetailProps> = ({ post, comments, users, onLinkP
 }
 
 const s = StyleSheet.create({
+  // The rest of the row beside the list, out to the window's right edge.
   container: {
     flex: 1,
   },
   list: {
-    paddingHorizontal: 16,
+    paddingHorizontal: PANE_PADDING,
   },
   emptyContainer: {
     flex: 1,

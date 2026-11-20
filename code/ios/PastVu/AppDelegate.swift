@@ -2,17 +2,18 @@ internal import Expo
 import React
 import ReactAppDependencyProvider
 
-/// Shows wherever React has not drawn yet, e.g. while a tablet turns to landscape at launch.
+/// Shows wherever React has not drawn yet, e.g. for a moment while the screen rotates.
 /// RN's default, systemBackground, is pure black in dark mode: use the app's dark grey instead
 /// (backgroundApp in core/components/theme/Theme.ts). Light mode stays white.
-private let appBackgroundColor = UIColor { traits in
+/// SceneDelegate puts it on the window, ReactNativeDelegate on the root view.
+let appBackgroundColor = UIColor { traits in
   traits.userInterfaceStyle == .dark
     ? UIColor(red: 0x1C / 255.0, green: 0x1C / 255.0, blue: 0x1E / 255.0, alpha: 1)
     : .white
 }
 
 @main
-class AppDelegate: ExpoAppDelegate {
+class AppDelegate: ExpoAppDelegate, ExpoReactNativeFactoryProvider {
   var window: UIWindow?
 
   var reactNativeDelegate: ExpoReactNativeFactoryDelegate?
@@ -29,35 +30,9 @@ class AppDelegate: ExpoAppDelegate {
     reactNativeDelegate = delegate
     reactNativeFactory = factory
 
-#if os(iOS) || os(tvOS)
-    window = UIWindow(frame: UIScreen.main.bounds)
-    window?.backgroundColor = appBackgroundColor
-    factory.startReactNative(
-      withModuleName: "main",
-      in: window,
-      launchOptions: launchOptions)
-#endif
-
+    // The window is created and React Native is started by `SceneDelegate` under the
+    // scene-based life cycle (required by the iOS 27 SDK).
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
-  }
-
-  // Linking API
-  public override func application(
-    _ app: UIApplication,
-    open url: URL,
-    options: [UIApplication.OpenURLOptionsKey: Any] = [:]
-  ) -> Bool {
-    return super.application(app, open: url, options: options) || RCTLinkingManager.application(app, open: url, options: options)
-  }
-
-  // Universal Links
-  public override func application(
-    _ application: UIApplication,
-    continue userActivity: NSUserActivity,
-    restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void
-  ) -> Bool {
-    let result = RCTLinkingManager.application(application, continue: userActivity, restorationHandler: restorationHandler)
-    return super.application(application, continue: userActivity, restorationHandler: restorationHandler) || result
   }
 }
 

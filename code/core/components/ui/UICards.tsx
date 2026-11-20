@@ -1,18 +1,27 @@
 import { useTheme } from '@react-navigation/native'
 import { FC, ReactNode } from 'react'
-import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native'
+import {
+  AccessibilityState,
+  Platform,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native'
 
 type UICardProps = {
   children: ReactNode[] | ReactNode
   onPress?: () => void
+  /** Read out by screen readers on a pressable card, e.g. which of several cards is selected. */
+  accessibilityState?: AccessibilityState
 }
 
-export const UICard: FC<UICardProps> = ({ children, onPress }) => {
+export const UICard: FC<UICardProps> = ({ children, onPress, accessibilityState }) => {
   const { colors } = useTheme()
   if (onPress) {
     return (
       <TouchableOpacity
         onPress={onPress}
+        accessibilityState={accessibilityState}
         style={[s.container, { backgroundColor: colors.baseSecond }]}>
         {children}
       </TouchableOpacity>

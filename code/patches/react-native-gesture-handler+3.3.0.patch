@@ -1,0 +1,103 @@
+diff --git a/node_modules/react-native-gesture-handler/react-native.config.js b/node_modules/react-native-gesture-handler/react-native.config.js
+index d19502f..0e6692e 100644
+--- a/node_modules/react-native-gesture-handler/react-native.config.js
++++ b/node_modules/react-native-gesture-handler/react-native.config.js
+@@ -2,8 +2,12 @@ module.exports = {
+   dependency: {
+     platforms: {
+       android: {
++        // PastVu: backport of #4521 (3.4.0). Listing any descriptor disables autodetection,
++        // so every one must be here, or Button and RootView get no descriptor registered.
+         componentDescriptors: [
++          'RNGestureHandlerButtonComponentDescriptor',
+           'RNGestureHandlerDetectorComponentDescriptor',
++          'RNGestureHandlerRootViewComponentDescriptor',
+         ],
+         cmakeListsPath: './CMakeLists.txt',
+       },
+diff --git a/node_modules/react-native-gesture-handler/src/index.ts b/node_modules/react-native-gesture-handler/src/index.ts
+index 42e2c5e..7ecfc78 100644
+--- a/node_modules/react-native-gesture-handler/src/index.ts
++++ b/node_modules/react-native-gesture-handler/src/index.ts
+@@ -1,27 +1,20 @@
++// PastVu: the app and its libraries (react-navigation stack, zoom toolkit, screens) use only the
++// gesture API (Gesture, GestureDetector, the gesture hooks, PanGestureHandler, State) and
++// GestureHandlerRootView. The component wrappers (Legacy* and v3 buttons, touchables, ScrollView
++// and friends, Pressable, Text, legacy_createNativeWrapper) are never imported, and Metro has no
++// tree shaking, so their value exports are removed here and in v3/index.ts to keep them out of the
++// bundle. Their types stay exported, so an import of a removed component still type-checks but is
++// undefined at runtime: restore its export first.
+ import './globals';
+ 
+ import { initialize } from './init';
+ 
+-export {
+-  LegacyBaseButton,
+-  LegacyBorderlessButton,
+-  LegacyRawButton,
+-  LegacyRectButton,
+-} from './components/GestureButtons';
+ export type {
+   LegacyBaseButtonProps,
+   LegacyBorderlessButtonProps,
+   LegacyRawButtonProps,
+   LegacyRectButtonProps,
+ } from './components/GestureButtonsProps';
+-export {
+-  LegacyDrawerLayoutAndroid,
+-  LegacyFlatList,
+-  LegacyRefreshControl,
+-  LegacyScrollView,
+-  LegacySwitch,
+-  LegacyTextInput,
+-} from './components/GestureComponents';
+ export { default as GestureHandlerRootView } from './components/GestureHandlerRootView';
+ export type {
+   LegacyPressableProps,
+@@ -29,21 +22,12 @@ export type {
+   PressableProps,
+   PressableStateCallbackType,
+ } from './components/Pressable';
+-export { default as LegacyPressable } from './components/Pressable';
+-export { LegacyText } from './components/Text';
+ export type {
+   TouchableHighlightProps,
+   TouchableOpacityProps,
+   TouchableWithoutFeedbackProps,
+ } from './components/touchables';
+-export {
+-  TouchableHighlight,
+-  TouchableNativeFeedback,
+-  TouchableOpacity,
+-  TouchableWithoutFeedback,
+-} from './components/touchables';
+ export { Directions } from './Directions';
+-export { default as legacy_createNativeWrapper } from './handlers/createNativeWrapper';
+ export type { FlingGestureHandlerProps } from './handlers/FlingGestureHandler';
+ export { FlingGestureHandler } from './handlers/FlingGestureHandler';
+ export type { ForceTouchGestureHandlerProps } from './handlers/ForceTouchGestureHandler';
+diff --git a/node_modules/react-native-gesture-handler/src/v3/index.ts b/node_modules/react-native-gesture-handler/src/v3/index.ts
+index d226128..a8dfa51 100644
+--- a/node_modules/react-native-gesture-handler/src/v3/index.ts
++++ b/node_modules/react-native-gesture-handler/src/v3/index.ts
+@@ -5,19 +5,7 @@ export type {
+   RectButtonProps,
+   TouchableProps,
+ } from './components';
+-export {
+-  BaseButton,
+-  BorderlessButton,
+-  FlatList,
+-  Pressable,
+-  RawButton,
+-  RectButton,
+-  RefreshControl,
+-  ScrollView,
+-  Switch,
+-  TextInput,
+-  Touchable,
+-} from './components';
++// PastVu: the component value exports are removed, see the note in src/index.ts.
+ export type { GestureDetectorProps } from './detectors';
+ export {
+   GestureDetector,

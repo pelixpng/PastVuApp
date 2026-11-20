@@ -1,8 +1,13 @@
 package com.pelixpng.PastVuApp
 import expo.modules.splashscreen.SplashScreenManager
 
+import android.content.pm.ActivityInfo
+import android.content.res.Configuration
+import android.graphics.Point
 import android.os.Build
 import android.os.Bundle
+import android.util.DisplayMetrics
+import kotlin.math.min
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
@@ -21,6 +26,46 @@ class MainActivity : ReactActivity() {
     SplashScreenManager.registerOnActivity(this)
     // @generated end expo-splashscreen
     super.onCreate(null)
+    lockPhonesToPortrait(resources.configuration)
+  }
+
+  /**
+   * A foldable moves between its screens without being recreated (configChanges in the manifest),
+   * keeping the orientation asked for on the other one. Asked again, folded it gets the phone's
+   * lock and unfolded none, which Android 15 and earlier honour on the inner screen too.
+   */
+  override fun onConfigurationChanged(newConfig: Configuration) {
+    super.onConfigurationChanged(newConfig)
+    lockPhonesToPortrait(newConfig)
+  }
+
+  /**
+   * Phones stay upright and tablets turn freely. A phone's screen is under 600 dp on its shorter
+   * side, the line at which App.tsx shows the phone's interface (ANDROID_TABLET_MIN_WIDTH).
+   */
+  private fun lockPhonesToPortrait(config: Configuration) {
+    val orientation =
+      if (screenSmallestWidthDp(config) < 600f) ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+      else ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+    if (requestedOrientation != orientation) requestedOrientation = orientation
+  }
+
+  /**
+   * The shorter side of the screen the activity is on, in dp. The screen's, not the window's: a
+   * split-screen window turns with the screen anyway, and a window boxed upright by the lock on an
+   * unfolded inner screen could measure under the line and keep itself locked.
+   */
+  private fun screenSmallestWidthDp(config: Configuration): Float {
+    val density = config.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+      // Not the configuration's smallest width: in split-screen it is the window's there.
+      val size = Point()
+      @Suppress("DEPRECATION")
+      windowManager.defaultDisplay.getRealSize(size)
+      return min(size.x, size.y) / density
+    }
+    val bounds = windowManager.maximumWindowMetrics.bounds
+    return min(bounds.width(), bounds.height()) / density
   }
 
   /**

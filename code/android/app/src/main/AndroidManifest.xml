@@ -39,6 +39,7 @@
       </intent-filter>
     </activity>
     <service android:name="expo.modules.location.services.LocationTaskService" tools:node="remove"/>
+    <service android:name="expo.modules.location.next.locationForegroundService.LocationForegroundService" tools:node="remove"/>
     <uses-library android:name="org.apache.http.legacy" android:required="false"/>
   </application>
 </manifest>
